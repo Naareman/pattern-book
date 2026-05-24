@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG — The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f7f3e9;
+    --paper-warm: #f0e9d6;
+    --ink: #1a1816;
+    --ink-soft: #4a4640;
+    --ink-faint: #9b9588;
+    --rule: #d6cdb5;
+    --red: #d94f3a;
+    --green: #4a7d4d;
+    --yellow: #e6b54a;
+    --blue: #4574a8;
+    --pink: #d97a8f;
+    --shadow: 0 4px 0 0 var(--ink);
+    --shadow-press: 0 1px 0 0 var(--ink);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+  body {
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 12% 25%, rgba(217, 79, 58, 0.04) 0%, transparent 30%),
+      radial-gradient(circle at 88% 70%, rgba(74, 125, 77, 0.04) 0%, transparent 30%);
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .serif { font-family: 'Fraunces', serif; }
+
+  /* ============ TERM DEFINITIONS ============ */
+  .term {
+    background: linear-gradient(180deg, transparent 60%, var(--yellow) 60%);
+    cursor: help;
+    border-bottom: 1.5px dotted var(--ink);
+    padding: 0 2px;
+    position: relative;
+    font-weight: 500;
+    transition: background 0.15s ease;
+  }
+  .term:hover { background: linear-gradient(180deg, transparent 30%, var(--yellow) 30%); }
+  .term::after {
+    content: attr(data-def);
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.4;
+    width: max-content;
+    max-width: 280px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 100;
+    text-align: center;
+    box-shadow: 0 4px 0 0 rgba(0,0,0,0.1);
+  }
+  .term::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    border: 6px solid transparent;
+    border-top-color: var(--ink);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 100;
+  }
+  .term:hover::after,
+  .term:hover::before,
+  .term:focus::after,
+  .term:focus::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ============ HEADER ============ */
+  .header {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 32px 24px;
+  }
+  .breadcrumb {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .breadcrumb .sep { color: var(--ink-faint); }
+  .breadcrumb a, .breadcrumb span.current { color: var(--ink-soft); }
+  .breadcrumb span.current { color: var(--red); font-weight: 700; }
+
+  h1.pattern-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(56px, 9vw, 110px);
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+  .full-name {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--ink-soft);
+    margin-bottom: 28px;
+  }
+  .meta-strip {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    padding: 16px 0;
+    border-top: 1.5px solid var(--ink);
+    border-bottom: 1.5px solid var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .meta-strip .item { color: var(--ink-soft); }
+  .meta-strip .item strong { display: block; color: var(--ink-faint); font-size: 9px; font-weight: 500; margin-bottom: 4px; }
+  .complexity-dots { display: inline-flex; gap: 3px; }
+  .complexity-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--rule);
+    border: 1px solid var(--ink);
+  }
+  .complexity-dots span.on { background: var(--red); }
+
+  /* ============ SECTIONS ============ */
+  section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 50px 32px;
+    position: relative;
+  }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: clamp(32px, 4.5vw, 48px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+  h2 em { font-style: italic; color: var(--red); }
+
+  /* ============ THE IDEA ============ */
+  .idea-stage {
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    padding: 36px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  .tagline-big {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(28px, 4vw, 38px);
+    line-height: 1.25;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+  }
+  .tagline-big strong { color: var(--red); font-weight: 700; }
+  .idea-tip {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  /* ============ DATA FLOW ============ */
+  .diagram-stage {
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    padding: 36px 24px 24px;
+    box-shadow: var(--shadow);
+  }
+  .diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 120px;
+    padding: 8px 0;
+    margin-bottom: 28px;
+  }
+  .node {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    box-shadow: 0 3px 0 0 var(--ink);
+    transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    min-width: 80px;
+    text-align: center;
+    will-change: transform;
+  }
+  .node .sub {
+    display: block;
+    margin-top: 4px;
+    font-size: 9px;
+    color: var(--ink-faint);
+    text-transform: none;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+  .node.active {
+    background: var(--red);
+    color: white;
+    border-color: var(--ink);
+    transform: translateY(-4px);
+    box-shadow: 0 7px 0 0 var(--ink);
+  }
+  .node.active .sub { color: rgba(255,255,255,0.85); }
+  .node.done {
+    background: #f0f5ee;
+    border-color: var(--green);
+    box-shadow: 0 3px 0 0 var(--green);
+  }
+  .arrow-mark {
+    color: var(--ink-faint);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    transition: color 0.3s ease;
+  }
+  .arrow-mark.active { color: var(--red); }
+  .arrow-mark.done { color: var(--green); }
+
+  .diagram-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 18px;
+    border-top: 1.5px dashed var(--rule);
+    gap: 14px;
+    flex-wrap: wrap;
+    min-height: 60px;
+  }
+  .step-info {
+    flex: 1;
+    min-width: 200px;
+    min-height: 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .step-info .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .step-info .step-text {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--ink);
+    line-height: 1.3;
+    min-height: 1.3em;
+  }
+  .diagram-btns { display: flex; gap: 8px; }
+  .diagram-btn {
+    padding: 10px 16px;
+    border: 2px solid var(--ink);
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    box-shadow: 0 3px 0 0 var(--ink);
+    transition: all 0.1s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); }
+  .diagram-btn:active { transform: translate(0, 2px); box-shadow: 0 1px 0 0 var(--ink); }
+  .diagram-btn.primary { background: var(--yellow); }
+
+  /* ============ WHEN IT WORKS / FAILS ============ */
+  .test-stage {
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .test-instruction {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .queries { display: flex; flex-direction: column; gap: 10px; }
+  .query-card {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 0 0 var(--ink);
+    position: relative;
+  }
+  .query-card:hover { transform: translateY(-1px); box-shadow: 0 3px 0 0 var(--ink); }
+  .query-card .q {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--ink);
+    transition: margin 0.3s ease;
+  }
+  .query-card .verdict {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, margin 0.3s ease;
+    font-weight: 700;
+  }
+  .query-card .verdict span.body {
+    font-family: 'Inter', sans-serif;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--ink-soft);
+    display: block;
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+  .query-card.revealed .verdict { max-height: 200px; margin-top: 14px; }
+  .query-card.good { background: #f0f5ee; border-color: var(--green); box-shadow: 0 2px 0 0 var(--green); }
+  .query-card.bad { background: #fde8e4; border-color: var(--red); box-shadow: 0 2px 0 0 var(--red); }
+  .query-card.good .verdict { color: var(--green); }
+  .query-card.bad .verdict { color: var(--red); }
+  .query-tracker {
+    margin-top: 16px;
+    padding: 12px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: 1.5px dashed var(--rule);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+  .query-tracker.complete {
+    background: var(--ink);
+    color: var(--yellow);
+    border-style: solid;
+    border-color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* ============ WORKED EXAMPLE — DOSSIER STYLE ============ */
+  .dossier {
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  .dossier::before {
+    content: 'CASE FILE';
+    position: absolute;
+    top: -10px;
+    right: 24px;
+    background: var(--ink);
+    color: var(--yellow);
+    padding: 3px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    font-weight: 700;
+    border-radius: 2px;
+  }
+  .dossier-q {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-bottom: 22px;
+    box-shadow: 0 2px 0 0 var(--ink);
+  }
+  .dossier-q .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .dossier-q .text {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+  .dossier-step {
+    display: flex;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px dashed var(--rule);
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .dossier-step.shown { opacity: 1; transform: translateX(0); }
+  .dossier-step:last-of-type { border-bottom: none; }
+  .dossier-step .icon {
+    width: 32px;
+    height: 32px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 2px 0 0 var(--ink);
+  }
+  .dossier-step.done .icon {
+    background: var(--green);
+    color: white;
+    border-color: var(--green);
+    box-shadow: 0 2px 0 0 var(--ink);
+  }
+  .dossier-step .body { flex: 1; }
+  .dossier-step .head {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .dossier-step .detail {
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .dossier-step .detail code {
+    background: var(--paper);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    border: 1px solid var(--rule);
+  }
+  .dossier-step .detail .pull-quote {
+    display: block;
+    margin-top: 6px;
+    padding: 8px 12px;
+    background: #fffbed;
+    border-left: 3px solid var(--yellow);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .dossier-final {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 4px;
+    padding: 18px 22px;
+    margin-top: 18px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .dossier-final.shown { opacity: 1; transform: translateY(0); }
+  .dossier-final .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    color: var(--yellow);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .dossier-final .answer {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    line-height: 1.4;
+  }
+  .dossier-final .cite {
+    color: var(--yellow);
+    font-weight: 700;
+    font-style: italic;
+  }
+  .dossier-replay {
+    margin-top: 18px;
+    text-align: center;
+  }
+  .dossier-replay button {
+    padding: 9px 18px;
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    box-shadow: var(--shadow);
+    transition: all 0.1s ease;
+  }
+  .dossier-replay button:hover { transform: translateY(-1px); }
+  .dossier-replay button:active { transform: translate(0, 3px); box-shadow: var(--shadow-press); }
+
+  /* ============ CODE ============ */
+  .code-stage {
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .code-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  pre.code {
+    background: var(--paper);
+    border-radius: 4px;
+    padding: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink);
+    overflow-x: auto;
+    margin-bottom: 14px;
+  }
+  .code-line {
+    cursor: pointer;
+    padding: 2px 6px;
+    margin: 0 -6px;
+    border-radius: 3px;
+    transition: background 0.15s ease;
+    display: block;
+  }
+  .code-line:hover { background: var(--paper-warm); }
+  .code-line.active { background: var(--yellow); }
+  .code-line .comment { color: var(--ink-faint); }
+  .code-line .kw { color: var(--red); font-weight: 700; }
+  .code-line .str { color: var(--green); }
+  .code-explainer {
+    background: var(--paper);
+    border: 1.5px dashed var(--rule);
+    border-radius: 4px;
+    padding: 16px;
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    color: var(--ink);
+    min-height: 60px;
+    line-height: 1.4;
+  }
+  .code-explainer .hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ============ TRADEOFFS ============ */
+  .tradeoffs-stage {
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+  }
+  .tradeoff-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+    min-width: 100px;
+  }
+  .tradeoff-bars { flex: 1; display: flex; gap: 4px; }
+  .tradeoff-bars .seg {
+    flex: 1;
+    height: 22px;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    border-radius: 2px;
+  }
+  .tradeoff-bars .seg.on { background: var(--red); }
+  .tradeoff-bars .seg.on-y { background: var(--yellow); }
+  .tradeoff-bars .seg.on-g { background: var(--green); }
+  .tradeoff-quote {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1.5px dashed var(--rule);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 22px;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .tradeoff-quote::before { content: '— '; color: var(--red); }
+
+  /* ============ RELATED ============ */
+  .related-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 700px) { .related-list { grid-template-columns: 1fr; } }
+  .related-item {
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 3px 0 0 var(--ink);
+  }
+  .related-item:hover { transform: translateY(-2px); box-shadow: 0 5px 0 0 var(--ink); }
+  .related-item .home {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .related-item .name {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .related-item .why {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+
+  footer {
+    max-width: 900px;
+    margin: 40px auto 60px;
+    padding: 32px 32px;
+    text-align: center;
+    border-top: 1.5px solid var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    line-height: 1.8;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    color: var(--ink);
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+  .back-link:hover {
+    transform: translate(-2px, -1px);
+    box-shadow: 6px 5px 0 0 var(--ink);
+  }
+  .back-link:active {
+    transform: translate(0, 2px);
+    box-shadow: 0 2px 0 0 var(--ink);
+  }
+  .back-arrow {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    color: var(--red);
+    font-weight: 700;
+    line-height: 1;
+  }
+  .back-link:hover .back-arrow {
+    transform: translateX(-3px);
+    transition: transform 0.2s ease;
+  }
+  .back-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .back-name {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .legend {
+    background: white;
+    border: 2px dashed var(--ink);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-top: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    line-height: 1.8;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .legend-empty {
+    color: var(--ink-faint);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-align: center;
+    transition: opacity 0.3s ease;
+  }
+  .legend-empty.hidden { display: none; }
+  .legend-row {
+    padding: 6px 10px;
+    margin: 0 -10px;
+    border-radius: 3px;
+    background: var(--yellow);
+    color: var(--ink);
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.35s ease, max-height 0.35s ease, padding 0.3s ease;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .legend-row.shown {
+    opacity: 1;
+    max-height: 80px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+  .legend-row strong { color: var(--ink); }
+  .legend strong { display: inline-block; min-width: 70px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="breadcrumb">
+    <a>The Pattern Book</a>
+    <span class="sep">/</span>
+    <a>L3a · Stateless Retrieval</a>
+    <span class="sep">/</span>
+    <a>Retrieval Strategies</a>
+    <span class="sep">/</span>
+    <span class="current">RAG</span>
+  </div>
+  <h1 class="pattern-title">RAG.</h1>
+  <div class="full-name">Retrieval-Augmented Generation</div>
+  <div class="meta-strip">
+    <div class="item">
+      <strong>Home</strong>L3a · Retrieval Strategies
+    </div>
+    <div class="item">
+      <strong>Complexity</strong>
+      <div class="complexity-dots">
+        <span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span>
+      </div>
+    </div>
+    <div class="item">
+      <strong>Tags</strong>stateless · grounded · cite-able
+    </div>
+    <div class="item">
+      <strong>Updated</strong>May 2026
+    </div>
+  </div>
+</header>
+
+<!-- 01 · THE IDEA -->
+<section>
+  <div class="section-label">01 · The Idea</div>
+  <h2>What is <em>RAG</em>?</h2>
+  <div class="idea-stage">
+    <div class="tagline-big">
+      Models don't know <strong>your</strong> documents. RAG fixes that — <strong>look them up first</strong>, then ask the model to answer using them.
+    </div>
+    <div class="idea-tip">↓ How it works lives in Section 02</div>
+  </div>
+</section>
+
+<!-- 02 · DATA FLOW -->
+<section>
+  <div class="section-label">02 · Data Flow</div>
+  <h2>How it <em>moves</em>.</h2>
+  <div class="diagram-stage">
+    <div class="diagram" id="diagram">
+      <div class="node" data-step="0">USER<span class="sub">Question</span></div>
+      <span class="arrow-mark" data-step="0">→</span>
+      <div class="node" data-step="1">EMBED<span class="sub">→ vector</span></div>
+      <span class="arrow-mark" data-step="1">→</span>
+      <div class="node" data-step="2">SEARCH<span class="sub">Top-k docs</span></div>
+      <span class="arrow-mark" data-step="2">→</span>
+      <div class="node" data-step="3">MODEL<span class="sub">+ context</span></div>
+      <span class="arrow-mark" data-step="3">→</span>
+      <div class="node" data-step="4">USER<span class="sub">Cited answer</span></div>
+    </div>
+    <div class="diagram-controls">
+      <div class="step-info">
+        <div class="step-num" id="stepNum">Step 0 of 5</div>
+        <div class="step-text" id="stepText">Press play to walk through each step.</div>
+      </div>
+      <div class="diagram-btns">
+        <button class="diagram-btn" id="stepBtn">→ Step</button>
+        <button class="diagram-btn primary" id="playFlowBtn">▶ Play</button>
+        <button class="diagram-btn" id="resetBtn">⟲ Reset</button>
+      </div>
+    </div>
+    <div class="legend" id="legend">
+      <div class="legend-empty" id="legendEmpty">Step through the flow ↑ Definitions appear here</div>
+      <div class="legend-row" data-step="1">
+        <strong>EMBED</strong>turn text into a <span class="term" data-def="A list of numbers that represents the meaning of text. Similar meanings get similar lists.">vector</span> (a list of numbers)
+      </div>
+      <div class="legend-row" data-step="2">
+        <strong>SEARCH</strong>find <span class="term" data-def="The K most similar items from your corpus. Usually 3–10. Higher K = more context but more noise.">top-k</span> closest <span class="term" data-def="Small pieces of your documents. Long docs get split into chunks so the search can find specific passages.">chunks</span> from your <span class="term" data-def="The full collection of documents you're searching over. Could be company docs, a website, anything.">corpus</span>
+      </div>
+      <div class="legend-row" data-step="3">
+        <strong>MODEL</strong>language model reads the chunks and answers
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 · THE TEST -->
+<section>
+  <div class="section-label">03 · When it Works · When it Fails</div>
+  <h2>Will RAG <em>handle this</em>?</h2>
+  <div class="test-stage">
+    <div class="test-instruction">Tap each question. Find out which RAG can answer and which it can't.</div>
+    <div class="queries" id="queries">
+      <div class="query-card" data-verdict="good" data-reason="RAG was built for this. Look up the policy doc, answer from it, cite the section.">
+        <div class="q">"What's our company's parental leave policy?"</div>
+        <div class="verdict">Handles it ✓<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="good" data-reason="The retriever pulls product docs into the prompt. The model can't make up a fake method because the real docs are right there.">
+        <div class="q">"How do I refund a charge with the Stripe API?"</div>
+        <div class="verdict">Handles it ✓<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="bad" data-reason="There's nothing to look up. The answer is in reasoning, not in any document. RAG just adds noise here.">
+        <div class="q">"If a train leaves Boston at 3pm going 60mph..."</div>
+        <div class="verdict">Fails ✗<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="bad" data-reason="RAG only knows what's in your corpus. If the docs are stale or wrong, the answer is too. Bitcoin's price is not sitting in a document.">
+        <div class="q">"What's the current price of Bitcoin?"</div>
+        <div class="verdict">Fails ✗<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="good" data-reason="HR doc gets retrieved, model answers from it, citations point straight to the section.">
+        <div class="q">"Can I work from another country for two months?"</div>
+        <div class="verdict">Handles it ✓<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="bad" data-reason="Pure language task. No facts to look up. RAG adds latency and cost for nothing.">
+        <div class="q">"Translate this paragraph to French."</div>
+        <div class="verdict">Fails ✗<span class="body"></span></div>
+      </div>
+    </div>
+    <div class="query-tracker" id="queryTracker">0 / 6 tested</div>
+  </div>
+</section>
+
+<!-- 04 · WORKED EXAMPLE — DOSSIER -->
+<section>
+  <div class="section-label">04 · Worked Example</div>
+  <h2>One real <em>case</em>.</h2>
+  <div class="dossier">
+    <div class="dossier-q">
+      <div class="label">User asks</div>
+      <div class="text">"Can I work from Portugal for the summer?"</div>
+    </div>
+
+    <div class="dossier-step" data-row="0">
+      <div class="icon">1</div>
+      <div class="body">
+        <div class="head">Embed</div>
+        <div class="detail">Turn the question into a <span class="term" data-def="A list of numbers that represents the meaning of text. Similar meanings get similar lists of numbers.">vector</span> like <code>[0.21, -0.84, 0.12, ...]</code>. The numbers themselves don't matter to you — they let the computer measure similarity.</div>
+      </div>
+    </div>
+
+    <div class="dossier-step" data-row="1">
+      <div class="icon">2</div>
+      <div class="body">
+        <div class="head">Search</div>
+        <div class="detail">Compare the vector to every <span class="term" data-def="Small pieces of your documents. Long docs get split so search can find specific passages, not just whole documents.">chunk</span> in the corpus. Pull the 3 most similar:
+          <span class="pull-quote">📄 HR Handbook §6.1 — "Remote Work International"<br>📄 HR Handbook §4.2 — "Leave & Time Off"<br>📄 HR Handbook §6.3 — "Tax Implications Abroad"</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dossier-step" data-row="2">
+      <div class="icon">3</div>
+      <div class="body">
+        <div class="head">Build the prompt</div>
+        <div class="detail">Stick the chunks into the prompt, before the question. The model now has everything it needs to answer specifically.</div>
+      </div>
+    </div>
+
+    <div class="dossier-step" data-row="3">
+      <div class="icon">4</div>
+      <div class="body">
+        <div class="head">Generate</div>
+        <div class="detail">The model reads the chunks and writes an answer. Because the policy text is right there, it can quote it directly and cite the section.</div>
+      </div>
+    </div>
+
+    <div class="dossier-final" data-row="4">
+      <div class="label">→ Answer returned to user</div>
+      <div class="answer">"Yes — you can work internationally for up to 30 days per year with manager approval. Portugal for the full summer would exceed the limit, so you'd need a special arrangement. <span class="cite">(per §6.1)</span>"</div>
+    </div>
+
+    <div class="dossier-replay">
+      <button id="dossierReplay">▶ Replay Case</button>
+    </div>
+  </div>
+</section>
+
+<!-- 05 · CODE -->
+<section>
+  <div class="section-label">05 · Code Sketch</div>
+  <h2>The <em>shape</em> in code.</h2>
+  <div class="code-stage">
+    <div class="code-hint">Hover any line to see what it does.</div>
+    <pre class="code"><code id="codeBlock"><span class="code-line" data-line="0"><span class="comment"># 1. find the most relevant documents</span></span>
+<span class="code-line" data-line="1">docs = retrieve(query, top_k=<span class="str">3</span>)</span>
+<span class="code-line" data-line="2"> </span>
+<span class="code-line" data-line="3"><span class="comment"># 2. build a prompt that includes them</span></span>
+<span class="code-line" data-line="4">prompt = <span class="str">f"Answer using:</span><span class="kw">\n</span><span class="str">{docs}</span><span class="kw">\n\n</span><span class="str">Q: {query}"</span></span>
+<span class="code-line" data-line="5"> </span>
+<span class="code-line" data-line="6"><span class="comment"># 3. ask the model, return answer + sources</span></span>
+<span class="code-line" data-line="7">answer = model(prompt)</span>
+<span class="code-line" data-line="8"><span class="kw">return</span> answer, docs</span></code></pre>
+    <div class="code-explainer" id="codeExplainer">
+      <div class="hint">Hover a line ↑</div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 · TRADEOFFS -->
+<section>
+  <div class="section-label">06 · Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-g"></div>
+        <div class="seg on-g"></div>
+        <div class="seg on-y"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-g"></div>
+        <div class="seg on-y"></div>
+        <div class="seg on-y"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Complexity</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-g"></div>
+        <div class="seg on-y"></div>
+        <div class="seg on-y"></div>
+        <div class="seg on"></div>
+        <div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Cheap. Fast. Cite-able. Only as good as your retriever.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="#" class="back-link">
+    <div class="back-arrow">←</div>
+    <div class="back-text">
+      <div class="back-hint">Back to category</div>
+      <div class="back-name">L3a · Retrieval Strategies</div>
+    </div>
+  </a>
+</section>
+
+<footer>
+  L3a · Retrieval Strategies · The Pattern Book<br>
+  Pattern 01
+</footer>
+
+<script>
+// ============ DIAGRAM ============
+const nodes = document.querySelectorAll('.node');
+const arrows = document.querySelectorAll('.arrow-mark');
+const stepNum = document.getElementById('stepNum');
+const stepText = document.getElementById('stepText');
+const stepBtn = document.getElementById('stepBtn');
+const playFlowBtn = document.getElementById('playFlowBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+const stepLabels = [
+  { num: 'Step 1 of 5', text: 'User sends a question.' },
+  { num: 'Step 2 of 5', text: 'Question becomes a vector (a list of numbers).' },
+  { num: 'Step 3 of 5', text: 'Search finds the most similar chunks.' },
+  { num: 'Step 4 of 5', text: 'Model gets question + chunks, writes answer.' },
+  { num: 'Step 5 of 5', text: 'User receives a grounded, cite-able answer.' }
+];
+
+let currentStep = -1;
+
+function setStep(s) {
+  nodes.forEach(n => n.classList.remove('active', 'done'));
+  arrows.forEach(a => a.classList.remove('active', 'done'));
+  document.querySelectorAll('.legend-row').forEach(r => r.classList.remove('shown'));
+  const legendEmpty = document.getElementById('legendEmpty');
+  if (s < 0) {
+    stepNum.textContent = 'Step 0 of 5';
+    stepText.textContent = 'Press play to walk through each step.';
+    if (legendEmpty) legendEmpty.classList.remove('hidden');
+    return;
+  }
+  for (let i = 0; i < s; i++) {
+    nodes[i].classList.add('done');
+    if (arrows[i]) arrows[i].classList.add('done');
+  }
+  nodes[s].classList.add('active');
+  if (arrows[s]) arrows[s].classList.add('active');
+  stepNum.textContent = stepLabels[s].num;
+  stepText.textContent = stepLabels[s].text;
+  // reveal only the legend row for this step (if one exists)
+  const matchingLegend = document.querySelector(`.legend-row[data-step="${s}"]`);
+  if (matchingLegend) {
+    matchingLegend.classList.add('shown');
+    if (legendEmpty) legendEmpty.classList.add('hidden');
+  } else {
+    if (legendEmpty) legendEmpty.classList.remove('hidden');
+  }
+}
+
+stepBtn.addEventListener('click', () => {
+  currentStep = (currentStep + 1) % 5;
+  setStep(currentStep);
+});
+
+let playing = false;
+playFlowBtn.addEventListener('click', async () => {
+  if (playing) return;
+  playing = true;
+  playFlowBtn.disabled = true;
+  for (let i = 0; i < 5; i++) {
+    currentStep = i;
+    setStep(i);
+    await sleep(800);
+  }
+  await sleep(300);
+  nodes.forEach(n => n.classList.remove('active'));
+  nodes.forEach(n => n.classList.add('done'));
+  arrows.forEach(a => a.classList.remove('active'));
+  arrows.forEach(a => a.classList.add('done'));
+  document.querySelectorAll('.legend-row').forEach(r => r.classList.remove('shown'));
+  const legendEmpty = document.getElementById('legendEmpty');
+  if (legendEmpty) legendEmpty.classList.remove('hidden');
+  stepNum.textContent = 'Complete';
+  stepText.textContent = '✓ All five steps done.';
+  playing = false;
+  playFlowBtn.disabled = false;
+});
+
+resetBtn.addEventListener('click', () => {
+  currentStep = -1;
+  setStep(-1);
+});
+
+// ============ QUERIES ============
+const queryCards = document.querySelectorAll('.query-card');
+const queryTracker = document.getElementById('queryTracker');
+const tested = new Set();
+
+queryCards.forEach(card => {
+  card.addEventListener('click', () => {
+    if (card.classList.contains('revealed')) return;
+    card.classList.add('revealed');
+    card.classList.add(card.dataset.verdict);
+    card.querySelector('.verdict .body').textContent = card.dataset.reason;
+    tested.add(card);
+    const n = tested.size;
+    if (n === queryCards.length) {
+      queryTracker.textContent = '✓ All 6 tested — pattern understood';
+      queryTracker.classList.add('complete');
+    } else {
+      queryTracker.textContent = `${n} / 6 tested`;
+    }
+  });
+});
+
+// ============ DOSSIER ============
+const dossierSteps = document.querySelectorAll('.dossier-step');
+const dossierFinal = document.querySelector('.dossier-final');
+const dossierReplay = document.getElementById('dossierReplay');
+
+async function playDossier() {
+  dossierSteps.forEach(s => { s.classList.remove('shown'); s.classList.remove('done'); });
+  dossierFinal.classList.remove('shown');
+  await sleep(200);
+  for (let i = 0; i < dossierSteps.length; i++) {
+    dossierSteps[i].classList.add('shown');
+    await sleep(900);
+    dossierSteps[i].classList.add('done');
+  }
+  await sleep(300);
+  dossierFinal.classList.add('shown');
+}
+
+dossierReplay.addEventListener('click', playDossier);
+const dossierObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      playDossier();
+      dossierObs.disconnect();
+    }
+  });
+}, { threshold: 0.3 });
+dossierObs.observe(document.querySelector('.dossier'));
+
+// ============ CODE ============
+const codeLines = document.querySelectorAll('.code-line');
+const codeExplainer = document.getElementById('codeExplainer');
+
+const codeExplanations = [
+  "Comment marking the first step.",
+  "Pull the top 3 most relevant chunks from your corpus. This is the heart of RAG.",
+  "",
+  "Comment for the prompt-building step.",
+  "Build a prompt that puts the retrieved chunks alongside the question.",
+  "",
+  "Comment for the generation step.",
+  "Send the prompt to the model. It can only use what's in the chunks.",
+  "Return the answer AND the source chunks, so the caller can cite them."
+];
+
+codeLines.forEach(line => {
+  line.addEventListener('mouseenter', () => {
+    codeLines.forEach(l => l.classList.remove('active'));
+    line.classList.add('active');
+    const idx = parseInt(line.dataset.line);
+    const text = codeExplanations[idx];
+    if (text) {
+      codeExplainer.textContent = text;
+    } else {
+      codeExplainer.innerHTML = '<div class="hint">(blank line)</div>';
+    }
+  });
+  line.addEventListener('mouseleave', () => {
+    line.classList.remove('active');
+  });
+});
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+
+</body>
+</html>

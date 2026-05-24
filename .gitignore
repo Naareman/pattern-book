@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# Node (only if a dev server is ever added)
+node_modules/
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+*.swp

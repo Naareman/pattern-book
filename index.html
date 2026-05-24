@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Pattern Book — interactive reference for AI system architecture</title>
+<meta name="description" content="An interactive, visual reference for AI system architecture patterns. Every page is a thing you operate, not a thing you read.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f7f3e9;
+    --paper-warm: #f0e9d6;
+    --ink: #1a1816;
+    --ink-soft: #4a4640;
+    --ink-faint: #9b9588;
+    --rule: #d6cdb5;
+    --red: #d94f3a;
+    --green: #4a7d4d;
+    --yellow: #e6b54a;
+    --blue: #4574a8;
+    --shadow: 0 4px 0 0 var(--ink);
+    --shadow-press: 0 1px 0 0 var(--ink);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+  body {
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 12% 25%, rgba(217, 79, 58, 0.04) 0%, transparent 30%),
+      radial-gradient(circle at 88% 70%, rgba(74, 125, 77, 0.04) 0%, transparent 30%);
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .serif { font-family: 'Fraunces', serif; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 32px; }
+
+  /* ============ HERO ============ */
+  .hero { padding: 64px 0 40px; }
+  .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--red); font-weight: 700; margin-bottom: 20px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif; font-weight: 900;
+    font-size: clamp(42px, 7vw, 76px); line-height: 0.98; letter-spacing: -0.02em;
+    margin-bottom: 22px;
+  }
+  .lede {
+    font-family: 'Fraunces', serif; font-size: clamp(19px, 2.4vw, 24px);
+    line-height: 1.45; color: var(--ink-soft); max-width: 640px; font-weight: 400;
+  }
+  .lede b { color: var(--ink); font-weight: 700; }
+
+  /* ============ STATUS BANNER ============ */
+  .banner {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    margin: 36px 0 8px; padding: 16px 20px;
+    border: 2px solid var(--ink); border-radius: 6px; background: var(--paper-warm);
+    box-shadow: var(--shadow);
+  }
+  .banner .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); flex: none; }
+  .banner .txt { font-size: 14px; color: var(--ink-soft); }
+  .banner .txt b { color: var(--ink); }
+  .banner a {
+    margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--ink); text-decoration: none; border-bottom: 2px solid var(--red); padding-bottom: 2px;
+  }
+  .banner a:hover { color: var(--red); }
+
+  /* ============ SECTION HEADS ============ */
+  .sec-head {
+    display: flex; align-items: baseline; gap: 12px;
+    margin: 64px 0 24px; padding-bottom: 12px; border-bottom: 2px solid var(--rule);
+  }
+  .sec-head .num {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--red);
+  }
+  .sec-head h2 { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; }
+  .sec-head .note { margin-left: auto; font-size: 13px; color: var(--ink-faint); }
+
+  /* ============ LAYER STACK ============ */
+  .stack { display: grid; gap: 12px; }
+  .layer {
+    display: grid; grid-template-columns: 84px 1fr auto; align-items: center; gap: 18px;
+    padding: 18px 22px; border: 2px solid var(--ink); border-radius: 6px;
+    background: #fff; box-shadow: var(--shadow); text-decoration: none; color: inherit;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .layer:hover { transform: translate(-2px, -2px); box-shadow: 0 6px 0 0 var(--ink); }
+  .layer .id {
+    font-family: 'Fraunces', serif; font-weight: 900; font-size: 24px; color: var(--red);
+  }
+  .layer .body .name { font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px; }
+  .layer .body .axis { font-size: 13px; color: var(--ink-soft); margin-top: 3px; }
+  .layer .count {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em;
+    color: var(--ink-faint); text-transform: uppercase; white-space: nowrap;
+  }
+  .layer.live .count { color: var(--green); font-weight: 700; }
+
+  /* ============ CROSSCUTS ============ */
+  .cross { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .cc {
+    padding: 16px 18px; border: 2px solid var(--ink); border-radius: 6px; background: var(--paper-warm);
+  }
+  .cc .id { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--blue); }
+  .cc .name { font-family: 'Fraunces', serif; font-weight: 700; font-size: 16px; margin-top: 4px; }
+  .cc .scope { font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+
+  /* ============ RECIPES ============ */
+  .pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.04em;
+    padding: 8px 14px; border: 1.5px solid var(--ink); border-radius: 20px; background: #fff; color: var(--ink-soft);
+  }
+
+  /* ============ FOOTER ============ */
+  footer {
+    margin-top: 80px; padding: 28px 0 48px; border-top: 2px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--ink-faint); text-align: center;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="kicker">The Pattern Book</div>
+      <h1>AI system patterns,<br>operated not read.</h1>
+      <p class="lede">An interactive reference for AI architecture. Every page is a thing you <b>operate</b>: drag the slider, step the diagram, tap the query. The rule reveals itself through the interaction, the way a children's museum teaches physics.</p>
+
+      <div class="banner">
+        <span class="dot"></span>
+        <span class="txt"><b>1 of 25</b> anchor patterns written. RAG is the calibrated example: this is what "good" looks like.</span>
+        <a href="example/rag.html">Open RAG →</a>
+      </div>
+    </header>
+
+    <section>
+      <div class="sec-head">
+        <span class="num">PART I</span>
+        <h2>The Layers</h2>
+        <span class="note">10 layers · one axis each · top of the stack first</span>
+      </div>
+      <div class="stack">
+        <a class="layer" href="layers/L7.html">
+          <span class="id">L7</span>
+          <span class="body"><span class="name">User Surface &amp; Agency</span><span class="axis">How the user experiences and controls the AI.</span></span>
+          <span class="count">soon</span>
+        </a>
+        <a class="layer" href="layers/L6.html">
+          <span class="id">L6</span>
+          <span class="body"><span class="name">Application Patterns</span><span class="axis">The relationship between input and output.</span></span>
+          <span class="count">soon</span>
+        </a>
+        <a class="layer" href="layers/L5.html">
+          <span class="id">L5</span>
+          <span class="body"><span class="name">Orchestration</span><span class="axis">How calls and actions organize across time and actors.</span></span>
+          <span class="count">soon</span>
+        </a>
+        <a class="layer" href="layers/L4.html">
+          <span class="id">L4</span>
+          <span class="body"><span class="name">Single-Call Control</span><span class="axis">What you shape at which point inside one model call.</span></span>
+          <span class="count">soon</span>
+        </a>
+        <a class="layer" href="layers/L3b.html">
+          <span class="id">L3b</span>
+          <span class="body"><span class="name">Stateful Memory</span><span class="axis">How knowledge accumulates and is recalled across sessions.</span></span>
+          <span class="count">soon</span>
+        </a>
+        <a class="layer live" href="example/rag.html">
+          <span class="id">L3a</span>
+          <span class="body"><span class="name">Stateless Retrieval</span><span class="axis">How external information enters a single call from a corpus.</span></span>
+          <span class="count">1 live · RAG</span>
+        </a>
+        <a class="layer" href="layers/L2.html">
+          <span class="id">L2</span>
+          <span class="body"><span class="name">Structural Composition</span><span class="axis">How multiple calls organize into a single answering act.</span></span>
+          <span class="count">soon</span>
+        </a>
+        <a class="layer" href="layers/L1.html">
+          <span class="id">L1</span>
+          <span class="body"><span class="name">Model Training &amp; Adaptation</span><span class="axis">Training lifecycle stage.</span></span>
+          <span class="count">soon</span>
+        </a>
+        <a class="layer" href="layers/L0.html">
+          <span class="id">L0</span>
+          <span class="body"><span class="name">Serving Infrastructure</span><span class="axis">What the runtime provides between caller and model.</span></span>
+          <span class="count">soon</span>
+        </a>
+        <a class="layer" href="layers/L-1.html">
+          <span class="id">L−1</span>
+          <span class="body"><span class="name">Data &amp; Artifact Lifecycle</span><span class="axis">Lifecycle of the artifacts that feed and define the system.</span></span>
+          <span class="count">soon</span>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head">
+        <span class="num">CROSSCUTS</span>
+        <h2>The Disciplines</h2>
+        <span class="note">ways of reasoning that cut across every layer</span>
+      </div>
+      <div class="cross">
+        <div class="cc"><div class="id">C1</div><div class="name">Evaluation</div><div class="scope">Every AI system.</div></div>
+        <div class="cc"><div class="id">C2</div><div class="name">Safety, Alignment &amp; Refusal</div><div class="scope">Every AI system.</div></div>
+        <div class="cc"><div class="id">C3</div><div class="name">Privacy, Security &amp; Governance</div><div class="scope">Systems handling user data.</div></div>
+        <div class="cc"><div class="id">C4</div><div class="name">Observability &amp; Debuggability</div><div class="scope">Every production system.</div></div>
+        <div class="cc"><div class="id">C5</div><div class="name">Cost, Latency &amp; Reliability</div><div class="scope">Systems with budgets.</div></div>
+        <div class="cc"><div class="id">C6</div><div class="name">Multimodal</div><div class="scope">Vision, audio, mixed.</div></div>
+        <div class="cc"><div class="id">C7</div><div class="name">Real-time / Streaming</div><div class="scope">Sub-second, incremental.</div></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head">
+        <span class="num">PART II</span>
+        <h2>The Recipes</h2>
+        <span class="note">named compositions of Part I patterns</span>
+      </div>
+      <div class="pills">
+        <span class="pill">Conversational Assistant</span>
+        <span class="pill">Document Q&amp;A</span>
+        <span class="pill">Coding Agent</span>
+        <span class="pill">Research Agent</span>
+        <span class="pill">Browsing Agent</span>
+        <span class="pill">Customer Support Agent</span>
+        <span class="pill">Reasoning + Code (PAL)</span>
+        <span class="pill">Summarization Service</span>
+        <span class="pill">Voice Assistant</span>
+        <span class="pill">Multi-Agent Research Team</span>
+      </div>
+    </section>
+
+    <footer>
+      The Pattern Book · A reference you operate · Reference &amp; teacher in one artifact
+    </footer>
+  </div>
+</body>
+</html>
