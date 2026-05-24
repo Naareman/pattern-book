@@ -33,7 +33,7 @@ This is a single-call input-shaping pattern. The diagram is thin on purpose. Do 
 **Diagram (3 nodes):**
 
 ```
-USER  →  MODEL  →  ANSWER
+PROMPT  →  MODEL  →  ANSWER
 (examples + new input)   (reads the pattern)   (same shape as examples)
 ```
 
@@ -46,7 +46,7 @@ USER  →  MODEL  →  ANSWER
 **Step-synced legend (only nodes that need a definition):**
 
 - **PROMPT** — the full text you send the model. Here it holds the examples plus the new input.
-- **MODEL** — the language model. It changes nothing internally; it just conditions its next output on the examples it can see.
+- **MODEL** — the language model. It changes nothing inside itself. It just matches the new input to the pattern in the examples it can see.
 
 **Jargon to define inline (Recipe 7 tooltips):**
 
@@ -81,9 +81,9 @@ Query test cards. Tap to reveal verdict + one-sentence reason. Mix is 3 help / 3
    - Verdict: Fails. (Red)
    - Reason: A few shots cannot cover 30 categories, and they bias the model toward whichever ones you showed.
 
-6. **"Solve this multi-step word problem and explain each step."**
-   - Verdict: Wrong tool. (Red)
-   - Reason: This needs reasoning, not pattern-matching; Chain-of-Thought fits, plain example answers do not.
+6. **"Solve this multi-step word problem; show only the final number."**
+   - Verdict: Fails. (Red)
+   - Reason: Plain input-answer examples teach the format, not the reasoning. To help here, the examples must show the worked steps, which is Chain-of-Thought.
 
 **Tracker:** 0 / 6 tested → ✓ All 6 tested.
 
@@ -97,6 +97,15 @@ One specific real case end to end. A formatting task where 2 examples fix the ou
 
 **User input (the new one to handle):**
 > "send it to apt 4b, 12 oak street, austin tx 78701"
+
+This case has a before state and an after state. The before state is the zero-shot attempt. The after state is the same input with two examples added. Showing both side by side is the punchline: the input never changed, only the examples did.
+
+**Step 0 (before) — Zero-shot attempt fails.**
+With instructions but no examples, the model guesses the shape and gets it wrong:
+```
+{"address":"12 oak street apt 4b","town":"austin","st":"TX","zipcode":78701}
+```
+Invented keys (`address`, `town`, `zipcode`), the unit merged into the street, zip as a number. The shipping API rejects it.
 
 **Step 1 — Write two solved examples.**
 The prompt opens with two messy-in, clean-out pairs:
@@ -114,7 +123,8 @@ The real address is added in the same `In:` line format, with an empty `Out:` fo
 **Step 3 — Model infers the rules from the examples.**
 From two shots it picks up: title-case the street, split the unit into its own field, uppercase the two-letter state, keep zip as a string. None of this was stated in words.
 
-**Step 4 — Model returns the new output in the learned shape.**
+**Step 4 (after) — Model returns the new output in the learned shape.**
+The model now continues the pattern it just saw, filling the empty `Out:` with the exact key set and casing from the examples.
 
 **Final answer:**
 ```
@@ -160,7 +170,7 @@ answer = model(prompt)                           # model fills Out in the shape 
 Three bars (green = low, yellow = medium, red = high) plus one quotable line.
 
 - **Cost:** Low-to-medium (2 of 5). One call, but the examples ride along in every request, so each call costs more tokens than zero-shot.
-- **Latency:** Low (1 of 5). Still a single round-trip; the extra example tokens add a little prefill time, nothing structural.
+- **Latency:** Low (1 of 5). Still a single round-trip. Reading the extra example tokens adds a little time, nothing structural.
 - **Complexity:** Low (1 of 5). No retrieval, no training, no extra calls. The judgment is which examples to show and in what order.
 
 **Quotable line:**

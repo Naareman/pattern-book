@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FCFCFD; --bg-subtle:#F6F7F9; --surface:#FFFFFF;
+    --text:#15171C; --text-soft:#565C68; --text-faint:#8A909C;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    font-feature-settings:"cv11","ss01";
+  }
+  .wrap{
+    max-width:720px;
+    margin:0 auto;
+    padding:72px 24px 96px;
+  }
+
+  /* Hero */
+  .hero{
+    text-align:center;
+    margin-bottom:36px;
+  }
+  .hero h1{
+    font-family:'Fraunces',serif;
+    font-weight:400;
+    font-size:clamp(34px,8vw,52px);
+    letter-spacing:-0.01em;
+    line-height:1.08;
+    color:var(--text);
+  }
+  .hero p{
+    margin:14px auto 0;
+    max-width:460px;
+    font-size:clamp(15px,4vw,17px);
+    color:var(--text-soft);
+    font-weight:400;
+  }
+
+  /* Search */
+  .search{
+    position:relative;
+    margin-bottom:28px;
+  }
+  .search svg{
+    position:absolute;
+    left:18px;
+    top:50%;
+    transform:translateY(-50%);
+    width:18px;height:18px;
+    color:var(--text-faint);
+    pointer-events:none;
+  }
+  .search input{
+    width:100%;
+    font-family:inherit;
+    font-size:16px;
+    color:var(--text);
+    background:var(--surface);
+    border:1px solid var(--border-strong);
+    border-radius:var(--radius);
+    padding:15px 18px 15px 48px;
+    outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+    box-shadow:0 1px 2px rgba(20,23,28,0.03);
+  }
+  .search input::placeholder{color:var(--text-faint)}
+  .search input:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 0 4px var(--accent-soft);
+  }
+
+  /* List */
+  .list{
+    list-style:none;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 1px 3px rgba(20,23,28,0.04);
+  }
+  .row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:15px 18px;
+    border-bottom:1px solid var(--border);
+    text-decoration:none;
+    color:inherit;
+    cursor:default;
+    transition:background .12s ease;
+  }
+  .list .row:last-child{border-bottom:none}
+  a.row{cursor:pointer}
+  a.row:hover{background:var(--bg-subtle)}
+  a.row .name{color:var(--text)}
+  a.row:hover .name{color:var(--accent)}
+
+  .row .main{min-width:0;flex:1}
+  .row .name{
+    font-size:15px;
+    font-weight:500;
+    letter-spacing:-0.005em;
+  }
+  .row .desc{
+    font-size:13.5px;
+    color:var(--text-soft);
+    margin-top:1px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .row .meta{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-shrink:0;
+  }
+  .tag{
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:0.01em;
+    color:var(--text-faint);
+    background:var(--bg-subtle);
+    border:1px solid var(--border);
+    padding:3px 9px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .soon{
+    font-size:11px;
+    color:var(--text-faint);
+    font-style:italic;
+  }
+  .arrow{
+    color:var(--accent);
+    flex-shrink:0;
+    opacity:0;
+    transition:opacity .12s ease, transform .12s ease;
+  }
+  a.row:hover .arrow{opacity:1;transform:translateX(2px)}
+
+  .empty{
+    display:none;
+    text-align:center;
+    padding:32px 18px;
+    color:var(--text-faint);
+    font-size:14px;
+  }
+
+  @media (max-width:480px){
+    .wrap{padding:48px 16px 72px}
+    .row{padding:13px 14px;gap:10px}
+    .row .desc{font-size:13px}
+    .tag{padding:2px 7px}
+    /* hide one-liner on very small screens to keep rows clean */
+  }
+  @media (max-width:380px){
+    .row .desc{white-space:normal}
+    .row .meta{flex-direction:column;align-items:flex-end;gap:4px}
+  }
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <h1>The Pattern Book</h1>
+      <p>An interactive reference for the patterns behind modern AI systems.</p>
+    </header>
+
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input id="q" type="text" placeholder="Search patterns…" autocomplete="off" spellcheck="false" aria-label="Search patterns">
+    </div>
+
+    <ul class="list" id="list">
+      <!-- rows injected by JS -->
+    </ul>
+    <div class="empty" id="empty">No patterns match that.</div>
+  </main>
+
+<script>
+  const patterns = [
+    {name:"RAG", cat:"Retrieval", desc:"Look things up, then answer from them", href:"../../example/rag.html"},
+    {name:"Tool Use", cat:"Retrieval", desc:"Call read-only tools"},
+    {name:"Reranking", cat:"Retrieval", desc:"Reorder results by relevance"},
+    {name:"Hybrid Search", cat:"Retrieval", desc:"Mix keyword and meaning search"},
+    {name:"Chain-of-Thought", cat:"Reasoning", desc:"Make it show its steps", href:"../../patterns/L4-chain-of-thought.html"},
+    {name:"Few-Shot", cat:"Reasoning", desc:"Teach by example"},
+    {name:"Self-Consistency", cat:"Reasoning", desc:"Sample many, take the majority"},
+    {name:"Structured Output", cat:"Reasoning", desc:"Force valid output"},
+    {name:"LLM-as-Judge", cat:"Evaluation", desc:"One model grades another"},
+    {name:"Reflection", cat:"Evaluation", desc:"The model critiques itself"},
+    {name:"ReAct", cat:"Agents", desc:"Think, act, observe, repeat"},
+    {name:"Reflexion", cat:"Agents", desc:"Learn from past attempts"},
+    {name:"Planner & Executor", cat:"Agents", desc:"Plan first, then do"},
+    {name:"Router & Cascade", cat:"Agents", desc:"Cheap model first, escalate"},
+    {name:"Long-Term Memory", cat:"Memory", desc:"Remember across sessions"}
+  ];
+
+  const arrowSVG = '<svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg>';
+
+  const list = document.getElementById('list');
+  const empty = document.getElementById('empty');
+  const q = document.getElementById('q');
+
+  function rowMarkup(p){
+    const inner =
+      '<div class="main">' +
+        '<div class="name">' + esc(p.name) + '</div>' +
+        '<div class="desc">' + esc(p.desc) + '</div>' +
+      '</div>' +
+      '<div class="meta">' +
+        '<span class="tag">' + esc(p.cat) + '</span>' +
+        (p.href ? arrowSVG : '<span class="soon">soon</span>') +
+      '</div>';
+    if(p.href){
+      return '<li><a class="row" href="' + p.href + '">' + inner + '</a></li>';
+    }
+    return '<li><div class="row" aria-disabled="true">' + inner + '</div></li>';
+  }
+
+  function esc(s){
+    return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  }
+
+  function render(query){
+    const term = query.trim().toLowerCase();
+    const matches = patterns.filter(p =>
+      !term ||
+      p.name.toLowerCase().includes(term) ||
+      p.desc.toLowerCase().includes(term) ||
+      p.cat.toLowerCase().includes(term)
+    );
+    list.innerHTML = matches.map(rowMarkup).join('');
+    const none = matches.length === 0;
+    list.style.display = none ? 'none' : '';
+    empty.style.display = none ? 'block' : 'none';
+  }
+
+  q.addEventListener('input', e => render(e.target.value));
+  render('');
+</script>
+</body>
+</html>

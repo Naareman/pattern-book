@@ -46,15 +46,15 @@ ReAct is a **loop**, not a straight line. The middle three steps repeat. Make th
 
 **Loop structure:**
 
-- Steps 2 → 3 → 4 → 5 form the cycle.
-- CHECK has two exits: **loop back** to THOUGHT (not done) or **proceed** to ANSWER (done).
-- The arrow from OBSERVE feeds the result into the next THOUGHT, so each turn sees everything before it.
+- Steps 2 → 3 → 4 → 5 form the cycle. CHECK has two exits: loop back to THOUGHT, or proceed to ANSWER.
 
 ```
 USER ─▶ THOUGHT ─▶ ACTION ─▶ OBSERVE ─▶ CHECK ─▶ ANSWER
             ▲                              │
             └──────── loop if not done ────┘
 ```
+
+**Animation note (the key teaching move):** Play must run at least two full turns before exiting. The reader has to *see* THOUGHT → ACTION → OBSERVE light up, then watch CHECK send the arrow back to THOUGHT for a second pass. A turn counter (`Turn 1`, `Turn 2`) ticks up each lap. The repetition is the pattern. One pass would teach the wrong shape.
 
 **Step-synced legend (jargon + inline definitions):**
 
@@ -127,7 +127,7 @@ This needs three facts chained: who bought GitHub, who runs that company now, an
 
 > "GitHub was acquired by Microsoft. Microsoft's current CEO is Satya Nadella, who was born in 1967."
 
-Note for the design: the punchline is that *the model strung three separate lookups together*, each one feeding the next thought. That chaining is the pattern. A single-shot RAG call could not have planned the second and third searches without seeing the first result.
+Note for the design: the punchline is the chaining. The model could not plan search two until it saw the result of search one. A single-shot call cannot do that.
 
 ---
 
@@ -136,26 +136,24 @@ Note for the design: the punchline is that *the model strung three separate look
 ~10 lines. The loop shape: reason, call a tool, observe, repeat until done. One plain-English line per line.
 
 ```python
-while True:                                  # keep looping until the model is done
+for turn in range(MAX_TURNS):                # loop, but never more than MAX_TURNS times
     thought, action = model(transcript)      # model writes its reasoning and picks a tool
     if action == "finish":                   # the model decided it can answer now
         return thought                       # break out and return the final answer
     result = run_tool(action)                # actually call the chosen tool
     transcript += f"{thought}\n{action}\n{result}"  # append the turn so the next loop sees it
-    if turns > MAX_TURNS:                     # safety valve against infinite loops
-        return "Stopped: too many steps."     # bail out so it can't spin forever
+return "Stopped: too many steps."            # safety valve if the loop never finished
 ```
 
 **Per-line explanations:**
 
-- **Line 1** — Loop forever; the body decides when to stop. The loop is the whole pattern.
+- **Line 1** — Loop turn by turn, capped at MAX_TURNS. The loop is the whole pattern; the cap stops it spinning forever.
 - **Line 2** — Ask the model what to think and which tool to call next, given everything so far.
 - **Line 3** — Watch for the model's signal that it has enough to answer.
 - **Line 4** — Stop the loop and hand back the final answer.
 - **Line 5** — Run the tool the model named and capture its result.
 - **Line 6** — Append thought, action, and result to the transcript so the next turn has full context.
-- **Line 7** — Without a turn cap, a confused model can loop forever. This is the guardrail.
-- **Line 8** — Give up cleanly instead of burning tokens and money indefinitely.
+- **Line 7** — If the loop runs out of turns without finishing, give up cleanly instead of burning tokens.
 
 ---
 

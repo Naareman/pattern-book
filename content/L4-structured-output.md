@@ -45,14 +45,21 @@ Diagram type: animated step-through (5 nodes). The mechanism that matters is at 
 
 **Step-synced legend (one row per non-obvious node):**
 
-- **SCHEMA** — the shape you require, written as a [schema]. A JSON Schema or a grammar that lists allowed fields, types, and values.
-- **MODEL** — the language model writes the answer as a stream of [tokens], the small text pieces it predicts one at a time.
-- **SHAPE** — [constrained decoding] in action: before each token is chosen, choices that would violate the schema are removed, so the running output stays valid.
-- **PARSE** — turn the text into a real object (a [JSON] dictionary, a typed record) the rest of the program can call into.
+- **SCHEMA:** the shape you require, written as a [schema]. A JSON Schema or a grammar that lists allowed fields, types, and values.
+- **MODEL:** the language model writes the answer as a stream of [tokens], the small text pieces it predicts one at a time.
+- **SHAPE:** [constrained decoding] in action. Before each token is chosen, choices that would violate the schema are removed, so the running output stays valid.
+- **PARSE:** turn the text into a real object (a [JSON] dictionary, a typed record) the rest of the program can call into.
 
-**Accuracy note to surface in the legend or a caption (do not drop):**
+**Two-mode toggle (interaction, sits under the diagram):**
 
-Two different mechanisms hide behind "structured output." (a) *Prompting for JSON*: you ask nicely in the prompt. The model usually complies but can still emit invalid or off-schema text. (b) *Constrained / guided decoding* and schema-enforced modes: invalid tokens are masked at generation time, so malformed output is impossible. A plain "JSON mode" guarantees the result parses as JSON, but not that it matches your specific schema unless the schema itself is enforced.
+A small two-state toggle. The reader flips it and the SHAPE node changes behaviour. This is the one idea most people get wrong, so make them operate it.
+
+| Toggle state | What SHAPE does | What you actually get |
+|---|---|---|
+| **Ask nicely** (prompt for JSON) | Nothing enforces the shape. The prompt requests JSON; the model usually complies. | Output is *probably* valid. It can still break format or drift off-schema, and your code must guard for that. |
+| **Enforce** (constrained decoding) | Before each token, choices that would violate the schema are masked out. | Output *cannot* be malformed. It always parses and always matches the schema. |
+
+*Caption to keep nearby:* A plain "JSON mode" sits between the two: it guarantees the result parses as [JSON], but not that it matches your specific schema. Only schema-level enforcement guarantees the exact shape.
 
 ---
 
@@ -84,7 +91,7 @@ Query test cards. Tap to reveal verdict + one-sentence reason. Mix is 3 works / 
    **Verdict:** Fails ✗
    **Reason:** An impossible schema forces a guess or an empty value; constraints cannot invent missing facts.
 
-**Tracker:** `0 / 6 tested` → `✓ All 6 tested — pattern understood`
+**Tracker:** `0 / 6 tested` → `✓ All 6 tested: pattern understood`
 
 ---
 
@@ -97,16 +104,16 @@ One specific case, end to end. A resume parser feeding an applicant-tracking dat
 - **User asks (system input):** "Parse this resume into our candidate record."
   Raw text pasted in: *"Mariam Hassan, Senior Backend Engineer. 7 yrs. Cairo. Python, Go, Postgres. mariam.h@example.com."*
 
-- **Step 1 — Define the schema.**
+- **Step 1: Define the schema.**
   The ATS needs five typed fields: `name` (string), `title` (string), `years_experience` (integer), `email` (string), `skills` (array of strings). Anything else is rejected.
 
-- **Step 2 — Constrain generation.**
+- **Step 2: Constrain generation.**
   The schema is compiled to a grammar. As the model writes, the decoder masks any token that would break the shape. It cannot, for example, put words where `years_experience` expects a number.
 
-- **Step 3 — Generate under the constraint.**
-  The model reads the resume text and emits the object. `years_experience` is forced to a digit, so "7 yrs" becomes `7`, not `"7 yrs"`.
+- **Step 3: Generate under the constraint.**
+  The model reads "7 yrs" and decides the value is 7. The constraint does a different job: it only allows digits in `years_experience`, so the model cannot park the text `"7 yrs"` in a number field. The model finds the value; the constraint enforces the type.
 
-- **Step 4 — Parse and store.**
+- **Step 4: Parse and store.**
   The output is guaranteed valid against the schema, so the ATS loads it with no try/except parsing dance and no defensive cleanup.
 
 - **→ Answer returned (the object):**
@@ -137,23 +144,23 @@ class Candidate(Schema):
 # 2. call the model, forcing output to match
 record = model.generate(resume_text, schema=Candidate)
 
-# 3. use the parsed object directly — no string parsing
+# 3. use the parsed object directly: no string parsing
 save_to_database(record.name, record.years_experience)
 ```
 
 **Per-line explanation (for hover):**
 
-- `# 1. declare the shape you require` — Comment marking the schema definition.
-- `class Candidate(Schema):` — Define the target shape: this class is the schema the output must satisfy.
-- `    name: str` — One field, typed as text.
-- `    years_experience: int` — One field, typed as a whole number; the decoder will not allow words here.
-- `    skills: list[str]` — One field, typed as a list of text values.
-- *(blank line)* — (blank line)
-- `# 2. call the model, forcing output to match` — Comment marking the constrained call.
-- `record = model.generate(resume_text, schema=Candidate)` — Run generation under the schema; invalid tokens are masked, so the result is a valid `Candidate`.
-- *(blank line)* — (blank line)
-- `# 3. use the parsed object directly — no string parsing` — Comment marking safe downstream use.
-- `save_to_database(record.name, record.years_experience)` — Read fields off the object as plain attributes; no JSON parsing or cleanup needed.
+- `# 1. declare the shape you require`: Comment marking the schema definition.
+- `class Candidate(Schema):`: Define the target shape. This class is the schema the output must satisfy.
+- `    name: str`: One field, typed as text.
+- `    years_experience: int`: One field, typed as a whole number. The decoder will not allow words here.
+- `    skills: list[str]`: One field, typed as a list of text values.
+- *(blank line)*: (blank line)
+- `# 2. call the model, forcing output to match`: Comment marking the constrained call.
+- `record = model.generate(resume_text, schema=Candidate)`: Run generation under the schema. Invalid tokens are masked, so the result is a valid `Candidate`.
+- *(blank line)*: (blank line)
+- `# 3. use the parsed object directly: no string parsing`: Comment marking safe downstream use.
+- `save_to_database(record.name, record.years_experience)`: Read fields off the object as plain attributes. No JSON parsing or cleanup needed.
 
 ---
 
@@ -161,9 +168,9 @@ save_to_database(record.name, record.years_experience)
 
 5-segment bars (green = low, yellow = medium, red = high).
 
-- **Cost:** Low. (2/5 green) — One model call, no extra round-trips; the constraint runs during decoding.
-- **Latency:** Low–Medium. (2/5, green + yellow) — Building the constraint index has a one-time cost; per-token masking adds little overhead once it is ready.
-- **Complexity:** Medium. (3/5, green + yellow×2) — Easy to call a hosted mode; harder to author good schemas and to know when constraints quietly hurt quality.
+- **Cost:** Low. (2/5 green). One model call, no extra round-trips. The constraint runs during decoding.
+- **Latency:** Low to Medium. (2/5, green + yellow). Compiling the schema into a constraint costs once. After that, per-token masking adds little overhead.
+- **Complexity:** Medium. (3/5, green + yellow x2). Easy to call a hosted mode. Harder to author good schemas, and to spot when constraints quietly hurt quality.
 
 **Quotable line (italic, the page takeaway):**
 
@@ -173,19 +180,19 @@ save_to_database(record.name, record.years_experience)
 
 ## TERMS (inline tooltip definitions)
 
-- **schema** — A description of the shape you require: which fields exist, their types, and allowed values.
-- **JSON** — A plain-text format for nested key-value data that almost every program can read.
-- **JSON mode** — A model setting that guarantees the output parses as JSON, but not that it matches your specific schema.
-- **constrained decoding** — Blocking tokens that would break the required shape, at the moment each token is chosen.
-- **guided generation** — Another name for constrained decoding: the allowed output is restricted to a grammar or pattern.
-- **tokens** — The small text pieces a model predicts one at a time; words are often one to three tokens.
-- **grammar** — A set of rules listing which sequences of tokens are allowed; a schema can be compiled into one.
-- **function calling** — A structured-output mode where the model returns arguments for a function as a valid object.
-- **enum** — A field whose value must be one of a fixed, listed set of options.
+- **schema:** A description of the shape you require: which fields exist, their types, and allowed values.
+- **JSON:** A plain-text format for nested key-value data that almost every program can read.
+- **JSON mode:** A model setting that guarantees the output parses as JSON, but not that it matches your specific schema.
+- **constrained decoding:** Blocking tokens that would break the required shape, at the moment each token is chosen.
+- **guided generation:** Another name for constrained decoding. The allowed output is restricted to a grammar or pattern.
+- **tokens:** The small text pieces a model predicts one at a time. Words are often one to three tokens.
+- **grammar:** A set of rules listing which sequences of tokens are allowed. A schema can be compiled into one.
+- **function calling:** A structured-output mode where the model returns arguments for a function as a valid object.
+- **enum:** A field whose value must be one of a fixed, listed set of options.
 
 ---
 
 ## REFERENCES
 
-- Willard, B. T., & Louf, R. (2023). *Efficient Guided Generation for Large Language Models.* arXiv:2307.09702. https://arxiv.org/abs/2307.09702 — Introduces finite-state-machine indexing over a model's vocabulary to enforce regular expressions and grammars during decoding; implemented in the open-source Outlines library.
-- OpenAI. *Structured Outputs* (API guide). https://platform.openai.com/docs/guides/structured-outputs — Describes schema-enforced outputs and function calling; documents the distinction between plain JSON mode and schema-constrained generation.
+- Willard, B. T., & Louf, R. (2023). *Efficient Guided Generation for Large Language Models.* arXiv:2307.09702. https://arxiv.org/abs/2307.09702. Introduces finite-state-machine indexing over a model's vocabulary to enforce regular expressions and grammars during decoding; implemented in the open-source Outlines library.
+- OpenAI. *Structured Outputs* (API guide). https://platform.openai.com/docs/guides/structured-outputs. Describes schema-enforced outputs and function calling; documents the distinction between plain JSON mode and schema-constrained generation.
