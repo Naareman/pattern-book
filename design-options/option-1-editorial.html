@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FBFAF7;
+    --paper-deep: #F4F2EC;
+    --ink: #1A1714;
+    --ink-soft: #4A453E;
+    --ink-faint: #8A8377;
+    --accent: #2F5D4F;
+    --accent-deep: #234539;
+    --accent-wash: #EBF0ED;
+    --hairline: #DDD8CC;
+    --hairline-soft: #E8E4D9;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 19px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--accent-wash); color: var(--accent-deep); }
+
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* ---------- Masthead ---------- */
+  header.masthead {
+    border-bottom: 1px solid var(--hairline);
+  }
+  .masthead-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 0;
+  }
+  .brand {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 17px;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+  .brand .mark {
+    width: 26px;
+    height: 26px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    position: relative;
+    flex: none;
+  }
+  .brand .mark::after {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .masthead-meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 500;
+  }
+  @media (max-width: 540px) { .masthead-meta { display: none; } }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    padding: 96px 0 64px;
+    position: relative;
+  }
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+    display: inline-block;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(48px, 9vw, 116px);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    max-width: 13ch;
+    color: var(--ink);
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero .lede {
+    font-family: 'Newsreader', serif;
+    font-size: clamp(21px, 2.6vw, 27px);
+    line-height: 1.45;
+    color: var(--ink-soft);
+    max-width: 30ch;
+    margin-top: 36px;
+  }
+  .hero .lede::first-letter {
+    initial-letter: 2;
+    -webkit-initial-letter: 2;
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    color: var(--accent);
+    padding-right: 10px;
+  }
+  .hero .subline {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 19px;
+    color: var(--ink-faint);
+    margin-top: 22px;
+    max-width: 42ch;
+  }
+  .cta-row {
+    margin-top: 44px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--paper);
+    background: var(--accent);
+    border: none;
+    padding: 16px 30px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.25s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--accent-deep); transform: translateY(-1px); }
+  .btn-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 3px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .btn-text:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* decorative folio number in hero */
+  .folio {
+    position: absolute;
+    top: 96px;
+    right: 0;
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    color: var(--ink-faint);
+    letter-spacing: 0.05em;
+    text-align: right;
+    line-height: 1.7;
+  }
+  .folio span { display: block; }
+  .folio .num {
+    font-size: 56px;
+    font-weight: 400;
+    color: var(--hairline);
+    line-height: 1;
+  }
+  @media (max-width: 720px) { .folio { display: none; } }
+
+  /* ---------- Section header ---------- */
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-top: 1px solid var(--ink);
+    padding-top: 18px;
+    margin-top: 40px;
+    margin-bottom: 44px;
+    gap: 20px;
+  }
+  .section-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(24px, 3.4vw, 34px);
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .section-head .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* ---------- Concept cards ---------- */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--hairline);
+    border-left: 1px solid var(--hairline);
+  }
+  .card {
+    border-right: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    padding: 38px 34px 42px;
+    background: var(--paper);
+    position: relative;
+    transition: background 0.3s ease;
+    cursor: pointer;
+  }
+  .card:hover { background: var(--paper-deep); }
+  .card-index {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--accent);
+    margin-bottom: 26px;
+  }
+  .card-kicker {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .card h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 28px;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    margin-bottom: 18px;
+  }
+  .card p {
+    font-family: 'Newsreader', serif;
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+  .card-arrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--accent);
+    margin-top: 26px;
+    letter-spacing: 0.04em;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .card:hover .card-arrow { opacity: 1; transform: translateX(0); }
+
+  @media (max-width: 860px) {
+    .cards { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Interactive stepper ---------- */
+  .demo {
+    margin-top: 96px;
+    background: var(--accent-deep);
+    color: var(--paper);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .demo-inner { padding: 56px 56px 60px; }
+  .demo .eyebrow { color: #A9C7BB; }
+  .demo .eyebrow::before { background: #A9C7BB; }
+  .demo h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(26px, 4vw, 40px);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    max-width: 18ch;
+    margin-bottom: 12px;
+  }
+  .demo h2 em { font-style: italic; color: #BFD7CC; }
+  .demo .demo-sub {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: #B7C9C1;
+    max-width: 44ch;
+    margin-bottom: 44px;
+  }
+
+  .stepper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .step {
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 3px;
+    padding: 26px 24px 28px;
+    transition: all 0.4s cubic-bezier(0.2, 0.7, 0.3, 1);
+    background: transparent;
+    position: relative;
+  }
+  .step .step-num {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #8FAEA2;
+    font-weight: 500;
+    transition: color 0.4s ease;
+  }
+  .step .step-title {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    font-weight: 500;
+    margin-top: 14px;
+    margin-bottom: 10px;
+    color: #DCE6E1;
+    transition: color 0.4s ease;
+  }
+  .step .step-desc {
+    font-family: 'Newsreader', serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #91A69D;
+    transition: color 0.4s ease;
+  }
+  .step.is-active {
+    background: var(--paper);
+    border-color: var(--paper);
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+  }
+  .step.is-active .step-num { color: var(--accent); }
+  .step.is-active .step-title { color: var(--ink); }
+  .step.is-active .step-desc { color: var(--ink-soft); }
+  .step.is-done {
+    border-color: rgba(255,255,255,0.32);
+  }
+  .step.is-done .step-num { color: #BFD7CC; }
+  .step.is-done .step-title { color: #DCE6E1; }
+  .step .step-check {
+    position: absolute;
+    top: 24px;
+    right: 22px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .step.is-active .step-check { opacity: 1; }
+
+  .demo-controls {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .btn-step {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--accent-deep);
+    background: var(--paper);
+    border: none;
+    padding: 14px 30px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .btn-step:hover { transform: translateY(-1px); background: #fff; }
+  .progress-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: #91A69D;
+  }
+  .progress-text strong { color: var(--paper); font-weight: 600; }
+
+  @media (max-width: 760px) {
+    .demo-inner { padding: 40px 28px 44px; }
+    .stepper { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    margin-top: 100px;
+    border-top: 1px solid var(--ink);
+    padding: 32px 0 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  footer .colophon {
+    font-family: 'Newsreader', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-faint);
+    max-width: 40ch;
+  }
+  footer .footer-brand {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    color: var(--ink-soft);
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 0 24px; }
+    .hero { padding: 64px 0 48px; }
+    .card { padding: 32px 26px 36px; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="masthead">
+    <div class="wrap masthead-inner">
+      <div class="brand">
+        <span class="mark"></span>
+        The Pattern Book
+      </div>
+      <div class="masthead-meta">A Field Reference · Vol. I</div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="wrap">
+        <div class="folio">
+          <span class="num">01</span>
+          <span>Patterns of</span>
+          <span>Modern Systems</span>
+        </div>
+        <div class="eyebrow">An Interactive Reference</div>
+        <h1>The <em>Pattern</em> Book</h1>
+        <p class="lede">An interactive reference for the patterns behind modern AI systems.</p>
+        <p class="subline">Understand each one by working through it, not just reading about it.</p>
+        <div class="cta-row">
+          <a href="#" class="btn-primary">Start with RAG →</a>
+          <a href="#patterns" class="btn-text">Browse the index</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONCEPT CARDS -->
+    <section id="patterns">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>The Patterns</h2>
+          <span class="label">Three of Twelve</span>
+        </div>
+        <div class="cards">
+          <article class="card">
+            <div class="card-index">№ I</div>
+            <div class="card-kicker">Retrieval</div>
+            <h3>RAG</h3>
+            <p>Look up your documents first, then let the model answer from them.</p>
+            <div class="card-arrow">Read the chapter →</div>
+          </article>
+          <article class="card">
+            <div class="card-index">№ II</div>
+            <div class="card-kicker">Reasoning</div>
+            <h3>Chain&#8209;of&#8209;Thought</h3>
+            <p>Make the model show its steps before it answers.</p>
+            <div class="card-arrow">Read the chapter →</div>
+          </article>
+          <article class="card">
+            <div class="card-index">№ III</div>
+            <div class="card-kicker">Evaluation</div>
+            <h3>LLM&#8209;as&#8209;Judge</h3>
+            <p>Use one model to grade another model's output.</p>
+            <div class="card-arrow">Read the chapter →</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE DEMO -->
+    <section>
+      <div class="wrap">
+        <div class="demo">
+          <div class="demo-inner">
+            <div class="eyebrow">Try It · Worked Example</div>
+            <h2>Watch a query move <em>through the pattern.</em></h2>
+            <p class="demo-sub">Every chapter is interactive. Press <em>Step</em> to advance the trace and see where you are.</p>
+
+            <div class="stepper" id="stepper">
+              <div class="step is-active" data-step="0">
+                <div class="step-check">●</div>
+                <div class="step-num">Stage 01</div>
+                <div class="step-title">Question</div>
+                <div class="step-desc">The user asks something the model must answer.</div>
+              </div>
+              <div class="step" data-step="1">
+                <div class="step-check">●</div>
+                <div class="step-num">Stage 02</div>
+                <div class="step-title">Reasoning</div>
+                <div class="step-desc">The model works through its steps, in the open.</div>
+              </div>
+              <div class="step" data-step="2">
+                <div class="step-check">●</div>
+                <div class="step-num">Stage 03</div>
+                <div class="step-title">Answer</div>
+                <div class="step-desc">A grounded response is returned to the reader.</div>
+              </div>
+            </div>
+
+            <div class="demo-controls">
+              <button class="btn-step" id="stepBtn">Step →</button>
+              <span class="progress-text">Stage <strong id="curStage">1</strong> of 3 · <span id="stageName">Question</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap" style="display:flex; justify-content:space-between; align-items:baseline; gap:20px; flex-wrap:wrap; width:100%;">
+      <p class="colophon">Set in Fraunces &amp; Newsreader. A living reference, revised as the field moves.</p>
+      <div class="footer-brand">The Pattern Book · MMXXVI</div>
+    </div>
+  </footer>
+
+<script>
+  (function () {
+    var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
+    var btn = document.getElementById('stepBtn');
+    var curStageEl = document.getElementById('curStage');
+    var stageNameEl = document.getElementById('stageName');
+    var names = ['Question', 'Reasoning', 'Answer'];
+    var current = 0;
+
+    function render() {
+      steps.forEach(function (el, i) {
+        el.classList.remove('is-active', 'is-done');
+        if (i < current) el.classList.add('is-done');
+        else if (i === current) el.classList.add('is-active');
+      });
+      curStageEl.textContent = current + 1;
+      stageNameEl.textContent = names[current];
+      btn.textContent = current === steps.length - 1 ? 'Restart ↺' : 'Step →';
+    }
+
+    btn.addEventListener('click', function () {
+      current = current === steps.length - 1 ? 0 : current + 1;
+      render();
+    });
+
+    // allow clicking a stage directly
+    steps.forEach(function (el, i) {
+      el.addEventListener('click', function () {
+        current = i;
+        render();
+      });
+    });
+
+    render();
+  })();
+</script>
+</body>
+</html>
