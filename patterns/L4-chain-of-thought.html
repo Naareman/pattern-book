@@ -3,75 +3,90 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CoT — The Pattern Book</title>
+<title>Chain-of-Thought — The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --paper: #f7f3e9;
-    --paper-warm: #f0e9d6;
-    --ink: #1a1816;
-    --ink-soft: #4a4640;
-    --ink-faint: #9b9588;
-    --rule: #d6cdb5;
-    --red: #d94f3a;
-    --green: #4a7d4d;
-    --yellow: #e6b54a;
-    --blue: #4574a8;
-    --pink: #d97a8f;
-    --shadow: 0 4px 0 0 var(--ink);
-    --shadow-press: 0 1px 0 0 var(--ink);
+    --bg:#FCFCFD; --bg-subtle:#F6F7F9; --surface:#FFFFFF;
+    --text:#15171C; --text-soft:#565C68; --text-faint:#8A909C;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#4F46E5; --accent-hover:#4338CA; --accent-soft:#EEF0FE;
+    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#E5484D; --error-soft:#FDECEC;
+    --radius:14px; --radius-sm:10px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.06);
+    --shadow:0 2px 4px rgba(16,24,40,0.04),0 6px 20px rgba(16,24,40,0.07);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
-    background: var(--paper);
-    color: var(--ink);
+    background: var(--bg);
+    color: var(--text);
     font-family: 'Inter', system-ui, sans-serif;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
-  body {
-    min-height: 100vh;
-    background-image:
-      radial-gradient(circle at 12% 25%, rgba(217, 79, 58, 0.04) 0%, transparent 30%),
-      radial-gradient(circle at 88% 70%, rgba(74, 125, 77, 0.04) 0%, transparent 30%);
-  }
-  .mono { font-family: 'JetBrains Mono', monospace; }
+  body { min-height: 100vh; }
   .serif { font-family: 'Fraunces', serif; }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(252,252,253,0.85);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 14px 32px;
+  }
+  .topbar a {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-soft);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .topbar a:hover { color: var(--accent); }
 
   /* ============ TERM DEFINITIONS ============ */
   .term {
-    background: linear-gradient(180deg, transparent 60%, var(--yellow) 60%);
-    cursor: help;
-    border-bottom: 1.5px dotted var(--ink);
-    padding: 0 2px;
+    background: var(--accent-soft);
+    cursor: pointer;
+    border-bottom: 1px dotted var(--accent);
+    padding: 0 3px;
+    border-radius: 3px;
     position: relative;
     font-weight: 500;
-    transition: background 0.15s ease;
+    color: var(--accent-hover);
   }
-  .term:hover { background: linear-gradient(180deg, transparent 30%, var(--yellow) 30%); }
   .term::after {
     content: attr(data-def);
     position: absolute;
     bottom: calc(100% + 10px);
     left: 50%;
     transform: translateX(-50%) translateY(4px);
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--text);
+    color: #fff;
     padding: 10px 14px;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-family: 'Inter', sans-serif;
     font-size: 13px;
     font-weight: 400;
-    line-height: 1.4;
+    line-height: 1.45;
     width: max-content;
-    max-width: 280px;
+    max-width: 260px;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition: opacity 0.18s ease, transform 0.18s ease;
     z-index: 100;
-    text-align: center;
-    box-shadow: 0 4px 0 0 rgba(0,0,0,0.1);
+    text-align: left;
+    box-shadow: var(--shadow);
   }
   .term::before {
     content: '';
@@ -80,16 +95,15 @@
     left: 50%;
     transform: translateX(-50%) translateY(4px);
     border: 6px solid transparent;
-    border-top-color: var(--ink);
+    border-top-color: var(--text);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition: opacity 0.18s ease, transform 0.18s ease;
     z-index: 100;
   }
-  .term:hover::after,
-  .term:hover::before,
-  .term:focus::after,
-  .term:focus::before {
+  .term:hover::after, .term:hover::before,
+  .term:focus::after, .term:focus::before,
+  .term.open::after, .term.open::before {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
@@ -98,122 +112,120 @@
   .header {
     max-width: 900px;
     margin: 0 auto;
-    padding: 40px 32px 24px;
+    padding: 48px 32px 24px;
   }
   .breadcrumb {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    color: var(--ink-faint);
-    text-transform: uppercase;
-    margin-bottom: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-faint);
+    margin-bottom: 28px;
     display: flex;
     gap: 8px;
     align-items: center;
     flex-wrap: wrap;
   }
-  .breadcrumb .sep { color: var(--ink-faint); }
-  .breadcrumb a, .breadcrumb span.current { color: var(--ink-soft); text-decoration: none; }
-  .breadcrumb span.current { color: var(--red); font-weight: 700; }
+  .breadcrumb .sep { color: var(--border-strong); }
+  .breadcrumb a { color: var(--text-faint); text-decoration: none; transition: color 0.15s ease; }
+  .breadcrumb a:hover { color: var(--accent); }
+  .breadcrumb span.current { color: var(--text-soft); font-weight: 600; }
 
   h1.pattern-title {
     font-family: 'Fraunces', serif;
-    font-weight: 900;
-    font-size: clamp(56px, 9vw, 110px);
-    line-height: 0.9;
-    letter-spacing: -0.03em;
-    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: clamp(40px, 8vw, 72px);
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
   }
   .full-name {
     font-family: 'Fraunces', serif;
     font-style: italic;
+    font-weight: 400;
     font-size: 22px;
-    color: var(--ink-soft);
-    margin-bottom: 28px;
+    color: var(--text-soft);
+    margin-bottom: 32px;
   }
   .meta-strip {
     display: flex;
-    gap: 28px;
+    gap: 36px;
     flex-wrap: wrap;
-    padding: 16px 0;
-    border-top: 1.5px solid var(--ink);
-    border-bottom: 1.5px solid var(--ink);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
   }
-  .meta-strip .item { color: var(--ink-soft); }
-  .meta-strip .item strong { display: block; color: var(--ink-faint); font-size: 9px; font-weight: 500; margin-bottom: 4px; }
-  .complexity-dots { display: inline-flex; gap: 3px; }
+  .meta-strip .item { color: var(--text-soft); }
+  .meta-strip .item strong {
+    display: block;
+    color: var(--text-faint);
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+  .complexity-dots { display: inline-flex; gap: 5px; align-items: center; }
   .complexity-dots span {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--rule);
-    border: 1px solid var(--ink);
+    background: var(--border-strong);
   }
-  .complexity-dots span.on { background: var(--red); }
+  .complexity-dots span.on { background: var(--accent); }
 
   /* ============ SECTIONS ============ */
   section {
     max-width: 900px;
     margin: 0 auto;
-    padding: 50px 32px;
+    padding: 52px 32px;
     position: relative;
   }
   .section-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-faint);
+    margin-bottom: 10px;
   }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 6px; }
   h2 {
     font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: clamp(32px, 4.5vw, 48px);
-    line-height: 1;
+    font-weight: 600;
+    font-size: clamp(26px, 5vw, 38px);
+    line-height: 1.1;
     letter-spacing: -0.02em;
-    margin-bottom: 24px;
+    margin-bottom: 26px;
   }
-  h2 em { font-style: italic; color: var(--red); }
+  h2 em { font-style: italic; color: var(--accent); }
 
   /* ============ THE IDEA ============ */
   .idea-stage {
-    background: white;
-    border: 2px solid var(--ink);
-    border-radius: 6px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     padding: 36px;
-    box-shadow: var(--shadow);
-    position: relative;
   }
   .tagline-big {
     font-family: 'Fraunces', serif;
-    font-size: clamp(28px, 4vw, 38px);
-    line-height: 1.25;
-    color: var(--ink);
+    font-weight: 400;
+    font-size: clamp(24px, 4vw, 34px);
+    line-height: 1.3;
+    color: var(--text);
     letter-spacing: -0.015em;
   }
-  .tagline-big strong { color: var(--red); font-weight: 700; }
+  .tagline-big strong { color: var(--accent); font-weight: 600; }
   .idea-tip {
     margin-top: 22px;
     padding-top: 18px;
-    border-top: 1px dashed var(--rule);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-faint);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-faint);
   }
 
   /* ============ DATA FLOW ============ */
   .diagram-stage {
-    background: white;
-    border: 2px solid var(--ink);
-    border-radius: 6px;
-    padding: 36px 24px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 28px 28px;
     box-shadow: var(--shadow);
   }
   .diagram {
@@ -221,284 +233,257 @@
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 10px;
     min-height: 120px;
     padding: 8px 0;
     margin-bottom: 28px;
   }
   .node {
-    background: var(--paper);
-    border: 2px solid var(--ink);
-    border-radius: 6px;
-    padding: 14px 18px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    box-shadow: 0 3px 0 0 var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
     transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     position: relative;
-    min-width: 80px;
+    min-width: 92px;
     text-align: center;
     will-change: transform;
   }
   .node .sub {
     display: block;
-    margin-top: 4px;
-    font-size: 9px;
-    color: var(--ink-faint);
-    text-transform: none;
-    letter-spacing: 0.05em;
-    font-weight: 500;
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--text-faint);
+    font-weight: 400;
   }
   .node.active {
-    background: var(--red);
-    color: white;
-    border-color: var(--ink);
-    transform: translateY(-4px);
-    box-shadow: 0 7px 0 0 var(--ink);
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
   }
   .node.active .sub { color: rgba(255,255,255,0.85); }
   .node.done {
-    background: #f0f5ee;
-    border-color: var(--green);
-    box-shadow: 0 3px 0 0 var(--green);
+    background: var(--success-soft);
+    border-color: var(--success);
   }
   .arrow-mark {
-    color: var(--ink-faint);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 18px;
+    color: var(--text-faint);
+    font-size: 20px;
     transition: color 0.3s ease;
   }
-  .arrow-mark.active { color: var(--red); }
-  .arrow-mark.done { color: var(--green); }
+  .arrow-mark .down { display: none; }
+  .arrow-mark.active { color: var(--accent); }
+  .arrow-mark.done { color: var(--success); }
 
   .diagram-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 18px;
-    border-top: 1.5px dashed var(--rule);
-    gap: 14px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    gap: 16px;
     flex-wrap: wrap;
     min-height: 60px;
   }
   .step-info {
     flex: 1;
     min-width: 200px;
-    min-height: 56px;
+    min-height: 52px;
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
   .step-info .step-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    color: var(--ink-faint);
-    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-faint);
     margin-bottom: 4px;
   }
   .step-info .step-text {
     font-family: 'Fraunces', serif;
+    font-weight: 400;
     font-size: 18px;
-    color: var(--ink);
-    line-height: 1.3;
-    min-height: 1.3em;
+    color: var(--text);
+    line-height: 1.35;
+    min-height: 1.35em;
   }
-  .diagram-btns { display: flex; gap: 8px; }
+  .diagram-btns { display: flex; gap: 10px; flex-wrap: wrap; }
   .diagram-btn {
     padding: 10px 16px;
-    border: 2px solid var(--ink);
-    background: white;
-    border-radius: 4px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    font-weight: 700;
-    box-shadow: 0 3px 0 0 var(--ink);
-    transition: all 0.1s ease;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
   }
-  .diagram-btn:hover { transform: translateY(-1px); }
-  .diagram-btn:active { transform: translate(0, 2px); box-shadow: 0 1px 0 0 var(--ink); }
-  .diagram-btn.primary { background: var(--yellow); }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); }
 
-  /* ============ THOUGHT TRACE (Section 02 reasoning panel) ============ */
+  /* ============ REASONING TRACE (Section 02) ============ */
   .trace {
-    background: white;
-    border: 2px dashed var(--ink);
-    border-radius: 6px;
-    padding: 14px 18px;
-    margin-top: 16px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--ink-soft);
-    line-height: 1.7;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin-top: 18px;
+    font-size: 14px;
+    color: var(--text-soft);
+    line-height: 1.6;
     min-height: 84px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 4px;
+    gap: 6px;
   }
   .trace-empty {
-    color: var(--ink-faint);
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
+    color: var(--text-faint);
+    font-size: 13px;
+    font-weight: 500;
     text-align: center;
   }
   .trace-empty.hidden { display: none; }
   .trace-row {
-    padding: 4px 10px;
-    margin: 0 -10px;
-    border-radius: 3px;
-    background: var(--paper-warm);
-    border-left: 3px solid var(--yellow);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
     opacity: 0;
     transform: translateX(-6px);
     transition: opacity 0.35s ease, transform 0.35s ease;
-    font-family: 'Inter', sans-serif;
     font-size: 14px;
-    line-height: 1.4;
+    line-height: 1.45;
+    color: var(--text);
   }
   .trace-row.shown { opacity: 1; transform: translateX(0); }
-  .trace-row .lead { font-family: 'JetBrains Mono', monospace; color: var(--red); font-weight: 700; margin-right: 8px; }
+  .trace-row .lead { color: var(--accent); font-weight: 600; margin-right: 8px; }
 
   /* ============ WHEN IT WORKS / FAILS ============ */
   .test-stage {
-    background: white;
-    border: 2px solid var(--ink);
-    border-radius: 6px;
-    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
     box-shadow: var(--shadow);
   }
   .test-instruction {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-faint);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 16px;
+    font-size: 14px;
+    color: var(--text-soft);
+    margin-bottom: 18px;
   }
-  .queries { display: flex; flex-direction: column; gap: 10px; }
+  .queries { display: flex; flex-direction: column; gap: 12px; }
   .query-card {
-    background: var(--paper);
-    border: 2px solid var(--ink);
-    border-radius: 4px;
-    padding: 16px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px 20px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 0 0 var(--ink);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    box-shadow: var(--shadow-sm);
     position: relative;
   }
-  .query-card:hover { transform: translateY(-1px); box-shadow: 0 3px 0 0 var(--ink); }
+  .query-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
   .query-card .q {
     font-family: 'Fraunces', serif;
+    font-weight: 400;
     font-size: 18px;
-    color: var(--ink);
-    transition: margin 0.3s ease;
+    color: var(--text);
   }
   .query-card .verdict {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 600;
     margin-top: 0;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.35s ease, margin 0.3s ease;
-    font-weight: 700;
   }
   .query-card .verdict span.body {
-    font-family: 'Inter', sans-serif;
-    text-transform: none;
-    letter-spacing: 0;
     font-weight: 400;
     font-size: 14px;
-    color: var(--ink-soft);
+    color: var(--text-soft);
     display: block;
     margin-top: 6px;
-    line-height: 1.4;
+    line-height: 1.5;
   }
-  .query-card.revealed .verdict { max-height: 200px; margin-top: 14px; }
-  .query-card.good { background: #f0f5ee; border-color: var(--green); box-shadow: 0 2px 0 0 var(--green); }
-  .query-card.bad { background: #fde8e4; border-color: var(--red); box-shadow: 0 2px 0 0 var(--red); }
-  .query-card.good .verdict { color: var(--green); }
-  .query-card.bad .verdict { color: var(--red); }
+  .query-card.revealed .verdict { max-height: 220px; margin-top: 14px; }
+  .query-card.good { background: var(--success-soft); border-color: var(--success); }
+  .query-card.bad { background: var(--error-soft); border-color: var(--error); }
+  .query-card.good .verdict { color: var(--success); }
+  .query-card.bad .verdict { color: var(--error); }
   .query-tracker {
-    margin-top: 16px;
+    margin-top: 18px;
     padding: 12px;
     text-align: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-faint);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    border: 1.5px dashed var(--rule);
-    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-faint);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
     transition: all 0.3s ease;
   }
   .query-tracker.complete {
-    background: var(--ink);
-    color: var(--yellow);
-    border-style: solid;
-    border-color: var(--ink);
-    font-weight: 700;
+    background: var(--accent-soft);
+    color: var(--accent-hover);
+    border-color: var(--accent);
+    font-weight: 600;
   }
 
-  /* ============ WORKED EXAMPLE — DOSSIER STYLE ============ */
+  /* ============ WORKED EXAMPLE — DOSSIER ============ */
   .dossier {
-    background: white;
-    border: 2px solid var(--ink);
-    border-radius: 6px;
-    padding: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 30px 28px;
     box-shadow: var(--shadow);
     position: relative;
   }
   .dossier::before {
-    content: 'CASE FILE';
+    content: 'Case file';
     position: absolute;
-    top: -10px;
+    top: -12px;
     right: 24px;
-    background: var(--ink);
-    color: var(--yellow);
-    padding: 3px 10px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.25em;
-    font-weight: 700;
-    border-radius: 2px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 999px;
   }
   .dossier-q {
-    background: var(--paper);
-    border: 2px solid var(--ink);
-    border-radius: 4px;
-    padding: 16px 20px;
-    margin-bottom: 22px;
-    box-shadow: 0 2px 0 0 var(--ink);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px 20px;
+    margin-bottom: 24px;
   }
   .dossier-q .label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    color: var(--ink-faint);
-    text-transform: uppercase;
-    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-faint);
+    margin-bottom: 7px;
   }
   .dossier-q .text {
     font-family: 'Fraunces', serif;
+    font-weight: 400;
     font-size: 20px;
-    line-height: 1.3;
-    color: var(--ink);
+    line-height: 1.35;
+    color: var(--text);
   }
   .dossier-step {
     display: flex;
     gap: 16px;
-    padding: 14px 0;
-    border-bottom: 1px dashed var(--rule);
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
     opacity: 0;
     transform: translateX(-8px);
     transition: opacity 0.5s ease, transform 0.5s ease;
@@ -508,287 +493,315 @@
   .dossier-step .icon {
     width: 32px;
     height: 32px;
-    background: var(--paper);
-    border: 2px solid var(--ink);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-strong);
+    color: var(--text-soft);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 600;
     flex-shrink: 0;
-    box-shadow: 0 2px 0 0 var(--ink);
+    transition: all 0.3s ease;
   }
   .dossier-step.done .icon {
-    background: var(--green);
-    color: white;
-    border-color: var(--green);
-    box-shadow: 0 2px 0 0 var(--ink);
+    background: var(--success);
+    color: #fff;
+    border-color: var(--success);
   }
   .dossier-step .body { flex: 1; }
   .dossier-step .head {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    color: var(--ink-faint);
-    text-transform: uppercase;
-    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-faint);
+    margin-bottom: 5px;
   }
   .dossier-step .detail {
     font-size: 15px;
-    color: var(--ink);
-    line-height: 1.4;
+    color: var(--text);
+    line-height: 1.5;
   }
   .dossier-step .detail code {
-    background: var(--paper);
+    background: var(--bg-subtle);
     padding: 2px 8px;
-    border-radius: 3px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--ink-soft);
-    border: 1px solid var(--rule);
+    border-radius: 5px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--text-soft);
+    border: 1px solid var(--border);
   }
   .dossier-step .detail .pull-quote {
     display: block;
-    margin-top: 6px;
-    padding: 8px 12px;
-    background: #fffbed;
-    border-left: 3px solid var(--yellow);
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
     font-family: 'Fraunces', serif;
     font-style: italic;
-    font-size: 14px;
-    color: var(--ink-soft);
+    font-size: 15px;
+    color: var(--text);
   }
   .dossier-final {
-    background: var(--ink);
-    color: var(--paper);
-    border-radius: 4px;
-    padding: 18px 22px;
-    margin-top: 18px;
+    background: var(--text);
+    color: #fff;
+    border-radius: var(--radius-sm);
+    padding: 20px 22px;
+    margin-top: 20px;
     opacity: 0;
     transform: translateY(8px);
     transition: opacity 0.5s ease, transform 0.5s ease;
   }
   .dossier-final.shown { opacity: 1; transform: translateY(0); }
   .dossier-final .label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.25em;
-    color: var(--yellow);
-    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
     margin-bottom: 8px;
   }
   .dossier-final .answer {
     font-family: 'Fraunces', serif;
+    font-weight: 400;
     font-size: 18px;
-    line-height: 1.4;
+    line-height: 1.5;
   }
   .dossier-final .cite {
-    color: var(--yellow);
-    font-weight: 700;
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 5px;
     font-style: italic;
   }
-  .dossier-replay {
-    margin-top: 18px;
-    text-align: center;
-  }
+  .dossier-replay { margin-top: 20px; text-align: center; }
   .dossier-replay button {
-    padding: 9px 18px;
-    background: var(--yellow);
-    border: 2px solid var(--ink);
-    border-radius: 4px;
+    padding: 10px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    font-weight: 700;
-    box-shadow: var(--shadow);
-    transition: all 0.1s ease;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
   }
-  .dossier-replay button:hover { transform: translateY(-1px); }
-  .dossier-replay button:active { transform: translate(0, 3px); box-shadow: var(--shadow-press); }
+  .dossier-replay button:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
 
   /* ============ CODE ============ */
   .code-stage {
-    background: white;
-    border: 2px solid var(--ink);
-    border-radius: 6px;
-    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
     box-shadow: var(--shadow);
   }
   .code-hint {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-faint);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--text-soft);
+    margin-bottom: 16px;
   }
   pre.code {
-    background: var(--paper);
-    border-radius: 4px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
     padding: 18px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
     line-height: 1.7;
-    color: var(--ink);
+    color: var(--text);
     overflow-x: auto;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
   }
   .code-line {
     cursor: pointer;
-    padding: 2px 6px;
-    margin: 0 -6px;
-    border-radius: 3px;
-    transition: background 0.15s ease;
+    padding: 2px 8px;
+    margin: 0 -8px;
+    border-radius: 5px;
+    border-left: 2px solid transparent;
+    transition: background 0.15s ease, border-color 0.15s ease;
     display: block;
   }
-  .code-line:hover { background: var(--paper-warm); }
-  .code-line.active { background: var(--yellow); }
-  .code-line .comment { color: var(--ink-faint); }
-  .code-line .kw { color: var(--red); font-weight: 700; }
-  .code-line .str { color: var(--green); }
+  .code-line:hover { background: var(--accent-soft); }
+  .code-line.active { background: var(--accent-soft); border-left: 2px solid var(--accent); }
+  .code-line .comment { color: var(--text-faint); }
+  .code-line .kw { color: var(--accent); font-weight: 500; }
+  .code-line .str { color: var(--success); }
   .code-explainer {
-    background: var(--paper);
-    border: 1.5px dashed var(--rule);
-    border-radius: 4px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
     padding: 16px;
     font-family: 'Fraunces', serif;
+    font-weight: 400;
     font-size: 16px;
-    color: var(--ink);
+    color: var(--text);
     min-height: 60px;
-    line-height: 1.4;
+    line-height: 1.5;
   }
   .code-explainer .hint {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-faint);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-faint);
   }
 
   /* ============ TRADEOFFS ============ */
   .tradeoffs-stage {
-    background: white;
-    border: 2px solid var(--ink);
-    border-radius: 6px;
-    padding: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 30px 28px;
     box-shadow: var(--shadow);
   }
   .tradeoff-row {
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin-bottom: 14px;
+    gap: 18px;
+    margin-bottom: 16px;
   }
   .tradeoff-row:last-of-type { margin-bottom: 0; }
   .tradeoff-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-soft);
     min-width: 100px;
   }
-  .tradeoff-bars { flex: 1; display: flex; gap: 4px; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
   .tradeoff-bars .seg {
     flex: 1;
     height: 22px;
-    background: var(--paper);
-    border: 1.5px solid var(--ink);
-    border-radius: 2px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 5px;
   }
-  .tradeoff-bars .seg.on { background: var(--red); }
-  .tradeoff-bars .seg.on-y { background: var(--yellow); }
-  .tradeoff-bars .seg.on-g { background: var(--green); }
+  .tradeoff-bars .seg.on { background: var(--error); border-color: var(--error); }
+  .tradeoff-bars .seg.on-y { background: var(--accent-soft); border-color: var(--border-strong); }
+  .tradeoff-bars .seg.on-g { background: var(--success); border-color: var(--success); }
   .tradeoff-quote {
-    margin-top: 22px;
-    padding-top: 18px;
-    border-top: 1.5px dashed var(--rule);
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
     font-family: 'Fraunces', serif;
     font-style: italic;
-    font-size: 22px;
-    line-height: 1.4;
-    color: var(--ink);
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 1.45;
+    color: var(--text);
   }
-  .tradeoff-quote::before { content: '— '; color: var(--red); }
+  .tradeoff-quote::before { content: '“'; color: var(--accent); }
+  .tradeoff-quote::after { content: '”'; color: var(--accent); }
 
-  footer {
-    max-width: 900px;
-    margin: 40px auto 60px;
-    padding: 32px 32px;
-    text-align: center;
-    border-top: 1.5px solid var(--ink);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    line-height: 1.8;
-  }
-
+  /* ============ BACK LINK ============ */
   .back-link {
     display: inline-flex;
     align-items: center;
     gap: 16px;
     padding: 18px 22px;
-    background: white;
-    border: 2px solid var(--ink);
-    border-radius: 6px;
-    box-shadow: var(--shadow);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
     text-decoration: none;
-    color: var(--ink);
-    transition: all 0.15s ease;
+    color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
     cursor: pointer;
   }
-  .back-link:hover {
-    transform: translate(-2px, -1px);
-    box-shadow: 6px 5px 0 0 var(--ink);
-  }
-  .back-link:active {
-    transform: translate(0, 2px);
-    box-shadow: 0 2px 0 0 var(--ink);
-  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
   .back-arrow {
     font-family: 'Fraunces', serif;
-    font-size: 32px;
-    color: var(--red);
-    font-weight: 700;
+    font-size: 28px;
+    color: var(--accent);
     line-height: 1;
-  }
-  .back-link:hover .back-arrow {
-    transform: translateX(-3px);
     transition: transform 0.2s ease;
   }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
   .back-hint {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    color: var(--ink-faint);
-    text-transform: uppercase;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-faint);
     margin-bottom: 3px;
   }
   .back-name {
     font-family: 'Fraunces', serif;
+    font-weight: 500;
     font-size: 20px;
-    font-weight: 700;
     line-height: 1;
     letter-spacing: -0.01em;
+  }
+
+  /* ============ SOURCES ============ */
+  .sources {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 28px 32px 0;
+  }
+  .sources .sources-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-faint);
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li {
+    font-size: 13px;
+    color: var(--text-soft);
+    line-height: 1.5;
+  }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--text-faint); }
+
+  /* ============ FOOTER ============ */
+  footer {
+    max-width: 900px;
+    margin: 32px auto 60px;
+    padding: 28px 32px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-faint);
+    line-height: 1.8;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 560px) {
+    .diagram { flex-direction: column; gap: 6px; }
+    .node { width: 100%; max-width: 280px; }
+    .arrow-mark { transform: rotate(90deg); font-size: 18px; }
+    .arrow-mark .right { display: none; }
+    .arrow-mark .down { display: inline; }
+  }
+  @media (max-width: 480px) {
+    .header, section, footer, .sources, .topbar-inner { padding-left: 22px; padding-right: 22px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+    .tradeoff-bars { width: 100%; }
+    .diagram-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btns { justify-content: stretch; }
+    .diagram-btn { flex: 1; }
   }
 </style>
 </head>
 <body>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a href="../index.html">← The Pattern Book</a>
+  </div>
+</nav>
 
 <!-- HEADER -->
 <header class="header">
   <div class="breadcrumb">
     <a href="../index.html">The Pattern Book</a>
     <span class="sep">/</span>
-    <a href="../layers/L4.html">L4 · Single-Call Control</a>
+    <a href="../index.html">L4 · Single-Call Control</a>
     <span class="sep">/</span>
-    <a href="../layers/L4.html">Cognitive Strategy</a>
+    <a href="../index.html">Cognitive Strategy</a>
     <span class="sep">/</span>
     <span class="current">CoT</span>
   </div>
@@ -815,11 +828,11 @@
 
 <!-- 01 · THE IDEA -->
 <section>
-  <div class="section-label">01 · The Idea</div>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What is <em>Chain-of-Thought</em>?</h2>
   <div class="idea-stage">
     <div class="tagline-big">
-      Models blurt the first answer that comes to mind. Chain-of-Thought makes them <strong>show their work first</strong> — and writing the steps is what makes the answer right.
+      Models blurt the first answer that comes to mind. Chain-of-Thought makes them <strong>show their work first</strong>, and writing the steps is what makes the answer right.
     </div>
     <div class="idea-tip">↓ How it works lives in Section 02</div>
   </div>
@@ -827,14 +840,14 @@
 
 <!-- 02 · DATA FLOW -->
 <section>
-  <div class="section-label">02 · Data Flow</div>
+  <div class="section-label"><span class="num">02</span>Data Flow</div>
   <h2>How it <em>moves</em>.</h2>
   <div class="diagram-stage">
     <div class="diagram" id="diagram">
       <div class="node" data-step="0">USER<span class="sub">Hard question</span></div>
-      <span class="arrow-mark" data-step="0">→</span>
+      <span class="arrow-mark" data-step="0"><span class="right">→</span><span class="down">↓</span></span>
       <div class="node" data-step="1">MODEL<span class="sub">Reasons first</span></div>
-      <span class="arrow-mark" data-step="1">→</span>
+      <span class="arrow-mark" data-step="1"><span class="right">→</span><span class="down">↓</span></span>
       <div class="node" data-step="2">ANSWER<span class="sub">From the steps</span></div>
     </div>
     <div class="diagram-controls">
@@ -849,17 +862,17 @@
       </div>
     </div>
     <div class="trace" id="trace">
-      <div class="trace-empty" id="traceEmpty">Step to the model ↑ Its reasoning appears here</div>
-      <div class="trace-row" data-step="1"><span class="lead">1</span>It writes the steps out as <span class="term" data-def="The pieces of text a model reads and writes, roughly word-sized. The model produces them one after another.">tokens</span>, left to right, like talking out loud.</div>
-      <div class="trace-row" data-step="1"><span class="lead">2</span>Each step it has written becomes part of what it reads next.</div>
-      <div class="trace-row" data-step="1"><span class="lead">3</span>By the final step, the answer is forced by the work — not guessed.</div>
+      <div class="trace-empty" id="traceEmpty">Step to the model. Its reasoning appears here.</div>
+      <div class="trace-row" data-step="1"><span class="lead">1</span>It writes the steps out as <span class="term" tabindex="0" data-def="The pieces of text a model reads and writes, roughly word-sized, produced one after another.">tokens</span>, left to right, like talking out loud.</div>
+      <div class="trace-row" data-step="1"><span class="lead">2</span>Each step it writes becomes part of what it reads next.</div>
+      <div class="trace-row" data-step="1"><span class="lead">3</span>By the final step, the answer is forced by the work, not guessed.</div>
     </div>
   </div>
 </section>
 
 <!-- 03 · THE TEST -->
 <section>
-  <div class="section-label">03 · When it Works · When it Fails</div>
+  <div class="section-label"><span class="num">03</span>When it Works · When it Fails</div>
   <h2>Will reasoning out loud <em>help</em>?</h2>
   <div class="test-stage">
     <div class="test-instruction">Tap each. CoT earns its tokens on some questions and wastes them on others.</div>
@@ -868,7 +881,7 @@
         <div class="q">"A word problem with three arithmetic steps."</div>
         <div class="verdict">Helps it ✓<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="good" data-reason="Many constraints to juggle at once. Writing them down one at a time keeps them straight instead of collapsing to a hunch.">
+      <div class="query-card" data-verdict="good" data-reason="Many constraints at once. Writing them down one at a time keeps them straight instead of collapsing to a hunch.">
         <div class="q">"Which of these 5 meetings fit before 3pm, given the room conflicts?"</div>
         <div class="verdict">Helps it ✓<span class="body"></span></div>
       </div>
@@ -876,11 +889,11 @@
         <div class="q">"Find the bug: why does this loop run one time too many?"</div>
         <div class="verdict">Helps it ✓<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="bad" data-reason="Pure recall. There are no steps to show. The reasoning is wasted tokens and added latency for an answer the model already knows.">
+      <div class="query-card" data-verdict="bad" data-reason="Pure recall. There are no steps to show. The reasoning is wasted tokens and latency for an answer the model already knows.">
         <div class="q">"What's the capital of France?"</div>
         <div class="verdict">Wasted ✗<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="bad" data-reason="A one-word call. Forcing reasoning can make the model talk itself out of the obvious answer — sometimes worse, never better.">
+      <div class="query-card" data-verdict="bad" data-reason="A one-word call. Forcing reasoning can make the model talk itself out of the obvious answer: sometimes worse, never better.">
         <div class="q">"Is this review positive or negative? 'Loved every minute.'"</div>
         <div class="verdict">Can hurt ✗<span class="body"></span></div>
       </div>
@@ -895,7 +908,7 @@
 
 <!-- 04 · WORKED EXAMPLE — DOSSIER -->
 <section>
-  <div class="section-label">04 · Worked Example</div>
+  <div class="section-label"><span class="num">04</span>Worked Example</div>
   <h2>One real <em>case</em>.</h2>
   <div class="dossier">
     <div class="dossier-q">
@@ -907,7 +920,7 @@
       <div class="icon">1</div>
       <div class="body">
         <div class="head">Pull out the numbers</div>
-        <div class="detail">4 painters, <code>3 rooms</code> each per day, <code>5 days</code>, <code>70 rooms</code> total. Naming the parts before computing is the whole point of reasoning first.</div>
+        <div class="detail">4 painters, <code>3 rooms</code> each per day, <code>5 days</code>, <code>70 rooms</code> total. Naming the parts before computing is the point of reasoning first.</div>
       </div>
     </div>
 
@@ -943,39 +956,39 @@
 
     <div class="dossier-final" data-row="4">
       <div class="label">→ Answer returned to user</div>
-      <div class="answer">"10 rooms are left unpainted." The answer is just the last step, and every step before it was easy to check. <span class="cite">(Asked cold, with no steps, models often blurt a wrong number here.)</span></div>
+      <div class="answer">"10 rooms are left unpainted." The answer is just the last step, and every step before it was easy to check. <span class="cite">Asked cold, with no steps, models often blurt a wrong number here.</span></div>
     </div>
 
     <div class="dossier-replay">
-      <button id="dossierReplay">▶ Replay Case</button>
+      <button id="dossierReplay">▶ Replay case</button>
     </div>
   </div>
 </section>
 
 <!-- 05 · CODE -->
 <section>
-  <div class="section-label">05 · Code Sketch</div>
+  <div class="section-label"><span class="num">05</span>Code Sketch</div>
   <h2>The <em>shape</em> in code.</h2>
   <div class="code-stage">
-    <div class="code-hint">Hover any line. The whole pattern is one change to the <span class="term" data-def="The text you send the model. Everything it sees before it starts writing.">prompt</span>.</div>
-    <pre class="code"><code id="codeBlock"><span class="code-line" data-line="0"><span class="comment"># the entire trick: ask for the reasoning before the answer</span></span>
+    <div class="code-hint">Tap a line to see what it does. The whole pattern is one change to the <span class="term" tabindex="0" data-def="The text you send the model. Everything it sees before it starts writing.">prompt</span>.</div>
+    <pre class="code"><code id="codeBlock"><span class="code-line" data-line="0"><span class="comment"># the trick: ask for the reasoning before the answer</span></span>
 <span class="code-line" data-line="1">prompt = question + <span class="str">"\nLet's think step by step."</span></span>
 <span class="code-line" data-line="2"> </span>
-<span class="code-line" data-line="3"><span class="comment"># the model now writes its steps, then lands on an answer</span></span>
+<span class="code-line" data-line="3"><span class="comment"># the model writes its steps, then lands on an answer</span></span>
 <span class="code-line" data-line="4">response = model(prompt)</span>
 <span class="code-line" data-line="5"> </span>
-<span class="code-line" data-line="6"><span class="comment"># the reasoning is everything above; the answer is the last line</span></span>
+<span class="code-line" data-line="6"><span class="comment"># reasoning is everything above; the answer is the last line</span></span>
 <span class="code-line" data-line="7">answer = response.splitlines()[<span class="str">-1</span>]</span>
 <span class="code-line" data-line="8"><span class="kw">return</span> answer, response</span></code></pre>
     <div class="code-explainer" id="codeExplainer">
-      <div class="hint">Hover a line ↑</div>
+      <div class="hint">Tap a line ↑</div>
     </div>
   </div>
 </section>
 
 <!-- 06 · TRADEOFFS -->
 <section>
-  <div class="section-label">06 · Tradeoffs</div>
+  <div class="section-label"><span class="num">06</span>Tradeoffs</div>
   <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-row">
@@ -1009,21 +1022,30 @@
       </div>
     </div>
     <div class="tradeoff-quote">
-      One sentence in the prompt buys you the model's reasoning. Gold on hard problems, noise on easy ones.
+      One sentence in the prompt buys the model's reasoning. Gold on hard problems, noise on easy ones.
     </div>
   </div>
 </section>
 
 <!-- BACK NAV -->
 <section style="padding-top: 20px; padding-bottom: 40px;">
-  <a href="../layers/L4.html" class="back-link">
+  <a href="../index.html" class="back-link">
     <div class="back-arrow">←</div>
     <div class="back-text">
-      <div class="back-hint">Back to category</div>
-      <div class="back-name">L4 · Cognitive Strategy</div>
+      <div class="back-hint">Back to</div>
+      <div class="back-name">The Pattern Book</div>
     </div>
   </a>
 </section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Wei et al. (2022). <em>Chain-of-Thought Prompting Elicits Reasoning in Large Language Models.</em></li>
+    <li>Kojima et al. (2022). <em>Large Language Models are Zero-Shot Reasoners.</em> <span class="note">Origin of the "Let's think step by step" trigger.</span></li>
+  </ul>
+</div>
 
 <footer>
   L4 · Cognitive Strategy · The Pattern Book<br>
@@ -1046,7 +1068,7 @@ const traceEmpty = document.getElementById('traceEmpty');
 const stepLabels = [
   { num: 'Step 1 of 3', text: 'The user asks something that takes more than recall.' },
   { num: 'Step 2 of 3', text: 'Instead of answering, the model writes its reasoning first.' },
-  { num: 'Step 3 of 3', text: 'The answer comes out of the last step — not a guess.' }
+  { num: 'Step 3 of 3', text: 'The answer comes out of the last step, not a guess.' }
 ];
 
 let currentStep = -1;
@@ -1164,31 +1186,59 @@ const codeExplainer = document.getElementById('codeExplainer');
 
 const codeExplanations = [
   "The one move that makes it Chain-of-Thought: ask the model to reason before it answers.",
-  "Append the trigger phrase. 'Let's think step by step' is enough to switch on reasoning — no examples needed.",
+  "Append the trigger phrase. 'Let's think step by step' is enough to switch on reasoning, no examples needed.",
   "",
   "Comment for the model call.",
   "Send it. The model writes its reasoning, then lands on a final answer.",
   "",
   "Comment: where the answer is.",
   "Take the last line as the answer. The lines above it are the reasoning that produced it.",
-  "Return both, so you can check the work — not just the result."
+  "Return both, so you can check the work, not just the result."
 ];
 
+let tappedLine = null;
+
+function showExplanation(line) {
+  codeLines.forEach(l => l.classList.remove('active'));
+  line.classList.add('active');
+  const idx = parseInt(line.dataset.line);
+  const text = codeExplanations[idx];
+  if (text) {
+    codeExplainer.textContent = text;
+  } else {
+    codeExplainer.innerHTML = '<div class="hint">(blank line)</div>';
+  }
+}
+
 codeLines.forEach(line => {
+  // desktop hover (only when nothing tapped/locked)
   line.addEventListener('mouseenter', () => {
-    codeLines.forEach(l => l.classList.remove('active'));
-    line.classList.add('active');
-    const idx = parseInt(line.dataset.line);
-    const text = codeExplanations[idx];
-    if (text) {
-      codeExplainer.textContent = text;
-    } else {
-      codeExplainer.innerHTML = '<div class="hint">(blank line)</div>';
-    }
+    if (tappedLine) return;
+    showExplanation(line);
   });
   line.addEventListener('mouseleave', () => {
+    if (tappedLine) return;
     line.classList.remove('active');
   });
+  // tap / click locks the explanation until another line is tapped
+  line.addEventListener('click', () => {
+    tappedLine = line;
+    showExplanation(line);
+  });
+});
+
+// ============ TERM TOOLTIPS (tap toggle on touch) ============
+const terms = document.querySelectorAll('.term');
+terms.forEach(term => {
+  term.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const wasOpen = term.classList.contains('open');
+    terms.forEach(t => t.classList.remove('open'));
+    if (!wasOpen) term.classList.add('open');
+  });
+});
+document.addEventListener('click', () => {
+  terms.forEach(t => t.classList.remove('open'));
 });
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
