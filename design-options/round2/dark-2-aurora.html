@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0A0A0F;
+    --bg-soft: #0E0E16;
+    --text: #F4F4F8;
+    --text-dim: #A8A8B8;
+    --text-faint: #74748A;
+    --violet: #8B5CF6;
+    --indigo: #6366F1;
+    --blue: #3B82F6;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --glass: rgba(255, 255, 255, 0.025);
+    --radius: 18px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* ---------- Aurora atmosphere ---------- */
+  .aurora {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .aurora__blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.55;
+    will-change: transform;
+    mix-blend-mode: screen;
+  }
+  .aurora__blob--1 {
+    width: 60vw; height: 60vw;
+    max-width: 720px; max-height: 720px;
+    top: -22vh; left: 50%;
+    margin-left: -30vw;
+    background: radial-gradient(circle at 30% 30%, var(--violet), transparent 65%);
+    animation: drift1 26s ease-in-out infinite alternate;
+  }
+  .aurora__blob--2 {
+    width: 50vw; height: 50vw;
+    max-width: 620px; max-height: 620px;
+    top: -10vh; left: 12%;
+    background: radial-gradient(circle at 40% 40%, var(--indigo), transparent 65%);
+    opacity: 0.42;
+    animation: drift2 32s ease-in-out infinite alternate;
+  }
+  .aurora__blob--3 {
+    width: 48vw; height: 48vw;
+    max-width: 560px; max-height: 560px;
+    top: -16vh; right: 6%;
+    background: radial-gradient(circle at 50% 50%, var(--blue), transparent 65%);
+    opacity: 0.40;
+    animation: drift3 29s ease-in-out infinite alternate;
+  }
+  /* fade the glow into the dark canvas */
+  .aurora__veil {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(120% 80% at 50% -10%, transparent 30%, var(--bg) 72%),
+      linear-gradient(to bottom, transparent, var(--bg) 88%);
+  }
+  /* subtle grain/noise via dotted overlay for texture */
+  .aurora__grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.025;
+    background-image: radial-gradient(rgba(255,255,255,0.6) 0.5px, transparent 0.5px);
+    background-size: 4px 4px;
+  }
+
+  @keyframes drift1 {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-6%, 8%) scale(1.12); }
+  }
+  @keyframes drift2 {
+    0%   { transform: translate(0, 0) scale(1.05); }
+    100% { transform: translate(10%, 6%) scale(0.95); }
+  }
+  @keyframes drift3 {
+    0%   { transform: translate(0, 0) scale(0.95); }
+    100% { transform: translate(-8%, 10%) scale(1.1); }
+  }
+
+  /* ---------- Layout ---------- */
+  .shell {
+    position: relative;
+    z-index: 1;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 26px 0;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .brand__mark {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--violet), var(--blue));
+    display: grid;
+    place-items: center;
+    box-shadow: 0 0 18px rgba(139, 92, 246, 0.45);
+    flex-shrink: 0;
+  }
+  .brand__mark svg { width: 15px; height: 15px; }
+  .nav__links {
+    display: flex;
+    gap: 30px;
+    font-size: 14.5px;
+    color: var(--text-dim);
+  }
+  .nav__links a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .nav__links a:hover { color: var(--text); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    text-align: center;
+    padding: 84px 0 70px;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 7px 15px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    margin-bottom: 30px;
+  }
+  .eyebrow .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--violet);
+    box-shadow: 0 0 8px var(--violet);
+  }
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2.6rem, 8.5vw, 5.2rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    background: linear-gradient(180deg, #FFFFFF 30%, #C8C6E6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 26px;
+  }
+  .tagline {
+    font-size: clamp(1.05rem, 2.6vw, 1.4rem);
+    color: var(--text);
+    font-weight: 400;
+    max-width: 620px;
+    margin: 0 auto 14px;
+    line-height: 1.45;
+  }
+  .subline {
+    font-size: clamp(0.95rem, 2.2vw, 1.08rem);
+    color: var(--text-dim);
+    max-width: 540px;
+    margin: 0 auto 40px;
+  }
+  .cta-row {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 26px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.2s ease, border-color 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn--primary {
+    color: #fff;
+    background: linear-gradient(135deg, var(--violet), var(--indigo) 55%, var(--blue));
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+  .btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 38px rgba(99, 102, 241, 0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .btn--ghost {
+    color: var(--text);
+    background: var(--glass);
+    border-color: var(--border-strong);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .btn--ghost:hover {
+    background: rgba(255,255,255,0.06);
+    transform: translateY(-2px);
+  }
+
+  /* ---------- Cards ---------- */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 26px;
+  }
+  .section-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--border), transparent);
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    padding-bottom: 78px;
+  }
+  .card {
+    position: relative;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 26px 30px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    overflow: hidden;
+    transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(139,92,246,0.4), transparent 40%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-strong);
+    background: rgba(255,255,255,0.045);
+  }
+  .card:hover::before { opacity: 1; }
+  .card__tag {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--violet);
+    padding: 5px 11px;
+    border-radius: 7px;
+    background: rgba(139, 92, 246, 0.12);
+    border: 1px solid rgba(139, 92, 246, 0.22);
+    margin-bottom: 18px;
+  }
+  .card h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.32rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-bottom: 10px;
+  }
+  .card p {
+    font-size: 14.5px;
+    color: var(--text-dim);
+    line-height: 1.62;
+  }
+  .card__arrow {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--text-faint);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: gap 0.25s ease, color 0.25s ease;
+  }
+  .card:hover .card__arrow { gap: 10px; color: var(--text-dim); }
+
+  /* ---------- Interactive flow ---------- */
+  .flow-section {
+    padding-bottom: 100px;
+  }
+  .flow-panel {
+    background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015));
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px 36px 36px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    position: relative;
+    overflow: hidden;
+  }
+  .flow-panel__glow {
+    position: absolute;
+    top: -40%; left: 50%; transform: translateX(-50%);
+    width: 70%; height: 80%;
+    background: radial-gradient(ellipse at center, rgba(99,102,241,0.18), transparent 70%);
+    filter: blur(40px);
+    pointer-events: none;
+  }
+  .flow-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 30px;
+    position: relative;
+  }
+  .flow-head h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.4rem, 4vw, 1.85rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .flow-head p {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+  .flow-counter {
+    font-size: 13px;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .flow-counter b { color: var(--text); font-weight: 600; }
+
+  .stages {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    position: relative;
+    margin-bottom: 30px;
+  }
+  /* connecting line */
+  .stages::before {
+    content: "";
+    position: absolute;
+    top: 38px;
+    left: 16.66%;
+    right: 16.66%;
+    height: 1px;
+    background: var(--border);
+    z-index: 0;
+  }
+  .stage {
+    position: relative;
+    z-index: 1;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 18px 20px;
+    text-align: center;
+    transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
+  }
+  .stage__num {
+    width: 34px; height: 34px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--text-dim);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    transition: all 0.4s ease;
+  }
+  .stage__title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.02rem;
+    font-weight: 600;
+    margin-bottom: 7px;
+    color: var(--text);
+  }
+  .stage__desc {
+    font-size: 13px;
+    color: var(--text-faint);
+    line-height: 1.5;
+    transition: color 0.4s ease;
+  }
+  /* active stage */
+  .stage.is-active {
+    background: rgba(139, 92, 246, 0.08);
+    border-color: rgba(139, 92, 246, 0.55);
+    transform: translateY(-4px);
+    box-shadow: 0 0 0 1px rgba(139,92,246,0.25), 0 14px 40px rgba(99, 102, 241, 0.30), 0 0 50px rgba(139, 92, 246, 0.22);
+  }
+  .stage.is-active .stage__num {
+    color: #fff;
+    background: linear-gradient(135deg, var(--violet), var(--blue));
+    border-color: transparent;
+    box-shadow: 0 0 16px rgba(139, 92, 246, 0.7);
+  }
+  .stage.is-active .stage__desc { color: var(--text-dim); }
+  /* completed stage */
+  .stage.is-done .stage__num {
+    color: var(--violet);
+    border-color: rgba(139,92,246,0.45);
+    background: rgba(139,92,246,0.1);
+  }
+
+  .flow-output {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    margin-bottom: 26px;
+    min-height: 92px;
+    position: relative;
+  }
+  .flow-output__label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 9px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .flow-output__label .pulse {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--violet);
+    box-shadow: 0 0 8px var(--violet);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 0.4; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1.15); }
+  }
+  .flow-output__text {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.6;
+    transition: opacity 0.3s ease;
+  }
+  .flow-output__text.mono {
+    font-family: 'Space Grotesk', monospace;
+    color: var(--text-dim);
+  }
+
+  .flow-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .btn--step {
+    color: #fff;
+    background: linear-gradient(135deg, var(--violet), var(--indigo) 60%, var(--blue));
+    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+  .btn--step:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .btn--reset {
+    color: var(--text-dim);
+    background: transparent;
+    border-color: var(--border-strong);
+    font-size: 14px;
+    padding: 13px 20px;
+  }
+  .btn--reset:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+  .progress-track {
+    flex: 1;
+    min-width: 80px;
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.06);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 4px;
+    background: linear-gradient(to right, var(--violet), var(--blue));
+    box-shadow: 0 0 12px rgba(139,92,246,0.6);
+    transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 30px 0;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-faint);
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 760px) {
+    .nav__links { display: none; }
+    .cards { grid-template-columns: 1fr; }
+    .stages { grid-template-columns: 1fr; }
+    .stages::before { display: none; }
+    .hero { padding: 56px 0 50px; }
+    .flow-panel { padding: 30px 22px 28px; }
+    .flow-head { flex-direction: column; align-items: flex-start; }
+  }
+  @media (max-width: 400px) {
+    .shell { padding: 0 18px; }
+    .flow-controls { gap: 10px; }
+    .btn--step { width: 100%; justify-content: center; }
+    .progress-track { order: 3; flex-basis: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+      scroll-behavior: auto !important;
+    }
+    .aurora__blob { opacity: 0.42; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Aurora atmosphere -->
+  <div class="aurora" aria-hidden="true">
+    <div class="aurora__blob aurora__blob--1"></div>
+    <div class="aurora__blob aurora__blob--2"></div>
+    <div class="aurora__blob aurora__blob--3"></div>
+    <div class="aurora__grain"></div>
+    <div class="aurora__veil"></div>
+  </div>
+
+  <div class="shell">
+    <!-- Nav -->
+    <nav>
+      <div class="brand">
+        <span class="brand__mark">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 5.5C4 4.7 4.7 4 5.5 4H11V20H5.5C4.7 20 4 19.3 4 18.5V5.5Z" fill="white" fill-opacity="0.95"/>
+            <path d="M20 5.5C20 4.7 19.3 4 18.5 4H13V20H18.5C19.3 20 20 19.3 20 18.5V5.5Z" fill="white" fill-opacity="0.6"/>
+          </svg>
+        </span>
+        The Pattern Book
+      </div>
+      <div class="nav__links">
+        <a href="#patterns">Patterns</a>
+        <a href="#playground">Playground</a>
+        <a href="#about">About</a>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero">
+      <span class="eyebrow"><span class="dot"></span> Interactive AI reference</span>
+      <h1>The Pattern Book</h1>
+      <p class="tagline">An interactive reference for the patterns behind modern AI systems.</p>
+      <p class="subline">Understand each one by working through it, not just reading about it.</p>
+      <div class="cta-row">
+        <a href="#playground" class="btn btn--primary">Start with RAG &rarr;</a>
+        <a href="#patterns" class="btn btn--ghost">Browse patterns</a>
+      </div>
+    </header>
+
+    <!-- Concept cards -->
+    <section id="patterns">
+      <div class="section-label">Core patterns</div>
+      <div class="cards">
+        <article class="card">
+          <span class="card__tag">Retrieval</span>
+          <h3>RAG</h3>
+          <p>Look up your documents first, then let the model answer from them.</p>
+          <span class="card__arrow">Explore pattern &rarr;</span>
+        </article>
+        <article class="card">
+          <span class="card__tag">Reasoning</span>
+          <h3>Chain-of-Thought</h3>
+          <p>Make the model show its steps before it answers.</p>
+          <span class="card__arrow">Explore pattern &rarr;</span>
+        </article>
+        <article class="card">
+          <span class="card__tag">Evaluation</span>
+          <h3>LLM-as-Judge</h3>
+          <p>Use one model to grade another model's output.</p>
+          <span class="card__arrow">Explore pattern &rarr;</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- Interactive flow -->
+    <section id="playground" class="flow-section">
+      <div class="section-label">Try it &mdash; Chain-of-Thought</div>
+      <div class="flow-panel">
+        <div class="flow-panel__glow" aria-hidden="true"></div>
+        <div class="flow-head">
+          <div>
+            <h2>Walk through the flow</h2>
+            <p>Step through how a reasoning model moves from a question to an answer.</p>
+          </div>
+          <div class="flow-counter">Stage <b id="counter">0</b> / 3</div>
+        </div>
+
+        <div class="stages" id="stages">
+          <div class="stage" data-stage="1">
+            <div class="stage__num">1</div>
+            <div class="stage__title">Question</div>
+            <div class="stage__desc">The user asks something the model needs to work out.</div>
+          </div>
+          <div class="stage" data-stage="2">
+            <div class="stage__num">2</div>
+            <div class="stage__title">Reasoning</div>
+            <div class="stage__desc">The model thinks out loud, step by step.</div>
+          </div>
+          <div class="stage" data-stage="3">
+            <div class="stage__num">3</div>
+            <div class="stage__title">Answer</div>
+            <div class="stage__desc">It commits to a final, grounded response.</div>
+          </div>
+        </div>
+
+        <div class="flow-output">
+          <div class="flow-output__label"><span class="pulse"></span> <span id="output-label">Idle</span></div>
+          <div class="flow-output__text" id="output">Press Step to begin walking through the pattern.</div>
+        </div>
+
+        <div class="flow-controls">
+          <button class="btn btn--step" id="stepBtn">Step &rarr;</button>
+          <button class="btn btn--reset" id="resetBtn">Reset</button>
+          <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <footer id="about">
+      The Pattern Book &middot; A working reference for AI engineers.
+    </footer>
+  </div>
+
+<script>
+  (function () {
+    var stages = Array.prototype.slice.call(document.querySelectorAll('.stage'));
+    var stepBtn = document.getElementById('stepBtn');
+    var resetBtn = document.getElementById('resetBtn');
+    var counter = document.getElementById('counter');
+    var progress = document.getElementById('progress');
+    var output = document.getElementById('output');
+    var outputLabel = document.getElementById('output-label');
+
+    var content = [
+      {
+        label: 'Idle',
+        text: 'Press Step to begin walking through the pattern.'
+      },
+      {
+        label: 'Question',
+        text: '"A shop sells pens at 3 for $2. How much do 12 pens cost?"',
+        mono: false
+      },
+      {
+        label: 'Reasoning',
+        text: '12 pens means 4 sets of 3. Each set costs $2, so 4 × $2 = $8.',
+        mono: true
+      },
+      {
+        label: 'Answer',
+        text: '$8 — and now the working is visible, so the result can be checked.',
+        mono: false
+      }
+    ];
+
+    var current = 0; // 0 = idle, 1..3 = stages
+    var total = stages.length;
+
+    function render() {
+      stages.forEach(function (s, i) {
+        var idx = i + 1;
+        s.classList.remove('is-active', 'is-done');
+        if (idx === current) s.classList.add('is-active');
+        else if (idx < current) s.classList.add('is-done');
+      });
+
+      counter.textContent = current;
+      progress.style.width = (current / total) * 100 + '%';
+
+      var c = content[current];
+      output.textContent = c.text;
+      outputLabel.textContent = c.label;
+      output.classList.toggle('mono', !!c.mono);
+
+      if (current >= total) {
+        stepBtn.textContent = 'Replay ↺';
+      } else {
+        stepBtn.textContent = 'Step →';
+      }
+
+      // gentle fade-in of output on change
+      output.style.opacity = '0';
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { output.style.opacity = '1'; });
+      });
+    }
+
+    stepBtn.addEventListener('click', function () {
+      if (current >= total) {
+        current = 0;
+      }
+      current += 1;
+      render();
+    });
+
+    resetBtn.addEventListener('click', function () {
+      current = 0;
+      render();
+    });
+
+    render();
+  })();
+</script>
+</body>
+</html>

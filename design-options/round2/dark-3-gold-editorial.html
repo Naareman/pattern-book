@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#111110;
+    --bg-rise:#16150f;
+    --ink:#EDE9DF;
+    --ink-soft:#B4AE9E;
+    --ink-faint:#8A8576;
+    --gold:#E8C57A;
+    --gold-deep:#D4AF7A;
+    --gold-dim:rgba(232,197,122,.14);
+    --hair:rgba(232,197,122,.16);
+    --hair-soft:rgba(237,233,223,.08);
+    --card:#17160F;
+    --card-edge:rgba(237,233,223,.07);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    position:relative;
+  }
+  /* subtle warm vignette / grain backdrop */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background:
+      radial-gradient(120% 80% at 70% -10%, rgba(232,197,122,.07), transparent 55%),
+      radial-gradient(90% 70% at 0% 100%, rgba(212,175,122,.05), transparent 50%);
+    pointer-events:none;z-index:0;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+
+  /* ---------- NAV ---------- */
+  nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:30px 0 26px;
+  }
+  .brand{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:1.18rem;
+    letter-spacing:.01em;
+    color:var(--ink);
+    display:flex;align-items:center;gap:11px;
+  }
+  .brand .mark{
+    width:26px;height:26px;flex:none;
+    border:1px solid var(--hair);
+    border-radius:50%;
+    display:grid;place-items:center;
+    color:var(--gold);
+    font-size:.72rem;font-family:'Inter';font-weight:600;
+    background:radial-gradient(circle at 50% 30%, rgba(232,197,122,.18), transparent 70%);
+  }
+  .nav-meta{
+    font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--ink-faint);
+  }
+  @media(max-width:560px){.nav-meta{display:none}}
+
+  /* ---------- HERO ---------- */
+  header{padding:64px 0 38px;border-bottom:1px solid var(--hair-soft)}
+  .eyebrow{
+    font-size:.72rem;letter-spacing:.34em;text-transform:uppercase;
+    color:var(--gold-deep);
+    display:flex;align-items:center;gap:14px;
+    margin-bottom:30px;
+  }
+  .eyebrow::after{
+    content:"";height:1px;flex:1;max-width:200px;
+    background:linear-gradient(90deg,var(--hair),transparent);
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:400;
+    font-size:clamp(2.9rem,8.5vw,5.6rem);
+    line-height:1.02;
+    letter-spacing:-.015em;
+    margin-bottom:26px;
+    max-width:14ch;
+  }
+  h1 em{font-style:italic;color:var(--gold);font-weight:400}
+  .tagline{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:clamp(1.25rem,3vw,1.7rem);
+    color:var(--ink);
+    line-height:1.4;
+    max-width:30ch;
+    margin-bottom:14px;
+  }
+  .subline{
+    font-size:1.02rem;
+    color:var(--ink-soft);
+    max-width:46ch;
+    margin-bottom:40px;
+  }
+  .actions{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+  .btn{
+    font-family:'Inter';font-size:.96rem;font-weight:500;
+    padding:15px 30px;border-radius:2px;
+    cursor:pointer;border:1px solid transparent;
+    text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+    transition:transform .25s ease, box-shadow .35s ease, background .3s ease;
+  }
+  .btn-primary{
+    background:linear-gradient(180deg,var(--gold),var(--gold-deep));
+    color:#23200f;
+    box-shadow:0 1px 0 rgba(255,255,255,.25) inset, 0 14px 34px -16px rgba(232,197,122,.7);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 20px 44px -16px rgba(232,197,122,.85)}
+  .btn-primary .arr{transition:transform .25s ease}
+  .btn-primary:hover .arr{transform:translateX(4px)}
+  .btn-ghost{
+    background:transparent;color:var(--ink);
+    border:1px solid var(--hair);
+  }
+  .btn-ghost:hover{border-color:var(--gold-deep);color:var(--gold)}
+
+  /* ---------- SECTION LABEL ---------- */
+  .sec-label{
+    display:flex;align-items:baseline;gap:16px;
+    margin:78px 0 30px;
+  }
+  .sec-num{
+    font-family:'Fraunces',serif;font-style:italic;
+    color:var(--gold-deep);font-size:1.1rem;
+  }
+  .sec-title{
+    font-size:.74rem;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--ink-faint);
+  }
+  .sec-rule{flex:1;height:1px;background:var(--hair-soft);align-self:center}
+
+  /* ---------- CARDS ---------- */
+  .cards{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+    background:var(--card-edge);
+    border:1px solid var(--card-edge);
+    border-radius:4px;overflow:hidden;
+  }
+  @media(max-width:760px){.cards{grid-template-columns:1fr}}
+  .card{
+    background:var(--card);
+    padding:34px 30px 38px;
+    position:relative;
+    transition:background .35s ease;
+  }
+  .card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:2px;
+    background:var(--gold);transform:scaleX(0);transform-origin:left;
+    transition:transform .4s cubic-bezier(.2,.7,.2,1);
+  }
+  .card:hover{background:var(--bg-rise)}
+  .card:hover::before{transform:scaleX(1)}
+  .card-idx{
+    font-family:'Fraunces',serif;font-style:italic;
+    color:var(--ink-faint);font-size:.92rem;margin-bottom:22px;
+  }
+  .card h3{
+    font-family:'Fraunces',serif;font-weight:500;
+    font-size:1.5rem;letter-spacing:-.01em;margin-bottom:6px;
+  }
+  .card .tag{
+    font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--gold-deep);margin-bottom:18px;display:block;
+  }
+  .card p{color:var(--ink-soft);font-size:.95rem;line-height:1.65}
+
+  /* ---------- INTERACTIVE FLOW ---------- */
+  .flow-panel{
+    background:linear-gradient(180deg,var(--card),#131209);
+    border:1px solid var(--card-edge);
+    border-radius:6px;
+    padding:clamp(28px,4vw,52px);
+    position:relative;overflow:hidden;
+  }
+  .flow-panel::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(80% 120% at 50% -20%, rgba(232,197,122,.06), transparent 60%);
+  }
+  .flow-head{
+    display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;
+    margin-bottom:36px;position:relative;z-index:1;
+  }
+  .flow-head h2{
+    font-family:'Fraunces',serif;font-weight:400;
+    font-size:clamp(1.6rem,3.4vw,2.2rem);letter-spacing:-.01em;
+  }
+  .flow-head p{color:var(--ink-faint);font-size:.92rem;max-width:34ch}
+
+  .stages{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;
+    position:relative;z-index:1;
+  }
+  @media(max-width:640px){.stages{grid-template-columns:1fr}}
+  .stage{
+    border:1px solid var(--hair-soft);
+    border-radius:5px;
+    padding:24px 22px 26px;
+    background:rgba(237,233,223,.015);
+    position:relative;
+    transition:border-color .4s ease, background .4s ease, transform .4s ease, box-shadow .4s ease;
+    opacity:.5;
+  }
+  .stage .step-no{
+    font-family:'Inter';font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--ink-faint);margin-bottom:14px;display:flex;align-items:center;gap:9px;
+  }
+  .stage .dot{
+    width:8px;height:8px;border-radius:50%;
+    border:1px solid var(--ink-faint);background:transparent;
+    transition:all .4s ease;flex:none;
+  }
+  .stage h4{
+    font-family:'Fraunces',serif;font-weight:500;font-size:1.32rem;margin-bottom:9px;
+    transition:color .4s ease;
+  }
+  .stage .body{color:var(--ink-faint);font-size:.9rem;line-height:1.6;transition:color .4s ease}
+
+  .stage.active{
+    opacity:1;
+    border-color:var(--gold-deep);
+    background:linear-gradient(180deg,rgba(232,197,122,.08),rgba(232,197,122,.02));
+    transform:translateY(-3px);
+    box-shadow:0 18px 40px -24px rgba(232,197,122,.6);
+  }
+  .stage.active .dot{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 4px var(--gold-dim)}
+  .stage.active h4{color:var(--gold)}
+  .stage.active .body{color:var(--ink)}
+  .stage.done{opacity:.85}
+  .stage.done .dot{background:var(--gold-deep);border-color:var(--gold-deep);opacity:.6}
+
+  /* connector arrows between stages (desktop) */
+  .stage:not(:last-child)::after{
+    content:"→";
+    position:absolute;right:-14px;top:50%;transform:translateY(-50%);
+    color:var(--ink-faint);font-size:.95rem;z-index:2;
+    transition:color .4s ease;
+  }
+  .stage.done:not(:last-child)::after{color:var(--gold-deep)}
+  @media(max-width:640px){
+    .stage:not(:last-child)::after{
+      content:"↓";right:auto;left:50%;top:auto;bottom:-13px;transform:translateX(-50%);
+    }
+  }
+
+  .flow-controls{
+    display:flex;flex-wrap:wrap;align-items:center;gap:18px;
+    margin-top:34px;position:relative;z-index:1;
+  }
+  .progress{
+    flex:1;min-width:140px;height:2px;background:var(--hair-soft);border-radius:2px;overflow:hidden;
+  }
+  .progress span{
+    display:block;height:100%;width:33.33%;
+    background:linear-gradient(90deg,var(--gold-deep),var(--gold));
+    border-radius:2px;transition:width .5s cubic-bezier(.2,.7,.2,1);
+  }
+  .flow-status{font-size:.78rem;letter-spacing:.06em;color:var(--ink-faint);white-space:nowrap}
+  .flow-status b{color:var(--gold);font-weight:600}
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    margin-top:90px;padding:34px 0 50px;border-top:1px solid var(--hair-soft);
+    display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;
+    font-size:.82rem;color:var(--ink-faint);
+  }
+  footer .brand{font-size:1rem}
+
+  /* entrance */
+  .reveal{opacity:0;transform:translateY(16px);animation:rise .9s cubic-bezier(.2,.7,.2,1) forwards}
+  .d1{animation-delay:.05s}.d2{animation-delay:.16s}.d3{animation-delay:.27s}.d4{animation-delay:.38s}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    .reveal{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="reveal d1">
+    <div class="brand"><span class="mark">PB</span> The Pattern Book</div>
+    <div class="nav-meta">A field reference · No. 01</div>
+  </nav>
+
+  <header>
+    <div class="eyebrow reveal d1">Patterns behind modern AI</div>
+    <h1 class="reveal d2">The <em>Pattern</em> Book</h1>
+    <p class="tagline reveal d2">An interactive reference for the patterns behind modern AI systems.</p>
+    <p class="subline reveal d3">Understand each one by working through it, not just reading about it.</p>
+    <div class="actions reveal d4">
+      <a href="#flow" class="btn btn-primary">Start with RAG <span class="arr">→</span></a>
+      <a href="#cards" class="btn btn-ghost">Browse the patterns</a>
+    </div>
+  </header>
+
+  <div class="sec-label" id="cards">
+    <span class="sec-num">I.</span>
+    <span class="sec-title">The Core Patterns</span>
+    <span class="sec-rule"></span>
+  </div>
+
+  <section class="cards">
+    <article class="card">
+      <div class="card-idx">01</div>
+      <span class="tag">Retrieval</span>
+      <h3>RAG</h3>
+      <p>Look up your documents first, then let the model answer from them.</p>
+    </article>
+    <article class="card">
+      <div class="card-idx">02</div>
+      <span class="tag">Reasoning</span>
+      <h3>Chain-of-Thought</h3>
+      <p>Make the model show its steps before it answers.</p>
+    </article>
+    <article class="card">
+      <div class="card-idx">03</div>
+      <span class="tag">Evaluation</span>
+      <h3>LLM-as-Judge</h3>
+      <p>Use one model to grade another model's output.</p>
+    </article>
+  </section>
+
+  <div class="sec-label" id="flow">
+    <span class="sec-num">II.</span>
+    <span class="sec-title">Walk Through One</span>
+    <span class="sec-rule"></span>
+  </div>
+
+  <section class="flow-panel">
+    <div class="flow-head">
+      <h2>How a pattern moves</h2>
+      <p>Press <b style="color:var(--gold)">Step</b> to advance the flow and watch each stage come to life.</p>
+    </div>
+
+    <div class="stages" id="stages">
+      <div class="stage" data-stage="0">
+        <div class="step-no"><span class="dot"></span> Stage 01</div>
+        <h4>Question</h4>
+        <p class="body">A user asks something specific. The system captures the intent before anything else happens.</p>
+      </div>
+      <div class="stage" data-stage="1">
+        <div class="step-no"><span class="dot"></span> Stage 02</div>
+        <h4>Reasoning</h4>
+        <p class="body">The model works through the problem step by step, drawing on context and structure.</p>
+      </div>
+      <div class="stage" data-stage="2">
+        <div class="step-no"><span class="dot"></span> Stage 03</div>
+        <h4>Answer</h4>
+        <p class="body">A grounded, considered response is returned: traceable back through every step.</p>
+      </div>
+    </div>
+
+    <div class="flow-controls">
+      <button class="btn btn-primary" id="stepBtn">Step <span class="arr">→</span></button>
+      <button class="btn btn-ghost" id="resetBtn">Reset</button>
+      <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+      <div class="flow-status" id="status">Stage <b>1</b> of 3</div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="brand"><span class="mark">PB</span> The Pattern Book</div>
+    <div>Set in Fraunces &amp; Inter · © 2026</div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var stages = Array.prototype.slice.call(document.querySelectorAll('.stage'));
+  var stepBtn = document.getElementById('stepBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var bar = document.getElementById('progressBar');
+  var status = document.getElementById('status');
+  var active = 0;
+  var total = stages.length;
+
+  function render(){
+    stages.forEach(function(s, i){
+      s.classList.remove('active','done');
+      if(i < active) s.classList.add('done');
+      if(i === active) s.classList.add('active');
+    });
+    bar.style.width = ((active+1)/total*100) + '%';
+    status.innerHTML = 'Stage <b>' + (active+1) + '</b> of ' + total;
+    stepBtn.firstChild.textContent = active === total-1 ? 'Replay ' : 'Step ';
+  }
+
+  stepBtn.addEventListener('click', function(){
+    active = (active + 1) % total;
+    render();
+  });
+  resetBtn.addEventListener('click', function(){
+    active = 0;
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
