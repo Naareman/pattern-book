@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Pattern Book — How AI systems are built</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ============ TOKENS (locked light-violet) ============ */
+  :root {
+    --bg: #FCFCFD;
+    --bg-subtle: #F6F7F9;
+    --surface: #FFFFFF;
+    --text: #15171C;
+    --text-soft: #565C68;
+    --text-faint: #8A909C;
+    --border: #E8EAEE;
+    --border-strong: #D5D9E0;
+    --accent: #7C5CF6;
+    --accent-hover: #6D4DE6;
+    --accent-soft: #F0ECFE;
+    --shadow-sm: 0 1px 2px rgba(16, 24, 40, .04), 0 2px 6px rgba(16, 24, 40, .04);
+    --shadow-md: 0 6px 20px rgba(16, 24, 40, .07);
+    --shadow-lg: 0 18px 48px rgba(16, 24, 40, .10), 0 4px 12px rgba(16, 24, 40, .05);
+    --node-glow: 0 6px 22px rgba(124, 92, 246, .28);
+    --ring: 0 0 0 3px var(--accent-soft);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -10%, rgba(124,92,246,.045), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; }
+  ::selection { background: var(--accent-soft); color: var(--text); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ============ HEADER ============ */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 22px clamp(16px, 5vw, 40px) 4px;
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+  .brand-mark {
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    display: grid; place-items: center;
+    background: linear-gradient(145deg, var(--accent), var(--accent-hover));
+    box-shadow: 0 4px 12px rgba(124,92,246,.30);
+    flex: none;
+  }
+  .brand-mark svg { width: 16px; height: 16px; display: block; }
+  .wordmark {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(20px, 3.4vw, 25px);
+    letter-spacing: -.01em;
+    line-height: 1;
+  }
+  .wordmark em { font-style: italic; font-weight: 500; color: var(--accent); }
+  .subline {
+    margin: 8px auto 0;
+    max-width: 1120px;
+    padding: 0 clamp(16px, 5vw, 40px);
+    color: var(--text-soft);
+    font-size: clamp(13.5px, 2vw, 15px);
+    font-weight: 450;
+  }
+
+  /* ============ STAGE ============ */
+  .stage-wrap {
+    max-width: 1120px;
+    margin: clamp(20px, 4vw, 40px) auto clamp(40px, 6vw, 64px);
+    padding: 0 clamp(16px, 5vw, 40px);
+  }
+
+  /* the three named region buttons across the top */
+  .regions {
+    display: grid;
+    grid-template-columns: 200px minmax(280px, 1fr) 1fr;
+    gap: 0;
+    margin-bottom: 14px;
+    align-items: end;
+  }
+  .region-btn {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    padding: 4px 0 8px;
+    border-bottom: 2px solid transparent;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 9px;
+    width: fit-content;
+    transition: border-color .16s ease, color .16s ease;
+  }
+  .region-btn .r-name {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(17px, 2.6vw, 21px);
+    letter-spacing: -.01em;
+    color: var(--text);
+  }
+  .region-btn .r-hint {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text-faint);
+    letter-spacing: -.005em;
+  }
+  .region-btn:hover, .region-btn:focus-visible {
+    border-bottom-color: var(--accent);
+    outline: none;
+  }
+  .region-btn:hover .r-name, .region-btn:focus-visible .r-name { color: var(--accent); }
+  /* center the concerns region label over the box */
+  .regions .region-concerns { justify-self: center; text-align: center; }
+  .regions .region-concerns { align-items: center; flex-direction: column; gap: 1px; }
+  .regions .region-builds { justify-self: start; }
+
+  /* the picture grid: arrow+stack | builds */
+  .scene {
+    display: grid;
+    grid-template-columns: 200px minmax(280px, 1fr) 1fr;
+    align-items: stretch;
+    gap: 0;
+    position: relative;
+  }
+
+  /* ---- DIRECTION AXIS (left of the stack) ---- */
+  .axis {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    padding: 30px 18px 14px 4px;
+  }
+  .axis-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+  }
+  .axis-cap {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    line-height: 1.25;
+    color: var(--text-soft);
+    max-width: 130px;
+  }
+  .axis-cap .em { color: var(--accent); }
+  .axis-top { padding-bottom: 6px; }
+  .axis-bot { padding-top: 6px; }
+  /* the vertical arrow line itself */
+  .axis-line {
+    position: absolute;
+    top: 34px; bottom: 34px;
+    right: 14px;
+    width: 2px;
+    background: linear-gradient(180deg, var(--accent), var(--accent-hover));
+    border-radius: 2px;
+  }
+  .axis-line::after {
+    content: "";
+    position: absolute;
+    bottom: -1px; left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 8px solid var(--accent-hover);
+  }
+  .axis-tip {
+    position: absolute;
+    top: 30px; right: 9px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: var(--ring);
+  }
+
+  /* ---- THE STACK SHELL (holds layers + crossing concern lines) ---- */
+  .stack-shell {
+    position: relative;
+    z-index: 2;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: var(--shadow-lg);
+    padding: 30px 18px 18px;
+    margin: 0 6px;
+  }
+  /* concern lines layer (SVG) sits over the bars but clicks pass to lines only */
+  .concern-svg {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    border-radius: 22px;
+    overflow: visible;
+  }
+  .concern-line {
+    fill: none;
+    stroke: var(--border-strong);
+    stroke-width: 1.4;
+    transition: stroke .18s ease, stroke-width .18s ease;
+  }
+  .concern-hit {
+    fill: none;
+    stroke: transparent;
+    stroke-width: 16;
+    pointer-events: stroke;
+    cursor: pointer;
+  }
+  .concern-cap {
+    position: absolute;
+    top: 6px;
+    transform: translateX(-50%);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: -.005em;
+    color: var(--text-faint);
+    white-space: nowrap;
+    cursor: pointer;
+    z-index: 5;
+    padding: 2px 4px;
+    border-radius: 6px;
+    transition: color .16s ease, background .16s ease;
+  }
+  .concern-cap:hover, .concern-cap.lit { color: var(--accent); background: var(--accent-soft); }
+  .concern-dot {
+    fill: var(--border-strong);
+    transition: fill .18s ease;
+  }
+  /* lit state for one concern across all layers */
+  .concern-group.lit .concern-line { stroke: var(--accent); stroke-width: 2.2; }
+  .concern-group.lit .concern-dot { fill: var(--accent); }
+
+  /* the bars */
+  .layers { display: flex; flex-direction: column; gap: 7px; position: relative; z-index: 3; }
+  .layer {
+    position: relative;
+    border: 1px solid var(--border);
+    background: var(--bg-subtle);
+    border-radius: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    width: 100%;
+    transition: background .16s ease, border-color .16s ease,
+                box-shadow .16s ease, transform .16s ease, color .16s ease;
+  }
+  .layer:hover, .layer:focus-visible {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    outline: none;
+    transform: translateX(2px);
+    box-shadow: var(--shadow-sm);
+  }
+  .layer-num {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--text-faint);
+    width: 14px;
+    flex: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .layer:hover .layer-num, .layer:focus-visible .layer-num { color: var(--accent); }
+  .layer-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    line-height: 1.2;
+  }
+  .layer-arrow {
+    margin-left: auto;
+    color: var(--text-faint);
+    opacity: 0;
+    transition: opacity .16s ease, transform .16s ease;
+    display: grid; place-items: center;
+  }
+  .layer-arrow svg { width: 14px; height: 14px; }
+  .layer:hover .layer-arrow, .layer:focus-visible .layer-arrow {
+    opacity: 1; transform: translateX(2px); color: var(--accent);
+  }
+  /* a concern lights every layer */
+  .stack-shell.lit .layer { border-color: var(--accent); }
+  /* a build lights its source layers */
+  .layer.sourced {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    box-shadow: var(--node-glow);
+  }
+
+  /* ---- BUILDS (outputs) ---- */
+  .builds {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+    padding: 30px 0 14px clamp(40px, 8vw, 104px);
+    position: relative;
+    z-index: 3;
+  }
+  .build {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 10px 18px 10px 12px;
+    cursor: pointer;
+    color: var(--text);
+    box-shadow: var(--shadow-sm);
+    transition: border-color .16s ease, box-shadow .16s ease,
+                transform .16s ease, color .16s ease;
+    width: fit-content;
+    max-width: 100%;
+  }
+  .build:hover, .build:focus-visible, .build.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: var(--shadow-md);
+    transform: translateX(3px);
+    outline: none;
+  }
+  .build-ico {
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    flex: none;
+    display: grid; place-items: center;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .build-ico svg { width: 16px; height: 16px; }
+  .build-name { font-size: 13.5px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; }
+
+  /* output arrows (SVG overlay stack -> builds) */
+  .build-lines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: visible;
+  }
+  .build-lines path { fill: none; stroke: var(--border-strong); stroke-width: 1.6; }
+  .build-lines polygon { fill: var(--border-strong); transition: fill .18s ease; }
+  .build-lines .flow {
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-dasharray: 6 240;
+    stroke-dashoffset: 0;
+    opacity: .95;
+  }
+  @keyframes travel { to { stroke-dashoffset: -246; } }
+  .build-lines .flow.pulsing { animation: travel 3.6s linear infinite; }
+
+  /* a slow violet pulse travelling one concern line */
+  @keyframes travelV { to { stroke-dashoffset: -1; } }
+  .concern-pulse {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    opacity: .9;
+    pointer-events: none;
+  }
+  .concern-pulse.pulsing { animation: travelV 3.8s linear infinite; }
+
+  /* ============ DRILL-IN SHEET ============ */
+  .sheet-scrim {
+    position: fixed; inset: 0; z-index: 90;
+    background: rgba(16, 24, 40, .28);
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+    opacity: 0; pointer-events: none; transition: opacity .2s ease;
+  }
+  .sheet-scrim.open { opacity: 1; pointer-events: auto; }
+  .sheet {
+    position: fixed; z-index: 91; top: 0; right: 0; height: 100%;
+    width: min(440px, 92vw);
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(102%);
+    transition: transform .26s cubic-bezier(.2,.7,.2,1);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .sheet.open { transform: translateX(0); }
+  .sheet-head {
+    padding: 24px 24px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .sheet-head .h-ico {
+    width: 40px; height: 40px; border-radius: 11px; flex: none;
+    display: grid; place-items: center;
+    background: var(--accent-soft); color: var(--accent);
+    border: 1px solid var(--border);
+  }
+  .sheet-head .h-ico svg { width: 20px; height: 20px; }
+  .sheet-eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .sheet-title { font-size: 20px; font-weight: 600; letter-spacing: -.01em; margin-top: 3px; }
+  .sheet-desc { font-size: 13px; color: var(--text-soft); margin-top: 6px; line-height: 1.5; }
+  .sheet-close {
+    margin-left: auto; width: 32px; height: 32px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text-soft); cursor: pointer; flex: none;
+    display: grid; place-items: center;
+  }
+  .sheet-close:hover { color: var(--accent); border-color: var(--accent); }
+  .sheet-close svg { width: 15px; height: 15px; }
+  .sheet-body { padding: 18px 24px 28px; overflow-y: auto; }
+  .sheet-body .grp-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--text-faint);
+    margin: 4px 0 12px;
+  }
+  .pat {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 14px; border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: 10px; background: var(--bg-subtle);
+  }
+  .pat.link { cursor: pointer; transition: border-color .16s, box-shadow .16s, transform .16s, background .16s; }
+  .pat.link:hover {
+    border-color: var(--accent); background: var(--surface);
+    box-shadow: var(--shadow-md); transform: translateX(2px);
+  }
+  .pat-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--border-strong); }
+  .pat.link .pat-dot { background: var(--accent); }
+  .pat-body { min-width: 0; }
+  .pat-name { font-size: 14px; font-weight: 600; letter-spacing: -.01em; }
+  .pat-name .open-tag {
+    margin-left: 7px; font-size: 10px; font-weight: 600; letter-spacing: .04em;
+    color: var(--accent); background: var(--accent-soft);
+    border-radius: 999px; padding: 2px 7px; vertical-align: middle;
+  }
+  .pat-sub { font-size: 12px; color: var(--text-soft); margin-top: 2px; }
+  .pat-arrow { margin-left: auto; color: var(--accent); flex: none; opacity: 0; transition: opacity .16s, transform .16s; }
+  .pat.link:hover .pat-arrow { opacity: 1; transform: translateX(2px); }
+  .pat-arrow svg { width: 15px; height: 15px; }
+  /* region explainer rows inside sheet */
+  .ex-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: 9px; background: var(--bg-subtle);
+  }
+  .ex-row .ex-mark { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--accent); }
+  .ex-row .ex-name { font-size: 13.5px; font-weight: 600; }
+  .ex-row .ex-sub { font-size: 12px; color: var(--text-soft); margin-top: 1px; }
+
+  .foot {
+    border-top: 1px solid var(--border);
+    padding: 24px clamp(16px, 5vw, 40px);
+    text-align: center; color: var(--text-faint); font-size: 12px;
+    max-width: 1120px; margin: 0 auto;
+  }
+  .foot strong { color: var(--text-soft); font-weight: 500; }
+
+  /* mobile helper labels (hidden on desktop) */
+  .m-only { display: none; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 900px) {
+    .regions, .scene { grid-template-columns: 168px minmax(240px, 1fr) 200px; }
+    .builds { padding-left: clamp(24px, 5vw, 56px); }
+  }
+
+  /* mobile: stack stays vertical; concerns become labelled markers crossing
+     each layer; builds become a labelled output row below. */
+  @media (max-width: 680px) {
+    .regions { display: flex; flex-wrap: wrap; gap: 10px 18px; justify-content: center; margin-bottom: 18px; }
+    .regions .region-concerns, .regions .region-builds { justify-self: auto; }
+    .regions .region-concerns { flex-direction: row; align-items: baseline; }
+
+    .scene { display: block; position: static; }
+    .build-lines { display: none; }
+    .m-only { display: block; }
+
+    /* axis becomes a slim labelled bar to the left, kept compact */
+    .axis { padding: 0; margin-bottom: 14px; }
+    .axis-inner { flex-direction: row; align-items: center; justify-content: space-between; width: 100%; }
+    .axis-line { display: none; }
+    .axis-tip { display: none; }
+    .axis-cap { max-width: none; display: inline-flex; align-items: center; gap: 6px; }
+    .axis-arrow-m { color: var(--accent); }
+
+    .stack-shell { max-width: 440px; margin: 0 auto; padding: 16px 14px; }
+    /* SVG concern overlay hidden; markers shown inline instead */
+    .concern-svg { display: none; }
+    .concern-cap { display: none; }
+
+    .layer { padding: 12px 12px; flex-wrap: wrap; }
+    /* inline concern markers crossing each layer */
+    .layer-marks { display: flex; gap: 5px; margin-left: auto; flex: none; }
+    .mark {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--border-strong);
+    }
+    .layer:hover .mark, .layer:focus-visible .mark { background: var(--accent); }
+
+    .builds {
+      flex-direction: row; flex-wrap: wrap; justify-content: center;
+      gap: 10px; padding: 0; margin-top: 18px;
+    }
+    .build { transform: none; }
+    .build:hover, .build:focus-visible, .build.active { transform: translateY(-2px); }
+  }
+  @media (min-width: 681px) {
+    .layer-marks { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+    }
+    .build-lines .flow.pulsing, .concern-pulse.pulsing { animation: none; }
+    .concern-pulse { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="nav">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M12 3v18"/>
+        </svg>
+      </span>
+      <span class="wordmark">The <em>Pattern</em> Book</span>
+    </div>
+    <p class="subline">How AI systems are built.</p>
+  </header>
+
+  <main class="stage-wrap">
+
+    <!-- THREE NAMED REGION BUTTONS -->
+    <div class="regions">
+      <button class="region-btn region-layers" id="regionLayers" type="button">
+        <span class="r-name">Layers</span>
+        <span class="r-hint">top &rarr; down</span>
+      </button>
+      <button class="region-btn region-concerns" id="regionConcerns" type="button">
+        <span class="r-name">Concerns</span>
+        <span class="r-hint">cut across every layer</span>
+      </button>
+      <button class="region-btn region-builds" id="regionBuilds" type="button">
+        <span class="r-name">Builds</span>
+        <span class="r-hint">what the stack produces</span>
+      </button>
+    </div>
+
+    <div class="scene" id="scene">
+
+      <!-- output arrows overlay (desktop) -->
+      <svg class="build-lines" id="buildLines" preserveAspectRatio="none" aria-hidden="true"></svg>
+
+      <!-- DIRECTION AXIS -->
+      <div class="axis" aria-hidden="true">
+        <div class="axis-inner">
+          <div class="axis-cap axis-top"><span class="em">User-facing</span><br>what people touch</div>
+          <div class="axis-cap axis-bot"><span class="em">Foundation</span><br>what it all rests on</div>
+        </div>
+        <span class="axis-tip"></span>
+        <span class="axis-line"></span>
+      </div>
+
+      <!-- THE STACK -->
+      <div class="stack-shell" id="stackShell">
+        <!-- concern lines crossing the whole stack -->
+        <svg class="concern-svg" id="concernSvg" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="concern-caps" id="concernCaps"></div>
+
+        <div class="layers" id="layers">
+          <button class="layer" data-layer="ux" type="button"><span class="layer-num">1</span><span class="layer-name">User experience</span><span class="layer-marks" aria-hidden="true"></span><span class="layer-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+          <button class="layer" data-layer="app" type="button"><span class="layer-num">2</span><span class="layer-name">Application patterns</span><span class="layer-marks" aria-hidden="true"></span><span class="layer-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+          <button class="layer" data-layer="orch" type="button"><span class="layer-num">3</span><span class="layer-name">Orchestration &amp; agents</span><span class="layer-marks" aria-hidden="true"></span><span class="layer-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+          <button class="layer" data-layer="single" type="button"><span class="layer-num">4</span><span class="layer-name">Single-call control</span><span class="layer-marks" aria-hidden="true"></span><span class="layer-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+          <button class="layer" data-layer="memory" type="button"><span class="layer-num">5</span><span class="layer-name">Memory</span><span class="layer-marks" aria-hidden="true"></span><span class="layer-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+          <button class="layer" data-layer="retrieval" type="button"><span class="layer-num">6</span><span class="layer-name">Retrieval</span><span class="layer-marks" aria-hidden="true"></span><span class="layer-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+          <button class="layer" data-layer="comp" type="button"><span class="layer-num">7</span><span class="layer-name">Composition</span><span class="layer-marks" aria-hidden="true"></span><span class="layer-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+          <button class="layer" data-layer="train" type="button"><span class="layer-num">8</span><span class="layer-name">Training &amp; adaptation</span><span class="layer-marks" aria-hidden="true"></span><span class="layer-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+          <button class="layer" data-layer="serve" type="button"><span class="layer-num">9</span><span class="layer-name">Serving &amp; infrastructure</span><span class="layer-marks" aria-hidden="true"></span><span class="layer-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+          <button class="layer" data-layer="data" type="button"><span class="layer-num">10</span><span class="layer-name">Data &amp; artifacts</span><span class="layer-marks" aria-hidden="true"></span><span class="layer-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+        </div>
+      </div>
+
+      <!-- BUILDS -->
+      <div class="builds" id="builds">
+        <span class="m-only" style="font-size:11.5px;color:var(--text-faint);text-align:center;width:100%;margin-bottom:2px;">The stack produces &rarr;</span>
+
+        <button class="build" data-build="coding" type="button">
+          <span class="build-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12"/></svg></span>
+          <span class="build-name">Coding Agent</span>
+        </button>
+
+        <button class="build" data-build="docqa" type="button">
+          <span class="build-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h4"/></svg></span>
+          <span class="build-name">Document Q&amp;A</span>
+        </button>
+
+        <button class="build" data-build="research" type="button">
+          <span class="build-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg></span>
+          <span class="build-name">Research Agent</span>
+        </button>
+
+        <button class="build" data-build="support" type="button">
+          <span class="build-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 0-3.2 6.9L21 20z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/></svg></span>
+          <span class="build-name">Customer Support Agent</span>
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="foot">
+    <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; click a layer for its patterns, or a region name to learn what it means
+  </footer>
+
+  <!-- DRILL-IN SHEET -->
+  <div class="sheet-scrim" id="scrim"></div>
+  <aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
+    <div class="sheet-head">
+      <span class="h-ico" id="sheetIco" aria-hidden="true"></span>
+      <div>
+        <div class="sheet-eyebrow" id="sheetEyebrow">Layer</div>
+        <div class="sheet-title" id="sheetTitle"></div>
+        <div class="sheet-desc" id="sheetDesc"></div>
+      </div>
+      <button class="sheet-close" id="sheetClose" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div class="grp-label" id="sheetGrp">Patterns in this layer</div>
+      <div id="sheetList"></div>
+    </div>
+  </aside>
+
+<script>
+(function () {
+  "use strict";
+
+  var reduceMotion = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- ICONS ---- */
+  var LAYER_ICON = {
+    ux:        '<path d="M4 5h16v11H4zM2 20h20M9.5 16v4M14.5 16v4"/>',
+    app:       '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+    orch:      '<circle cx="12" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M10.5 7.5L7.5 16M13.5 7.5l3 8.5M8.5 18h7"/>',
+    single:    '<path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/>',
+    memory:    '<rect x="5" y="5" width="14" height="14" rx="2"/><path d="M5 9h14M9 5v14M2 8h3M2 12h3M2 16h3M19 8h3M19 12h3M19 16h3"/>',
+    retrieval: '<path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4"/>',
+    comp:      '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 3v18M4 7.5l8 4.5 8-4.5"/>',
+    train:     '<path d="M5 19V9M12 19V5M19 19v-7"/><path d="M3 19h18"/>',
+    serve:     '<rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/><path d="M8 7h.01M8 17h.01"/>',
+    data:      '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>'
+  };
+
+  var LAYERS = {
+    ux: { title: 'User experience', desc: 'How people see, steer, and trust the system.', patterns: [
+      { name: 'Streaming responses', sub: 'Show tokens as they arrive' },
+      { name: 'Citations & sources', sub: 'Point back to the evidence' },
+      { name: 'Human-in-the-loop', sub: 'Pause for approval on risky steps' }
+    ]},
+    app: { title: 'Application patterns', desc: 'The recognisable shapes whole products are built on.', patterns: [
+      { name: 'Question answering', sub: 'Ask, get a grounded reply' },
+      { name: 'Summarisation', sub: 'Long input, short output' },
+      { name: 'Classification & routing', sub: 'Sort and send to the right path' }
+    ]},
+    orch: { title: 'Orchestration & agents', desc: 'Many model calls and tools working as one loop.', patterns: [
+      { name: 'Tool use', sub: 'Let the model call functions' },
+      { name: 'ReAct loop', sub: 'Reason, act, observe, repeat' },
+      { name: 'Planner / executor', sub: 'Plan first, then carry it out' }
+    ]},
+    single: { title: 'Single-call control', desc: 'Getting the most from one model call.', patterns: [
+      { name: 'Chain-of-Thought', sub: 'Make the model show its steps', href: '../../patterns/L4-chain-of-thought.html' },
+      { name: 'Few-shot prompting', sub: 'Teach by examples in the prompt' },
+      { name: 'Structured output', sub: 'Force clean JSON or schema' }
+    ]},
+    memory: { title: 'Memory', desc: 'What the system remembers between turns and sessions.', patterns: [
+      { name: 'Conversation buffer', sub: 'Keep the recent turns' },
+      { name: 'Summary memory', sub: 'Compress old turns into notes' },
+      { name: 'Long-term store', sub: 'Persist facts about the user' }
+    ]},
+    retrieval: { title: 'Retrieval', desc: 'Finding the right context before the model answers.', patterns: [
+      { name: 'RAG', sub: 'Look things up, then answer from them', href: '../../example/rag.html' },
+      { name: 'Hybrid search', sub: 'Mix keyword and vector search' },
+      { name: 'Re-ranking', sub: 'Sort results by real relevance' }
+    ]},
+    comp: { title: 'Composition', desc: 'Combining models and steps into bigger flows.', patterns: [
+      { name: 'Prompt chaining', sub: 'Feed one output into the next' },
+      { name: 'Routing', sub: 'Pick the right model per task' },
+      { name: 'Parallel fan-out', sub: 'Run many calls, then merge' }
+    ]},
+    train: { title: 'Training & adaptation', desc: 'Teaching a model new behaviour.', patterns: [
+      { name: 'Fine-tuning', sub: 'Adjust weights on your data' },
+      { name: 'LoRA adapters', sub: 'Lightweight, swappable tuning' },
+      { name: 'Preference tuning', sub: 'Align to what people prefer' }
+    ]},
+    serve: { title: 'Serving & infrastructure', desc: 'Running models fast, cheap, and reliably.', patterns: [
+      { name: 'Batching', sub: 'Group requests for throughput' },
+      { name: 'KV cache', sub: 'Reuse attention state' },
+      { name: 'Autoscaling', sub: 'Match capacity to demand' }
+    ]},
+    data: { title: 'Data & artifacts', desc: 'The raw material everything is built from.', patterns: [
+      { name: 'Chunking', sub: 'Split documents for retrieval' },
+      { name: 'Embeddings', sub: 'Turn text into vectors' },
+      { name: 'Versioned datasets', sub: 'Track what trained what' }
+    ]}
+  };
+
+  /* concerns, left-to-right across the box */
+  var CONCERNS = [
+    { key: 'eval',    name: 'Evaluation',    sub: 'Is it actually good? Measure quality at every layer.' },
+    { key: 'safety',  name: 'Safety',        sub: 'Keep behaviour in bounds, top to bottom.' },
+    { key: 'privacy', name: 'Privacy',       sub: 'Protect user data everywhere it flows.' },
+    { key: 'obs',     name: 'Observability', sub: 'See what the system is doing, layer by layer.' },
+    { key: 'cost',    name: 'Cost',          sub: 'Watch spend at every level of the stack.' }
+  ];
+
+  var BUILD_SOURCES = {
+    coding:   ['ux','app','orch','single','memory','serve','data'],
+    docqa:    ['ux','app','single','retrieval','comp','data'],
+    research: ['ux','app','orch','single','memory','retrieval','comp'],
+    support:  ['ux','app','orch','single','memory','retrieval','serve']
+  };
+  var BUILD_META = {
+    coding:   { title: 'Coding Agent', sub: 'Writes, edits, and runs code across a project.' },
+    docqa:    { title: 'Document Q&A', sub: 'Answers questions grounded in your documents.' },
+    research: { title: 'Research Agent', sub: 'Plans, searches, and synthesises findings.' },
+    support:  { title: 'Customer Support Agent', sub: 'Resolves user issues with memory and tools.' }
+  };
+
+  var scene = document.getElementById('scene');
+  var stackShell = document.getElementById('stackShell');
+  var concernSvg = document.getElementById('concernSvg');
+  var concernCaps = document.getElementById('concernCaps');
+  var buildLines = document.getElementById('buildLines');
+  var layerBtns = Array.prototype.slice.call(document.querySelectorAll('.layer'));
+  var buildBtns = Array.prototype.slice.call(document.querySelectorAll('.build'));
+
+  /* mobile concern markers inside each layer */
+  layerBtns.forEach(function (l) {
+    var holder = l.querySelector('.layer-marks');
+    if (!holder) return;
+    holder.innerHTML = CONCERNS.map(function () { return '<span class="mark"></span>'; }).join('');
+  });
+
+  function isDesktop() { return window.innerWidth > 680; }
+
+  function rel(el, ref) {
+    var s = ref.getBoundingClientRect();
+    var r = el.getBoundingClientRect();
+    return { x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height,
+             cx: r.left - s.left + r.width / 2, cy: r.top - s.top + r.height / 2 };
+  }
+
+  /* -------- DRAW concern lines crossing the whole stack -------- */
+  function drawConcerns() {
+    concernSvg.innerHTML = '';
+    concernCaps.innerHTML = '';
+    if (!isDesktop()) return;
+
+    var shellRect = stackShell.getBoundingClientRect();
+    var W = shellRect.width, H = shellRect.height;
+    concernSvg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+    var layerRects = layerBtns.map(function (l) { return rel(l, stackShell); });
+    var topY = 22;                       // just below the shell top padding
+    var botY = H - 12;                   // near the bottom padding
+
+    var n = CONCERNS.length;
+    /* spread lines evenly across the inner width, with comfortable margins */
+    var marginX = Math.max(34, W * 0.10);
+    var span = W - marginX * 2;
+    var pulseTarget = 1; // which concern carries the slow violet pulse
+
+    CONCERNS.forEach(function (c, i) {
+      var x = marginX + (n === 1 ? span / 2 : span * (i / (n - 1)));
+
+      var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('class', 'concern-group');
+      g.setAttribute('data-concern', c.key);
+
+      // the visible line
+      var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('class', 'concern-line');
+      line.setAttribute('x1', x); line.setAttribute('y1', topY);
+      line.setAttribute('x2', x); line.setAttribute('y2', botY);
+      g.appendChild(line);
+
+      // a dot where it crosses each layer
+      layerRects.forEach(function (lr) {
+        var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('class', 'concern-dot');
+        dot.setAttribute('cx', x); dot.setAttribute('cy', lr.cy); dot.setAttribute('r', 2.4);
+        g.appendChild(dot);
+      });
+
+      // the slow violet pulse travels one concern line
+      if (i === pulseTarget && !reduceMotion) {
+        var len = botY - topY;
+        var pulse = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        pulse.setAttribute('class', 'concern-pulse pulsing');
+        pulse.setAttribute('x1', x); pulse.setAttribute('y1', topY);
+        pulse.setAttribute('x2', x); pulse.setAttribute('y2', botY);
+        pulse.setAttribute('stroke-dasharray', '14 ' + (len));
+        pulse.setAttribute('stroke-dashoffset', len);
+        // animate from offset=len down: use keyframe travelV to ~ -1; set custom via inline
+        pulse.style.animation = 'concernTravel 3.8s linear infinite';
+        g.appendChild(pulse);
+        ensureConcernKeyframe(len);
+      }
+
+      // invisible wide hit area
+      var hit = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      hit.setAttribute('class', 'concern-hit');
+      hit.setAttribute('x1', x); hit.setAttribute('y1', topY);
+      hit.setAttribute('x2', x); hit.setAttribute('y2', botY);
+      g.appendChild(hit);
+
+      concernSvg.appendChild(g);
+
+      // top caption (clickable)
+      var cap = document.createElement('button');
+      cap.type = 'button';
+      cap.className = 'concern-cap';
+      cap.textContent = c.name;
+      cap.setAttribute('data-concern', c.key);
+      cap.style.left = x + 'px';
+      concernCaps.appendChild(cap);
+
+      // wire hover/focus on both line and caption
+      bindConcern(g, cap, c.key);
+    });
+  }
+
+  /* one shared keyframe for the concern pulse, sized to the line */
+  var styleTag = null;
+  function ensureConcernKeyframe(len) {
+    if (styleTag) return;
+    styleTag = document.createElement('style');
+    styleTag.textContent =
+      '@keyframes concernTravel { from { stroke-dashoffset: ' + len + '; } to { stroke-dashoffset: ' + (-len * 0.06) + '; } }';
+    document.head.appendChild(styleTag);
+  }
+
+  function litConcern(key, on) {
+    var g = concernSvg.querySelector('[data-concern="' + key + '"]');
+    var cap = concernCaps.querySelector('[data-concern="' + key + '"]');
+    if (g) g.classList.toggle('lit', on);
+    if (cap) cap.classList.toggle('lit', on);
+    stackShell.classList.toggle('lit', on);
+  }
+  function bindConcern(g, cap, key) {
+    var on = function () { litConcern(key, true); };
+    var off = function () { litConcern(key, false); };
+    [g, cap].forEach(function (el) {
+      el.addEventListener('mouseenter', on);
+      el.addEventListener('mouseleave', off);
+    });
+    cap.addEventListener('focus', on);
+    cap.addEventListener('blur', off);
+    cap.addEventListener('click', function () { openConcern(key); });
+  }
+
+  /* -------- DRAW output arrows: stack -> builds -------- */
+  function drawArrows() {
+    buildLines.innerHTML = '';
+    if (!isDesktop()) return;
+    var s = scene.getBoundingClientRect();
+    buildLines.setAttribute('viewBox', '0 0 ' + s.width + ' ' + s.height);
+
+    var m = rel(stackShell, scene);
+    var bHtml = '';
+    buildBtns.forEach(function (btn, i) {
+      var bb = rel(btn, scene);
+      var sx = m.x + m.w;
+      var sy = m.cy + (i - (buildBtns.length - 1) / 2) * (m.h / (buildBtns.length + 1.6));
+      var ex = bb.x - 7;
+      var ey = bb.cy;
+      var midX = sx + (ex - sx) * 0.5;
+      var d = 'M' + sx + ' ' + sy + ' C' + midX + ' ' + sy + ' ' + midX + ' ' + ey + ' ' + ex + ' ' + ey;
+      var isFlow = (i === 0);
+      bHtml += '<path class="' + (isFlow ? 'flow' + (reduceMotion ? '' : ' pulsing') : '') + '" data-arrow="' + btn.getAttribute('data-build') + '" d="' + d + '"/>';
+      bHtml += '<polygon data-head="' + btn.getAttribute('data-build') + '" points="' +
+               ex + ',' + ey + ' ' + (ex - 7) + ',' + (ey - 4) + ' ' + (ex - 7) + ',' + (ey + 4) + '"/>';
+    });
+    buildLines.innerHTML = bHtml;
+  }
+
+  function drawAll() { drawConcerns(); drawArrows(); }
+
+  var rT;
+  function onResize() { clearTimeout(rT); rT = setTimeout(drawAll, 90); }
+  window.addEventListener('resize', onResize);
+  window.addEventListener('load', drawAll);
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(drawAll); }
+  drawAll();
+
+  /* -------- BUILD hover/click -> light source layers + arrow -------- */
+  function litBuild(key, on) {
+    var srcs = BUILD_SOURCES[key] || [];
+    layerBtns.forEach(function (l) {
+      var k = l.getAttribute('data-layer');
+      l.classList.toggle('sourced', on && srcs.indexOf(k) !== -1);
+    });
+    var arrow = buildLines.querySelector('[data-arrow="' + key + '"]');
+    var head = buildLines.querySelector('[data-head="' + key + '"]');
+    if (arrow && !arrow.classList.contains('flow')) {
+      arrow.style.stroke = on ? 'var(--accent)' : '';
+      arrow.style.strokeWidth = on ? '2.2' : '';
+    }
+    if (head) head.style.fill = on ? 'var(--accent)' : '';
+  }
+  var activeBuild = null;
+  buildBtns.forEach(function (b) {
+    var key = b.getAttribute('data-build');
+    b.addEventListener('mouseenter', function () { if (!activeBuild) litBuild(key, true); });
+    b.addEventListener('mouseleave', function () { if (!activeBuild) litBuild(key, false); });
+    b.addEventListener('click', function () {
+      openBuild(key);
+    });
+  });
+
+  /* ---------------- DRILL-IN SHEET ---------------- */
+  var sheet = document.getElementById('sheet');
+  var scrim = document.getElementById('scrim');
+  var sheetIco = document.getElementById('sheetIco');
+  var sheetEyebrow = document.getElementById('sheetEyebrow');
+  var sheetTitle = document.getElementById('sheetTitle');
+  var sheetDesc = document.getElementById('sheetDesc');
+  var sheetGrp = document.getElementById('sheetGrp');
+  var sheetList = document.getElementById('sheetList');
+  var sheetClose = document.getElementById('sheetClose');
+  var lastFocus = null;
+
+  function patternRow(p) {
+    if (p.href) {
+      var a = document.createElement('a');
+      a.className = 'pat link';
+      a.href = p.href;
+      a.innerHTML =
+        '<span class="pat-dot"></span>' +
+        '<span class="pat-body"><span class="pat-name">' + p.name +
+          '<span class="open-tag">open &rarr;</span></span>' +
+          '<span class="pat-sub">' + p.sub + '</span></span>' +
+        '<span class="pat-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>';
+      return a;
+    }
+    var div = document.createElement('div');
+    div.className = 'pat';
+    div.innerHTML =
+      '<span class="pat-dot"></span>' +
+      '<span class="pat-body"><span class="pat-name">' + p.name + '</span>' +
+        '<span class="pat-sub">' + p.sub + '</span></span>';
+    return div;
+  }
+  function exRow(name, sub) {
+    var div = document.createElement('div');
+    div.className = 'ex-row';
+    div.innerHTML = '<span class="ex-mark"></span><span><span class="ex-name">' +
+      name + '</span><span class="ex-sub">' + sub + '</span></span>';
+    return div;
+  }
+
+  function openSheet() {
+    lastFocus = document.activeElement;
+    scrim.classList.add('open');
+    sheet.classList.add('open');
+    sheet.setAttribute('aria-hidden', 'false');
+    sheetClose.focus();
+  }
+  function closeSheet() {
+    scrim.classList.remove('open');
+    sheet.classList.remove('open');
+    sheet.setAttribute('aria-hidden', 'true');
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  function setIco(svgInner) {
+    sheetIco.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (svgInner || '') + '</svg>';
+  }
+
+  function openLayer(key) {
+    var data = LAYERS[key]; if (!data) return;
+    setIco(LAYER_ICON[key]);
+    sheetEyebrow.textContent = 'Layer';
+    sheetTitle.textContent = data.title;
+    sheetDesc.textContent = data.desc;
+    sheetGrp.textContent = 'Patterns in this layer';
+    sheetList.innerHTML = '';
+    data.patterns.forEach(function (p) { sheetList.appendChild(patternRow(p)); });
+    openSheet();
+  }
+
+  /* region drill-ins */
+  function openRegionLayers() {
+    setIco('<rect x="4" y="4" width="16" height="4" rx="1"/><rect x="4" y="10" width="16" height="4" rx="1"/><rect x="4" y="16" width="16" height="4" rx="1"/>');
+    sheetEyebrow.textContent = 'Region';
+    sheetTitle.textContent = 'Layers';
+    sheetDesc.textContent = 'The system as a vertical stack: from the user surface at the top down to the foundation at the bottom. Click a layer to open its patterns.';
+    sheetGrp.textContent = 'The ten layers, top to bottom';
+    sheetList.innerHTML = '';
+    Object.keys(LAYERS).forEach(function (k) {
+      var d = LAYERS[k];
+      var row = patternRow({ name: d.title, sub: d.desc });
+      row.className = 'pat link';
+      row.addEventListener('click', function () { openLayer(k); });
+      var arr = document.createElement('span');
+      arr.className = 'pat-arrow';
+      arr.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+      row.appendChild(arr);
+      sheetList.appendChild(row);
+    });
+    openSheet();
+  }
+  function openRegionConcerns() {
+    setIco('<path d="M6 3v18M12 3v18M18 3v18M3 8h18M3 16h18"/>');
+    sheetEyebrow.textContent = 'Region';
+    sheetTitle.textContent = 'Concerns';
+    sheetDesc.textContent = 'Cross-cutting concerns run straight through every layer of the stack. They are not a layer of their own: each one touches all ten.';
+    sheetGrp.textContent = 'The five concerns';
+    sheetList.innerHTML = '';
+    CONCERNS.forEach(function (c) { sheetList.appendChild(exRow(c.name, c.sub)); });
+    openSheet();
+  }
+  function openConcern(key) {
+    var c = CONCERNS.filter(function (x) { return x.key === key; })[0];
+    if (!c) return openRegionConcerns();
+    setIco('<path d="M6 3v18M12 3v18M18 3v18M3 8h18M3 16h18"/>');
+    sheetEyebrow.textContent = 'Concern';
+    sheetTitle.textContent = c.name;
+    sheetDesc.textContent = c.sub + ' It cuts across all ten layers, top to bottom.';
+    sheetGrp.textContent = 'Applies to every layer';
+    sheetList.innerHTML = '';
+    Object.keys(LAYERS).forEach(function (k) {
+      sheetList.appendChild(exRow(LAYERS[k].title, c.name + ' applies here'));
+    });
+    openSheet();
+  }
+  function openRegionBuilds() {
+    setIco('<path d="M5 12h14M13 6l6 6-6 6"/><rect x="2" y="9" width="3" height="6" rx="1"/>');
+    sheetEyebrow.textContent = 'Region';
+    sheetTitle.textContent = 'Builds';
+    sheetDesc.textContent = 'The products the stack produces. Each build draws on a different set of layers: hover one to see which.';
+    sheetGrp.textContent = 'What the stack produces';
+    sheetList.innerHTML = '';
+    Object.keys(BUILD_META).forEach(function (k) { var b = BUILD_META[k]; sheetList.appendChild(exRow(b.title, b.sub)); });
+    openSheet();
+  }
+  function openBuild(key) {
+    var b = BUILD_META[key]; if (!b) return openRegionBuilds();
+    var btn = buildBtns.filter(function (x) { return x.getAttribute('data-build') === key; })[0];
+    setIco('<path d="M5 12h14M13 6l6 6-6 6"/>');
+    sheetEyebrow.textContent = 'Build';
+    sheetTitle.textContent = b.title;
+    sheetDesc.textContent = b.sub + ' It is produced by the layers highlighted in the stack.';
+    sheetGrp.textContent = 'Built from these layers';
+    sheetList.innerHTML = '';
+    (BUILD_SOURCES[key] || []).forEach(function (k) {
+      sheetList.appendChild(exRow(LAYERS[k].title, LAYERS[k].desc));
+    });
+    openSheet();
+  }
+
+  layerBtns.forEach(function (l) {
+    l.addEventListener('click', function () { openLayer(l.getAttribute('data-layer')); });
+  });
+  document.getElementById('regionLayers').addEventListener('click', openRegionLayers);
+  document.getElementById('regionConcerns').addEventListener('click', openRegionConcerns);
+  document.getElementById('regionBuilds').addEventListener('click', openRegionBuilds);
+
+  scrim.addEventListener('click', closeSheet);
+  sheetClose.addEventListener('click', closeSheet);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && sheet.classList.contains('open')) closeSheet();
+  });
+
+})();
+</script>
+</body>
+</html>
