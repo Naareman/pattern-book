@@ -312,11 +312,11 @@
       let t=3600; concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showBoxCap('concerns', null, 'every layer has to handle all of these: a longer bar means it matters more there'); showBars(cc.textContent.trim(), cc); }}); t+=1800; }); a.push({at:t, fn:()=> endDemo(true)});
     } else if(kind==='connect'){
       // intro: whole Layers box glows -> "produces" becomes prominent -> whole Builds box glows -> then each build's layers
-      a.push({at:0,    fn:()=>{ showBoxCap('builds', null, 'each one lights up the layers it uses'); layersBox.classList.add('glow'); }});
+      a.push({at:0,    fn:()=>{ showBoxCap('builds', null, 'each product lights up the layers it uses'); layersBox.classList.add('glow'); }});
       a.push({at:1800,  fn:()=>{ layersBox.classList.remove('glow'); producesEl.classList.add('glow'); }});
       a.push({at:2600, fn:()=>{ producesEl.classList.remove('glow'); buildsBox.classList.add('glow'); }});
       a.push({at:3400, fn:()=>{ buildsBox.classList.remove('glow'); }});
-      let t=3600; buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ showBoxCap('builds', null, 'each one lights up the layers it uses'); layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1800; }); a.push({at:t, fn:()=> endDemo(true)});
+      let t=3600; buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ showBoxCap('builds', null, 'each product lights up the layers it uses'); layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1800; }); a.push({at:t, fn:()=> endDemo(true)});
     } else if(kind==='tour'){
       // one guided walk through all three layers groupings, reusing the stack/concern/connect visuals
       let t=0;
@@ -334,12 +334,12 @@
       t+=200;  concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showBoxCap('concerns', '2 / 3', 'every layer has to handle all of these: a longer bar means it matters more there'); showBars(cc.textContent.trim(), cc); }}); t+=1800; });
       t+=500;
       // ---- Phase 3: Builds, what layer combinations produce ----
-      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('builds', '3 / 3', 'each one lights up the layers it uses'); }});
+      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('builds', '3 / 3', 'each product lights up the layers it uses'); }});
       t+=1800;  a.push({at:t, fn:()=>{ layersBox.classList.add('glow'); }});
       t+=1200;  a.push({at:t, fn:()=>{ layersBox.classList.remove('glow'); producesEl.classList.add('glow'); }});
       t+=1200;  a.push({at:t, fn:()=>{ producesEl.classList.remove('glow'); buildsBox.classList.add('glow'); }});
       t+=1200;  a.push({at:t, fn:()=>{ buildsBox.classList.remove('glow'); }});
-      t+=200;  buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ showBoxCap('builds', '3 / 3', 'each one lights up the layers it uses'); layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1800; });
+      t+=200;  buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ showBoxCap('builds', '3 / 3', 'each product lights up the layers it uses'); layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1800; });
       // ---- End: clean resting state ----
       a.push({at:t+300, fn:()=> endDemo(true)});
     }
