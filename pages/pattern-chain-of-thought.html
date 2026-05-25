@@ -316,30 +316,16 @@
   }
   /* the tokens build up here, left to right */
   .board-tokens {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    align-items: center;
+    flex: 1;
+    min-width: 0;
     font-size: 15px;
-    line-height: 1.5;
+    line-height: 1.6;
     color: var(--text);
     min-height: 22px;
   }
-  /* each token chip, popped in one at a time */
-  .token {
-    display: inline-block;
-    background: var(--surface);
-    border: 1px solid var(--border-strong);
-    border-radius: 6px;
-    padding: 1px 7px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-    animation: token-pop 0.3s ease both;
-  }
-  .board-line.writing .token { border-color: var(--accent); }
-  @keyframes token-pop { from { opacity: 0; transform: translateY(3px) scale(0.94); } to { opacity: 1; transform: none; } }
+  /* tokens render as plain readable text; each briefly highlights as it is written, left to right */
+  .tok { border-radius: 3px; transition: background 0.4s ease; }
+  .tok.writing-tok { background: var(--accent-soft); }
   /* the answer, falling out of the last line */
   .board-answer {
     display: flex;
@@ -879,16 +865,27 @@ const boardWork = [
 ];
 // the caption narrates exactly what is happening, line by line
 const boardCaptions = [
-  'It writes its thinking out, a little piece (a token) at a time, left to right.',
-  'Each line builds on the one before.',
-  'Each line builds on the one before.'
+  'It reads the question in small pieces (tokens), left to right.',
+  'It works out a result: 3 × 6 = 18.',
+  'It carries that 18 forward, takes away the 4, and reaches the answer.'
 ];
 const boardStart = 'Press Play, and watch the model write its working out.';
 const boardEnd = 'The answer falls out of the last line, not a guess. Without the steps, models often jump to a wrong number.';
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// write one line, token by token. Returns when the line is fully written.
+// tokens render as plain text with proper spacing; punctuation hugs the previous word
+function spaceBefore(tok, i) { return i > 0 && tok !== ',' && tok !== '.'; }
+function addTok(slot, tok, i, highlight) {
+  if (spaceBefore(tok, i)) slot.appendChild(document.createTextNode(' '));
+  const s = document.createElement('span');
+  s.className = 'tok';
+  s.textContent = tok;
+  slot.appendChild(s);
+  if (highlight) { s.classList.add('writing-tok'); setTimeout(() => s.classList.remove('writing-tok'), 360); }
+}
+
+// write one line, one token at a time, left to right; each briefly highlights, then settles to plain text
 async function writeLine(r, animate) {
   const line = boardLines[r];
   const slot = line.querySelector('.board-tokens');
@@ -898,26 +895,18 @@ async function writeLine(r, animate) {
   boardCaption.textContent = boardCaptions[r];
   const tokens = boardWork[r];
   for (let i = 0; i < tokens.length; i++) {
-    const chip = document.createElement('span');
-    chip.className = 'token';
-    chip.textContent = tokens[i];
-    slot.appendChild(chip);
-    if (animate) await sleep(260);
+    addTok(slot, tokens[i], i, animate);
+    if (animate) await sleep(220);
   }
   line.classList.remove('writing');
 }
 
-// fill a line instantly (no token animation), used for Step taps and reduced-motion
+// fill a line instantly (Step taps and reduced-motion)
 function fillLine(r) {
   const line = boardLines[r];
   const slot = line.querySelector('.board-tokens');
   slot.innerHTML = '';
-  boardWork[r].forEach(t => {
-    const chip = document.createElement('span');
-    chip.className = 'token';
-    chip.textContent = t;
-    slot.appendChild(chip);
-  });
+  boardWork[r].forEach((t, i) => addTok(slot, t, i, false));
   line.classList.add('shown');
 }
 
