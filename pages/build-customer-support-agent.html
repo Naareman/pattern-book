@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Support Agent · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --warn:#B45309; --warn-soft:#FEF3C7;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* topbar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; white-space: nowrap;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* layer pills under header */
+  .layer-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  .layer-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; letter-spacing: .03em;
+    color: var(--soft); background: var(--surface);
+    border: 1px solid var(--border-strong); border-radius: 20px; padding: 4px 11px;
+    text-decoration: none;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+  }
+  .layer-pill:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .layer-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
+
+  /* -------- DEMO: customer support flow -------- */
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+
+  /* question chooser */
+  .q-chooser { display: flex; flex-direction: column; gap: 9px; margin-bottom: 18px; }
+  .q-btn {
+    display: block; width: 100%; text-align: left;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 13px 16px;
+    font-family: 'Fraunces', serif; font-size: 16px; font-weight: 400; color: var(--text);
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease, transform .15s ease;
+  }
+  .q-btn:hover { background: var(--accent-soft); border-color: var(--accent); transform: translateY(-1px); }
+  .q-btn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); font-weight: 500; }
+  .q-label { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
+
+  /* pipeline track */
+  .pipeline { display: flex; flex-direction: column; gap: 0; }
+  .pipe-step {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    opacity: .25;
+    transform: translateX(-4px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .pipe-step:last-child { border-bottom: 0; }
+  .pipe-step.lit { opacity: 1; transform: translateX(0); }
+  .pipe-step.active-step { opacity: 1; transform: translateX(0); }
+
+  .pipe-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; color: var(--faint);
+    transition: background .35s ease, border-color .35s ease, color .35s ease;
+  }
+  .pipe-step.lit .pipe-icon { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .pipe-icon svg { width: 18px; height: 18px; }
+
+  .pipe-body { flex: 1; min-width: 0; }
+  .pipe-name { font-weight: 600; font-size: 14px; color: var(--text); line-height: 1.3; margin-bottom: 3px; }
+  .pipe-desc { font-size: 13px; color: var(--faint); line-height: 1.5; }
+  .pipe-result {
+    font-size: 13px; color: var(--soft); line-height: 1.5;
+    margin-top: 6px;
+    max-height: 0; overflow: hidden;
+    transition: max-height .4s ease, margin .3s ease;
+  }
+  .pipe-step.lit .pipe-result { max-height: 120px; }
+  .pipe-result strong { color: var(--text); font-weight: 600; }
+
+  /* escalation banner */
+  .escalation-banner {
+    margin-top: 16px; padding: 14px 16px;
+    border-radius: var(--radius-sm); font-size: 14px; font-weight: 600;
+    display: none; align-items: center; gap: 10px; line-height: 1.4;
+  }
+  .escalation-banner.show { display: flex; }
+  .escalation-banner.resolved { background: var(--success-soft); color: var(--success); border: 1px solid var(--success); }
+  .escalation-banner.escalated { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn); }
+  .escalation-banner .esc-icon { font-size: 18px; flex-shrink: 0; }
+  .escalation-banner .esc-body { font-weight: 400; font-size: 13px; margin-top: 2px; color: inherit; line-height: 1.5; }
+  .escalation-banner .esc-head { font-weight: 600; font-size: 14px; }
+
+  /* reply bubble */
+  .reply-bubble {
+    margin-top: 14px; padding: 14px 18px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'Fraunces', serif; font-size: 16px; line-height: 1.55; color: var(--text);
+    min-height: 58px;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .4s ease, transform .4s ease;
+  }
+  .reply-bubble.show { opacity: 1; transform: translateY(0); }
+  .reply-label { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
+
+  /* controls */
+  .demo-controls { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 16px; margin-top: 4px; border-top: 1px solid var(--border); }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong); background: var(--surface);
+    border-radius: var(--radius-sm); cursor: pointer;
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: .5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* -------- 03 REAL EXAMPLE -------- */
+  .example-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .example-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); padding: 18px;
+  }
+  .example-card .ec-label { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
+  .example-card .ec-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--text); margin-bottom: 6px; line-height: 1.3; }
+  .example-card .ec-desc { font-size: 13.5px; color: var(--soft); line-height: 1.55; }
+  .example-card .ec-tag {
+    display: inline-block; margin-top: 10px;
+    font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 20px;
+  }
+  .example-card .ec-tag.resolve { background: var(--success-soft); color: var(--success); }
+  .example-card .ec-tag.escalate { background: var(--warn-soft); color: var(--warn); }
+
+  /* -------- 04 TRADEOFFS -------- */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); min-width: 110px; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { min-width: 110px; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm);
+    text-decoration: none; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  .sources a { color: var(--accent-hover); text-decoration: none; }
+  .sources a:hover { text-decoration: underline; }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 600px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .example-grid { grid-template-columns: 1fr; }
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="builds.html">Builds</a><span class="sep">/</span><span class="here">Customer Support Agent</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+    </span>Build
+  </span>
+  <h1 class="page-title">Customer Support Agent</h1>
+  <p class="explainer">A real product: the agent reads your help guides, answers customer questions in plain language, and passes the hard ones to a human.</p>
+  <div class="layer-pills" aria-label="Layers used in this build">
+    <a class="layer-pill" href="layer-knowledge-memory.html"><span class="dot" aria-hidden="true"></span>Knowledge &amp; Memory</a>
+    <a class="layer-pill" href="layer-application-patterns.html"><span class="dot" aria-hidden="true"></span>Application Patterns</a>
+  </div>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>A <span style="color:var(--accent-hover);font-weight:500">customer support agent</span> is an AI that knows your product through its help articles. When a customer asks a question, the agent finds the right article, pulls the relevant paragraph, and writes a plain-language reply. When the question is too complex or the agent is not sure, it stops and sends the conversation to a human. No guessing. No hallucinating policies it does not have.</p>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Watch the <em>agent</em> handle it.</h2>
+  <p class="demo-lede">Pick a customer question. Watch the agent retrieve the right article, draft a reply, and decide whether to resolve or escalate.</p>
+
+  <div class="demo-stage">
+    <div class="q-label">Customer question</div>
+    <div class="q-chooser" role="group" aria-label="Choose a customer question">
+      <button class="q-btn" data-qi="0">How do I reset my password?</button>
+      <button class="q-btn" data-qi="1">My payment failed but I was charged twice.</button>
+      <button class="q-btn" data-qi="2">Can I get a refund after 30 days?</button>
+    </div>
+
+    <div id="pipelineWrap" aria-live="polite" aria-label="Agent pipeline status">
+      <div class="pipeline" id="pipeline">
+
+        <div class="pipe-step" id="step-0" data-step="0">
+          <div class="pipe-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <div class="pipe-body">
+            <div class="pipe-name">Retrieve</div>
+            <div class="pipe-desc">Search the help articles for the closest match.</div>
+            <div class="pipe-result" id="result-0"></div>
+          </div>
+        </div>
+
+        <div class="pipe-step" id="step-1" data-step="1">
+          <div class="pipe-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <div class="pipe-body">
+            <div class="pipe-name">Read the article</div>
+            <div class="pipe-desc">Pull the relevant section from the matched article.</div>
+            <div class="pipe-result" id="result-1"></div>
+          </div>
+        </div>
+
+        <div class="pipe-step" id="step-2" data-step="2">
+          <div class="pipe-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="pipe-body">
+            <div class="pipe-name">Draft a reply</div>
+            <div class="pipe-desc">Write a plain-language answer grounded in the article.</div>
+            <div class="pipe-result" id="result-2"></div>
+          </div>
+        </div>
+
+        <div class="pipe-step" id="step-3" data-step="3">
+          <div class="pipe-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="pipe-body">
+            <div class="pipe-name">Confidence check</div>
+            <div class="pipe-desc">Score how well the article covers this question.</div>
+            <div class="pipe-result" id="result-3"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="replyWrap" style="margin-top:16px; display:none;">
+        <div class="reply-label">Agent reply</div>
+        <div class="reply-bubble" id="replyBubble"></div>
+      </div>
+
+      <div id="escalationBanner" class="escalation-banner" role="status"></div>
+
+    </div>
+
+    <div class="demo-controls">
+      <button class="diagram-btn primary" id="runBtn">&#9654; Run agent</button>
+      <button class="diagram-btn" id="resetBtn" disabled>&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>Real Example</div>
+  <h2>Where it <em>lives</em> today.</h2>
+  <div class="example-grid">
+    <div class="example-card">
+      <div class="ec-label">Resolve path</div>
+      <div class="ec-name">Intercom Fin</div>
+      <div class="ec-desc">Trained on a company's own help center articles. Answers up to 50% of tickets without human involvement by citing the exact article it used.</div>
+      <span class="ec-tag resolve">Self-resolved</span>
+    </div>
+    <div class="example-card">
+      <div class="ec-label">Escalate path</div>
+      <div class="ec-name">Zendesk AI</div>
+      <div class="ec-desc">Drafts a suggested reply for the agent to review. On billing disputes and account suspensions, it routes to a human rather than answering directly.</div>
+      <span class="ec-tag escalate">Hands off to human</span>
+    </div>
+    <div class="example-card">
+      <div class="ec-label">Retrieval grounding</div>
+      <div class="ec-name">Notion AI Q&amp;A</div>
+      <div class="ec-desc">Searches workspace pages before answering an internal query. If no page matches, it says so rather than inventing an answer.</div>
+      <span class="ec-tag resolve">Grounded in docs</span>
+    </div>
+    <div class="example-card">
+      <div class="ec-label">Sensitive escalate</div>
+      <div class="ec-name">Klarna AI</div>
+      <div class="ec-desc">Handles routine refund and order queries autonomously. Routes to a human for anything involving dispute resolution or fraud suspicion.</div>
+      <span class="ec-tag escalate">Human for disputes</span>
+    </div>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>What you <em>gain and give up</em>.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Coverage</div>
+      <div class="tradeoff-bars" aria-label="Coverage: high (4 of 5)">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Accuracy risk</div>
+      <div class="tradeoff-bars" aria-label="Accuracy risk: low-medium (2 of 5)">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Setup effort</div>
+      <div class="tradeoff-bars" aria-label="Setup effort: medium (3 of 5)">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Escalation rate</div>
+      <div class="tradeoff-bars" aria-label="Escalation rate: low (1 of 5)">
+        <div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      The agent is only as good as its help articles. If an article is wrong or missing, the agent either gives a wrong answer or escalates. Keeping the knowledge base fresh is the real ongoing cost.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top:20px;padding-bottom:40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Lewis et al. (2020). <em>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.</em> <span class="note">The foundational paper behind grounding AI answers in retrieved documents.</span></li>
+    <li>Anthropic (2024). <em><a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Building effective agents.</a></em> <span class="note">Covers retrieval, confidence scoring, and human handoff patterns.</span></li>
+    <li>Intercom (2024). <em>Fin AI Agent documentation.</em> <span class="note">Production example of retrieval-grounded support with escalation routing.</span></li>
+    <li>Shinn et al. (2023). <em>Reflexion: Language Agents with Verbal Reinforcement Learning.</em> <span class="note">Confidence self-scoring and fallback strategies for agents.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// -------- DATA --------
+const questions = [
+  {
+    text: "How do I reset my password?",
+    steps: [
+      { result: 'Matched: <strong>"Account access and passwords"</strong> (score 0.91)' },
+      { result: 'Found section: <strong>"To reset your password, click Forgot Password on the login page. A reset link is sent to your email and expires in 15 minutes."</strong>' },
+      { result: '"Go to the login page, tap Forgot Password, then check your email for a reset link. It expires in 15 minutes."' },
+      { result: 'Confidence: <strong>0.91</strong> — article directly answers the question.' }
+    ],
+    reply: 'Go to the login page, tap "Forgot Password," and check your email for a reset link. It expires in 15 minutes.',
+    outcome: 'resolved'
+  },
+  {
+    text: "My payment failed but I was charged twice.",
+    steps: [
+      { result: 'Matched: <strong>"Payment troubleshooting"</strong> (score 0.61)' },
+      { result: 'Found section: <strong>"Failed payments may briefly appear on your statement before being voided. Allow 3-5 business days for the hold to drop."</strong>' },
+      { result: 'Draft: "The charge may be a temporary hold that will reverse within 3-5 days — but if you see two settled charges…"' },
+      { result: 'Confidence: <strong>0.61</strong> — article partially covers this; a duplicate settled charge is not in the docs.' }
+    ],
+    reply: null,
+    outcome: 'escalated',
+    escalateReason: 'This involves a possible duplicate charge. I am passing your conversation to a billing specialist who can check your account directly.'
+  },
+  {
+    text: "Can I get a refund after 30 days?",
+    steps: [
+      { result: 'Matched: <strong>"Refund policy"</strong> (score 0.88)' },
+      { result: 'Found section: <strong>"Refunds are available within 30 days of purchase. Requests after 30 days are reviewed on a case-by-case basis by the billing team."</strong>' },
+      { result: '"Refunds are available within the first 30 days. After that, requests go to the billing team for review — outcomes vary case by case."' },
+      { result: 'Confidence: <strong>0.88</strong> — policy is documented but outcome is uncertain; routing to billing for a definitive answer.' }
+    ],
+    reply: null,
+    outcome: 'escalated',
+    escalateReason: 'The policy says refunds after 30 days are handled case by case. I am routing you to the billing team so they can review your request.'
+  }
+];
+
+// -------- STATE --------
+let selectedQ = null;
+let running = false;
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// -------- ELEMENTS --------
+const qBtns = document.querySelectorAll('.q-btn');
+const runBtn = document.getElementById('runBtn');
+const resetBtn = document.getElementById('resetBtn');
+const steps = document.querySelectorAll('.pipe-step');
+const replyWrap = document.getElementById('replyWrap');
+const replyBubble = document.getElementById('replyBubble');
+const escalationBanner = document.getElementById('escalationBanner');
+
+// -------- QUESTION SELECTION --------
+qBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (running) return;
+    resetDemo();
+    const qi = parseInt(btn.dataset.qi);
+    selectedQ = questions[qi];
+    qBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    runBtn.disabled = false;
+  });
+});
+
+// -------- RESET --------
+function resetDemo() {
+  steps.forEach(s => {
+    s.classList.remove('lit', 'active-step');
+    document.getElementById('result-' + s.dataset.step).textContent = '';
+    document.getElementById('result-' + s.dataset.step).innerHTML = '';
+  });
+  replyWrap.style.display = 'none';
+  replyBubble.classList.remove('show');
+  replyBubble.textContent = '';
+  escalationBanner.className = 'escalation-banner';
+  escalationBanner.innerHTML = '';
+  runBtn.disabled = (selectedQ === null);
+  resetBtn.disabled = true;
+}
+
+resetBtn.addEventListener('click', () => {
+  if (running) return;
+  resetDemo();
+});
+
+// -------- RUN --------
+runBtn.addEventListener('click', async () => {
+  if (!selectedQ || running) return;
+  running = true;
+  runBtn.disabled = true;
+  resetBtn.disabled = true;
+
+  const q = selectedQ;
+
+  if (reduceMotion) {
+    // instant: light all steps at once
+    q.steps.forEach((s, i) => {
+      const stepEl = document.getElementById('step-' + i);
+      const resEl = document.getElementById('result-' + i);
+      stepEl.classList.add('lit');
+      resEl.innerHTML = s.result;
+    });
+    showOutcome(q);
+  } else {
+    for (let i = 0; i < q.steps.length; i++) {
+      const stepEl = document.getElementById('step-' + i);
+      const resEl = document.getElementById('result-' + i);
+      stepEl.classList.add('lit');
+      resEl.innerHTML = q.steps[i].result;
+      await sleep(q.steps[i].delay || 900);
+    }
+    await sleep(300);
+    showOutcome(q);
+  }
+
+  running = false;
+  resetBtn.disabled = false;
+});
+
+function showOutcome(q) {
+  if (q.outcome === 'resolved' && q.reply) {
+    replyWrap.style.display = 'block';
+    replyBubble.textContent = q.reply;
+    requestAnimationFrame(() => replyBubble.classList.add('show'));
+
+    escalationBanner.className = 'escalation-banner resolved show';
+    escalationBanner.innerHTML = '<span class="esc-icon" aria-hidden="true">&#10003;</span><div><div class="esc-head">Resolved by agent</div><div class="esc-body">The article covered this question. No human needed.</div></div>';
+  } else {
+    escalationBanner.className = 'escalation-banner escalated show';
+    escalationBanner.innerHTML = '<span class="esc-icon" aria-hidden="true">&#9651;</span><div><div class="esc-head">Escalated to human</div><div class="esc-body">' + (q.escalateReason || 'Confidence too low to answer safely.') + '</div></div>';
+  }
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// init
+runBtn.disabled = true;
+</script>
+</body>
+</html>
