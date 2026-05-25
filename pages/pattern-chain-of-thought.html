@@ -207,31 +207,7 @@
   }
   h2 em { font-style: italic; color: var(--accent); }
 
-  /* ============ THE IDEA ============ */
-  .idea-stage {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 18px 20px;
-  }
-  .tagline-big {
-    font-size: 16px;
-    line-height: 1.6;
-    color: var(--soft);
-    max-width: 660px;
-  }
-  .tagline-big strong { color: var(--accent-hover); font-weight: 600; }
-  .idea-tip {
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px solid var(--border);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--faint);
-  }
-
-  /* ============ HOW IT WORKS: SYNCED DEMO (Section 02) ============ */
+  /* ============ HOW IT WORKS: THE WHITEBOARD (Section 02) ============ */
   .demo-lede {
     font-size: 15px;
     color: var(--soft);
@@ -239,76 +215,78 @@
     max-width: 640px;
     margin-bottom: 18px;
   }
-  .demo-stage {
+  .board-stage {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 20px;
     box-shadow: var(--shadow);
   }
-  /* the question being worked on */
-  .demo-question {
+  /* the whiteboard itself */
+  .board {
     background: var(--bg-subtle);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+  }
+  /* the question, pinned at the top of the board */
+  .board-question {
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    padding: 16px 18px;
-    margin-bottom: 18px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
   }
-  .demo-qlabel {
+  .board-qlabel {
     display: block;
     font-size: 12px;
     font-weight: 500;
     color: var(--faint);
     margin-bottom: 6px;
   }
-  .demo-qtext {
+  .board-qtext {
     font-family: 'Fraunces', serif;
     font-weight: 500;
     font-size: 16px;
     line-height: 1.4;
     color: var(--text);
   }
-  /* the "paper" the model writes its reasoning on */
-  .demo-paper {
-    background: var(--bg-subtle);
-    border: 1px dashed var(--border-strong);
-    border-radius: var(--radius-sm);
-    padding: 18px;
-    min-height: 168px;
+  /* the narrating caption, on the board, right by the writing */
+  .board-caption {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--accent-hover);
+    font-weight: 500;
+    min-height: 21px;
+    margin-bottom: 14px;
+  }
+  /* where the working is written */
+  .board-work {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    position: relative;
+    gap: 9px;
+    min-height: 132px;
   }
-  .demo-placeholder {
-    color: var(--faint);
-    font-size: 13px;
-    font-weight: 500;
-    text-align: center;
-    margin: auto;
-  }
-  .demo-placeholder.hidden { display: none; }
-  /* each reasoning line: hidden until its step, then fades / slides in */
-  .demo-line {
+  /* each line of working: hidden until revealed */
+  .board-line {
     display: flex;
     align-items: flex-start;
     gap: 11px;
-    padding: 10px 14px;
+    padding: 9px 13px;
     border-radius: var(--radius-sm);
     background: var(--surface);
     border: 1px solid var(--border);
     border-left: 3px solid var(--accent);
     opacity: 0;
     transform: translateY(6px);
-    transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.3s ease;
+    transition: opacity 0.35s ease, transform 0.35s ease, box-shadow 0.3s ease;
   }
-  .demo-line.shown { opacity: 1; transform: translateY(0); }
-  /* the line being written right now gets a soft highlight */
-  .demo-line.writing {
+  .board-line.shown { opacity: 1; transform: translateY(0); }
+  .board-line.writing {
     background: var(--accent-soft);
     box-shadow: 0 4px 16px rgba(124,92,246,.16);
   }
-  .demo-bullet {
+  .board-bullet {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -322,43 +300,62 @@
     flex-shrink: 0;
     margin-top: 1px;
   }
-  .demo-line-text {
+  /* the tokens build up here, left to right */
+  .board-tokens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
     font-size: 15px;
     line-height: 1.5;
     color: var(--text);
+    min-height: 22px;
   }
-  .demo-line-text strong { font-weight: 600; color: var(--text); }
-  /* the final answer: clearly comes OUT of the last reasoning line */
-  .demo-answer {
+  /* each token chip, popped in one at a time */
+  .token {
+    display: inline-block;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 1px 7px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    animation: token-pop 0.3s ease both;
+  }
+  .board-line.writing .token { border-color: var(--accent); }
+  @keyframes token-pop { from { opacity: 0; transform: translateY(3px) scale(0.94); } to { opacity: 1; transform: none; } }
+  /* the answer, falling out of the last line */
+  .board-answer {
     display: flex;
     align-items: baseline;
     gap: 12px;
-    margin-top: 4px;
+    margin-top: 3px;
     margin-left: 26px;
-    padding: 14px 18px;
+    padding: 13px 16px;
     background: var(--text);
     color: #fff;
     border-radius: var(--radius-sm);
     opacity: 0;
     transform: translateY(8px) scale(0.98);
-    transition: opacity 0.45s ease, transform 0.45s ease;
+    transition: opacity 0.4s ease, transform 0.4s ease;
     position: relative;
   }
-  /* a small connector showing the answer drops out of the last line */
-  .demo-answer::before {
+  .board-answer::before {
     content: '';
     position: absolute;
     left: -14px;
-    top: -10px;
+    top: -9px;
     width: 2px;
-    height: 18px;
+    height: 16px;
     background: var(--accent);
     opacity: 0;
-    transition: opacity 0.45s ease;
+    transition: opacity 0.4s ease;
   }
-  .demo-answer.shown { opacity: 1; transform: translateY(0) scale(1); }
-  .demo-answer.shown::before { opacity: 1; }
-  .demo-answer-label {
+  .board-answer.shown { opacity: 1; transform: translateY(0) scale(1); }
+  .board-answer.shown::before { opacity: 1; }
+  .board-answer-label {
     font-size: 11px;
     font-weight: 600;
     letter-spacing: .06em;
@@ -366,44 +363,21 @@
     color: rgba(255,255,255,0.65);
     flex-shrink: 0;
   }
-  .demo-answer-text {
+  .board-answer-text {
     font-family: 'Fraunces', serif;
     font-weight: 500;
     font-size: 16px;
     line-height: 1.4;
   }
-  /* controls: caption (synced narration) + buttons */
-  .demo-controls {
+  /* controls below the board */
+  .board-controls {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 18px;
-    margin-top: 18px;
-    border-top: 1px solid var(--border);
-    gap: 16px;
+    gap: 10px;
     flex-wrap: wrap;
+    padding-top: 16px;
+    margin-top: 16px;
+    border-top: 1px solid var(--border);
   }
-  .demo-caption {
-    flex: 1;
-    min-width: 220px;
-    min-height: 44px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .demo-caption-step {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--accent-hover);
-    margin-bottom: 4px;
-    min-height: 1em;
-  }
-  .demo-caption-text {
-    font-size: 14px;
-    color: var(--soft);
-    line-height: 1.5;
-  }
-  .demo-btns { display: flex; gap: 10px; flex-wrap: wrap; }
   .diagram-btn {
     padding: 10px 16px;
     border: 1px solid var(--border-strong);
@@ -421,50 +395,7 @@
   .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
   .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 
-  /* ============ TOKENS CHIP STRIP (always visible, no hover) ============ */
-  .tokens-explain {
-    background: var(--bg-subtle);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 16px 18px;
-    margin-bottom: 22px;
-  }
-  .tokens-explain .lede {
-    font-size: 14px;
-    color: var(--soft);
-    line-height: 1.55;
-    margin-bottom: 12px;
-  }
-  .tokens-explain .lede b { color: var(--accent-hover); font-weight: 600; }
-  .token-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    align-items: center;
-  }
-  .token-chip {
-    display: inline-block;
-    background: var(--surface);
-    border: 1px solid var(--border-strong);
-    border-radius: 7px;
-    padding: 5px 10px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-    box-shadow: var(--shadow-sm);
-    animation: chip-pop 0.4s ease both;
-  }
-  @keyframes chip-pop { from { opacity: 0; transform: translateY(4px) scale(0.96); } to { opacity: 1; transform: none; } }
-  .token-caption {
-    margin-top: 11px;
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--faint);
-    line-height: 1.5;
-  }
-
-  /* ============ WHEN IT WORKS / FAILS ============ */
+  /* ============ WHEN IT HELPS / WASTED ============ */
   .test-stage {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -537,158 +468,6 @@
     font-weight: 600;
   }
 
-  /* ============ WORKED EXAMPLE - DOSSIER ============ */
-  .dossier {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    box-shadow: var(--shadow);
-    position: relative;
-  }
-  .dossier::before {
-    content: 'Case file';
-    position: absolute;
-    top: -12px;
-    right: 24px;
-    background: var(--accent-soft);
-    color: var(--accent-hover);
-    padding: 5px 12px;
-    font-size: 12px;
-    font-weight: 600;
-    border-radius: 999px;
-    border: 1px solid var(--accent);
-  }
-  .dossier-q {
-    background: var(--bg-subtle);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    margin-bottom: 18px;
-  }
-  .dossier-q .label {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--faint);
-    margin-bottom: 7px;
-  }
-  .dossier-q .text {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 1.4;
-    color: var(--text);
-  }
-  .dossier-step {
-    display: flex;
-    gap: 16px;
-    padding: 16px 0;
-    border-bottom: 1px solid var(--border);
-    opacity: 0;
-    transform: translateX(-8px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  .dossier-step.shown { opacity: 1; transform: translateX(0); }
-  .dossier-step:last-of-type { border-bottom: none; }
-  .dossier-step .icon {
-    width: 32px;
-    height: 32px;
-    background: var(--bg-subtle);
-    border: 1px solid var(--border-strong);
-    color: var(--soft);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 600;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
-  }
-  .dossier-step.done .icon {
-    background: var(--success);
-    color: #fff;
-    border-color: var(--success);
-  }
-  .dossier-step .body { flex: 1; }
-  .dossier-step .head {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--faint);
-    margin-bottom: 5px;
-  }
-  .dossier-step .detail {
-    font-size: 15px;
-    color: var(--text);
-    line-height: 1.5;
-  }
-  .dossier-step .detail code {
-    background: var(--bg-subtle);
-    padding: 2px 8px;
-    border-radius: 5px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 500;
-    font-size: 13px;
-    color: var(--soft);
-    border: 1px solid var(--border);
-  }
-  .dossier-step .detail .pull-quote {
-    display: block;
-    margin-top: 8px;
-    padding: 10px 14px;
-    background: var(--accent-soft);
-    border-left: 3px solid var(--accent);
-    border-radius: 6px;
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 15px;
-    color: var(--text);
-  }
-  .dossier-final {
-    background: var(--text);
-    color: #fff;
-    border-radius: var(--radius-sm);
-    padding: 16px 18px;
-    margin-top: 16px;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  .dossier-final.shown { opacity: 1; transform: translateY(0); }
-  .dossier-final .label {
-    font-size: 12px;
-    font-weight: 500;
-    color: rgba(255,255,255,0.6);
-    margin-bottom: 8px;
-  }
-  .dossier-final .answer {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 1.5;
-  }
-  .dossier-final .cite {
-    background: rgba(255,255,255,0.14);
-    color: #fff;
-    padding: 1px 6px;
-    border-radius: 5px;
-    font-style: italic;
-  }
-  .dossier-replay { margin-top: 20px; text-align: center; }
-  .dossier-replay button {
-    padding: 10px 18px;
-    background: var(--surface);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-  }
-  .dossier-replay button:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
-
   /* ============ CODE ============ */
   .code-stage {
     background: var(--surface);
@@ -709,7 +488,7 @@
     padding: 18px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
-    line-height: 1.7;
+    line-height: 1.55;
     color: var(--text);
     overflow-x: auto;
     margin-bottom: 16px;
@@ -872,8 +651,7 @@
     .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
     .tradeoff-label { min-width: 0; }
     .tradeoff-bars { width: 100%; }
-    .demo-controls { flex-direction: column; align-items: stretch; }
-    .demo-btns { justify-content: stretch; }
+    .board-controls { flex-direction: column; align-items: stretch; }
     .diagram-btn { flex: 1; }
   }
 </style>
@@ -898,198 +676,108 @@
 <!-- 01 · THE IDEA -->
 <section>
   <div class="section-label"><span class="num">01</span>The Idea</div>
-  <h2>What is <em>Chain-of-Thought</em>?</h2>
-  <div class="idea-stage">
-    <div class="tagline-big">
-      Chain-of-Thought is one line you add to your prompt, like <strong>"Let's think step by step."</strong> The model then shows its working before answering, and that working is what makes the answer right.
+  <h2>What <em>is</em> it?</h2>
+  <p class="demo-lede">Chain-of-Thought is just one line you add to your prompt, like "Let's think step by step." That one line gets the model to work the problem out before answering, and the working is what gets it right.</p>
+</section>
+
+<!-- 02 · THE WHITEBOARD -->
+<section>
+  <div class="section-label"><span class="num">02</span>How it Works</div>
+  <h2>On the <em>whiteboard</em>.</h2>
+
+  <p class="demo-lede">Watch the model work one problem out, step by step:</p>
+
+  <div class="board-stage">
+    <!-- The whiteboard the model writes on -->
+    <div class="board" id="board" aria-live="polite">
+      <!-- the question, pinned at the top of the board -->
+      <div class="board-question">
+        <span class="board-qlabel">Question</span>
+        <span class="board-qtext">3 baskets, each with 6 apples. I eat 4 apples. How many are left?</span>
+      </div>
+
+      <!-- the narrating caption sits on the board, right by the writing -->
+      <div class="board-caption" id="boardCaption">Press Play, and watch the model write its working out.</div>
+
+      <!-- the model's working, written one token at a time, left to right -->
+      <div class="board-work">
+        <div class="board-line" data-reveal="0">
+          <span class="board-bullet" aria-hidden="true">1</span>
+          <span class="board-tokens"></span>
+        </div>
+        <div class="board-line" data-reveal="1">
+          <span class="board-bullet" aria-hidden="true">2</span>
+          <span class="board-tokens"></span>
+        </div>
+        <div class="board-line" data-reveal="2">
+          <span class="board-bullet" aria-hidden="true">3</span>
+          <span class="board-tokens"></span>
+        </div>
+
+        <div class="board-answer" id="boardAnswer">
+          <span class="board-answer-label">Answer</span>
+          <span class="board-answer-text">14 apples are left.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- controls live below the board -->
+    <div class="board-controls">
+      <button class="diagram-btn" id="boardStepBtn">&rarr; Step</button>
+      <button class="diagram-btn primary" id="boardPlayBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="boardResetBtn">&#8635; Reset</button>
     </div>
   </div>
 </section>
 
-<!-- 02 · DATA FLOW -->
+<!-- 03 · WHEN IT HELPS -->
 <section>
-  <div class="section-label"><span class="num">02</span>Data Flow</div>
-  <h2>How it <em>works</em>.</h2>
-
-  <p class="demo-lede">Watch the model answer one small question. Instead of jumping to a number, it writes its thinking out loud, line by line, and the answer falls out of the last line.</p>
-
-  <div class="demo-stage">
-    <!-- The question being worked on -->
-    <div class="demo-question">
-      <span class="demo-qlabel">Question</span>
-      <span class="demo-qtext">3 baskets, each with 6 apples. I eat 4 apples. How many are left?</span>
-    </div>
-
-    <!-- The model's reasoning, written one line at a time, with the answer at the end -->
-    <div class="demo-paper" id="demoPaper" aria-live="polite">
-      <div class="demo-placeholder" id="demoPlaceholder">Press Play to watch the model write its thinking.</div>
-
-      <div class="demo-line" data-reveal="0">
-        <span class="demo-bullet" aria-hidden="true">1</span>
-        <span class="demo-line-text">There are <strong>3 baskets</strong>, and each one has <strong>6 apples</strong>.</span>
-      </div>
-      <div class="demo-line" data-reveal="1">
-        <span class="demo-bullet" aria-hidden="true">2</span>
-        <span class="demo-line-text">So in total: <strong>3 &times; 6 = 18 apples</strong>.</span>
-      </div>
-      <div class="demo-line" data-reveal="2">
-        <span class="demo-bullet" aria-hidden="true">3</span>
-        <span class="demo-line-text">I eat 4 of those 18, so <strong>18 &minus; 4 = 14</strong>.</span>
-      </div>
-
-      <div class="demo-answer" data-reveal="3" id="demoAnswer">
-        <span class="demo-answer-label">Answer</span>
-        <span class="demo-answer-text"><strong>14 apples are left.</strong></span>
-      </div>
-    </div>
-
-    <div class="demo-controls">
-      <!-- one caption that narrates exactly what is on screen right now -->
-      <div class="demo-caption" aria-live="polite">
-        <div class="demo-caption-step" id="demoCapStep">&nbsp;</div>
-        <div class="demo-caption-text" id="demoCapText">An apple problem with two small steps. A guess could miss it. Watch what the model does instead.</div>
-      </div>
-      <div class="demo-btns">
-        <button class="diagram-btn" id="demoStepBtn">&rarr; Step</button>
-        <button class="diagram-btn primary" id="demoPlayBtn">&#9654; Play</button>
-        <button class="diagram-btn" id="demoResetBtn">&#8635; Reset</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- What "tokens" are, always visible -->
-  <div class="tokens-explain">
-    <div class="lede">A token is a small piece of text, about a word:</div>
-    <div class="token-chips" aria-label="The sentence broken into tokens">
-      <span class="token-chip">Let</span>
-      <span class="token-chip">'s</span>
-      <span class="token-chip">think</span>
-      <span class="token-chip">step</span>
-      <span class="token-chip">by</span>
-      <span class="token-chip">step</span>
-      <span class="token-chip">.</span>
-    </div>
-    <div class="token-caption">The model writes one at a time, left to right.</div>
-  </div>
-</section>
-
-<!-- 03 · THE TEST -->
-<section>
-  <div class="section-label"><span class="num">03</span>When it Works . When it Fails</div>
-  <h2>Will reasoning out loud <em>help</em>?</h2>
+  <div class="section-label"><span class="num">03</span>When it Helps</div>
+  <h2>Helps, or just <em>wasted</em>?</h2>
   <div class="test-stage">
-    <div class="test-instruction">Tap each. Showing the steps helps on some questions and is a waste on others.</div>
+    <div class="test-instruction">Tap to check. It helps on hard, multi-step problems and is wasted on simple recall.</div>
     <div class="queries" id="queries">
-      <div class="query-card" data-verdict="good" data-reason="Three math steps, each small and easy to check. The model gets the in-between numbers right instead of guessing the total.">
+      <div class="query-card" data-verdict="good" data-reason="Multi-step math, checked one step at a time.">
         <div class="q">"A word problem with three arithmetic steps."</div>
         <div class="verdict">Helps it &#10003;<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="good" data-reason="Lots of rules at once. Writing them one at a time keeps them straight instead of jumping to a hunch.">
-        <div class="q">"Which of these 5 meetings fit before 3pm, given the room conflicts?"</div>
+      <div class="query-card" data-verdict="good" data-reason="Many rules at once, kept straight by listing them.">
+        <div class="q">"Which of these 5 meetings fit before 3pm?"</div>
         <div class="verdict">Helps it &#10003;<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="good" data-reason="Following the loop one round at a time IS the work. Writing the steps makes the model actually do it instead of guessing from things it has seen before.">
-        <div class="q">"Find the bug: why does this loop run one time too many?"</div>
+      <div class="query-card" data-verdict="good" data-reason="Tracing the loop step by step is the work.">
+        <div class="q">"Why does this loop run one time too many?"</div>
         <div class="verdict">Helps it &#10003;<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="bad" data-reason="Just remembering a fact. There are no steps to show. The extra text costs time and money for an answer the model already knows.">
+      <div class="query-card" data-verdict="bad" data-reason="Just recall. No steps to show.">
         <div class="q">"What's the capital of France?"</div>
         <div class="verdict">Wasted &#10007;<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="bad" data-reason="A one-word answer. Forcing it to reason can make the model talk itself out of the obvious answer: sometimes worse, never better.">
-        <div class="q">"Is this review positive or negative? 'Loved every minute.'"</div>
-        <div class="verdict">Can hurt &#10007;<span class="body"></span></div>
-      </div>
-      <div class="query-card" data-verdict="bad" data-reason="There are no steps to work through. Showing reasoning just adds length and cost without making the summary any better.">
+      <div class="query-card" data-verdict="bad" data-reason="A one-line summary. Reasoning only adds length.">
         <div class="q">"Summarize this paragraph in one line."</div>
         <div class="verdict">Wasted &#10007;<span class="body"></span></div>
       </div>
     </div>
-    <div class="query-tracker" id="queryTracker" aria-live="polite">0 / 6 tested</div>
+    <div class="query-tracker" id="queryTracker" aria-live="polite">0 / 5 tested</div>
   </div>
 </section>
 
-<!-- 04 · WORKED EXAMPLE - DOSSIER -->
+<!-- 04 · CODE -->
 <section>
-  <div class="section-label"><span class="num">04</span>Worked Example</div>
-  <h2>One real <em>case</em>.</h2>
-  <div class="dossier">
-    <div class="dossier-q">
-      <div class="label">User asks</div>
-      <div class="text">"A crew of 4 painters each finish 3 rooms a day. They work 5 days. The building has 70 rooms. How many are left unpainted?"</div>
-    </div>
-
-    <div class="dossier-step" data-row="0">
-      <div class="icon">1</div>
-      <div class="body">
-        <div class="head">Pull out the numbers</div>
-        <div class="detail">4 painters, <code>3 rooms</code> each per day, <code>5 days</code>, <code>70 rooms</code> total. Listing the facts before doing any math is what reasoning first means.</div>
-      </div>
-    </div>
-
-    <div class="dossier-step" data-row="1">
-      <div class="icon">2</div>
-      <div class="body">
-        <div class="head">Step one, per day</div>
-        <div class="detail">How many rooms get painted in a single day?
-          <span class="pull-quote">4 painters &times; 3 rooms = 12 rooms / day</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="dossier-step" data-row="2">
-      <div class="icon">3</div>
-      <div class="body">
-        <div class="head">Step two, over five days</div>
-        <div class="detail">Use the answer from the step before, don't start over.
-          <span class="pull-quote">12 rooms/day &times; 5 days = 60 rooms painted</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="dossier-step" data-row="3">
-      <div class="icon">4</div>
-      <div class="body">
-        <div class="head">Step three, what's left</div>
-        <div class="detail">Subtract painted from the total.
-          <span class="pull-quote">70 rooms &minus; 60 painted = 10 left</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="dossier-final" data-row="4">
-      <div class="label">Answer returned to user</div>
-      <div class="answer">"10 rooms are left unpainted." The answer is just the last step, and every step before it was easy to check. <span class="cite">Without the steps, models often jump to a wrong number here.</span></div>
-    </div>
-
-    <div class="dossier-replay">
-      <button id="dossierReplay">&#9654; Replay case</button>
-    </div>
-  </div>
-</section>
-
-<!-- 05 · CODE -->
-<section>
-  <div class="section-label"><span class="num">05</span>Code Sketch</div>
+  <div class="section-label"><span class="num">04</span>Code Sketch</div>
   <h2>The <em>shape</em> in code.</h2>
   <div class="code-stage">
     <div class="code-hint">Tap a line to see what it does. The whole pattern is one change to the <span class="term" tabindex="0" role="button" aria-label="prompt: The text you send the model. Everything it sees before it starts writing." data-def="The text you send the model. Everything it sees before it starts writing.">prompt</span>.</div>
-    <pre class="code"><code id="codeBlock"><span class="code-line" data-line="0"><span class="comment"># the trick: ask for the reasoning before the answer</span></span>
-<span class="code-line" data-line="1">prompt = question + <span class="str">"\nLet's think step by step."</span></span>
-<span class="code-line" data-line="2"><span class="comment"># the model writes its steps, then lands on an answer</span></span>
-<span class="code-line" data-line="3">response = model(prompt)</span>
-<span class="code-line" data-line="4"><span class="comment"># reasoning is everything above; the answer is the last line</span></span>
-<span class="code-line" data-line="5">answer = response.splitlines()[<span class="str">-1</span>]</span>
-<span class="code-line" data-line="6"><span class="kw">return</span> answer, response</span></code></pre>
+    <pre class="code"><code id="codeBlock"><span class="code-line" data-line="0"><span class="comment"># the trick: ask for the reasoning before the answer</span></span><span class="code-line" data-line="1">prompt = question + <span class="str">"\nLet's think step by step."</span></span><span class="code-line" data-line="2"><span class="comment"># the model writes its steps, then lands on an answer</span></span><span class="code-line" data-line="3">response = model(prompt)</span><span class="code-line" data-line="4"><span class="comment"># reasoning is everything above; the answer is the last line</span></span><span class="code-line" data-line="5">answer = response.splitlines()[<span class="str">-1</span>]</span><span class="code-line" data-line="6"><span class="kw">return</span> answer, response</span></code></pre>
     <div class="code-explainer" id="codeExplainer" aria-live="polite">
       <div class="hint">Tap a line above</div>
     </div>
   </div>
 </section>
 
-<!-- 06 · TRADEOFFS -->
+<!-- 05 · TRADEOFFS -->
 <section>
-  <div class="section-label"><span class="num">06</span>Tradeoffs</div>
+  <div class="section-label"><span class="num">05</span>Tradeoffs</div>
   <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-row">
@@ -1123,7 +811,7 @@
       </div>
     </div>
     <div class="tradeoff-quote">
-      Asking the model to think step by step helps a lot on hard problems. On a simple question it just adds extra words, so you pay more (tokens) for no better answer.
+      Steps help a lot on hard questions. On easy ones, they just waste time and money for the same answer.
     </div>
   </div>
 </section>
@@ -1153,115 +841,139 @@
 </footer>
 
 <script>
-// ============ HOW IT WORKS: SYNCED DEMO ============
-// One reveal at a time. Each reveal lights up a reasoning line (or the answer)
-// AND swaps the single caption so the words match exactly what just appeared.
-const demoPlaceholder = document.getElementById('demoPlaceholder');
-const demoLines = document.querySelectorAll('.demo-line');     // 3 reasoning lines, data-reveal 0..2
-const demoAnswer = document.getElementById('demoAnswer');       // the answer, data-reveal 3
-const demoCapStep = document.getElementById('demoCapStep');
-const demoCapText = document.getElementById('demoCapText');
-const demoStepBtn = document.getElementById('demoStepBtn');
-const demoPlayBtn = document.getElementById('demoPlayBtn');
-const demoResetBtn = document.getElementById('demoResetBtn');
+// ============ THE WHITEBOARD ============
+// The model writes its working on the board, one TOKEN at a time, left to right.
+// Each line is a list of tokens; chips pop in one by one to show what a token is
+// and that writing goes left to right. The caption lives on the board, by the work,
+// and updates as each line is written. The answer falls out of the last line.
+const boardLines = document.querySelectorAll('.board-line');   // 3 lines, data-reveal 0..2
+const boardAnswer = document.getElementById('boardAnswer');     // the answer, data-reveal 3
+const boardCaption = document.getElementById('boardCaption');
+const boardStepBtn = document.getElementById('boardStepBtn');
+const boardPlayBtn = document.getElementById('boardPlayBtn');
+const boardResetBtn = document.getElementById('boardResetBtn');
 
-// 4 reveals (3 reasoning lines + 1 answer). The caption narrates what is on
-// screen at that exact moment. These are the old three ideas, now synced.
-const DEMO_TOTAL = 4;
-const demoCaptions = [
-  { step: 'Writing its thinking', text: 'Instead of answering at once, it writes its thinking out, one step at a time.' },
-  { step: 'Building on the step before', text: 'Each step it writes, it reads back, so this one builds on the last: 3 × 6 = 18.' },
-  { step: 'Still building, step by step', text: 'It carries that 18 forward, takes away the 4, and lands on the last step.' },
-  { step: 'The answer falls out', text: 'The answer comes straight out of that last step, not a guess: 18 − 4 = 14.' }
+// each line's working, split into tokens written left to right
+const boardWork = [
+  ['3', 'baskets', ',', 'each', 'with', '6', 'apples', '.'],
+  ['3', '×', '6', '=', '18', 'apples', 'in', 'all', '.'],
+  ['18', '−', '4', '=', '14', 'left', '.']
 ];
-const demoStart = { step: '', text: 'An apple problem with two small steps. A guess could miss it. Watch what the model does instead.' };
-const demoEnd = { step: 'Done', text: '✓ It wrote out its working first, and the right answer fell out of it.' };
+// the caption narrates exactly what is happening, line by line
+const boardCaptions = [
+  'It writes its thinking out, a little piece (a token) at a time, left to right.',
+  'Each line builds on the one before.',
+  'Each line builds on the one before.'
+];
+const boardStart = 'Press Play, and watch the model write its working out.';
+const boardEnd = 'The answer falls out of the last line, not a guess. Without the steps, models often jump to a wrong number.';
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// reveal index r: 0..2 = reasoning lines, 3 = answer.
-function demoReveal(r, isWriting) {
-  if (demoPlaceholder) demoPlaceholder.classList.add('hidden');
-  if (r < 3) {
-    demoLines.forEach(l => l.classList.remove('writing'));
-    demoLines[r].classList.add('shown');
-    if (isWriting) demoLines[r].classList.add('writing');
-  } else {
-    demoLines.forEach(l => l.classList.remove('writing'));
-    demoAnswer.classList.add('shown');
+// write one line, token by token. Returns when the line is fully written.
+async function writeLine(r, animate) {
+  const line = boardLines[r];
+  const slot = line.querySelector('.board-tokens');
+  slot.innerHTML = '';
+  boardLines.forEach(l => l.classList.remove('writing'));
+  line.classList.add('shown', 'writing');
+  boardCaption.textContent = boardCaptions[r];
+  const tokens = boardWork[r];
+  for (let i = 0; i < tokens.length; i++) {
+    const chip = document.createElement('span');
+    chip.className = 'token';
+    chip.textContent = tokens[i];
+    slot.appendChild(chip);
+    if (animate) await sleep(170);
   }
-  const c = demoCaptions[r];
-  demoCapStep.textContent = c.step || ' ';
-  demoCapText.textContent = c.text;
+  line.classList.remove('writing');
 }
 
-function demoReset() {
-  demoLines.forEach(l => l.classList.remove('shown', 'writing'));
-  demoAnswer.classList.remove('shown');
-  if (demoPlaceholder) demoPlaceholder.classList.remove('hidden');
-  demoCapStep.textContent = demoStart.step || ' ';
-  demoCapText.textContent = demoStart.text;
-  demoStep = -1;
+// fill a line instantly (no token animation), used for Step taps and reduced-motion
+function fillLine(r) {
+  const line = boardLines[r];
+  const slot = line.querySelector('.board-tokens');
+  slot.innerHTML = '';
+  boardWork[r].forEach(t => {
+    const chip = document.createElement('span');
+    chip.className = 'token';
+    chip.textContent = t;
+    slot.appendChild(chip);
+  });
+  line.classList.add('shown');
 }
 
-// show the whole thing at once (used for reduced-motion and as a final state)
-function demoShowAll() {
-  if (demoPlaceholder) demoPlaceholder.classList.add('hidden');
-  demoLines.forEach(l => { l.classList.add('shown'); l.classList.remove('writing'); });
-  demoAnswer.classList.add('shown');
-  demoCapStep.textContent = demoEnd.step;
-  demoCapText.textContent = demoEnd.text;
-  demoStep = DEMO_TOTAL - 1;
+function boardReset() {
+  boardLines.forEach(l => {
+    l.classList.remove('shown', 'writing');
+    l.querySelector('.board-tokens').innerHTML = '';
+  });
+  boardAnswer.classList.remove('shown');
+  boardCaption.textContent = boardStart;
+  boardStep = -1;
 }
 
-let demoStep = -1;     // last revealed index
-let demoPlaying = false;
+// show the whole board + answer + final caption at once
+function boardShowAll() {
+  for (let r = 0; r < boardLines.length; r++) fillLine(r);
+  boardLines.forEach(l => l.classList.remove('writing'));
+  boardAnswer.classList.add('shown');
+  boardCaption.textContent = boardEnd;
+  boardStep = BOARD_TOTAL - 1;
+}
 
-// Step button: reveal the next line/answer, one tap at a time
-demoStepBtn.addEventListener('click', () => {
-  if (demoPlaying) return;
-  if (demoStep >= DEMO_TOTAL - 1) { demoReset(); return; }
-  demoStep += 1;
-  // when stepping, mark a reasoning line as "writing" only if it's the newest one
-  demoReveal(demoStep, demoStep < 3);
-  if (demoStep === DEMO_TOTAL - 1) {
-    // settle on the end caption once the answer is up
-    demoLines.forEach(l => l.classList.remove('writing'));
+const BOARD_TOTAL = 4;   // 3 lines + 1 answer
+let boardStep = -1;      // last revealed index
+let boardPlaying = false;
+
+// Step: one tap reveals the next line (filled instantly) or the answer
+boardStepBtn.addEventListener('click', () => {
+  if (boardPlaying) return;
+  if (boardStep >= BOARD_TOTAL - 1) { boardReset(); return; }
+  boardStep += 1;
+  if (boardStep < 3) {
+    boardLines.forEach(l => l.classList.remove('writing'));
+    fillLine(boardStep);
+    boardCaption.textContent = boardCaptions[boardStep];
+  } else {
+    boardLines.forEach(l => l.classList.remove('writing'));
+    boardAnswer.classList.add('shown');
+    boardCaption.textContent = boardEnd;
   }
 });
 
-// Play button: auto-reveal each line, then the answer, captions in lockstep
-demoPlayBtn.addEventListener('click', async () => {
-  if (demoPlaying) return;
-  if (reduceMotion) { demoShowAll(); return; }
-  demoPlaying = true;
-  demoPlayBtn.disabled = true;
-  demoStepBtn.disabled = true;
-  demoReset();
+// Play: write each line token by token, then drop the answer out of the last line
+boardPlayBtn.addEventListener('click', async () => {
+  if (boardPlaying) return;
+  if (reduceMotion) { boardShowAll(); return; }
+  boardPlaying = true;
+  boardPlayBtn.disabled = true;
+  boardStepBtn.disabled = true;
+  boardReset();
   await sleep(250);
   for (let r = 0; r < 3; r++) {
-    demoReveal(r, true);          // line appears + its caption, highlighted as "being written"
-    await sleep(1500);
-    demoLines[r].classList.remove('writing');
-    await sleep(200);
+    await writeLine(r, true);
+    await sleep(350);
   }
   await sleep(250);
-  demoReveal(3, false);           // answer drops out of the last line + final caption
-  demoPlaying = false;
-  demoPlayBtn.disabled = false;
-  demoStepBtn.disabled = false;
+  boardAnswer.classList.add('shown');
+  boardCaption.textContent = boardEnd;
+  boardStep = BOARD_TOTAL - 1;
+  boardPlaying = false;
+  boardPlayBtn.disabled = false;
+  boardStepBtn.disabled = false;
 });
 
-demoResetBtn.addEventListener('click', () => {
-  if (demoPlaying) return;
-  demoReset();
+boardResetBtn.addEventListener('click', () => {
+  if (boardPlaying) return;
+  boardReset();
 });
 
-// Reduced motion: teach immediately, no animation needed.
+// Reduced motion: teach immediately, full board + answer + final caption.
 if (reduceMotion) {
-  demoShowAll();
+  boardShowAll();
 } else {
-  demoReset();
+  boardReset();
 }
 
 // ============ QUERIES ============
@@ -1278,42 +990,13 @@ queryCards.forEach(card => {
     tested.add(card);
     const n = tested.size;
     if (n === queryCards.length) {
-      queryTracker.textContent = '✓ All 6 tested, pattern understood';
+      queryTracker.textContent = '✓ All 5 tested, pattern understood';
       queryTracker.classList.add('complete');
     } else {
-      queryTracker.textContent = `${n} / 6 tested`;
+      queryTracker.textContent = `${n} / 5 tested`;
     }
   });
 });
-
-// ============ DOSSIER ============
-const dossierSteps = document.querySelectorAll('.dossier-step');
-const dossierFinal = document.querySelector('.dossier-final');
-const dossierReplay = document.getElementById('dossierReplay');
-
-async function playDossier() {
-  dossierSteps.forEach(s => { s.classList.remove('shown'); s.classList.remove('done'); });
-  dossierFinal.classList.remove('shown');
-  await sleep(200);
-  for (let i = 0; i < dossierSteps.length; i++) {
-    dossierSteps[i].classList.add('shown');
-    await sleep(900);
-    dossierSteps[i].classList.add('done');
-  }
-  await sleep(300);
-  dossierFinal.classList.add('shown');
-}
-
-dossierReplay.addEventListener('click', playDossier);
-const dossierObs = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      playDossier();
-      dossierObs.disconnect();
-    }
-  });
-}, { threshold: 0.3 });
-dossierObs.observe(document.querySelector('.dossier'));
 
 // ============ CODE ============
 const codeLines = document.querySelectorAll('.code-line');
