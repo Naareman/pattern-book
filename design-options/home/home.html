@@ -68,6 +68,9 @@
 
   .produces{align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--faint);font-size:12px;gap:4px}
   .builds{align-self:center}
+  .box.glow{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft),var(--shadow)}
+  .produces.glow{color:var(--accent-hover);font-weight:600}
+  .produces.glow .flow{opacity:1;height:3px}
   .flow{position:relative;background:var(--accent);opacity:.4;border-radius:2px}
   .flow-x{width:40px;height:2px}
   .flow-x::after{content:"";position:absolute;right:-1px;top:50%;transform:translateY(-50%);border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:7px solid var(--accent)}
@@ -196,6 +199,9 @@
   const stageCap = document.getElementById('stageCap');
   function showCap(t){ stageCap.textContent = t; stageCap.classList.add('show'); }
   function hideCap(){ stageCap.classList.remove('show'); }
+  const layersBox = document.querySelector('.box.layers');
+  const buildsBox = document.querySelector('.box.builds');
+  const producesEl = document.querySelector('.produces');
 
   const playBtns = Array.from(document.querySelectorAll('.head-play'));
   playBtns.forEach(b=> b.dataset.cta = b.innerHTML);   // remember each button's label (Build it / Trace it / Weigh it)
@@ -212,6 +218,7 @@
     buildItems.forEach(el=> el.classList.remove('demo'));
     concernItems.forEach(c=> c.classList.remove('active'));
     concernsBox.classList.remove('pulse');
+    layersBox.classList.remove('glow'); buildsBox.classList.remove('glow'); producesEl.classList.remove('glow');
     rail.style.transition='none'; rail.style.transform='scaleY(1)';
     activeConcern = null;
     requestAnimationFrame(()=> requestAnimationFrame(()=> document.body.classList.remove('snapping')));
@@ -250,10 +257,12 @@
       a.push({at:0, fn:()=>{ showCap('Concerns: what every layer must get right'); concernsBox.classList.add('pulse'); }});
       let t=1600; concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ hideCap(); showBars(cc.textContent.trim(), cc); }}); t+=1400; }); a.push({at:t, fn:()=> endDemo(true)});
     } else if(kind==='connect'){
-      // intro: layers -> produces -> builds, then each build's layers
-      a.push({at:0, fn:()=>{ showCap('Builds: assembled from patterns across the layers'); layerItems.forEach(el=>el.classList.add('lit')); }});
-      a.push({at:1000, fn:()=>{ layerItems.forEach(el=>el.classList.remove('lit')); }});
-      let t=1600; buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ hideCap(); layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1300; }); a.push({at:t, fn:()=> endDemo(true)});
+      // intro: whole Layers box glows -> "produces" becomes prominent -> whole Builds box glows -> then each build's layers
+      a.push({at:0,    fn:()=>{ layersBox.classList.add('glow'); }});
+      a.push({at:850,  fn:()=>{ layersBox.classList.remove('glow'); producesEl.classList.add('glow'); }});
+      a.push({at:1600, fn:()=>{ producesEl.classList.remove('glow'); buildsBox.classList.add('glow'); }});
+      a.push({at:2400, fn:()=>{ buildsBox.classList.remove('glow'); }});
+      let t=2600; buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1300; }); a.push({at:t, fn:()=> endDemo(true)});
     }
     return a;
   }
