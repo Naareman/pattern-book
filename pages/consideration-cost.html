@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cost . The Pattern Book</title>
+<title>Cost, Latency &amp; Reliability . The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -73,6 +73,29 @@
   .idea-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
   .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
   .idea-card p + p { margin-top: 14px; }
+
+  /* WHAT THIS COVERS MAP */
+  .covers-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 24px 28px;
+  }
+  .covers-scope {
+    font-size: 13px; color: var(--soft); margin-bottom: 6px; line-height: 1.5;
+  }
+  .covers-scope strong { color: var(--text); }
+  .covers-axis {
+    font-size: 13px; color: var(--soft); margin-bottom: 18px; line-height: 1.5;
+  }
+  .covers-axis strong { color: var(--text); }
+  .covers-note {
+    margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);
+    font-size: 12.5px; color: var(--faint); line-height: 1.5;
+  }
+  .covers-note strong { color: var(--soft); }
+  .discipline-list { display: flex; flex-direction: column; gap: 10px; }
+  .discipline-item { display: flex; flex-direction: column; gap: 3px; }
+  .discipline-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; color: var(--text); }
+  .discipline-line { font-size: 13px; color: var(--soft); line-height: 1.5; }
 
   /* 02 INTERACTIVE COST METER */
   .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
@@ -217,11 +240,14 @@
   .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
   .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
   .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
-  .tradeoff-bars .seg.on-g { background: var(--success); border-color: var(--success); }
   .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
   .tradeoff-scale .spacer { min-width: 130px; }
   .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
   .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
+    .tradeoff-label { min-width: 0; }
+  }
 
   /* BACK LINK */
   .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
@@ -268,7 +294,7 @@
   <div class="topbar-inner">
     <a class="back" href="considerations.html"><span aria-hidden="true">&larr;</span> Considerations</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Cost</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Cost, Latency &amp; Reliability</span>
     </nav>
   </div>
 </nav>
@@ -281,19 +307,77 @@
         <circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-1.7 2.5-1.7s2.5.6 2.5 1.9c0 2.6-5 1.4-5 4 0 1.3 1.1 2 2.5 2s2.5-.5 2.5-1.7"/>
       </svg>
     </span>
-    Consideration
+    C5 &middot; Consideration
   </span>
-  <h1 class="page-title">Cost</h1>
-  <p class="explainer">Every word the AI reads or writes costs real money. Keep it cheap enough and everyone can use it. Let it run unchecked and the bill ends the product.</p>
+  <h1 class="page-title">Cost, Latency &amp; Reliability</h1>
+  <p class="explainer">A discipline for every system that has a budget, a speed target, or an uptime promise. How you charge AI work to a budget, how fast it must respond, and what happens when something goes wrong.</p>
 </header>
+
+<!-- 00 WHAT THIS COVERS -->
+<section>
+  <div class="section-label"><span class="num">00</span>What This Covers</div>
+  <h2>The <em>disciplines</em> inside this crosscut.</h2>
+  <div class="covers-card">
+    <p class="covers-scope"><strong>Applies to:</strong> every system with cost, latency, or reliability constraints.</p>
+    <p class="covers-axis"><strong>Axis:</strong> engineering AI systems against budgets and SLAs (service-level agreements).</p>
+
+    <div class="discipline-list">
+
+      <div class="discipline-item">
+        <span class="discipline-name">Cost Attribution</span>
+        <span class="discipline-line">Working out which part of the system (prompt, model call, retrieval step) is responsible for which fraction of the bill.</span>
+      </div>
+
+      <div class="discipline-item">
+        <span class="discipline-name">Cost-Quality Tradeoff</span>
+        <span class="discipline-line">Deciding when spending more on a bigger model or longer context actually improves the answer enough to be worth it.</span>
+      </div>
+
+      <div class="discipline-item">
+        <span class="discipline-name">Latency Budgets</span>
+        <span class="discipline-line">Splitting the total time a user is willing to wait across all the steps in the pipeline: retrieval, model call, post-processing. Covers perceived latency, actual latency, and tail latency.</span>
+      </div>
+
+      <div class="discipline-item">
+        <span class="discipline-name">Latency-Quality Tradeoff</span>
+        <span class="discipline-line">Understanding what quality you give up when you cut response time: fewer reasoning steps, smaller model, truncated context.</span>
+      </div>
+
+      <div class="discipline-item">
+        <span class="discipline-name">Context-Strategy Tradeoff</span>
+        <span class="discipline-line">Choosing between RAG (Retrieval-Augmented Generation: find relevant chunks and inject them), long-context (put the whole document in the window), or a hybrid. Each has a different cost, latency, and recall profile. See also: L3a Stateless Retrieval.</span>
+      </div>
+
+      <div class="discipline-item">
+        <span class="discipline-name">SLA/SLO Design</span>
+        <span class="discipline-line">Setting the service-level agreements (SLAs: contracts with users) and service-level objectives (SLOs: internal targets) that cost and latency decisions must satisfy.</span>
+      </div>
+
+      <div class="discipline-item">
+        <span class="discipline-name">Error Budgets &amp; Graceful Degradation</span>
+        <span class="discipline-line">Deciding how much failure is acceptable before triggering a response, and what the system does when it hits that limit: fall back to a cached answer, use a cheaper model, or surface an honest error.</span>
+      </div>
+
+      <div class="discipline-item">
+        <span class="discipline-name">Incident Response</span>
+        <span class="discipline-line">The playbook for what to do when cost spikes, latency blows out, or the model goes down: who gets paged, what gets throttled, how you roll back.</span>
+      </div>
+
+    </div>
+
+    <p class="covers-note">
+      <strong>This is a discipline, not a mechanism.</strong> The runtime mechanism that picks a cheaper model on the fly lives in <strong>L0 Serving Infrastructure</strong> (cost/latency-optimized model selection at runtime). This crosscut owns the frameworks for deciding when and why to make those choices.
+    </p>
+  </div>
+</section>
 
 <!-- 01 THE IDEA -->
 <section>
   <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What <em>costs</em> money?</h2>
   <div class="idea-card">
-    <p>AI models charge per <span style="color:var(--accent-hover);font-weight:600">token</span>: roughly one word, in or out. Every character you send and every character the model writes adds to the bill. A longer prompt, a bigger model, or a thousand users asking the same question all drive the cost up.</p>
-    <p>Three levers bring it back down: write <strong>shorter prompts</strong> (fewer tokens in), pick a <strong>smaller model</strong> for easy tasks (cheaper per token), and <strong>cache</strong> repeated answers (pay once, serve many).</p>
+    <p>AI models charge per <span style="color:var(--accent-hover);font-weight:600">token</span> (a token is a small piece the AI works in: roughly one word, or a short fragment of a longer word). Tokens you send make up your question; tokens the model writes make up the answer. Both cost money. A longer prompt, a bigger model, or a thousand users asking the same question all drive the bill up.</p>
+    <p>Three levers bring it back down: write <strong>shorter prompts</strong> (fewer tokens in), pick a <strong>smaller model</strong> for easy tasks (cheaper per token), and use <strong>response caching</strong> to serve a repeated answer for free instead of running the model again.</p>
   </div>
 </section>
 
@@ -301,7 +385,7 @@
 <section>
   <div class="section-label"><span class="num">02</span>See It Work</div>
   <h2>Turn the <em>dials</em>.</h2>
-  <p class="demo-lede">Adjust prompt length, model size, and caching. Watch the cost meter update instantly.</p>
+  <p class="demo-lede">Adjust prompt length, model size, and response caching. Watch the cost meter update instantly.</p>
 
   <div class="demo-stage">
     <div class="controls">
@@ -311,7 +395,7 @@
         <div class="ctrl-label">
           <span class="ctrl-label-name">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"/></svg>
-            Prompt length
+            Prompt Length
           </span>
           <span class="ctrl-value" id="promptVal">500 tokens</span>
         </div>
@@ -327,7 +411,7 @@
         <div class="ctrl-label">
           <span class="ctrl-label-name">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-            Model size
+            Model Size
           </span>
           <span class="ctrl-value" id="modelVal">Medium</span>
         </div>
@@ -338,22 +422,22 @@
         </div>
       </div>
 
-      <!-- Caching -->
+      <!-- Response Caching -->
       <div class="ctrl-row">
         <div class="ctrl-label">
           <span class="ctrl-label-name">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-            Caching
+            Response Caching
           </span>
           <span class="ctrl-value" id="cacheVal">Off</span>
         </div>
         <div class="cache-row">
-          <span class="desc">Store the answer to repeated questions and serve it for free instead of running the model again.</span>
+          <span class="desc">Store the completed answer to a repeated question and serve it for free instead of running the model again.</span>
           <div class="switch-wrap">
             <label class="switch">
               <input type="checkbox" id="cacheToggle" role="switch" aria-checked="false">
               <span class="switch-track"></span>
-              <span class="switch-label sr-only">Enable caching</span>
+              <span class="switch-label sr-only">Enable response caching</span>
             </label>
           </div>
         </div>
@@ -366,7 +450,7 @@
     <div class="meter-box" aria-live="polite" aria-atomic="true" aria-label="Cost meter">
       <div class="meter-row">
         <div class="meter-cost-block">
-          <div class="meter-label">Cost per 1 000 queries</div>
+          <div class="meter-label">Cost per 1 000 Queries</div>
           <div class="meter-amount" id="meterAmount">$0.00</div>
           <div class="savings-badge" id="savingsBadge">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
@@ -375,17 +459,17 @@
         </div>
         <div class="meter-breakdown">
           <div class="breakdown-row">
-            <span class="breakdown-name">Input tokens</span>
+            <span class="breakdown-name">Input Tokens</span>
             <div class="breakdown-bar-track"><div class="breakdown-bar-fill" id="barInput" style="width:0%"></div></div>
             <span class="breakdown-num" id="numInput">$0.00</span>
           </div>
           <div class="breakdown-row">
-            <span class="breakdown-name">Output tokens</span>
+            <span class="breakdown-name">Output Tokens</span>
             <div class="breakdown-bar-track"><div class="breakdown-bar-fill" id="barOutput" style="width:0%"></div></div>
             <span class="breakdown-num" id="numOutput">$0.00</span>
           </div>
           <div class="breakdown-row">
-            <span class="breakdown-name">Cache savings</span>
+            <span class="breakdown-name">Cache Savings</span>
             <div class="breakdown-bar-track"><div class="breakdown-bar-fill saved" id="barSaved" style="width:0%"></div></div>
             <span class="breakdown-num saved" id="numSaved">$0.00</span>
           </div>
@@ -418,16 +502,16 @@
           <span class="scenario-badge good">Sustainable</span>
         </div>
         <div class="scenario-detail">
-          Simple questions go to a small cheap model. Complex ones go to the large model. Answers to the 200 most common questions are cached. Same 10 000 daily users, same features. Bill: <strong>$1 400/month</strong>. The product stays open and grows.
+          Simple questions go to a small cheap model. Complex ones go to the large model. The 200 most common questions are cached so repeated queries are served without a model call. Same 10 000 daily users, same features. Bill: <strong>$1 400/month</strong>. The product stays open and grows.
         </div>
       </div>
       <div class="scenario" role="button" tabindex="0" aria-expanded="false" data-id="c">
         <div class="scenario-top">
           <span class="scenario-name">Enterprise: shorter system prompts</span>
-          <span class="scenario-badge good">Quick win</span>
+          <span class="scenario-badge good">Quick Win</span>
         </div>
         <div class="scenario-detail">
-          The system prompt (instructions sent with every query) was 2 400 tokens of verbose policy text. After trimming it to 600 tokens without changing behavior, input costs dropped <strong>by 75%</strong> across millions of monthly calls. No model change, no caching, just fewer words.
+          The system prompt (the instructions sent with every query) was 2 400 tokens of verbose policy text. After trimming it to 600 tokens without changing behavior, input costs dropped <strong>by 75%</strong> across millions of monthly calls. No model change, no caching, just fewer words.
         </div>
       </div>
     </div>
@@ -440,27 +524,27 @@
   <div class="section-label"><span class="num">04</span>Tradeoffs</div>
   <h2>What you <em>give up</em>.</h2>
   <div class="tradeoffs-stage">
-    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>Low</span><span>High</span></div></div>
     <div class="tradeoff-row">
-      <div class="tradeoff-label">Shorter prompts</div>
+      <div class="tradeoff-label">Shorter Prompts</div>
       <div class="tradeoff-bars">
-        <div class="seg on-g"></div><div class="seg on-g"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
       </div>
     </div>
     <div class="tradeoff-row">
-      <div class="tradeoff-label">Smaller model</div>
+      <div class="tradeoff-label">Smaller Model</div>
       <div class="tradeoff-bars">
-        <div class="seg on-g"></div><div class="seg on-g"></div><div class="seg on-g"></div><div class="seg"></div><div class="seg"></div>
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
       </div>
     </div>
     <div class="tradeoff-row">
-      <div class="tradeoff-label">Caching</div>
+      <div class="tradeoff-label">Response Caching</div>
       <div class="tradeoff-bars">
-        <div class="seg on-g"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+        <div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
       </div>
     </div>
     <div class="tradeoff-quote">
-      Shorter prompts risk losing important context. Smaller models may miss nuance on hard questions. Caching only helps when queries repeat, and cached answers can go stale. None of these is free. The skill is knowing when the savings outweigh the loss.
+      Shorter prompts risk losing important context. Smaller models may miss nuance on hard questions. Response caching only helps when queries repeat, and cached answers can go stale. None of these is free. The skill is knowing when the savings outweigh the loss.
     </div>
   </div>
 </section>
@@ -480,10 +564,10 @@
 <div class="sources">
   <div class="sources-title">Sources</div>
   <ul>
-    <li>Anthropic (2024). <em>Prompt caching.</em> <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching" target="_blank" rel="noopener">docs.anthropic.com</a> <span class="note">. Official docs on caching repeated prompt prefixes to cut input costs.</span></li>
     <li>Chen et al. (2023). <em>FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance.</em> <span class="note">arXiv:2305.05176. Empirical study of model routing and cascade strategies for cost reduction.</span></li>
     <li>OpenAI (2024). <em>Pricing.</em> <a href="https://openai.com/pricing" target="_blank" rel="noopener">openai.com/pricing</a> <span class="note">. Real per-token pricing across model sizes, illustrating the cost gap between small and large models.</span></li>
     <li>Samyam Rajbhandari et al. (2020). <em>ZeRO: Memory Optimizations Toward Training Trillion Parameter Models.</em> <span class="note">SC '20. Foundational work on reducing the compute cost of training large models.</span></li>
+    <li>Crankshaw et al. (2017). <em>Clipper: A Low-Latency Online Prediction Serving System.</em> <span class="note">NSDI '17. Latency budgets, caching, and model selection at serving time for ML systems.</span></li>
   </ul>
 </div>
 
@@ -503,7 +587,7 @@ const MODELS = {
 
 // Assume output is ~40% of input length (typical for Q&A)
 const OUTPUT_RATIO = 0.4;
-// Cache hit rate: ~60% of 1000 queries hit the cache when caching is on
+// Cache hit rate: ~60% of 1000 queries hit the cache when response caching is on
 const CACHE_HIT_RATE = 0.60;
 // Queries per batch shown in the meter
 const QUERIES = 1000;
@@ -527,7 +611,7 @@ function computeCost(s) {
 
   let cacheSaving = 0;
   if (s.cacheOn) {
-    // cache hits avoid running the model entirely for that fraction
+    // response cache hits avoid running the model entirely for that fraction
     cacheSaving = rawTotal * CACHE_HIT_RATE;
   }
 
@@ -584,17 +668,16 @@ function updateMeter() {
 
   // Contextual note
   let note = '';
-  const m = MODELS[state.model];
   if (state.model === 'large' && state.promptTokens > 1000) {
     note = 'Largest model + long prompt: the most expensive combination. Consider routing simpler queries to a smaller model.';
   } else if (state.model === 'small' && state.cacheOn) {
-    note = 'Small model with caching: the lowest-cost configuration. Good for high-volume, repetitive tasks.';
+    note = 'Small model with response caching: the lowest-cost configuration. Good for high-volume, repetitive tasks.';
   } else if (state.promptTokens > 1500) {
     note = 'Long prompts drive up input costs fast. Even a 30% trim can meaningfully reduce the bill.';
   } else if (state.model === 'large') {
     note = 'Large models are 6-50x more expensive per token than small ones. Reserve them for questions that need it.';
   } else if (state.cacheOn) {
-    note = 'Caching repeated answers means those queries cost nothing extra after the first time.';
+    note = 'Response caching means repeated queries cost nothing extra after the first one.';
   } else {
     note = 'Illustrative costs based on realistic per-token ratios. Actual rates vary by provider and model.';
   }
