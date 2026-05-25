@@ -25,28 +25,31 @@
   .wordmark{font-family:'Fraunces',serif;font-weight:500;font-size:25px;letter-spacing:-.01em}
   .strap{color:var(--soft);font-size:15px;margin-top:4px;line-height:1.5;max-width:660px}
   .strap b{color:var(--text);font-weight:600}
-  .cta-row{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px}
-  .tour-btn{display:inline-flex;align-items:center;gap:7px;font-family:'Inter';font-size:14px;font-weight:600;color:#fff;background:var(--accent);border:none;border-radius:24px;padding:10px 20px;cursor:pointer;box-shadow:0 4px 14px rgba(124,92,246,.25);transition:background .14s ease,transform .14s ease,box-shadow .14s ease}
-  .tour-btn:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 6px 18px rgba(124,92,246,.3)}
-  .tour-btn .tri{font-size:10px}
-  .cta-hint{color:var(--faint);font-size:13px}
+  /* quiet inline tour link: plain text + link, no pill */
+  .tour-line{margin-top:8px;font-size:13px;color:var(--faint)}
+  .tour-link{display:inline;font-size:14px;font-weight:500;color:var(--accent-hover);background:none;border:none;padding:0;cursor:pointer;font-family:'Inter';text-decoration:none}
+  .tour-link .tri{font-size:9px;margin-right:3px}
+  .tour-link:hover{text-decoration:underline}
+  .tour-hint{color:var(--faint);font-size:13px}
 
   .stage{padding:24px 0 34px}
-  .stage-cap{height:24px;text-align:center;font-family:'Fraunces',serif;font-weight:500;font-size:16px;color:var(--accent-hover);opacity:0;transition:opacity .4s ease;margin:2px 0 6px}
-  .stage-cap.show{opacity:1}
+  .lead{text-align:center;font-size:14px;line-height:1.5;color:var(--soft);max-width:600px;margin:0 auto 14px;min-height:21px;transition:color .3s ease}
+  .lead.live{color:var(--accent-hover);font-weight:500}
+  .tour-bar{text-align:center;margin:0 0 16px}
   .canvas{width:840px;max-width:100%;margin:0 auto}
 
   .box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:border-color .25s ease,box-shadow .25s ease,transform .25s ease}
   .box-head{display:flex;align-items:center;border-bottom:1px solid var(--border);background:#fff}
   .head-link{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:13px 16px;border:none;background:none;cursor:pointer;text-align:left}
   .head-link:hover{background:var(--accent-soft)}
+  .head-link .step{flex:none;width:18px;height:18px;border-radius:50%;background:var(--accent-soft);color:var(--accent-hover);font-size:10.5px;font-weight:600;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
   .head-link .name{font-family:'Fraunces',serif;font-weight:500;font-size:18px}
-  .head-link .what{font-size:12.5px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .head-link .what{font-size:12.5px;color:var(--soft);line-height:1.3;min-width:0}
   .head-link .open{margin-left:auto;color:var(--faint);font-size:14px;padding-left:6px}
   .head-link:hover .name{color:var(--accent-hover)} .head-link:hover .open{color:var(--accent)}
-  /* play button = clear call-to-action */
-  .head-play{flex:none;margin:0 12px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#fff;background:var(--accent);border:none;border-radius:20px;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:background .14s ease}
-  .head-play:hover{background:var(--accent-hover)}
+  /* play button = quiet optional "watch" (soft fill, title stays the primary action) */
+  .head-play{flex:none;margin:0 12px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:none;border-radius:20px;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:background .14s ease,color .14s ease}
+  .head-play:hover{background:var(--accent);color:#fff}
   .head-play .tri{font-size:8px}
 
   .items{padding:8px}
@@ -131,20 +134,17 @@
         <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M12 3v18"/></svg></span>
         <span class="wordmark">The Pattern Book</span>
       </div>
-      <div class="strap">A map of how AI products are built, in three parts: the <b>Stack</b> they're made of, the <b>Concerns</b> that apply across every layer, and the <b>Builds</b> you create.</div>
-      <div class="cta-row">
-        <button class="tour-btn" id="tourBtn" type="button"><span class="tri">▶</span> Take the tour</button>
-        <span class="cta-hint">or tap any piece to explore.</span>
-      </div>
+      <div class="strap">How AI products are built, mapped in one picture.</div>
     </header>
-    <div class="stage-cap" id="stageCap"></div>
 
     <div class="stage">
+      <div class="lead" id="stageCap">An AI is built in parts: shared standards run across them, and real products are built on top.</div>
+      <div class="tour-bar"><button class="tour-link" id="tourBtn" type="button"><span class="tri">▶</span> Take the 60-second tour</button></div>
       <div class="canvas">
         <div class="top">
           <div class="box layers">
             <div class="box-head">
-              <button class="head-link" data-go="layers" data-href="pages/layers.html"><span class="name">Stack</span><span class="what">built in layers</span><span class="open">›</span></button>
+              <button class="head-link" data-go="layers" data-href="pages/layers.html"><span class="name">Stack</span><span class="what">the parts that make an AI work</span><span class="open">›</span></button>
               <button class="head-play" data-play="stack" type="button" aria-label="Watch the stack build, foundation to user-facing"><span class="tri">▶</span> Build it</button>
             </div>
             <div class="body">
@@ -174,7 +174,7 @@
 
           <div class="box builds">
             <div class="box-head">
-              <button class="head-link" data-go="builds"><span class="name">Builds</span><span class="what">combining layers</span><span class="open">›</span></button>
+              <button class="head-link" data-go="builds" data-href="pages/builds.html"><span class="name">Builds</span><span class="what">real products made from the parts</span><span class="open">›</span></button>
               <button class="head-play" data-play="connect" type="button" aria-label="Watch how each build connects to layers"><span class="tri">▶</span> Trace it</button>
             </div>
             <div class="items">
@@ -192,7 +192,7 @@
 
         <div class="box concerns">
           <div class="box-head">
-            <button class="head-link" data-go="concerns"><span class="name">Concerns</span><span class="what">spanning all layers</span><span class="open">›</span></button>
+            <button class="head-link" data-go="concerns" data-href="pages/considerations.html"><span class="name">Considerations</span><span class="what">what every part must get right</span><span class="open">›</span></button>
             <button class="head-play" data-play="concern" type="button" aria-label="Watch how each concern weighs on the layers"><span class="tri">▶</span> Weigh it</button>
           </div>
           <div class="items">
@@ -217,8 +217,9 @@
   const concernsBox = document.querySelector('.box.concerns');
   const rail = document.querySelector('.axis .rail');
   const stageCap = document.getElementById('stageCap');
-  function showCap(t){ stageCap.textContent = t; stageCap.classList.add('show'); }
-  function hideCap(){ stageCap.classList.remove('show'); }
+  const DEFAULT_LEAD = stageCap.textContent;
+  function showCap(t){ stageCap.textContent = t; stageCap.classList.add('live'); }
+  function hideCap(){ stageCap.textContent = DEFAULT_LEAD; stageCap.classList.remove('live'); }
   const layersBox = document.querySelector('.box.layers');
   const buildsBox = document.querySelector('.box.builds');
   const producesEl = document.querySelector('.produces');
@@ -248,9 +249,10 @@
     requestAnimationFrame(()=> requestAnimationFrame(()=> document.body.classList.remove('snapping')));
   }
 
+  function isTour(b){ return b && b.dataset.play === 'tour'; }
   function endDemo(clearViz){ clearTimers(); document.body.classList.remove('demoing'); hideCap(); if(clearViz) resetVisual(); if(activeBtn) activeBtn.innerHTML = activeBtn.dataset.cta; demoState='idle'; activeBtn=null; steps=[]; elapsed=0; }
-  function pauseDemo(){ elapsed += performance.now()-startedAt; clearTimers(); demoState='paused'; if(activeBtn) activeBtn.innerHTML = '<span class="tri">▶</span> Resume'; }
-  function resumeDemo(){ demoState='playing'; if(activeBtn) activeBtn.innerHTML = '<span class="tri">❚❚</span> Pause'; schedule(); }
+  function pauseDemo(){ elapsed += performance.now()-startedAt; clearTimers(); demoState='paused'; if(activeBtn) activeBtn.innerHTML = isTour(activeBtn) ? '<span class="tri">▶</span>Resume tour' : '<span class="tri">▶</span> Resume'; }
+  function resumeDemo(){ demoState='playing'; if(activeBtn) activeBtn.innerHTML = isTour(activeBtn) ? '<span class="tri">❚❚</span>Pause tour' : '<span class="tri">❚❚</span> Pause'; schedule(); }
 
   // concern criticality per layer (0-3 = how critical that concern is for each layer)
   const importance = {
@@ -272,47 +274,47 @@
     const a=[];
     if(kind==='stack'){
       // intro: name it, then build foundation -> user-facing
-      a.push({at:0, fn:()=>{ showCap('Layers: built from the foundation up to the user'); layerItems.forEach(el=>el.classList.add('dim')); rail.style.transition='none'; rail.style.transform='scaleY(0)'; }});
+      a.push({at:0, fn:()=>{ showCap('1 / 3 · Stack: the parts that make an AI work'); layerItems.forEach(el=>el.classList.add('dim')); rail.style.transition='none'; rail.style.transform='scaleY(0)'; }});
       let revealed=0, t=1500;
-      for(let i=layerItems.length-1;i>=0;i--){ const idx=i; a.push({at:t, fn:()=>{ hideCap(); layerItems[idx].classList.remove('dim'); revealed++; rail.style.transition='transform .18s ease'; rail.style.transform='scaleY('+(revealed/layerItems.length)+')'; }}); t+=200; }
-      a.push({at:t+150, fn:()=> endDemo(false)});   // layers stay built
+      for(let i=layerItems.length-1;i>=0;i--){ const idx=i; a.push({at:t, fn:()=>{ layerItems[idx].classList.remove('dim'); revealed++; rail.style.transition='transform .18s ease'; rail.style.transform='scaleY('+(revealed/layerItems.length)+')'; }}); t+=200; }
+      a.push({at:t+150, fn:()=>{ hideCap(); endDemo(false); }});   // layers stay built
     } else if(kind==='concern'){
       // intro: Layers box glows -> the "applies to every layer" bracket lights -> Concerns box glows -> per-concern criticality
-      a.push({at:0,    fn:()=>{ layersBox.classList.add('glow'); }});
+      a.push({at:0,    fn:()=>{ showCap('2 / 3 · Considerations: what every part must get right'); layersBox.classList.add('glow'); }});
       a.push({at:850,  fn:()=>{ layersBox.classList.remove('glow'); acrossEl.classList.add('glow'); }});
       a.push({at:1700, fn:()=>{ acrossEl.classList.remove('glow'); concernsBox.classList.add('glow'); }});
       a.push({at:2600, fn:()=>{ concernsBox.classList.remove('glow'); }});
-      let t=2800; concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=> showBars(cc.textContent.trim(), cc)}); t+=1400; }); a.push({at:t, fn:()=> endDemo(true)});
+      let t=2800; concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showCap('2 / 3 · Considerations: what every part must get right'); showBars(cc.textContent.trim(), cc); }}); t+=1400; }); a.push({at:t, fn:()=> endDemo(true)});
     } else if(kind==='connect'){
       // intro: whole Layers box glows -> "produces" becomes prominent -> whole Builds box glows -> then each build's layers
-      a.push({at:0,    fn:()=>{ layersBox.classList.add('glow'); }});
+      a.push({at:0,    fn:()=>{ showCap('3 / 3 · Builds: real products made from the parts'); layersBox.classList.add('glow'); }});
       a.push({at:850,  fn:()=>{ layersBox.classList.remove('glow'); producesEl.classList.add('glow'); }});
       a.push({at:1600, fn:()=>{ producesEl.classList.remove('glow'); buildsBox.classList.add('glow'); }});
       a.push({at:2400, fn:()=>{ buildsBox.classList.remove('glow'); }});
-      let t=2600; buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1300; }); a.push({at:t, fn:()=> endDemo(true)});
+      let t=2600; buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ showCap('3 / 3 · Builds: real products made from the parts'); layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1300; }); a.push({at:t, fn:()=> endDemo(true)});
     } else if(kind==='tour'){
       // one guided walk through all three parts, reusing the stack/concern/connect visuals
       let t=0;
       // ---- Phase 1: the Stack, foundation up ----
-      a.push({at:t, fn:()=>{ resetVisual(); showCap('1 / 3 - The Stack: the building blocks of an AI'); layerItems.forEach(el=>el.classList.add('dim')); rail.style.transition='none'; rail.style.transform='scaleY(0)'; }});
+      a.push({at:t, fn:()=>{ resetVisual(); showCap('1 / 3 · Stack: the parts that make an AI work'); layerItems.forEach(el=>el.classList.add('dim')); rail.style.transition='none'; rail.style.transform='scaleY(0)'; }});
       t+=1500; let revealed=0;
       for(let i=layerItems.length-1;i>=0;i--){ const idx=i; a.push({at:t, fn:()=>{ layerItems[idx].classList.remove('dim'); revealed++; rail.style.transition='transform .18s ease'; rail.style.transform='scaleY('+(revealed/layerItems.length)+')'; }}); t+=200; }
       t+=1100;
       // ---- Phase 2: Concerns, what every layer must get right ----
-      a.push({at:t, fn:()=>{ resetVisual(); showCap('2 / 3 - Concerns: what every layer must get right'); }});
+      a.push({at:t, fn:()=>{ resetVisual(); showCap('2 / 3 · Considerations: what every part must get right'); }});
       t+=600;  a.push({at:t, fn:()=>{ layersBox.classList.add('glow'); }});
       t+=850;  a.push({at:t, fn:()=>{ layersBox.classList.remove('glow'); acrossEl.classList.add('glow'); }});
       t+=850;  a.push({at:t, fn:()=>{ acrossEl.classList.remove('glow'); concernsBox.classList.add('glow'); }});
       t+=900;  a.push({at:t, fn:()=>{ concernsBox.classList.remove('glow'); }});
-      t+=200;  concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showCap('2 / 3 - Concerns: what every layer must get right'); showBars(cc.textContent.trim(), cc); }}); t+=1100; });
+      t+=200;  concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showCap('2 / 3 · Considerations: what every part must get right'); showBars(cc.textContent.trim(), cc); }}); t+=1100; });
       t+=400;
       // ---- Phase 3: Builds, what layer combinations produce ----
-      a.push({at:t, fn:()=>{ resetVisual(); showCap('3 / 3 - Builds: what layer combinations produce'); }});
+      a.push({at:t, fn:()=>{ resetVisual(); showCap('3 / 3 · Builds: real products made from the parts'); }});
       t+=600;  a.push({at:t, fn:()=>{ layersBox.classList.add('glow'); }});
       t+=850;  a.push({at:t, fn:()=>{ layersBox.classList.remove('glow'); producesEl.classList.add('glow'); }});
       t+=850;  a.push({at:t, fn:()=>{ producesEl.classList.remove('glow'); buildsBox.classList.add('glow'); }});
       t+=900;  a.push({at:t, fn:()=>{ buildsBox.classList.remove('glow'); }});
-      t+=200;  buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ showCap('3 / 3 - Builds: what layer combinations produce'); layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1200; });
+      t+=200;  buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ showCap('3 / 3 · Builds: real products made from the parts'); layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1200; });
       // ---- End: clean resting state ----
       a.push({at:t+300, fn:()=> endDemo(true)});
     }
@@ -323,7 +325,7 @@
     resetVisual();
     document.body.classList.add('demoing');
     activeBtn=btn; demoState='playing'; elapsed=0;
-    btn.innerHTML='<span class="tri">❚❚</span> Pause';
+    btn.innerHTML = isTour(btn) ? '<span class="tri">❚❚</span>Pause tour' : '<span class="tri">❚❚</span> Pause';
     steps = buildSteps(kind);
     schedule();
   }
