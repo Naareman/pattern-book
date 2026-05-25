@@ -215,6 +215,20 @@
     max-width: 640px;
     margin-bottom: 18px;
   }
+  .idea-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--text);
+  }
   .board-stage {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -677,7 +691,9 @@
 <section>
   <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What <em>is</em> it?</h2>
-  <p class="demo-lede">Chain-of-Thought is just one line you add to your prompt, like "Let's think step by step." That one line gets the model to work the problem out before answering, and the working is what gets it right.</p>
+  <div class="idea-card">
+    <p>Chain-of-Thought is just one line you add to your prompt, like "Let's think step by step." That one line gets the model to work the problem out before answering, and the working is what gets it right.</p>
+  </div>
 </section>
 
 <!-- 02 · THE WHITEBOARD -->
