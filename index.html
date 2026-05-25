@@ -137,6 +137,11 @@
   .concerns .item:hover{border-color:var(--accent)}
   .concerns .item.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
 
+  /* during the guided tour only: hide connectors + Considerations/Builds, then reveal each in step.
+     opacity+visibility (never display:none) so layout space stays reserved and nothing reflows. */
+  body.touring .box.concerns, body.touring .box.builds, body.touring .across, body.touring .produces{opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .5s ease,visibility .5s ease,transform .5s ease}
+  body.touring .box.concerns.revealed, body.touring .box.builds.revealed, body.touring .across.revealed, body.touring .produces.revealed{opacity:1;visibility:visible;transform:none}
+
   .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
   .foot strong{color:var(--soft);font-weight:500}
 
@@ -173,15 +178,15 @@
             <div class="box-cap" id="capStack" aria-live="polite"></div>
             <div class="body">
               <div class="items">
-                <button class="item" data-go="layer"><span class="num">9</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4zM2 20h20M9.5 16v4M14.5 16v4"/></svg></span>User experience</button>
-                <button class="item" data-go="layer"><span class="num">8</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span>Application patterns</button>
-                <button class="item" data-go="layer"><span class="num">7</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M10.5 7.5L7.5 16M13.5 7.5l3 8.5M8.5 18h7"/></svg></span>Orchestration &amp; agents</button>
+                <button class="item" data-go="layer" data-href="pages/layer-user-experience.html"><span class="num">9</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4zM2 20h20M9.5 16v4M14.5 16v4"/></svg></span>User experience</button>
+                <button class="item" data-go="layer" data-href="pages/layer-application-patterns.html"><span class="num">8</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span>Application patterns</button>
+                <button class="item" data-go="layer" data-href="pages/layer-orchestration-agents.html"><span class="num">7</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M10.5 7.5L7.5 16M13.5 7.5l3 8.5M8.5 18h7"/></svg></span>Orchestration &amp; agents</button>
                 <button class="item" data-go="layer" data-href="pages/layer-single-call-control.html"><span class="num">6</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>Single-call control</button>
-                <button class="item" data-go="layer"><span class="num">5</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4"/></svg></span>Knowledge &amp; memory</button>
-                <button class="item" data-go="layer"><span class="num">4</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 3v18M4 7.5l8 4.5 8-4.5"/></svg></span>Composition</button>
-                <button class="item" data-go="layer"><span class="num">3</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V9M12 19V5M19 19v-7"/><path d="M3 19h18"/></svg></span>Training &amp; adaptation</button>
-                <button class="item" data-go="layer"><span class="num">2</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/><path d="M8 7h.01M8 17h.01"/></svg></span>Serving &amp; infrastructure</button>
-                <button class="item" data-go="layer"><span class="num">1</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></span>Data &amp; artifacts</button>
+                <button class="item" data-go="layer" data-href="pages/layer-knowledge-memory.html"><span class="num">5</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4"/></svg></span>Knowledge &amp; memory</button>
+                <button class="item" data-go="layer" data-href="pages/layer-composition.html"><span class="num">4</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 3v18M4 7.5l8 4.5 8-4.5"/></svg></span>Composition</button>
+                <button class="item" data-go="layer" data-href="pages/layer-training-adaptation.html"><span class="num">3</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V9M12 19V5M19 19v-7"/><path d="M3 19h18"/></svg></span>Training &amp; adaptation</button>
+                <button class="item" data-go="layer" data-href="pages/layer-serving-infrastructure.html"><span class="num">2</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/><path d="M8 7h.01M8 17h.01"/></svg></span>Serving &amp; infrastructure</button>
+                <button class="item" data-go="layer" data-href="pages/layer-data-artifacts.html"><span class="num">1</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></span>Data &amp; artifacts</button>
               </div>
               <div class="axis">
                 <div class="cap"><b>User-facing</b>what people use</div>
@@ -203,12 +208,12 @@
             </div>
             <div class="box-cap" id="capBuilds" aria-live="polite"></div>
             <div class="items">
-              <button class="item" data-go="build"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12"/></svg></span>Coding Agent</button>
-              <button class="item" data-go="build"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h4"/></svg></span>Document Q&amp;A</button>
-              <button class="item" data-go="build"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg></span>Research Agent</button>
-              <button class="item" data-go="build"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 0-3.2 6.9L21 20z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/></svg></span>Customer Support Agent</button>
-              <button class="item" data-go="build"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>Voice Assistant</button>
-              <button class="item more" data-go="builds">… and more</button>
+              <button class="item" data-go="build" data-href="pages/build-coding-agent.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12"/></svg></span>Coding Agent</button>
+              <button class="item" data-go="build" data-href="pages/build-document-qa.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h4"/></svg></span>Document Q&amp;A</button>
+              <button class="item" data-go="build" data-href="pages/build-research-agent.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg></span>Research Agent</button>
+              <button class="item" data-go="build" data-href="pages/build-customer-support-agent.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 0-3.2 6.9L21 20z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/></svg></span>Customer Support Agent</button>
+              <button class="item" data-go="build" data-href="pages/build-voice-assistant.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>Voice Assistant</button>
+              <button class="item more" data-go="builds" data-href="pages/builds.html">… and more</button>
             </div>
           </div>
         </div>
@@ -278,6 +283,7 @@
     concernItems.forEach(c=> c.classList.remove('active'));
     concernsBox.classList.remove('pulse');
     layersBox.classList.remove('glow'); buildsBox.classList.remove('glow'); producesEl.classList.remove('glow'); acrossEl.classList.remove('glow');
+    concernsBox.classList.remove('revealed'); buildsBox.classList.remove('revealed'); producesEl.classList.remove('revealed'); acrossEl.classList.remove('revealed');
     concernsBox.classList.remove('queued','appearing'); buildsBox.classList.remove('queued','appearing');
     rail.style.transition='none'; rail.style.transform='scaleY(1)';
     hideBoxCaps();
@@ -339,16 +345,16 @@
       // ---- Phase 2: Concerns, what every layer must get right ----
       a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('concerns', '2 / 3', 'every layer has to handle all of these: a longer bar means it matters more there'); setTourPhase(2); concernsBox.classList.add('queued'); }});
       t+=1800;  a.push({at:t, fn:()=>{ layersBox.classList.add('glow'); }});
-      t+=1200;  a.push({at:t, fn:()=>{ layersBox.classList.remove('glow'); acrossEl.classList.add('glow'); }});
-      t+=1200;  a.push({at:t, fn:()=>{ acrossEl.classList.remove('glow'); concernsBox.classList.add('glow'); concernsBox.classList.remove('queued'); concernsBox.classList.add('appearing'); }});
+      t+=1200;  a.push({at:t, fn:()=>{ layersBox.classList.remove('glow'); acrossEl.classList.add('glow'); acrossEl.classList.add('revealed'); }});
+      t+=1200;  a.push({at:t, fn:()=>{ acrossEl.classList.remove('glow'); concernsBox.classList.add('glow'); concernsBox.classList.add('revealed'); concernsBox.classList.remove('queued'); concernsBox.classList.add('appearing'); }});
       t+=1200;  a.push({at:t, fn:()=>{ concernsBox.classList.remove('glow'); }});
       t+=200;  concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showBoxCap('concerns', '2 / 3', 'every layer has to handle all of these: a longer bar means it matters more there'); showBars(cc.textContent.trim(), cc); }}); t+=1800; });
       t+=500;
       // ---- Phase 3: Builds, what layer combinations produce ----
       a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('builds', '3 / 3', 'each product lights up the layers it uses'); setTourPhase(3); buildsBox.classList.add('queued'); }});
       t+=1800;  a.push({at:t, fn:()=>{ layersBox.classList.add('glow'); }});
-      t+=1200;  a.push({at:t, fn:()=>{ layersBox.classList.remove('glow'); producesEl.classList.add('glow'); }});
-      t+=1200;  a.push({at:t, fn:()=>{ producesEl.classList.remove('glow'); buildsBox.classList.add('glow'); buildsBox.classList.remove('queued'); buildsBox.classList.add('appearing'); }});
+      t+=1200;  a.push({at:t, fn:()=>{ layersBox.classList.remove('glow'); producesEl.classList.add('glow'); producesEl.classList.add('revealed'); }});
+      t+=1200;  a.push({at:t, fn:()=>{ producesEl.classList.remove('glow'); buildsBox.classList.add('glow'); buildsBox.classList.add('revealed'); buildsBox.classList.remove('queued'); buildsBox.classList.add('appearing'); }});
       t+=1200;  a.push({at:t, fn:()=>{ buildsBox.classList.remove('glow'); }});
       t+=200;  buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ showBoxCap('builds', '3 / 3', 'each product lights up the layers it uses'); layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1800; });
       // ---- End: clean resting state ----
