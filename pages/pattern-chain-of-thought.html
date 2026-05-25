@@ -266,14 +266,7 @@
     color: var(--text);
   }
   /* the narrating caption, on the board, right by the writing */
-  .board-caption {
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--accent-hover);
-    font-weight: 500;
-    min-height: 21px;
-    margin-bottom: 14px;
-  }
+  .board-caption { display: none; }
   /* where the working is written */
   .board-work {
     display: flex;
@@ -284,9 +277,10 @@
   /* each line of working: hidden until revealed */
   .board-line {
     display: flex;
-    align-items: flex-start;
-    gap: 11px;
-    padding: 9px 13px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 7px;
+    padding: 11px 13px;
     border-radius: var(--radius-sm);
     background: var(--surface);
     border: 1px solid var(--border);
@@ -327,7 +321,9 @@
   .tok { border-radius: 3px; transition: background 0.4s ease; }
   .tok.writing-tok { background: var(--accent-soft); }
   /* short label beside each step, so the explanation sits where the eye is */
-  .board-note { flex: none; align-self: center; margin-left: 10px; font-size: 11.5px; font-weight: 600; letter-spacing: .02em; color: var(--accent-hover); white-space: nowrap; }
+  .board-note { font-size: 11.5px; font-weight: 600; letter-spacing: .03em; color: var(--accent-hover); }
+  .board-row { display: flex; align-items: flex-start; gap: 11px; }
+  .board-insight { font-size: 13px; color: var(--soft); line-height: 1.5; margin-top: 12px; }
   /* the answer, falling out of the last line */
   .board-answer {
     display: flex;
@@ -707,25 +703,23 @@
       <!-- the model's working, written one token at a time, left to right -->
       <div class="board-work">
         <div class="board-line" data-reveal="0">
-          <span class="board-bullet" aria-hidden="true">1</span>
-          <span class="board-tokens"></span>
-          <span class="board-note">tokens, left to right</span>
+          <span class="board-note">reads the question, left to right, as tokens</span>
+          <div class="board-row"><span class="board-bullet" aria-hidden="true">1</span><span class="board-tokens"></span></div>
         </div>
         <div class="board-line" data-reveal="1">
-          <span class="board-bullet" aria-hidden="true">2</span>
-          <span class="board-tokens"></span>
-          <span class="board-note">a first result</span>
+          <span class="board-note">works out a first result</span>
+          <div class="board-row"><span class="board-bullet" aria-hidden="true">2</span><span class="board-tokens"></span></div>
         </div>
         <div class="board-line" data-reveal="2">
-          <span class="board-bullet" aria-hidden="true">3</span>
-          <span class="board-tokens"></span>
-          <span class="board-note">carries it forward</span>
+          <span class="board-note">carries that result forward</span>
+          <div class="board-row"><span class="board-bullet" aria-hidden="true">3</span><span class="board-tokens"></span></div>
         </div>
 
         <div class="board-answer" id="boardAnswer">
           <span class="board-answer-label">Answer</span>
           <span class="board-answer-text">14 apples are left.</span>
         </div>
+        <div class="board-insight">The answer falls out of the last line, not a guess. Without the steps, models often jump to a wrong number.</div>
       </div>
     </div>
 
