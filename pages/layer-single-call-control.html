@@ -45,65 +45,37 @@
   .title{font-family:'Fraunces',serif;font-weight:500;font-size:38px;letter-spacing:-.015em;margin:16px 0 0;line-height:1.08;scroll-margin-top:72px}
   .explainer{color:var(--soft);font-size:16px;line-height:1.6;max-width:660px;margin-top:14px}
 
-  /* intro card */
-  .intro-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;margin:28px 0 0;max-width:720px}
-  .intro-card p{font-size:15px;color:var(--soft);line-height:1.7}
-  .intro-card p+p{margin-top:10px}
-  .inline-def{font-style:italic;color:var(--soft)}
+  /* one-line boundary note (plain, small) */
+  .boundary-note{font-size:13.5px;color:var(--faint);line-height:1.6;margin:18px 0 0;max-width:660px}
+  .boundary-note strong{color:var(--soft);font-weight:600}
 
   /* sections */
-  .section{padding:18px 0 8px}
-  .guide-head{font-family:'Fraunces',serif;font-weight:500;font-size:23px;letter-spacing:-.01em;margin:4px 4px 14px;line-height:1.15}
-
-  /* intent map (keeps existing hub rows) */
-  .map{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-  .map-head{display:grid;grid-template-columns:1fr 34px 1.3fr;align-items:center;gap:16px;padding:13px 20px;border-bottom:1px solid var(--border);background:var(--bg)}
-  .map-head span{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
-  .map-head .h-method{grid-column:3}
-  .map-row{display:grid;grid-template-columns:1fr 34px 1.3fr;align-items:center;gap:16px;padding:16px 20px;border-top:1px solid var(--border);transition:background .15s ease}
-  .map-row:first-child{border-top:0}
-  .map-row:hover{background:var(--accent-soft)}
-  .row-goal{font-family:'Fraunces',serif;font-weight:500;font-size:17px;letter-spacing:-.005em;line-height:1.25;color:var(--text);min-width:0}
-  .row-arrow{justify-self:center;color:var(--accent);font-size:18px;line-height:1}
-  .row-method{min-width:0}
-  .row-name{display:block;font-weight:600;font-size:15px;letter-spacing:-.005em;color:var(--accent-hover);line-height:1.3}
-  .row-what{display:block;font-size:13.5px;color:var(--soft);margin-top:3px;line-height:1.5}
-
-  /* inside-this-layer card */
-  .layer-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px 28px 24px;margin-top:40px}
-  .layer-card-title{font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:-.01em;color:var(--text);margin-bottom:6px}
-  .axis-line{font-size:13.5px;color:var(--soft);line-height:1.6;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:24px}
-  .axis-line strong{color:var(--text);font-weight:600}
+  .section{padding:30px 0 8px}
+  .guide-head{font-family:'Fraunces',serif;font-weight:500;font-size:23px;letter-spacing:-.01em;margin:4px 4px 18px;line-height:1.15}
 
   /* sub-axis groups */
-  .sub-axis{margin-bottom:28px}
-  .sub-axis:last-child{margin-bottom:0}
-  .sub-axis-head{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-hover);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+  .sub-axis{margin-top:30px}
+  .sub-axis:first-of-type{margin-top:0}
+  .sub-axis-head{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-hover);margin:0 4px 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 
   /* nested group label (in-prompt / in-decoding) */
-  .nested-group{margin-top:14px;margin-bottom:4px}
-  .nested-group-label{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--faint);text-transform:uppercase;margin-bottom:10px}
+  .nested-group-label{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--faint);text-transform:uppercase;margin:18px 4px 8px}
 
-  /* chips */
-  .chips{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{display:inline-flex;align-items:center;gap:5px;font-family:inherit;font-size:13px;font-weight:500;line-height:1;padding:7px 12px;border-radius:999px;border:1px solid var(--border-strong);background:var(--surface);color:var(--soft);cursor:pointer;transition:background .15s ease,border-color .15s ease,color .15s ease}
-  .chip:hover{border-color:var(--accent);color:var(--accent-hover)}
-  /* outline (non-anchor) toggle chip */
-  button.chip{-webkit-appearance:none;appearance:none}
-  button.chip[aria-expanded="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
-  /* anchor (link) chip: accent-filled */
-  a.chip{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-  a.chip:hover{background:var(--accent-hover);border-color:var(--accent-hover);color:#fff}
-  a.chip .chip-arrow{font-size:11px;opacity:.85}
-
-  /* detail strip under a chip row */
-  .detail-strip{font-size:13px;color:var(--soft);line-height:1.5;margin-top:10px;padding:9px 13px;background:var(--bg);border:1px solid var(--border);border-radius:8px}
-  .detail-strip[hidden]{display:none}
-  .detail-strip .dt-name{font-weight:600;color:var(--text)}
-  .detail-note{margin-top:8px;font-size:12.5px;color:var(--faint);line-height:1.5}
+  /* tidy row list (the preferred two-part row style) */
+  .map{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .map-row{display:grid;grid-template-columns:minmax(0,1fr) 1.25fr 24px;align-items:center;gap:16px;padding:14px 20px;border-top:1px solid var(--border)}
+  .map-row:first-child{border-top:0}
+  a.map-row{transition:background .15s ease}
+  a.map-row:hover{background:var(--accent-soft)}
+  .row-name{font-family:'Fraunces',serif;font-weight:500;font-size:16px;letter-spacing:-.005em;line-height:1.3;color:var(--text);min-width:0;display:inline-flex;align-items:baseline;gap:5px}
+  a.map-row .row-name{color:var(--accent-hover)}
+  .row-name .na{font-size:11px;color:var(--accent);font-family:'Inter',sans-serif}
+  .row-what{font-size:13.5px;color:var(--soft);line-height:1.5;min-width:0}
+  .row-arrow{justify-self:end;color:var(--accent);font-size:16px;line-height:1}
+  .map-row.is-plain{background:var(--bg)}
 
   /* filing rule */
-  .filing-rule{margin-top:20px;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--soft);line-height:1.6}
+  .filing-rule{margin-top:22px;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--soft);line-height:1.6}
   .filing-rule strong{color:var(--text);font-weight:600}
 
   /* footer */
@@ -115,12 +87,8 @@
     .title{font-size:30px}
     .explainer{font-size:15px}
     .guide-head{font-size:21px}
-    .map-head{display:none}
-    .map-row{grid-template-columns:1fr;gap:7px;padding:15px 16px}
+    .map-row{grid-template-columns:1fr;gap:5px;padding:14px 16px}
     .row-arrow{display:none}
-    .row-goal{font-size:16px}
-    .layer-card{padding:20px 16px 16px}
-    .layer-card-title{font-size:20px}
   }
 </style>
 </head>
@@ -146,200 +114,182 @@
       <p class="explainer">Every knob you can turn inside one message to the AI, before and after it thinks.</p>
     </header>
 
-    <div class="intro-card">
-      <p>A <span class="inline-def">prompt (the text you send the AI)</span> is not just instructions. It sets a role, supplies examples, guides reasoning, and shapes the reply, all before a single token (a token is a small piece the AI works in: roughly a word, or a slice of an image or sound) leaves the model. L4 covers every technique that operates inside that single boundary.</p>
-      <p>Nothing here needs a second call. The moment you add a second call, or a second model, you have crossed into L5 or L2.</p>
-    </div>
+    <p class="boundary-note">Nothing here needs a second call. <strong>A second call is L5; a second model is L2.</strong></p>
 
-    <div class="section" id="main" role="main">
+    <section class="section" id="main" role="main" aria-label="Inside this layer">
 
-      <h2 class="guide-head">What Do You Want to Do?</h2>
-
-      <div class="map">
-        <div class="map-head" aria-hidden="true">
-          <span>What you want</span>
-          <span class="h-method">Use this</span>
-        </div>
-
-        <a class="map-row" href="pattern-few-shot.html">
-          <span class="row-goal">Get it to copy a style I show</span>
-          <span class="row-arrow" aria-hidden="true">&rarr;</span>
-          <span class="row-method">
-            <span class="row-name">Few-Shot ↗</span>
-            <span class="row-what">Give it a few examples to copy.</span>
-          </span>
-        </a>
-
-        <a class="map-row" href="pattern-zero-shot.html">
-          <span class="row-goal">Get an answer by just asking</span>
-          <span class="row-arrow" aria-hidden="true">&rarr;</span>
-          <span class="row-method">
-            <span class="row-name">Zero-Shot ↗</span>
-            <span class="row-what">Describe what you want, no examples.</span>
-          </span>
-        </a>
-
-        <a class="map-row" href="pattern-chain-of-thought.html">
-          <span class="row-goal">Get a hard problem right</span>
-          <span class="row-arrow" aria-hidden="true">&rarr;</span>
-          <span class="row-method">
-            <span class="row-name">Chain-of-Thought ↗</span>
-            <span class="row-what">Ask it to think step by step.</span>
-          </span>
-        </a>
-
-        <a class="map-row" href="pattern-self-consistency.html">
-          <span class="row-goal">Get a more reliable answer</span>
-          <span class="row-arrow" aria-hidden="true">&rarr;</span>
-          <span class="row-method">
-            <span class="row-name">Self-Consistency ↗</span>
-            <span class="row-what">Sample multiple reasoning paths, take the most common.</span>
-          </span>
-        </a>
-
-        <a class="map-row" href="pattern-structured-output.html">
-          <span class="row-goal">Get the answer in a fixed format</span>
-          <span class="row-arrow" aria-hidden="true">&rarr;</span>
-          <span class="row-method">
-            <span class="row-name">Structured Output ↗</span>
-            <span class="row-what">Tell it the exact shape to return.</span>
-          </span>
-        </a>
-
-        <a class="map-row" href="pattern-reflection.html">
-          <span class="row-goal">Get it to fix its own mistakes</span>
-          <span class="row-arrow" aria-hidden="true">&rarr;</span>
-          <span class="row-method">
-            <span class="row-name">Self-Reflection ↗</span>
-            <span class="row-what">Ask it to review and revise its answer inside the same call.</span>
-          </span>
-        </a>
-      </div>
-
-    </div>
-
-    <!-- ===== Inside this layer ===== -->
-    <div class="layer-card" aria-label="Inside this layer">
-      <div class="layer-card-title">Inside This Layer</div>
-      <div class="axis-line">
-        <strong>Axis:</strong> what you shape, and at which point, inside one model call.
-      </div>
+      <h2 class="guide-head">Inside This Layer</h2>
 
       <!-- Sub-axis 1: Input Shape -->
-      <div class="sub-axis">
-        <div class="sub-axis-head">Input Shape</div>
-        <div class="chips" data-strip="strip-input">
-          <a class="chip" href="pattern-zero-shot.html">Zero-Shot Framing <span class="chip-arrow" aria-hidden="true">↗</span></a>
-          <a class="chip" href="pattern-few-shot.html">Few-Shot Framing <span class="chip-arrow" aria-hidden="true">↗</span></a>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-input" data-desc="Give the AI an identity to set its tone.">Role / Persona</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-input" data-desc="Markers that keep instructions and data apart.">Delimiters</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-input" data-desc="Tell it what not to do or include.">Negative Prompting</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-input" data-desc="Ask the AI to write the prompt itself.">Meta-Prompting</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-input" data-desc="Reusable prompt skeletons with fill-in placeholders.">Prompt Templates</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-input" data-desc="Pick which examples to include per query.">Example Selection</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-input" data-desc="Order examples deliberately; position changes attention.">Example Ordering</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-input" data-desc="Fit the most useful info in the token budget.">Context Packing</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-input" data-desc="Put key content at the edges, not the middle.">Lost-in-the-Middle Mitigation</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-input" data-desc="Shrink the prompt to cut cost and latency.">Prompt Compression</button>
+      <h3 class="sub-axis-head">Input Shape</h3>
+      <div class="map sub-axis" style="margin-top:0">
+        <a class="map-row" href="pattern-zero-shot.html">
+          <span class="row-name">Zero-Shot Framing <span class="na" aria-hidden="true">↗</span></span>
+          <span class="row-what">Describe what you want, no examples.</span>
+          <span class="row-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+        <a class="map-row" href="pattern-few-shot.html">
+          <span class="row-name">Few-Shot Framing <span class="na" aria-hidden="true">↗</span></span>
+          <span class="row-what">Give it a few examples to copy.</span>
+          <span class="row-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+        <div class="map-row is-plain">
+          <span class="row-name">Role / Persona</span>
+          <span class="row-what">Give the AI an identity to set tone.</span>
         </div>
-        <div class="detail-strip" id="strip-input" hidden></div>
+        <div class="map-row is-plain">
+          <span class="row-name">Delimiters</span>
+          <span class="row-what">Markers that keep instructions and data apart.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Negative Prompting</span>
+          <span class="row-what">Tell it what not to do or include.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Meta-Prompting</span>
+          <span class="row-what">Ask the AI to write the prompt itself.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Prompt Templates</span>
+          <span class="row-what">Reusable skeletons with fill-in placeholders.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Example Selection</span>
+          <span class="row-what">Pick which examples to include per query.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Example Ordering</span>
+          <span class="row-what">Order examples deliberately; position shifts attention.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Context Packing</span>
+          <span class="row-what">Fit the most useful info in the budget.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Lost-in-the-Middle Mitigation</span>
+          <span class="row-what">Put key content at the edges, not the middle.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Prompt Compression</span>
+          <span class="row-what">Shrink the prompt to cut cost and latency.</span>
+        </div>
       </div>
 
       <!-- Sub-axis 2: Cognitive Strategy -->
-      <div class="sub-axis">
-        <div class="sub-axis-head">Cognitive Strategy</div>
-
-        <div class="nested-group">
-          <div class="nested-group-label">In-Prompt (authored as text the model follows)</div>
-          <div class="chips" data-strip="strip-inprompt">
-            <button class="chip" type="button" aria-expanded="false" aria-controls="strip-inprompt" data-desc="Answer a broader version first, then the specific.">Step-Back</button>
-            <button class="chip" type="button" aria-expanded="false" aria-controls="strip-inprompt" data-desc="Break into sub-problems, solve easiest first.">Least-to-Most</button>
-            <button class="chip" type="button" aria-expanded="false" aria-controls="strip-inprompt" data-desc="Write a plan first, then execute each step.">Plan-and-Solve</button>
-            <button class="chip" type="button" aria-expanded="false" aria-controls="strip-inprompt" data-desc="Recall a relevant analogy before answering.">Analogical Prompting</button>
-            <a class="chip" href="pattern-chain-of-thought.html">Chain-of-Thought <span class="chip-arrow" aria-hidden="true">↗</span></a>
-          </div>
-          <div class="detail-strip" id="strip-inprompt" hidden></div>
+      <h3 class="sub-axis-head">Cognitive Strategy</h3>
+      <div class="nested-group-label">In-Prompt</div>
+      <div class="map">
+        <div class="map-row is-plain">
+          <span class="row-name">Step-Back</span>
+          <span class="row-what">Answer a broader version first, then the specific.</span>
         </div>
-
-        <div class="nested-group">
-          <div class="nested-group-label">In-Decoding (search over generations)</div>
-          <div class="chips" data-strip="strip-indecoding">
-            <button class="chip" type="button" aria-expanded="false" aria-controls="strip-indecoding" data-desc="Explore many reasoning paths like a search tree.">Tree-of-Thoughts</button>
-            <button class="chip" type="button" aria-expanded="false" aria-controls="strip-indecoding" data-desc="Outline first, then fill sections in parallel.">Skeleton-of-Thought</button>
-            <a class="chip" href="pattern-self-consistency.html">Self-Consistency as Search <span class="chip-arrow" aria-hidden="true">↗</span></a>
-          </div>
-          <div class="detail-strip" id="strip-indecoding" hidden></div>
+        <div class="map-row is-plain">
+          <span class="row-name">Least-to-Most</span>
+          <span class="row-what">Break into sub-problems, solve easiest first.</span>
         </div>
-        <div class="detail-note">Cognitive-Strategy note: Self-Consistency is L4 with the same model and same prompt. Vary the model or prompt and it becomes L2 Combine (Ensembling).</div>
+        <div class="map-row is-plain">
+          <span class="row-name">Plan-and-Solve</span>
+          <span class="row-what">Write a plan first, then execute each step.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Analogical Prompting</span>
+          <span class="row-what">Recall a relevant analogy before answering.</span>
+        </div>
+        <a class="map-row" href="pattern-chain-of-thought.html">
+          <span class="row-name">Chain-of-Thought <span class="na" aria-hidden="true">↗</span></span>
+          <span class="row-what">Ask it to think step by step.</span>
+          <span class="row-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+      <div class="nested-group-label">In-Decoding</div>
+      <div class="map">
+        <div class="map-row is-plain">
+          <span class="row-name">Tree-of-Thoughts</span>
+          <span class="row-what">Explore many reasoning paths like a search tree.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Skeleton-of-Thought</span>
+          <span class="row-what">Outline first, then fill sections in parallel.</span>
+        </div>
+        <a class="map-row" href="pattern-self-consistency.html">
+          <span class="row-name">Self-Consistency as Search <span class="na" aria-hidden="true">↗</span></span>
+          <span class="row-what">Sample many paths, take the most common.</span>
+          <span class="row-arrow" aria-hidden="true">&rarr;</span>
+        </a>
       </div>
 
       <!-- Sub-axis 3: Self-Verification -->
-      <div class="sub-axis">
-        <div class="sub-axis-head">Self-Verification</div>
-        <div class="chips" data-strip="strip-verify">
-          <a class="chip" href="pattern-reflection.html">Self-Reflection <span class="chip-arrow" aria-hidden="true">↗</span></a>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-verify" data-desc="Ask yes/no checks about its own answer.">Chain-of-Verification</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-verify" data-desc="Answer its own follow-up sub-questions first.">Self-Ask</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-verify" data-desc="Argue both sides, then decide, in one call.">Single-Model Debate-Then-Decide</button>
+      <h3 class="sub-axis-head">Self-Verification</h3>
+      <div class="map sub-axis" style="margin-top:0">
+        <a class="map-row" href="pattern-reflection.html">
+          <span class="row-name">Self-Reflection <span class="na" aria-hidden="true">↗</span></span>
+          <span class="row-what">Review and revise its answer in the same call.</span>
+          <span class="row-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+        <div class="map-row is-plain">
+          <span class="row-name">Chain-of-Verification</span>
+          <span class="row-what">Ask yes/no checks about its own answer.</span>
         </div>
-        <div class="detail-strip" id="strip-verify" hidden></div>
-        <div class="detail-note">Self-Verification note: stays L4 only if it is one call to one model. Add a second call or a second model and it moves to L2 Verify.</div>
+        <div class="map-row is-plain">
+          <span class="row-name">Self-Ask</span>
+          <span class="row-what">Answer its own follow-up sub-questions first.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Single-Model Debate-Then-Decide</span>
+          <span class="row-what">Argue both sides, then decide, in one call.</span>
+        </div>
       </div>
 
       <!-- Sub-axis 4: Output Shape & Decoding -->
-      <div class="sub-axis">
-        <div class="sub-axis-head">Output Shape &amp; Decoding</div>
-        <div class="chips" data-strip="strip-output">
-          <a class="chip" href="pattern-structured-output.html">Structured Output <span class="chip-arrow" aria-hidden="true">↗</span></a>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-output" data-desc="Supply a formal schema of required fields.">Schema Enforcement</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-output" data-desc="Limit generation to a valid grammar.">Constrained Decoding</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-output" data-desc="Check output as it streams, not after.">Streaming with Validation</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-output" data-desc="Fix raw output to match the wanted format.">Format Coercion</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-output" data-desc="Low is focused; high is varied and creative.">Temperature and Sampling</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-output" data-desc="Boost or suppress specific tokens before sampling.">Logit Biasing</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-output" data-desc="Strings that halt generation on contact.">Stop Sequences</button>
-          <button class="chip" type="button" aria-expanded="false" aria-controls="strip-output" data-desc="Keep top candidate sequences, pick the best.">Beam Search</button>
+      <h3 class="sub-axis-head">Output Shape &amp; Decoding</h3>
+      <div class="map sub-axis" style="margin-top:0">
+        <a class="map-row" href="pattern-structured-output.html">
+          <span class="row-name">Structured Output <span class="na" aria-hidden="true">↗</span></span>
+          <span class="row-what">Tell it the exact shape to return.</span>
+          <span class="row-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+        <div class="map-row is-plain">
+          <span class="row-name">Schema Enforcement</span>
+          <span class="row-what">Supply a formal schema of required fields.</span>
         </div>
-        <div class="detail-strip" id="strip-output" hidden></div>
+        <div class="map-row is-plain">
+          <span class="row-name">Constrained Decoding</span>
+          <span class="row-what">Limit generation to a valid grammar.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Streaming with Validation</span>
+          <span class="row-what">Check output as it streams, not after.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Format Coercion</span>
+          <span class="row-what">Fix raw output to match the wanted format.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Temperature &amp; Sampling</span>
+          <span class="row-what">Low is focused; high is varied and creative.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Logit Biasing</span>
+          <span class="row-what">Boost or suppress specific tokens before sampling.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Stop Sequences</span>
+          <span class="row-what">Strings that halt generation on contact.</span>
+        </div>
+        <div class="map-row is-plain">
+          <span class="row-name">Beam Search</span>
+          <span class="row-what">Keep top candidate sequences, pick the best.</span>
+        </div>
       </div>
 
       <div class="filing-rule">
         <strong>Filing rule:</strong> if it happens inside one call to one model, it belongs here. A second call is L5. A second model is L2.
       </div>
-    </div>
+
+    </section>
 
     <footer class="foot"><strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.</footer>
   </div>
-
-  <script>
-    // Inside-This-Layer chips: tap a quiet chip to show a one-line detail
-    // in the strip under its sub-axis. One open at a time per sub-axis.
-    document.querySelectorAll('.chips').forEach(function (group) {
-      var strip = document.getElementById(group.getAttribute('data-strip'));
-      if (!strip) return;
-      group.querySelectorAll('button.chip').forEach(function (chip) {
-        chip.addEventListener('click', function () {
-          var isOpen = chip.getAttribute('aria-expanded') === 'true';
-          // collapse all chips in this group
-          group.querySelectorAll('button.chip[aria-expanded="true"]').forEach(function (c) {
-            c.setAttribute('aria-expanded', 'false');
-          });
-          if (isOpen) {
-            strip.hidden = true;
-            strip.innerHTML = '';
-            return;
-          }
-          chip.setAttribute('aria-expanded', 'true');
-          var name = chip.textContent.trim();
-          var desc = chip.getAttribute('data-desc') || '';
-          strip.innerHTML = '<span class="dt-name"></span> ';
-          strip.querySelector('.dt-name').textContent = name + ':';
-          strip.appendChild(document.createTextNode(' ' + desc));
-          strip.hidden = false;
-        });
-      });
-    });
-  </script>
 
 </body>
 </html>
