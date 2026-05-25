@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#8A909C;
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
     --border:#E8EAEE; --border-strong:#D5D9E0; --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
     --radius:16px;
@@ -18,94 +18,89 @@
   html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   .wrap{max-width:920px;margin:0 auto;padding:0 24px}
 
-  header{padding:42px 0 8px}
+  header{padding:26px 0 6px}
   .wordmark{font-family:'Fraunces',serif;font-weight:500;font-size:25px;letter-spacing:-.01em}
   .strap{color:var(--soft);font-size:15px;margin-top:4px}
 
-  .stage{padding:34px 0 64px}
+  .stage{padding:20px 0 22px}
   .canvas{width:840px;max-width:100%;margin:0 auto}
 
-  /* identical box treatment for all three */
-  .box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-  .box-head{display:flex;align-items:center;gap:8px;width:100%;padding:13px 16px;border:none;border-bottom:1px solid var(--border);background:#fff;cursor:pointer;text-align:left}
-  .box-head:hover{background:var(--accent-soft)}
-  .box-head .name{font-family:'Fraunces',serif;font-weight:500;font-size:18px}
-  .box-head .what{font-size:12.5px;color:var(--soft)}
-  .box-head .open{margin-left:auto;color:var(--faint);font-size:14px}
-  .box-head:hover .name{color:var(--accent-hover)} .box-head:hover .open{color:var(--accent)}
+  .box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:border-color .25s ease,box-shadow .25s ease}
+  /* header: a clickable title link + a play button on the same line */
+  .box-head{display:flex;align-items:center;border-bottom:1px solid var(--border);background:#fff}
+  .head-link{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:13px 16px;border:none;background:none;cursor:pointer;text-align:left}
+  .head-link:hover{background:var(--accent-soft)}
+  .head-link .name{font-family:'Fraunces',serif;font-weight:500;font-size:18px}
+  .head-link .what{font-size:12.5px;color:var(--soft)}
+  .head-link .open{margin-left:auto;color:var(--faint);font-size:14px}
+  .head-link:hover .name{color:var(--accent-hover)} .head-link:hover .open{color:var(--accent)}
+  .head-play{flex:none;margin:0 12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--border-strong);background:#fff;color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background .14s ease,border-color .14s ease}
+  .head-play:hover{background:var(--accent-soft);border-color:var(--accent)}
+  .head-play svg{width:11px;height:11px;display:block;margin-left:1px}
 
   .items{padding:8px}
-  .item{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:9px 11px;border-radius:9px;border:1px solid transparent;background:none;font-family:'Inter';font-size:14px;font-weight:500;color:var(--text);cursor:pointer;transition:background .14s ease,border-color .14s ease}
+  .item{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:9px 11px;border-radius:9px;border:1px solid transparent;background:none;font-family:'Inter';font-size:14px;font-weight:500;color:var(--text);cursor:pointer;transition:background .25s ease,border-color .25s ease,opacity .5s ease,transform .5s ease}
   .item + .item{margin-top:3px}
   .item:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
   .item .num{flex:none;width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent-hover);font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
-  .item .dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--accent);opacity:.55}
   .item .ico{flex:none;width:18px;height:18px;color:var(--accent);display:block}
   .item .ico svg{width:18px;height:18px;display:block}
   .item.more{color:var(--faint);font-weight:500}
   .item.more:hover{background:none;border-color:transparent;color:var(--accent)}
-  /* interaction: a concern lights every layer; a build lights the layers it is made from */
   .layers .item.lit{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover);box-shadow:inset 0 0 0 1px var(--accent)}
-  /* a demoed build reuses the hover look */
+  .layers .item.dim{opacity:0;transform:translateY(10px)}
   .builds .item.demo{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
+  /* per-layer importance meter for a selected concern (hidden until a concern is active) */
+  .item .meter{margin-left:auto;flex:none;width:48px;height:5px;border-radius:3px;background:var(--border);overflow:hidden;opacity:0;transition:opacity .3s ease}
+  .item .meter > i{display:block;height:100%;width:0;background:var(--accent);transition:width .5s ease}
+  .box.layers.show-meters .item .meter{opacity:1}
+  .concerns .item.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
 
-  /* orchestrated on-load reveal: hidden initial state + .shown reveal, layout space reserved */
-  .reveal{opacity:0;transform:translateY(8px);transition:opacity .45s ease,transform .45s ease}
-  .reveal.shown{opacity:1;transform:none}
-  @media (prefers-reduced-motion:reduce){
-    .reveal{opacity:1!important;transform:none!important;transition:none!important}
-  }
-
-  /* Replay button: locked, subtle, centered */
-  .replay-row{display:flex;justify-content:center;margin-top:22px;min-height:34px}
-  .replay-btn{display:inline-flex;align-items:center;gap:7px;font-family:'Inter',system-ui,sans-serif;font-size:12.5px;font-weight:500;color:var(--accent);background:#fff;border:1px solid var(--border-strong);border-radius:20px;padding:7px 15px;cursor:pointer;opacity:0;transition:opacity .45s ease,background .14s ease,border-color .14s ease,color .14s ease}
-  .replay-btn.shown{opacity:1}
-  .replay-btn:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
-  .replay-btn svg{width:14px;height:14px;display:block}
-  @media (prefers-reduced-motion:reduce){.replay-row{display:none}}
-
-  /* TOP: layers (with axis on the RIGHT) + builds output centered vertically */
   .top{display:grid;grid-template-columns:1fr 96px 210px;align-items:start;column-gap:0}
   .layers .body{display:grid;grid-template-columns:1fr 100px}
-  /* direction arrow, on the right of the layer list */
+  /* direction arrow: points UP (foundation -> user-facing); grows when you build the stack */
   .axis{display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:16px 8px;text-align:center;border-left:1px solid var(--border)}
   .axis .cap{font-size:10.5px;color:var(--soft);line-height:1.25}
   .axis .cap b{display:block;color:var(--text);font-size:11.5px;font-weight:600;margin-bottom:1px}
-  .axis .rail{flex:1;min-height:70px;width:2px;background:var(--accent);opacity:.4;margin:10px 0;position:relative;border-radius:2px}
-  .axis .rail::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);border-left:4px solid transparent;border-right:4px solid transparent;border-top:8px solid var(--accent);opacity:.9}
+  .axis .rail{flex:1;min-height:70px;width:4px;background:var(--accent);opacity:.75;margin:10px 0;position:relative;border-radius:3px;transform-origin:bottom center}
+  .axis .rail::after{content:"";position:absolute;top:-3px;left:50%;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:11px solid var(--accent)}
 
-  /* produces + builds, vertically centered against the layers box */
+  /* produces -> builds (an output, so a directional flow + spark is right) */
   .produces{align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--faint);font-size:12px;gap:4px}
   .builds{align-self:center}
-
-  /* across -> full-width concerns band, centered items */
-  .across{display:flex;flex-direction:column;align-items:center;margin-top:16px;color:var(--faint);font-size:12px;gap:5px}
-  .across .leg{width:1.5px;height:15px;background:var(--border-strong)}
-  /* live neon flow on the connectors */
   .flow{position:relative;background:var(--accent);opacity:.4;border-radius:2px}
   .flow-x{width:46px;height:2px}
   .flow-x::after{content:"";position:absolute;right:-1px;top:50%;transform:translateY(-50%);border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:7px solid var(--accent)}
-  .flow-y{width:2px;height:15px}
   .spark{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px 2px rgba(124,92,246,.75)}
-  .flow-x .spark{top:50%;transform:translateY(-50%);animation:sparkX 1.8s linear infinite}
-  .flow-y .spark{left:50%;transform:translateX(-50%);animation:sparkY 1.8s linear infinite}
+  .flow-x .spark{top:50%;transform:translateY(-50%);animation:sparkX 2.6s linear infinite}
   @keyframes sparkX{0%{left:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{left:100%;opacity:0}}
-  @keyframes sparkY{0%{top:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:100%;opacity:0}}
+
+  /* across: a bracket spanning the whole Layers box, pointing down to Concerns, with a neon spark */
+  .across{position:relative;width:64%;margin:14px auto 0;height:36px}
+  .across .bar{position:absolute;top:0;left:0;right:0;height:1.5px;background:var(--border-strong);border-radius:2px}
+  .across .bar::before,.across .bar::after{content:"";position:absolute;top:0;width:1.5px;height:7px;background:var(--border-strong)}
+  .across .bar::before{left:0}.across .bar::after{right:0}
+  .across .stem{position:absolute;left:50%;top:0;transform:translateX(-50%);width:1.5px;height:36px;background:var(--border-strong)}
+  .across .spark{position:absolute;left:50%;margin-left:-3px;animation:sparkDown 2.4s linear infinite}
+  @keyframes sparkDown{0%{top:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:36px;opacity:0}}
   @media (prefers-reduced-motion:reduce){.spark{display:none}}
-  .concerns{width:100%;margin-top:5px}
+
+  .concerns{width:100%;margin-top:2px}
+  .concerns.pulse{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--shadow)}
   .concerns .items{display:flex;flex-wrap:wrap;gap:9px;padding:16px;justify-content:center}
   .concerns .item{width:auto;border:1px solid var(--border-strong);border-radius:22px;padding:8px 16px}
   .concerns .item:hover{border-color:var(--accent)}
+  .concerns .item .meter{display:none}
 
-  .foot{border-top:1px solid var(--border);padding:20px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:32px}
+  .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:18px}
   .foot strong{color:var(--soft);font-weight:500}
 
   @media(max-width:720px){
     .canvas{width:100%}
     .top{grid-template-columns:1fr}
     .produces{flex-direction:row;padding:10px 0}
-    .produces svg{transform:rotate(90deg)}
     .builds{width:100%}
+    .across{width:80%}
   }
 </style>
 </head>
@@ -119,20 +114,23 @@
     <div class="stage">
       <div class="canvas">
         <div class="top">
-          <!-- LAYERS: numbered list, with direction arrow on the right -->
+          <!-- LAYERS: numbered BOTTOM-UP, arrow points up (foundation -> user-facing), play in the header -->
           <div class="box layers">
-            <button class="box-head" data-go="layers"><span class="name">Layers</span><span class="what">what it's built from</span><span class="open">›</span></button>
+            <div class="box-head">
+              <button class="head-link" data-go="layers"><span class="name">Layers</span><span class="what">what it's built from</span><span class="open">›</span></button>
+              <button class="head-play" data-play="stack" type="button" aria-label="Watch the stack build, foundation to user-facing"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+            </div>
             <div class="body">
               <div class="items">
-                <button class="item reveal" data-go="layer"><span class="num">1</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4zM2 20h20M9.5 16v4M14.5 16v4"/></svg></span>User experience</button>
-                <button class="item reveal" data-go="layer"><span class="num">2</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span>Application patterns</button>
-                <button class="item reveal" data-go="layer"><span class="num">3</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M10.5 7.5L7.5 16M13.5 7.5l3 8.5M8.5 18h7"/></svg></span>Orchestration &amp; agents</button>
-                <button class="item reveal" data-go="layer"><span class="num">4</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>Single-call control</button>
-                <button class="item reveal" data-go="layer"><span class="num">5</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4"/></svg></span>Knowledge &amp; memory</button>
-                <button class="item reveal" data-go="layer"><span class="num">6</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 3v18M4 7.5l8 4.5 8-4.5"/></svg></span>Composition</button>
-                <button class="item reveal" data-go="layer"><span class="num">7</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V9M12 19V5M19 19v-7"/><path d="M3 19h18"/></svg></span>Training &amp; adaptation</button>
-                <button class="item reveal" data-go="layer"><span class="num">8</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/><path d="M8 7h.01M8 17h.01"/></svg></span>Serving &amp; infrastructure</button>
-                <button class="item reveal" data-go="layer"><span class="num">9</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></span>Data &amp; artifacts</button>
+                <button class="item" data-go="layer"><span class="num">9</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4zM2 20h20M9.5 16v4M14.5 16v4"/></svg></span>User experience</button>
+                <button class="item" data-go="layer"><span class="num">8</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span>Application patterns</button>
+                <button class="item" data-go="layer"><span class="num">7</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M10.5 7.5L7.5 16M13.5 7.5l3 8.5M8.5 18h7"/></svg></span>Orchestration &amp; agents</button>
+                <button class="item" data-go="layer"><span class="num">6</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>Single-call control</button>
+                <button class="item" data-go="layer"><span class="num">5</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4"/></svg></span>Knowledge &amp; memory</button>
+                <button class="item" data-go="layer"><span class="num">4</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 3v18M4 7.5l8 4.5 8-4.5"/></svg></span>Composition</button>
+                <button class="item" data-go="layer"><span class="num">3</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V9M12 19V5M19 19v-7"/><path d="M3 19h18"/></svg></span>Training &amp; adaptation</button>
+                <button class="item" data-go="layer"><span class="num">2</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/><path d="M8 7h.01M8 17h.01"/></svg></span>Serving &amp; infrastructure</button>
+                <button class="item" data-go="layer"><span class="num">1</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></span>Data &amp; artifacts</button>
               </div>
               <div class="axis">
                 <div class="cap"><b>User-facing</b>what people touch</div>
@@ -142,15 +140,16 @@
             </div>
           </div>
 
-          <!-- produces (centered, next to builds) -->
-          <div class="produces reveal">
+          <div class="produces">
             <div class="flow flow-x"><span class="spark"></span></div>
             <span>produces</span>
           </div>
 
-          <!-- BUILDS output (centered vertically) -->
-          <div class="box builds reveal">
-            <button class="box-head" data-go="builds"><span class="name">Builds</span><span class="what">what it produces</span><span class="open">›</span></button>
+          <div class="box builds">
+            <div class="box-head">
+              <button class="head-link" data-go="builds"><span class="name">Builds</span><span class="what">what it produces</span><span class="open">›</span></button>
+              <button class="head-play" data-play="connect" type="button" aria-label="Watch how a build connects to layers"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+            </div>
             <div class="items">
               <button class="item" data-go="build"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12"/></svg></span>Coding Agent</button>
               <button class="item" data-go="build"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h4"/></svg></span>Document Q&amp;A</button>
@@ -162,10 +161,14 @@
           </div>
         </div>
 
-        <!-- across -> full-width concerns band -->
-        <div class="across reveal"><div class="flow flow-y"><span class="spark"></span></div>across<div class="flow flow-y"><span class="spark"></span></div></div>
-        <div class="box concerns reveal">
-          <button class="box-head" data-go="concerns"><span class="name">Concerns</span><span class="what">what every layer must get right</span><span class="open">›</span></button>
+        <!-- bracket spanning the Layers box, pointing down to Concerns (neon spark) -->
+        <div class="across"><div class="bar"></div><div class="stem"></div><span class="spark"></span></div>
+
+        <div class="box concerns">
+          <div class="box-head">
+            <button class="head-link" data-go="concerns"><span class="name">Concerns</span><span class="what">what every layer must get right</span><span class="open">›</span></button>
+            <button class="head-play" data-play="concern" type="button" aria-label="Watch how a concern weighs on each layer"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+          </div>
           <div class="items">
             <button class="item" data-go="concern"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13a9 9 0 0 1 18 0"/><path d="M12 13l4-3"/><circle cx="12" cy="13" r="1.3" fill="currentColor" stroke="none"/></svg></span>Evaluation</button>
             <button class="item" data-go="concern"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg></span>Safety</button>
@@ -177,91 +180,90 @@
           </div>
         </div>
       </div>
-      <div class="replay-row">
-        <button class="replay-btn" id="replay" type="button" aria-label="Replay intro animation">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 4v4h4"/></svg>
-          Replay
-        </button>
-      </div>
     </div>
     <footer class="foot"><strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.</footer>
   </div>
 
 <script>
-  const layerItems = Array.from(document.querySelectorAll('.layers .item'));
-  const buildItems = Array.from(document.querySelectorAll('.builds .item'));
-  const across     = document.querySelector('.across');
-  const concerns   = document.querySelector('.box.concerns');
-  const produces   = document.querySelector('.produces');
-  const builds     = document.querySelector('.box.builds');
-  const replayBtn  = document.getElementById('replay');
-  const reduced    = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const layerItems = Array.from(document.querySelectorAll('.layers .item'));   // 0 = top (User experience) ... 8 = bottom (Data & artifacts)
+  const buildItems = Array.from(document.querySelectorAll('.builds .item')).filter(b=> !b.classList.contains('more'));
+  const concernItems = Array.from(document.querySelectorAll('.concerns .item'));
+  const concernsBox = document.querySelector('.box.concerns');
+  const layersBox = document.querySelector('.box.layers');
+  const rail = document.querySelector('.axis .rail');
 
-  // click / tap = navigate to the item's own page (placeholder until pages are built)
-  document.querySelectorAll('[data-go]').forEach(el=>{
-    el.addEventListener('click',()=> console.log('navigate ->', el.dataset.go, el.textContent.trim()));
-  });
+  // inject a small importance meter into each layer row (hidden until a concern is active)
+  layerItems.forEach(el=>{ const m=document.createElement('span'); m.className='meter'; m.innerHTML='<i></i>'; el.appendChild(m); });
+  const meters = layerItems.map(el=> el.querySelector('.meter > i'));
 
-  // --- orchestrated on-load intro (additive; layout space is reserved via opacity/transform) ---
   let timers = [];
   const wait = (ms, fn)=> timers.push(setTimeout(fn, ms));
-  const clearTimers = ()=>{ timers.forEach(clearTimeout); timers = []; };
-
-  function resetIntro(){
-    clearTimers();
-    [...layerItems, across, concerns, produces, builds].forEach(el=> el.classList.remove('shown'));
-    layerItems.forEach(el=> el.classList.remove('lit'));
+  const stop = ()=>{ timers.forEach(clearTimeout); timers = []; };
+  let activeConcern = null;
+  function clearAll(){
+    layerItems.forEach(el=> el.classList.remove('lit','dim'));
     buildItems.forEach(el=> el.classList.remove('demo'));
-    replayBtn.classList.remove('shown');
+    concernItems.forEach(c=> c.classList.remove('active'));
+    concernsBox.classList.remove('pulse');
+    layersBox.classList.remove('show-meters');
+    meters.forEach(m=> m.style.width='0');
+    rail.style.transition='transform .3s ease'; rail.style.transform='scaleY(1)';
+    activeConcern = null;
   }
 
-  function playIntro(){
-    resetIntro();
-    let t = 150;
+  // PLAY 1: build the stack, foundation up, and draw the foundation->user arrow as it goes
+  function buildStack(){
+    stop(); clearAll();
+    layerItems.forEach(el=> el.classList.add('dim'));
+    rail.style.transition='none'; rail.style.transform='scaleY(0)'; rail.getBoundingClientRect();
+    const total = 200 + layerItems.length*180;
+    rail.style.transition='transform '+(total/1000)+'s ease'; rail.style.transform='scaleY(1)';
+    let t = 200;
+    for(let i = layerItems.length - 1; i >= 0; i--){ wait(t, ()=> layerItems[i].classList.remove('dim')); t += 180; }
+  }
 
-    // 1. layer items appear one by one, FOUNDATION up (item 9 -> item 1), ~110ms apart
-    for(let i = layerItems.length - 1; i >= 0; i--){
-      wait(t, ()=> layerItems[i].classList.add('shown'));
-      t += 110;
-    }
-
-    // 2. across + concerns fade in, then sweep .lit across all layers (~900ms)
-    t += 250;
-    wait(t, ()=>{ across.classList.add('shown'); concerns.classList.add('shown'); });
-    t += 300; // let the concerns box settle in before the sweep
-    wait(t, ()=> layerItems.forEach(el=> el.classList.add('lit')));
-    t += 900;
-    wait(t, ()=> layerItems.forEach(el=> el.classList.remove('lit')));
-
-    // 3. produces + builds fade in (the output)
-    t += 150;
-    wait(t, ()=>{ produces.classList.add('shown'); builds.classList.add('shown'); });
-
-    // 4. demo a build: highlight first build, light layers 3,4,5, hold ~1600ms, then clear
-    t += 400;
-    const litLayers = [3,4,5];
-    wait(t, ()=>{
-      buildItems[0].classList.add('demo');
-      litLayers.forEach(n=> layerItems[n-1].classList.add('lit'));
+  // PLAY 2: a concern, overall (applies to every layer) then drilled into per-layer importance
+  const importance = {
+    'Evaluation':[1,2,2,3,2,3,3,1,2], 'Safety':[3,3,2,3,2,1,2,1,2], 'Privacy':[2,2,1,1,3,1,2,2,3],
+    'Observability':[1,1,3,1,1,2,1,3,2], 'Cost':[1,1,2,2,2,2,3,3,1], 'Multimodal':[2,2,1,2,2,1,2,1,1], 'Real-time':[2,1,2,1,1,1,1,3,1]
+  };
+  function showConcern(name, chip){
+    stop(); clearAll();
+    const v = importance[name]; if(!v) return;
+    activeConcern = name; if(chip) chip.classList.add('active'); concernsBox.classList.add('pulse');
+    // overall: it touches EVERY layer
+    layerItems.forEach(el=> el.classList.add('lit'));
+    // then drill into how much it weighs per layer
+    wait(1200, ()=>{
+      layerItems.forEach(el=> el.classList.remove('lit'));
+      layersBox.classList.add('show-meters');
+      meters.forEach((m,i)=> m.style.width = ((v[i]||0)/3*100)+'%');
     });
-    t += 1600;
-    wait(t, ()=>{
-      buildItems[0].classList.remove('demo');
-      litLayers.forEach(n=> layerItems[n-1].classList.remove('lit'));
-    });
+  }
+  function concernDemo(){ const c = concernItems.find(x=> x.textContent.trim()==='Cost'); showConcern('Cost', c); }
 
-    // 5. Replay button appears
-    t += 250;
-    wait(t, ()=> replayBtn.classList.add('shown'));
+  // PLAY 3: how a build connects — first two builds only, a bit faster
+  function connect(){
+    stop(); clearAll();
+    const A=[2,3,4], B=[0,4,8];
+    buildItems[0].classList.add('demo'); A.forEach(i=> layerItems[i].classList.add('lit'));
+    wait(1400, ()=>{ buildItems[0].classList.remove('demo'); A.forEach(i=> layerItems[i].classList.remove('lit')); });
+    wait(1700, ()=>{ buildItems[1].classList.add('demo'); B.forEach(i=> layerItems[i].classList.add('lit')); });
+    wait(3100, ()=>{ buildItems[1].classList.remove('demo'); B.forEach(i=> layerItems[i].classList.remove('lit')); });
   }
 
-  if(reduced){
-    // show everything immediately, no auto-lighting, no replay
-    [...layerItems, across, concerns, produces, builds].forEach(el=> el.classList.add('shown'));
-  } else {
-    replayBtn.addEventListener('click', playIntro);
-    playIntro();
-  }
+  document.querySelectorAll('.head-play').forEach(b=>{
+    b.addEventListener('click',()=>{ const p=b.dataset.play; if(p==='stack')buildStack(); else if(p==='connect')connect(); else if(p==='concern')concernDemo(); });
+  });
+  // click a concern chip -> its per-layer importance (toggle)
+  concernItems.forEach(c=>{
+    const name = c.textContent.trim();
+    c.addEventListener('click',()=>{ if(activeConcern===name){ clearAll(); } else { showConcern(name, c); } });
+  });
+  // click a title / layer / build -> navigate to its page (placeholder)
+  document.querySelectorAll('.head-link[data-go], .layers .item[data-go], .builds .item[data-go]').forEach(el=>{
+    el.addEventListener('click',()=> console.log('navigate ->', el.dataset.go, el.textContent.trim()));
+  });
 </script>
 </body>
 </html>
