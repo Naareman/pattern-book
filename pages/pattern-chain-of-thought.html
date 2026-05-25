@@ -569,9 +569,10 @@
     border: 1px solid var(--border);
     border-radius: 5px;
   }
-  .tradeoff-bars .seg.on { background: var(--error); border-color: var(--error); }
-  .tradeoff-bars .seg.on-y { background: var(--accent-soft); border-color: var(--accent); }
-  .tradeoff-bars .seg.on-g { background: var(--success); border-color: var(--success); }
+  .tradeoff-bars .seg.on, .tradeoff-bars .seg.on-y, .tradeoff-bars .seg.on-g { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { min-width: 100px; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
   .tradeoff-quote {
     margin-top: 18px;
     padding-top: 16px;
@@ -692,7 +693,7 @@
   <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What <em>is</em> it?</h2>
   <div class="idea-card">
-    <p><span style="color:var(--accent-hover)">Chain-of-Thought</span> is just one line you add to your prompt, like <strong style="color:var(--accent-hover)">"Let's think step by step."</strong> That one line gets the model to work the problem out before answering, and the working is what gets it right.</p>
+    <p><span style="color:var(--accent-hover)">Chain-of-Thought</span> is just one line you add to your prompt, like <strong style="color:var(--accent-hover)">"Let's think step by step."</strong><br>That one line gets the model to work the problem out before answering, and the working is what gets it right.</p>
   </div>
 </section>
 
@@ -753,23 +754,23 @@
   <div class="test-stage">
     <div class="test-instruction">Tap to check. It helps on hard, multi-step problems and is wasted on simple recall.</div>
     <div class="queries" id="queries">
-      <div class="query-card" data-verdict="good" data-reason="Multi-step math, checked one step at a time.">
+      <div class="query-card" data-verdict="good" data-reason="Three small steps. Doing them one at a time gets the in-between numbers right, instead of guessing the total.">
         <div class="q">"A word problem with three arithmetic steps."</div>
         <div class="verdict">Helps it &#10003;<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="good" data-reason="Many rules at once, kept straight by listing them.">
+      <div class="query-card" data-verdict="good" data-reason="Lots of rules at once. Listing them one by one keeps them straight, instead of jumping to a hunch.">
         <div class="q">"Which of these 5 meetings fit before 3pm?"</div>
         <div class="verdict">Helps it &#10003;<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="good" data-reason="Tracing the loop step by step is the work.">
+      <div class="query-card" data-verdict="good" data-reason="Following the loop one round at a time is the actual work, so writing it out makes the model do it, not guess.">
         <div class="q">"Why does this loop run one time too many?"</div>
         <div class="verdict">Helps it &#10003;<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="bad" data-reason="Just recall. No steps to show.">
+      <div class="query-card" data-verdict="bad" data-reason="Just recalling a fact. There are no steps to show, so the reasoning only costs time and money.">
         <div class="q">"What's the capital of France?"</div>
         <div class="verdict">Wasted &#10007;<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="bad" data-reason="A one-line summary. Reasoning only adds length.">
+      <div class="query-card" data-verdict="bad" data-reason="No steps to work through. Reasoning just adds length without making the summary any better.">
         <div class="q">"Summarize this paragraph in one line."</div>
         <div class="verdict">Wasted &#10007;<span class="body"></span></div>
       </div>
@@ -796,6 +797,7 @@
   <div class="section-label"><span class="num">05</span>Tradeoffs</div>
   <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
     <div class="tradeoff-row">
       <div class="tradeoff-label">Cost</div>
       <div class="tradeoff-bars">
