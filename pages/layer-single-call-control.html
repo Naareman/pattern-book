@@ -15,6 +15,7 @@
     --radius:16px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-padding-top:72px}
   html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   body{overflow-x:hidden}
   .wrap{max-width:920px;margin:0 auto;padding:0 24px}
@@ -31,7 +32,8 @@
   .crumb .here{color:var(--soft);font-weight:500}
 
   /* page head */
-  header{padding:34px 0 8px}
+  header{padding:40px 0 8px;scroll-margin-top:72px}
+  .title{scroll-margin-top:72px}
   .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--border);border-radius:20px;padding:5px 12px}
   .eyebrow .ico{width:15px;height:15px;display:block;color:var(--accent)}
   .eyebrow .ico svg{width:15px;height:15px;display:block}
