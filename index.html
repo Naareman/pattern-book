@@ -372,7 +372,7 @@
   // click a concern chip -> its criticality (toggle); stops any running demo first
   concernItems.forEach(c=>{
     const name = c.textContent.trim();
-    c.addEventListener('click',()=>{ const was=activeConcern; if(activeBtn) endDemo(true); else resetVisual(); if(was!==name){ showBars(name, c); } });
+    c.addEventListener('click',()=>{ window.location.href = 'pages/consideration-' + name.toLowerCase() + '.html'; });
   });
   // click a title / layer / build -> navigate to its page (placeholder)
   document.querySelectorAll('.head-link[data-go], .layers .item[data-go], .builds .item[data-go]').forEach(el=>{
