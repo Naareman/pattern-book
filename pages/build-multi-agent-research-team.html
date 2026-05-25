@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Agent Research Team · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.6; color: var(--text); }
+
+  /* layer badges */
+  .layer-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .layer-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .layer-badge:hover { border-color: var(--accent); background: #e4dcfe; }
+  .layer-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ============ DEMO: multi-agent fan-out ============ */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* query bar */
+  .query-bar {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 18px;
+  }
+  .query-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .query-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--text); line-height: 1.3; }
+
+  /* phases */
+  .phases { display: flex; flex-direction: column; gap: 14px; }
+  .phase {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    overflow: hidden; opacity: 0; transform: translateY(6px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .phase.visible { opacity: 1; transform: translateY(0); }
+  .phase-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; background: var(--bg-subtle); border-bottom: 1px solid var(--border);
+  }
+  .phase-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .phase.active .phase-head { background: var(--accent-soft); border-bottom-color: var(--accent); }
+  .phase-title { font-weight: 600; font-size: 14px; color: var(--text); }
+  .phase-status {
+    margin-left: auto; font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    color: var(--faint); text-transform: uppercase;
+  }
+  .phase.active .phase-status { color: var(--accent); }
+  .phase.done .phase-status { color: var(--success); }
+  .phase.done .phase-head { background: var(--success-soft); border-bottom-color: #b2e4d5; }
+  .phase.done .phase-num { background: var(--success); }
+  .phase-body { padding: 12px 14px; min-height: 48px; }
+
+  /* Phase 1: plan list */
+  .plan-list { font-size: 13px; color: var(--soft); line-height: 1.7; display: none; }
+  .plan-list ol { margin: 6px 0 0 18px; display: flex; flex-direction: column; gap: 3px; }
+
+  /* Phase 2: worker agents grid */
+  .workers-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  }
+  @media (max-width: 560px) { .workers-grid { grid-template-columns: 1fr; } }
+
+  .worker-card {
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); padding: 10px 12px;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .3s ease, transform .3s ease, border-color .3s ease, background .3s ease;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .worker-card.in { opacity: 1; transform: translateY(0); }
+  .worker-card.working { border-color: var(--accent); background: var(--accent-soft); }
+  .worker-card.done-card { border-color: var(--success); background: var(--success-soft); }
+
+  .worker-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--faint);
+  }
+  .worker-card.working .worker-label { color: var(--accent-hover); }
+  .worker-card.done-card .worker-label { color: var(--success); }
+
+  .worker-topic { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; }
+  .worker-finding {
+    font-size: 12px; color: var(--soft); line-height: 1.5;
+    border-top: 1px solid var(--border); padding-top: 6px;
+    opacity: 0; transition: opacity .4s ease;
+  }
+  .worker-card.done-card .worker-finding { opacity: 1; }
+  .worker-card.done-card .worker-finding { color: var(--text); }
+
+  .worker-status { font-size: 12px; font-weight: 600; color: var(--faint); }
+  .worker-card.working .worker-status { color: var(--accent); }
+  .worker-card.done-card .worker-status { color: var(--success); }
+
+  /* Phase 3: merge + report */
+  .merge-note {
+    font-size: 13px; color: var(--soft); margin-bottom: 10px; display: none;
+    line-height: 1.6;
+  }
+  .report-block {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+    font-size: 14px; line-height: 1.7; color: var(--text);
+    opacity: 0; transition: opacity .5s ease;
+    min-height: 60px;
+  }
+  .report-block.visible { opacity: 1; }
+  .report-block .cite { font-size: 12px; color: var(--faint); border-top: 1px solid var(--border); margin-top: 10px; padding-top: 8px; }
+
+  /* controls */
+  .demo-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ SECTION 03: REAL EXAMPLE ============ */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .example-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
+  .example-flow { display: flex; flex-direction: column; gap: 0; }
+  .ex-row {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .ex-row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .ex-icon { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; }
+  .ex-icon svg { width: 16px; height: 16px; color: var(--accent-hover); display: block; }
+  .ex-body { flex: 1; min-width: 0; }
+  .ex-step { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
+  .ex-text { font-size: 14px; line-height: 1.6; color: var(--text); }
+  .ex-text strong { color: var(--accent-hover); }
+
+  /* ============ PATTERNS IT USES ============ */
+  .patterns-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 28px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .pattern-row {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding-bottom: 14px; border-bottom: 1px solid var(--border);
+  }
+  .pattern-row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .pattern-tag {
+    flex-shrink: 0; font-size: 11px; font-weight: 600; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 3px 9px;
+    white-space: nowrap;
+  }
+  .pattern-desc { font-size: 14px; line-height: 1.6; color: var(--soft); flex: 1; min-width: 0; }
+  .pattern-desc strong { color: var(--text); font-weight: 600; }
+
+  /* ============ TRADEOFFS ============ */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { min-width: 100px; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); min-width: 100px; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
+    .tradeoff-label { min-width: 0; }
+  }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .patterns-card { padding: 18px 16px; }
+    .pattern-row { flex-direction: column; gap: 8px; }
+  }
+  @media (max-width: 480px) {
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+    .ex-row { gap: 10px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep">/</span>
+      <a href="builds.html">Builds</a>
+      <span class="sep">/</span>
+      <span class="here">Multi-Agent Research Team</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="18" rx="3"/>
+        <path d="M7 8h10M7 12h6"/>
+      </svg>
+    </span>Build
+  </span>
+  <h1 class="pattern-title">Multi-Agent Research Team</h1>
+  <p class="explainer">A lead agent (the AI model, or LLM) splits a question into parts, hands each part to a worker agent, and merges their findings into one report.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>A <span style="color:var(--accent-hover);font-weight:500">Multi-Agent Research Team</span> works like a small research squad. A <strong style="color:var(--accent-hover)">lead agent</strong> reads the question, breaks it into sub-topics, and delegates each one to a <strong style="color:var(--accent-hover)">worker agent</strong>. The workers look things up in parallel (each one fires off retrieval calls at the same time, not one after another), then send their findings back. The lead agent reads all the findings together and writes a single combined report. The result covers more ground than any single agent could, and it often finishes faster because the workers run at the same time.</p>
+  </div>
+  <div class="layer-badges" aria-label="Layers used by this build">
+    <a class="layer-badge" href="layer-orchestration-agents.html">
+      <span class="dot" aria-hidden="true"></span>L5 Orchestration
+    </a>
+    <a class="layer-badge" href="layer-stateless-retrieval.html">
+      <span class="dot" aria-hidden="true"></span>L3a Stateless Retrieval
+    </a>
+    <a class="layer-badge" href="layer-composition.html">
+      <span class="dot" aria-hidden="true"></span>L2 Structural Composition
+    </a>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Watch the team <em>fan out</em>.</h2>
+
+  <p class="demo-lede">The lead agent receives one question, assigns a sub-topic to each of three workers, all three research in parallel, then their findings are merged into one answer.</p>
+
+  <div class="demo-stage">
+    <!-- the question -->
+    <div class="query-bar">
+      <div class="query-label">Question (the prompt sent to the lead agent)</div>
+      <div class="query-text">How is AI changing the job market for knowledge workers?</div>
+    </div>
+
+    <!-- phases, revealed one at a time -->
+    <div class="phases" aria-live="polite" aria-atomic="false">
+
+      <!-- Phase 1: Plan and delegate -->
+      <div class="phase" id="phase-plan">
+        <div class="phase-head">
+          <span class="phase-num" aria-hidden="true">1</span>
+          <span class="phase-title">Lead Agent: plan and delegate</span>
+          <span class="phase-status" id="status-plan">waiting</span>
+        </div>
+        <div class="phase-body">
+          <div class="plan-list" id="plan-body">
+            The lead agent breaks the question into three sub-topics and assigns one to each worker:
+            <ol>
+              <li><strong>Worker A</strong>: which jobs are most affected and why?</li>
+              <li><strong>Worker B</strong>: which new roles are AI creating?</li>
+              <li><strong>Worker C</strong>: what do the economic studies say about net job impact?</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 2: Workers research in parallel -->
+      <div class="phase" id="phase-workers">
+        <div class="phase-head">
+          <span class="phase-num" aria-hidden="true">2</span>
+          <span class="phase-title">Worker Agents: research in parallel</span>
+          <span class="phase-status" id="status-workers">waiting</span>
+        </div>
+        <div class="phase-body">
+          <div class="workers-grid" id="workers-grid">
+
+            <div class="worker-card" id="wc0">
+              <div class="worker-label">Worker A</div>
+              <div class="worker-topic">Jobs most affected</div>
+              <div class="worker-status" id="ws0">queued</div>
+              <div class="worker-finding">Roles with high routine-text content (legal review, data entry, first-draft writing) face 30-60% task substitution per McKinsey 2024.</div>
+            </div>
+
+            <div class="worker-card" id="wc1">
+              <div class="worker-label">Worker B</div>
+              <div class="worker-topic">New roles created</div>
+              <div class="worker-status" id="ws1">queued</div>
+              <div class="worker-finding">Prompt engineers, AI trainers, model auditors, and AI-augmented specialists are among the fastest-growing titles since 2022.</div>
+            </div>
+
+            <div class="worker-card" id="wc2">
+              <div class="worker-label">Worker C</div>
+              <div class="worker-topic">Net economic impact</div>
+              <div class="worker-status" id="ws2">queued</div>
+              <div class="worker-finding">IMF (2024): AI affects 60% of jobs in advanced economies; productivity gains may offset displacement but timing is uneven across sectors.</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 3: Merge into report -->
+      <div class="phase" id="phase-report">
+        <div class="phase-head">
+          <span class="phase-num" aria-hidden="true">3</span>
+          <span class="phase-title">Lead Agent: merge findings into one report</span>
+          <span class="phase-status" id="status-report">waiting</span>
+        </div>
+        <div class="phase-body">
+          <div class="merge-note" id="merge-note">
+            The lead agent reads all three findings together and composes a single coherent answer.
+          </div>
+          <div class="report-block" id="report-block">
+            AI is reshaping knowledge work along three fronts. First, roles heavy in routine text tasks (legal review, data entry, first-draft writing) face significant task substitution, with some studies estimating 30-60% of tasks automatable. Second, new specialist roles are emerging fast: prompt engineers, AI trainers, and model auditors are among the highest-demand titles. Third, the net job impact is positive in aggregate but uneven in timing: the IMF estimates 60% of advanced-economy jobs are affected, with productivity gains likely outpacing displacement over the medium term.
+            <div class="cite">Sources: Worker A (McKinsey 2024), Worker B (LinkedIn Emerging Jobs 2024), Worker C (IMF World Economic Outlook 2024)</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /phases -->
+
+    <div class="demo-controls">
+      <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>How a <em>real one</em> runs.</h2>
+  <div class="example-stage">
+    <p class="example-intro">
+      OpenAI's Deep Research product is a working Multi-Agent Research Team. Here is what happens under the hood when you submit a long-horizon question.
+    </p>
+    <div class="example-flow">
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5l4 4L7 21H3v-4z"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 1: Lead Plans</div>
+          <div class="ex-text">The lead agent reads your question and writes a <strong>research plan</strong>: a list of sub-topics and which sources or tools each worker should use.</div>
+        </div>
+      </div>
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="12" r="2"/><path d="M7 12h5M14 12h5M12 7v4"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 2: Workers Dispatched</div>
+          <div class="ex-text">Each worker receives its sub-topic as a prompt (the text you send the AI) and a set of tools. All workers start at the same time: <strong>parallel fan-out</strong> means total wait time equals the slowest worker, not all workers added together.</div>
+        </div>
+      </div>
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 3: Workers Retrieve and Filter</div>
+          <div class="ex-text">Each worker searches its assigned sources (web search is read-only retrieval, so it lives at the Stateless Retrieval layer), reads the results, and distills only the <strong>relevant snippets</strong> back to the lead.</div>
+        </div>
+      </div>
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6M9 16h4M6 3h8l4 4v14H6z"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 4: Lead Merges</div>
+          <div class="ex-text">The lead agent reads all worker findings together on a <strong>shared workspace</strong> and writes one coherent report with cross-references between the sub-topics.</div>
+        </div>
+      </div>
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M3 12h3M18 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 5: Cited Report Delivered</div>
+          <div class="ex-text">The final answer arrives with <strong>numbered citations</strong> pointing to each worker's sources, so you can verify every claim. Tokens (small pieces the AI works in: roughly a word, or a slice of text) from all workers feed into one final generation call.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 04 PATTERNS IT USES -->
+<section>
+  <div class="section-label"><span class="num">04</span>Patterns It Uses</div>
+  <h2>Which <em>layers</em> do the work.</h2>
+  <div class="patterns-card">
+
+    <div class="pattern-row">
+      <span class="pattern-tag">L5 Coordination</span>
+      <div class="pattern-desc">
+        <strong>Agent-to-agent protocols and shared workspace.</strong> The lead and workers communicate via a message-passing protocol (each task is a structured message) and write findings to a shared workspace the lead reads at merge time.
+      </div>
+    </div>
+
+    <div class="pattern-row">
+      <span class="pattern-tag">L5 Shape</span>
+      <div class="pattern-desc">
+        <strong>Parallel fan-out and hierarchical planning.</strong> The lead uses a Planner-Executor pattern: it writes the plan first, then fans all worker calls out in parallel, then waits for all to complete before the merge step.
+      </div>
+    </div>
+
+    <div class="pattern-row">
+      <span class="pattern-tag">L3a Stateless Retrieval</span>
+      <div class="pattern-desc">
+        <strong>Read-only retrieval per worker call.</strong> Each worker issues retrieval calls (web search, index lookup) that are read-only and stateless: they do not write anything to the world, so they file at L3a, not L5 Action.
+      </div>
+    </div>
+
+    <div class="pattern-row">
+      <span class="pattern-tag">L2 Combine</span>
+      <div class="pattern-desc">
+        <strong>Decomposition and recomposition.</strong> The question is decomposed into sub-topics (one per worker), and the findings are recomposed by the lead into a single answer. This is the Decomposition and Recomposition sub-pattern of L2 Combine.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 05 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">05</span>Tradeoffs</div>
+  <h2>What you <em>pay</em>.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Coverage</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Speed</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Coordination</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      More agents mean more coverage and faster wall-clock time for broad questions, but every worker adds a separate AI call, so cost scales with team size. Coordination also adds overhead: the lead must write a good plan, workers must return structured findings, and merging N outputs can introduce inconsistency if the lead is not careful. For simple, single-topic questions a single Research Agent is cheaper and just as accurate.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>OpenAI (2025). <em>Deep Research: How it works.</em> <span class="note">A production multi-agent research system described in their product documentation.</span></li>
+    <li>Khattab et al. (2023). <em>DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines.</em> <span class="note">Describes orchestrated multi-step LLM programs including multi-agent patterns.</span></li>
+    <li>Nakano et al. (2022). <em>WebGPT: Browser-assisted question-answering with human feedback.</em> <span class="note">Foundational paper for search-then-synthesise agent patterns.</span></li>
+    <li>Yao et al. (2023). <em>ReAct: Synergizing Reasoning and Acting in Language Models.</em> <span class="note">Describes the iterative-loop shape that agents use for retrieval and reasoning.</span></li>
+    <li>IMF (2024). <em>World Economic Outlook: AI and the Labor Market.</em> <span class="note">Source for the economic impact figures used in the demo example.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ DEMO ANIMATION ============
+// Phase 1: lead plans (reveal list)
+// Phase 2: workers fan out in parallel, each goes queued -> working -> done
+// Phase 3: lead merges into report
+// Step: one phase per tap. Play: auto-runs all. Reset: hides everything.
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+const phasePlan    = document.getElementById('phase-plan');
+const phaseWorkers = document.getElementById('phase-workers');
+const phaseReport  = document.getElementById('phase-report');
+
+const statusPlan    = document.getElementById('status-plan');
+const statusWorkers = document.getElementById('status-workers');
+const statusReport  = document.getElementById('status-report');
+
+const planBody   = document.getElementById('plan-body');
+const mergeNote  = document.getElementById('merge-note');
+const reportBlock = document.getElementById('report-block');
+
+const wCards = [
+  document.getElementById('wc0'),
+  document.getElementById('wc1'),
+  document.getElementById('wc2'),
+];
+const wStatuses = [
+  document.getElementById('ws0'),
+  document.getElementById('ws1'),
+  document.getElementById('ws2'),
+];
+
+const stepBtn  = document.getElementById('stepBtn');
+const playBtn  = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+let demoStep = -1;
+let running  = false;
+
+function resetDemo() {
+  demoStep = -1;
+  running  = false;
+
+  [phasePlan, phaseWorkers, phaseReport].forEach(p => {
+    p.classList.remove('visible', 'active', 'done');
+  });
+  statusPlan.textContent    = 'waiting';
+  statusWorkers.textContent = 'waiting';
+  statusReport.textContent  = 'waiting';
+
+  planBody.style.display  = 'none';
+  mergeNote.style.display = 'none';
+  reportBlock.classList.remove('visible');
+
+  wCards.forEach((c, i) => {
+    c.classList.remove('in', 'working', 'done-card');
+    wStatuses[i].textContent = 'queued';
+  });
+}
+
+// Phase 1: lead plans
+async function doPhase1(animate) {
+  phasePlan.classList.add('visible', 'active');
+  statusPlan.textContent = 'planning...';
+  if (animate) await sleep(reduceMotion ? 0 : 500);
+  planBody.style.display = 'block';
+  if (animate) await sleep(reduceMotion ? 0 : 500);
+  phasePlan.classList.remove('active');
+  phasePlan.classList.add('done');
+  statusPlan.textContent = 'done';
+}
+
+// Phase 2: workers in parallel
+async function doPhase2(animate) {
+  phaseWorkers.classList.add('visible', 'active');
+  statusWorkers.textContent = 'researching...';
+
+  // Show all three cards at once (queued state)
+  for (let i = 0; i < wCards.length; i++) {
+    wCards[i].classList.add('in');
+    if (animate) await sleep(reduceMotion ? 0 : 120);
+  }
+
+  if (animate) await sleep(reduceMotion ? 0 : 200);
+
+  // All three go to "working" simultaneously (fan-out)
+  for (let i = 0; i < wCards.length; i++) {
+    wCards[i].classList.add('working');
+    wStatuses[i].textContent = 'researching...';
+  }
+
+  if (animate) await sleep(reduceMotion ? 0 : 900);
+
+  // All three finish (simulate parallel completion with small stagger)
+  for (let i = 0; i < wCards.length; i++) {
+    wCards[i].classList.remove('working');
+    wCards[i].classList.add('done-card');
+    wStatuses[i].textContent = 'done';
+    if (animate) await sleep(reduceMotion ? 0 : 180);
+  }
+
+  if (animate) await sleep(reduceMotion ? 0 : 300);
+  phaseWorkers.classList.remove('active');
+  phaseWorkers.classList.add('done');
+  statusWorkers.textContent = 'done';
+}
+
+// Phase 3: lead merges
+async function doPhase3(animate) {
+  phaseReport.classList.add('visible', 'active');
+  statusReport.textContent = 'merging...';
+  mergeNote.style.display = 'block';
+  if (animate) await sleep(reduceMotion ? 0 : 600);
+  reportBlock.classList.add('visible');
+  if (animate) await sleep(reduceMotion ? 0 : 300);
+  phaseReport.classList.remove('active');
+  phaseReport.classList.add('done');
+  statusReport.textContent = 'done';
+}
+
+// Step button
+stepBtn.addEventListener('click', async () => {
+  if (running) return;
+  if (demoStep >= 2) { resetDemo(); return; }
+  running = true;
+  stepBtn.disabled = true; playBtn.disabled = true;
+  demoStep++;
+  if (demoStep === 0) await doPhase1(true);
+  else if (demoStep === 1) await doPhase2(true);
+  else if (demoStep === 2) await doPhase3(true);
+  running = false;
+  stepBtn.disabled = false; playBtn.disabled = false;
+});
+
+// Play button
+playBtn.addEventListener('click', async () => {
+  if (running) return;
+  resetDemo();
+  running = true;
+  playBtn.disabled = true; stepBtn.disabled = true;
+  await sleep(reduceMotion ? 0 : 200);
+  await doPhase1(!reduceMotion);
+  await sleep(reduceMotion ? 0 : 400);
+  await doPhase2(!reduceMotion);
+  await sleep(reduceMotion ? 0 : 300);
+  await doPhase3(!reduceMotion);
+  demoStep = 2;
+  running = false;
+  playBtn.disabled = false; stepBtn.disabled = false;
+});
+
+// Reset button
+resetBtn.addEventListener('click', () => {
+  if (running) return;
+  resetDemo();
+});
+
+// Reduced motion: skip straight to fully revealed state
+if (reduceMotion) {
+  (async () => {
+    await doPhase1(false);
+    await doPhase2(false);
+    await doPhase3(false);
+    demoStep = 2;
+  })();
+}
+</script>
+</body>
+</html>
