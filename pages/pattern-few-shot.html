@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Few-Shot . The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#C2554F; --error-soft:#FBECEB;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  .serif { font-family: 'Fraunces', serif; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* TOP BAR */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none;
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* HEADER */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    scroll-margin-top: 80px; font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* SECTIONS */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* 01 idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.5; color: var(--text); }
+
+  /* 02 DEMO */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+
+  /* the prompt panel */
+  .prompt-panel { padding: 20px; }
+  .prompt-box {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.65;
+    color: var(--text); overflow: hidden;
+  }
+  .prompt-section-label {
+    display: block; font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 600;
+    letter-spacing: .07em; text-transform: uppercase; color: var(--faint);
+    padding: 10px 14px 4px;
+  }
+  .prompt-divider { height: 1px; background: var(--border); margin: 0 14px; }
+
+  /* example pairs inside the prompt */
+  .example-block {
+    padding: 10px 14px; border-radius: 0;
+    transition: background 0.3s ease, opacity 0.35s ease, max-height 0.4s ease, padding 0.35s ease;
+    overflow: hidden;
+  }
+  .example-block.hidden-example {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .example-block.visible-example {
+    max-height: 120px;
+    opacity: 1;
+  }
+  .ex-label { font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-hover); margin-bottom: 5px; }
+  .ex-input { color: var(--soft); }
+  .ex-arrow { color: var(--faint); padding: 0 4px; }
+  .ex-output { color: var(--success); }
+
+  /* the live query row */
+  .query-row {
+    padding: 10px 14px 14px;
+    border-top: 1px solid var(--border);
+  }
+  .query-label { font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); display: block; margin-bottom: 5px; }
+  .query-text { color: var(--accent-hover); font-weight: 500; }
+
+  /* the model output panel */
+  .output-panel {
+    border-top: 1px solid var(--border); padding: 20px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .output-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+  .output-box {
+    background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; min-height: 64px;
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 16px; line-height: 1.5; color: var(--text);
+    position: relative; overflow: hidden;
+  }
+  .output-box .placeholder { color: var(--faint); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; font-style: normal; }
+
+  /* token animation inside the output */
+  .out-tok { border-radius: 3px; transition: background 0.35s ease; }
+  .out-tok.writing-tok { background: var(--accent-soft); }
+
+  /* status badge on output */
+  .output-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 600;
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .output-badge.on-badge { opacity: 1; }
+  .output-badge.good-badge { background: var(--success-soft); color: var(--success); }
+  .output-badge.bad-badge { background: var(--error-soft); color: var(--error); }
+
+  /* toggle strip */
+  .toggle-strip {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 20px; border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .toggle-label { font-size: 13px; font-weight: 500; color: var(--soft); }
+
+  /* toggle pill */
+  .pill-toggle {
+    position: relative; display: inline-flex; align-items: center;
+    width: 46px; height: 26px; border-radius: 13px;
+    background: var(--border-strong); border: none; cursor: pointer;
+    transition: background 0.25s ease;
+    flex-shrink: 0;
+  }
+  .pill-toggle.on { background: var(--accent); }
+  .pill-thumb {
+    position: absolute; left: 3px; width: 20px; height: 20px; border-radius: 50%;
+    background: #fff; transition: left 0.22s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,.18);
+  }
+  .pill-toggle.on .pill-thumb { left: 23px; }
+
+  .toggle-state-label { font-size: 13px; font-weight: 600; color: var(--soft); }
+  .toggle-state-label.on-state { color: var(--accent-hover); }
+
+  /* run button */
+  .run-btn {
+    margin-left: auto; padding: 9px 18px;
+    background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+    transition: background 0.18s ease, transform 0.15s ease;
+  }
+  .run-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .run-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+  /* 03 WHEN IT HELPS */
+  .test-stage {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px; box-shadow: var(--shadow);
+  }
+  .test-instruction { font-size: 14px; color: var(--soft); margin-bottom: 18px; }
+  .when-grid { display: flex; flex-direction: column; gap: 12px; }
+  .when-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    box-shadow: var(--shadow-sm);
+  }
+  .when-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .when-card .q { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; line-height: 1.3; color: var(--text); }
+  .when-card .verdict { font-size: 14px; font-weight: 600; margin-top: 0; max-height: 0; overflow: hidden; transition: max-height 0.35s ease, margin 0.3s ease; }
+  .when-card .verdict span.body { font-weight: 400; font-size: 14px; color: var(--soft); display: block; margin-top: 6px; line-height: 1.5; }
+  .when-card.revealed .verdict { max-height: 200px; margin-top: 14px; }
+  .when-card.good { background: var(--success-soft); border-color: var(--success); }
+  .when-card.bad { background: var(--error-soft); border-color: var(--error); }
+  .when-card.good:hover { border-color: var(--success); }
+  .when-card.bad:hover { border-color: var(--error); }
+  .when-card.good .verdict { color: var(--success); }
+  .when-card.bad .verdict { color: var(--error); }
+  .when-tracker {
+    margin-top: 18px; padding: 12px; text-align: center; font-size: 13px; font-weight: 500;
+    color: var(--faint); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+  }
+  .when-tracker.complete { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); font-weight: 600; }
+
+  /* BACK LINK */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm);
+    text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* SOURCES */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* FOOTER */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* RESPONSIVE */
+  @media (max-width: 560px) { h1.pattern-title { font-size: 30px; } .explainer { font-size: 15px; } h2 { font-size: 21px; } }
+  @media (max-width: 480px) { .toggle-strip { flex-direction: column; align-items: flex-start; } .run-btn { margin-left: 0; width: 100%; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-single-call-control.html">Single-call control</a><span class="sep">/</span><span class="here">Few-Shot</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v6M14.5 17h6"/></svg></span>Pattern</span>
+  <h1 class="pattern-title">Few-Shot</h1>
+  <p class="explainer">Put a few worked examples right in the prompt, and the model copies the pattern.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>A model reads everything in the prompt before writing its reply. <span style="color:var(--accent-hover)">Few-shot prompting</span> exploits that: you put a handful of <strong style="color:var(--accent-hover)">example pairs</strong> (input, then the output you want) right before the real question. The model sees the pattern and follows it, matching your format, tone, or label scheme without any training or fine-tuning.</p>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it work</div>
+  <h2>Toggle the <em>examples</em> on and off.</h2>
+
+  <p class="demo-lede">The toggle shows or hides the example pairs inside the prompt. Run it both ways and watch how the output changes.</p>
+
+  <div class="demo-stage">
+
+    <!-- THE PROMPT -->
+    <div class="prompt-panel" aria-label="Prompt sent to the model">
+      <div class="prompt-box">
+
+        <!-- examples section header -->
+        <span class="prompt-section-label" id="examplesHeader">Examples (in the prompt)</span>
+
+        <!-- Example 1 -->
+        <div class="example-block visible-example" id="ex1" aria-hidden="false">
+          <div class="ex-label">Example 1</div>
+          <span class="ex-input">"The concert was a total blast."</span>
+          <span class="ex-arrow">&rarr;</span>
+          <span class="ex-output">sentiment: positive</span>
+        </div>
+        <div class="prompt-divider" id="div1"></div>
+
+        <!-- Example 2 -->
+        <div class="example-block visible-example" id="ex2" aria-hidden="false">
+          <div class="ex-label">Example 2</div>
+          <span class="ex-input">"The queue took forever and the staff were rude."</span>
+          <span class="ex-arrow">&rarr;</span>
+          <span class="ex-output">sentiment: negative</span>
+        </div>
+        <div class="prompt-divider" id="div2"></div>
+
+        <!-- Example 3 -->
+        <div class="example-block visible-example" id="ex3" aria-hidden="false">
+          <div class="ex-label">Example 3</div>
+          <span class="ex-input">"It was fine, nothing special."</span>
+          <span class="ex-arrow">&rarr;</span>
+          <span class="ex-output">sentiment: neutral</span>
+        </div>
+        <div class="prompt-divider" id="div3"></div>
+
+        <!-- The live query (always shown) -->
+        <div class="query-row">
+          <span class="query-label">Now classify this:</span>
+          <span class="query-text">"The food was incredible but the service let it down."</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="output-panel">
+      <div class="output-label">Model output</div>
+      <div class="output-box" id="outputBox" aria-live="polite">
+        <span class="placeholder">Press Run to see the model reply.</span>
+      </div>
+      <div class="output-badge" id="outputBadge" aria-live="polite"></div>
+    </div>
+
+    <!-- TOGGLE + RUN -->
+    <div class="toggle-strip">
+      <span class="toggle-label" id="toggleLabel">Examples in prompt:</span>
+      <button
+        class="pill-toggle on"
+        id="examplesToggle"
+        role="switch"
+        aria-checked="true"
+        aria-label="Toggle example pairs in the prompt"
+      >
+        <span class="pill-thumb"></span>
+      </button>
+      <span class="toggle-state-label on-state" id="toggleStateLabel" aria-live="polite">On</span>
+      <button class="run-btn" id="runBtn">&#9654; Run</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 WHEN IT HELPS -->
+<section>
+  <div class="section-label"><span class="num">03</span>When it helps</div>
+  <h2>Use it, or <em>skip it?</em></h2>
+  <div class="test-stage">
+    <div class="test-instruction">Tap each task to see whether few-shot is worth it.</div>
+    <div class="when-grid" id="whenGrid">
+      <div class="when-card" data-verdict="good" data-reason="You have a specific label format (e.g. 'sentiment: positive'). The model will copy it exactly every time, which zero-shot often does not.">
+        <div class="q">"Classify reviews as positive / negative / neutral."</div>
+        <div class="verdict">Use it &#10003;<span class="body"></span></div>
+      </div>
+      <div class="when-card" data-verdict="good" data-reason="Your domain has an unusual writing style. A couple of on-brand examples anchor the model's tone better than any instruction paragraph.">
+        <div class="q">"Write product copy in our brand voice."</div>
+        <div class="verdict">Use it &#10003;<span class="body"></span></div>
+      </div>
+      <div class="when-card" data-verdict="good" data-reason="You need structured output (e.g. JSON keys, a fixed table layout). Examples show the exact shape; zero-shot guesses it.">
+        <div class="q">"Extract name, date, and amount from invoices."</div>
+        <div class="verdict">Use it &#10003;<span class="body"></span></div>
+      </div>
+      <div class="when-card" data-verdict="bad" data-reason="General questions have no format to impose. Zero-shot works fine and keeps your prompt short and cheap.">
+        <div class="q">"Summarize this article."</div>
+        <div class="verdict">Skip it &#10007;<span class="body"></span></div>
+      </div>
+      <div class="when-card" data-verdict="bad" data-reason="A reasoning problem needs Chain-of-Thought, not output format. Examples of wrong steps can even mislead the model.">
+        <div class="q">"Solve this multi-step maths problem."</div>
+        <div class="verdict">Skip it &#10007;<span class="body"></span></div>
+      </div>
+    </div>
+    <div class="when-tracker" id="whenTracker" aria-live="polite">0 / 5 tapped</div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-single-call-control.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Single-call control</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Brown et al. (2020). <em>Language Models are Few-Shot Learners.</em> NeurIPS. <span class="note">The GPT-3 paper that named and demonstrated few-shot prompting at scale.</span></li>
+    <li>Min et al. (2022). <em>Rethinking the Role of Demonstrations: What Makes In-Context Learning Work?</em> <span class="note">Shows that label correctness in examples matters less than format and distribution.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ STATE ============
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let examplesOn = true;   // whether examples are currently toggled on
+let isRunning = false;
+
+// ============ ELEMENTS ============
+const toggle = document.getElementById('examplesToggle');
+const toggleStateLabel = document.getElementById('toggleStateLabel');
+const runBtn = document.getElementById('runBtn');
+const outputBox = document.getElementById('outputBox');
+const outputBadge = document.getElementById('outputBadge');
+
+const exBlocks = [
+  document.getElementById('ex1'),
+  document.getElementById('ex2'),
+  document.getElementById('ex3'),
+];
+const exDividers = [
+  document.getElementById('div1'),
+  document.getElementById('div2'),
+  document.getElementById('div3'),
+];
+
+// ============ OUTPUTS ============
+// When examples are ON: the model copies the exact "sentiment: X" format
+const outputWithExamples = [
+  'sentiment:', ' mixed'
+];
+// When examples are OFF: the model does something reasonable but doesn't match the format
+const outputWithoutExamples = [
+  'The', ' review', ' is', ' mixed', '.', ' The', ' person', ' enjoyed', ' the', ' food',
+  ' but', ' was', ' disappointed', ' by', ' the', ' service', '.'
+];
+
+// ============ TOGGLE ============
+function setExamples(on) {
+  examplesOn = on;
+  toggle.classList.toggle('on', on);
+  toggle.setAttribute('aria-checked', String(on));
+  toggleStateLabel.textContent = on ? 'On' : 'Off';
+  toggleStateLabel.classList.toggle('on-state', on);
+
+  exBlocks.forEach(b => {
+    b.classList.toggle('visible-example', on);
+    b.classList.toggle('hidden-example', !on);
+    b.setAttribute('aria-hidden', String(!on));
+  });
+  exDividers.forEach(d => {
+    d.style.display = on ? '' : 'none';
+  });
+
+  // reset output when toggling
+  resetOutput();
+}
+
+toggle.addEventListener('click', () => {
+  if (isRunning) return;
+  setExamples(!examplesOn);
+});
+
+// ============ OUTPUT HELPERS ============
+function resetOutput() {
+  outputBox.innerHTML = '<span class="placeholder">Press Run to see the model reply.</span>';
+  outputBadge.classList.remove('on-badge', 'good-badge', 'bad-badge');
+  outputBadge.textContent = '';
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function spaceBefore(tok) {
+  return tok !== '.' && tok !== ',' && tok !== '!' && tok !== '?';
+}
+
+// write tokens one by one with a brief highlight
+async function writeTokens(tokens, animate) {
+  outputBox.innerHTML = '';
+  let first = true;
+  for (let i = 0; i < tokens.length; i++) {
+    const tok = tokens[i];
+    const needsSpace = !first && spaceBefore(tok);
+    if (needsSpace) outputBox.appendChild(document.createTextNode('​'));
+    const span = document.createElement('span');
+    span.className = 'out-tok';
+    span.textContent = tok.trimStart();
+    outputBox.appendChild(span);
+    if (animate) {
+      span.classList.add('writing-tok');
+      await sleep(110);
+      span.classList.remove('writing-tok');
+      await sleep(60);
+    }
+    first = false;
+  }
+}
+
+// show badge after output
+function showBadge(on) {
+  outputBadge.classList.remove('on-badge', 'good-badge', 'bad-badge');
+  if (on) {
+    outputBadge.textContent = 'Matched the format exactly';
+    outputBadge.classList.add('on-badge', 'good-badge');
+  } else {
+    outputBadge.textContent = 'No format to copy, so it free-formed';
+    outputBadge.classList.add('on-badge', 'bad-badge');
+  }
+}
+
+// ============ RUN ============
+runBtn.addEventListener('click', async () => {
+  if (isRunning) return;
+  isRunning = true;
+  runBtn.disabled = true;
+  toggle.disabled = true;
+
+  resetOutput();
+  const tokens = examplesOn ? outputWithExamples : outputWithoutExamples;
+
+  if (reduceMotion) {
+    // instant: write all tokens without animation
+    outputBox.innerHTML = '';
+    tokens.forEach((tok, i) => {
+      if (i > 0 && spaceBefore(tok)) outputBox.appendChild(document.createTextNode('​'));
+      const span = document.createElement('span');
+      span.className = 'out-tok';
+      span.textContent = tok.trimStart();
+      outputBox.appendChild(span);
+    });
+  } else {
+    await sleep(200);
+    await writeTokens(tokens, true);
+  }
+
+  showBadge(examplesOn);
+
+  isRunning = false;
+  runBtn.disabled = false;
+  toggle.disabled = false;
+});
+
+// ============ WHEN IT HELPS ============
+const whenCards = document.querySelectorAll('.when-card');
+const whenTracker = document.getElementById('whenTracker');
+const tapped = new Set();
+
+whenCards.forEach(card => {
+  card.addEventListener('click', () => {
+    if (card.classList.contains('revealed')) return;
+    card.classList.add('revealed', card.dataset.verdict);
+    card.querySelector('.verdict .body').textContent = card.dataset.reason;
+    tapped.add(card);
+    const n = tapped.size;
+    if (n === whenCards.length) {
+      whenTracker.textContent = '✓ All 5 tapped, pattern clear';
+      whenTracker.classList.add('complete');
+    } else {
+      whenTracker.textContent = `${n} / 5 tapped`;
+    }
+  });
+});
+</script>
+
+</body>
+</html>

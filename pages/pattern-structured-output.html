@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Structured Output . The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#C2554F; --error-soft:#FBECEB;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  .serif { font-family: 'Fraunces', serif; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* TOP BAR */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none;
+    padding: 5px 11px; border: 1px solid var(--border-strong);
+    border-radius: 20px; background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* HEADER */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    scroll-margin-top: 80px;
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* SECTIONS */
+  section {
+    max-width: 920px; margin: 0 auto; padding: 18px 24px 34px;
+    position: relative; scroll-margin-top: 80px;
+  }
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--faint); margin-bottom: 9px;
+  }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
+    line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* IDEA CARD */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px;
+    line-height: 1.5; color: var(--text);
+  }
+
+  /* DEMO */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .compare-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
+
+  /* the question prompt shared by both sides */
+  .compare-prompt {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 18px;
+  }
+  .compare-prompt-label {
+    display: block; font-size: 12px; font-weight: 500; color: var(--faint); margin-bottom: 6px;
+  }
+  .compare-prompt-text {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px;
+    line-height: 1.4; color: var(--text);
+  }
+
+  /* two columns: free-text left, structured right */
+  .compare-cols {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start;
+  }
+  @media (max-width: 600px) { .compare-cols { grid-template-columns: 1fr; } }
+
+  .compare-col {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--surface); overflow: hidden;
+  }
+  .compare-col-head {
+    padding: 10px 14px;
+    font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-col.free .compare-col-head { background: var(--bg-subtle); color: var(--faint); }
+  .compare-col.structured .compare-col-head { background: var(--accent-soft); color: var(--accent-hover); }
+
+  /* free-text result: plain paragraph */
+  .free-result {
+    padding: 16px; font-size: 15px; line-height: 1.7; color: var(--soft);
+    font-style: italic; min-height: 140px;
+  }
+
+  /* structured result: JSON block with fields that animate in */
+  .json-block {
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px; line-height: 1.65;
+    color: var(--text);
+    min-height: 140px;
+  }
+  .json-brace { color: var(--faint); }
+  .json-key { color: var(--accent-hover); }
+  .json-val { color: var(--success); }
+  .json-field {
+    display: block;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    padding: 2px 0;
+  }
+  .json-field.filled {
+    opacity: 1; transform: translateX(0);
+  }
+  .json-field.filling {
+    background: var(--accent-soft);
+    border-radius: 4px;
+  }
+
+  /* controls */
+  .board-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm); cursor: pointer;
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* status line below demo */
+  .demo-status {
+    margin-top: 14px; font-size: 13px; color: var(--faint);
+    text-align: center; min-height: 20px;
+    transition: color 0.3s ease;
+  }
+  .demo-status.ready { color: var(--accent-hover); font-weight: 500; }
+
+  /* SECTION 03 — when + gotchas */
+  .when-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  }
+  @media (max-width: 560px) { .when-grid { grid-template-columns: 1fr; } }
+
+  .when-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 18px 20px;
+    box-shadow: var(--shadow-sm);
+  }
+  .when-card .when-icon {
+    font-size: 20px; margin-bottom: 10px; display: block;
+  }
+  .when-card .when-title {
+    font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px;
+  }
+  .when-card .when-body {
+    font-size: 14px; line-height: 1.6; color: var(--soft);
+  }
+  .when-card.gotcha { border-left: 3px solid var(--error); }
+  .when-card.use-it { border-left: 3px solid var(--success); }
+  .when-card.gotcha .when-title { color: var(--error); }
+  .when-card.use-it .when-title { color: var(--success); }
+
+  .section-prose {
+    font-size: 15px; color: var(--soft); line-height: 1.65; max-width: 660px; margin-bottom: 18px;
+  }
+
+  /* BACK LINK */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* SOURCES */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title {
+    font-size: 13px; font-weight: 500; color: var(--faint);
+    padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px;
+  }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  .sources a { color: var(--accent-hover); text-decoration: none; }
+  .sources a:hover { text-decoration: underline; }
+
+  /* FOOTER */
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* RESPONSIVE */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+  }
+  @media (max-width: 480px) {
+    .board-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a href="layers.html">Layers</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a href="layer-single-call-control.html">Single-call control</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <span class="here">Structured output</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <path d="M8 7h2M8 12h8M8 17h5"/>
+      </svg>
+    </span>
+    Pattern
+  </span>
+  <h1 class="pattern-title">Structured Output</h1>
+  <p class="explainer">Tell the model the exact shape to return, so the answer is predictable and a program can read it directly.</p>
+</header>
+
+<!-- 01 · THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>Normally a model answers in free prose: you ask about an invoice, it writes you a sentence. <span style="color:var(--accent-hover)">Structured output</span> is when you say: <strong style="color:var(--accent-hover)">"Answer as a JSON object with these exact fields."</strong> The model fills in the shape you defined, field by field, and your code can read it straight away without guessing where the date or the amount lives.</p>
+  </div>
+</section>
+
+<!-- 02 · SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <h2>Free text vs. <em>fixed shape</em>.</h2>
+  <p class="demo-lede">Same request, two responses. Watch the fields populate on the right.</p>
+
+  <div class="compare-stage">
+    <div class="compare-prompt">
+      <span class="compare-prompt-label">Request</span>
+      <span class="compare-prompt-text">"Extract the vendor name, invoice date, and total amount from this invoice."</span>
+    </div>
+
+    <div class="compare-cols">
+      <!-- free text side -->
+      <div class="compare-col free">
+        <div class="compare-col-head">Free text</div>
+        <div class="free-result" id="freeResult" aria-live="polite">
+          <span id="freeText" style="opacity:0; transition: opacity 0.5s ease;"></span>
+        </div>
+      </div>
+
+      <!-- structured side -->
+      <div class="compare-col structured">
+        <div class="compare-col-head">Structured output</div>
+        <div class="json-block" id="jsonBlock" aria-live="polite">
+          <span class="json-brace">{</span>
+          <span class="json-field" id="jf-vendor">&nbsp;&nbsp;<span class="json-key">"vendor"</span>: <span class="json-val" id="jv-vendor"></span><span class="json-comma">,</span></span>
+          <span class="json-field" id="jf-date">&nbsp;&nbsp;<span class="json-key">"date"</span>: <span class="json-val" id="jv-date"></span><span class="json-comma">,</span></span>
+          <span class="json-field" id="jf-amount">&nbsp;&nbsp;<span class="json-key">"amount"</span>: <span class="json-val" id="jv-amount"></span><span class="json-comma">,</span></span>
+          <span class="json-field" id="jf-currency">&nbsp;&nbsp;<span class="json-key">"currency"</span>: <span class="json-val" id="jv-currency"></span></span>
+          <br><span class="json-brace">}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-status" id="demoStatus" aria-live="polite">Press Play to see both responses arrive.</div>
+
+    <div class="board-controls">
+      <button class="diagram-btn primary" id="demoPlayBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="demoResetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 · WHEN IT MATTERS -->
+<section>
+  <div class="section-label"><span class="num">03</span>When It Matters</div>
+  <h2>Use it, or <em>skip it?</em></h2>
+  <p class="section-prose">Structured output shines when the answer feeds a system, not a person. It comes with one real constraint: the model must follow the schema exactly, and you should validate what comes back.</p>
+
+  <div class="when-grid">
+    <div class="when-card use-it">
+      <span class="when-icon" aria-hidden="true">&#10003;</span>
+      <div class="when-title">Feeding another system</div>
+      <div class="when-body">A form, a database, an API. The downstream code expects exact field names and types. Free text breaks it.</div>
+    </div>
+    <div class="when-card use-it">
+      <span class="when-icon" aria-hidden="true">&#10003;</span>
+      <div class="when-title">Pipelines and automation</div>
+      <div class="when-body">If step 2 reads the output of step 1, you need a guaranteed shape. Prose is unpredictable at scale.</div>
+    </div>
+    <div class="when-card gotcha">
+      <span class="when-icon" aria-hidden="true">!</span>
+      <div class="when-title">Schema drift</div>
+      <div class="when-body">The model may add extra fields or omit optional ones. Always validate the output against the schema before trusting it.</div>
+    </div>
+    <div class="when-card gotcha">
+      <span class="when-icon" aria-hidden="true">!</span>
+      <div class="when-title">Not for open answers</div>
+      <div class="when-body">If the response is a story or an explanation, forcing a schema just breaks the output. Use free text when a human reads it.</div>
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-single-call-control.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Single-call control</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>
+      <a href="https://platform.openai.com/docs/guides/structured-outputs" target="_blank" rel="noopener">OpenAI. <em>Structured Outputs guide.</em></a>
+      <span class="note">Covers JSON mode, function calling, and schema enforcement in the API.</span>
+    </li>
+    <li>
+      <a href="https://json-schema.org/specification" target="_blank" rel="noopener">JSON Schema Specification.</a>
+      <span class="note">The standard that defines how schemas are expressed and validated.</span>
+    </li>
+    <li>
+      <a href="https://platform.openai.com/docs/guides/function-calling" target="_blank" rel="noopener">OpenAI. <em>Function calling.</em></a>
+      <span class="note">The original mechanism for reliable structured extraction before JSON mode.</span>
+    </li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ DEMO ============
+// Left side: free text arrives as a stream (typewriter).
+// Right side: JSON fields animate in one by one, each briefly highlighted.
+
+const FREE_TEXT = "The invoice is from Acme Corp, dated March 12, 2024, for a total of $4,750 USD.";
+
+const FIELDS = [
+  { id: "vendor",   val: '"Acme Corp"' },
+  { id: "date",     val: '"2024-03-12"' },
+  { id: "amount",   val: '4750.00' },
+  { id: "currency", val: '"USD"' },
+];
+
+const demoPlayBtn  = document.getElementById('demoPlayBtn');
+const demoResetBtn = document.getElementById('demoResetBtn');
+const demoStatus   = document.getElementById('demoStatus');
+const freeText     = document.getElementById('freeText');
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function resetDemo() {
+  freeText.style.opacity = '0';
+  freeText.textContent = '';
+  FIELDS.forEach(f => {
+    const el = document.getElementById('jf-' + f.id);
+    const valEl = document.getElementById('jv-' + f.id);
+    el.classList.remove('filled', 'filling');
+    valEl.textContent = '';
+  });
+  demoStatus.textContent = 'Press Play to see both responses arrive.';
+  demoStatus.classList.remove('ready');
+}
+
+async function typeText(el, text, delay) {
+  el.textContent = '';
+  for (let i = 0; i < text.length; i++) {
+    el.textContent += text[i];
+    if (delay > 0) await sleep(delay);
+  }
+}
+
+async function fillField(fieldId, value) {
+  const el    = document.getElementById('jf-' + fieldId);
+  const valEl = document.getElementById('jv-' + fieldId);
+  el.classList.add('filling');
+  valEl.textContent = value;
+  el.classList.add('filled');
+  await sleep(200);
+  el.classList.remove('filling');
+}
+
+async function runDemo() {
+  demoPlayBtn.disabled  = true;
+  demoResetBtn.disabled = true;
+  demoStatus.textContent = 'Generating...';
+
+  if (reduceMotion) {
+    // instant: show everything at once
+    freeText.textContent = FREE_TEXT;
+    freeText.style.opacity = '1';
+    FIELDS.forEach(f => {
+      const el    = document.getElementById('jf-' + f.id);
+      const valEl = document.getElementById('jv-' + f.id);
+      valEl.textContent = f.val;
+      el.classList.add('filled');
+    });
+  } else {
+    // animate both sides concurrently
+    const leftP = (async () => {
+      await sleep(200);
+      freeText.style.opacity = '1';
+      await typeText(freeText, FREE_TEXT, 22);
+    })();
+
+    const rightP = (async () => {
+      for (let i = 0; i < FIELDS.length; i++) {
+        await sleep(300 + i * 480);
+        await fillField(FIELDS[i].id, FIELDS[i].val);
+      }
+    })();
+
+    await Promise.all([leftP, rightP]);
+  }
+
+  demoStatus.textContent = 'Same answer. The right side is ready for code.';
+  demoStatus.classList.add('ready');
+  demoPlayBtn.disabled  = false;
+  demoResetBtn.disabled = false;
+}
+
+demoPlayBtn.addEventListener('click', async () => {
+  resetDemo();
+  await sleep(100);
+  await runDemo();
+});
+
+demoResetBtn.addEventListener('click', () => {
+  resetDemo();
+});
+</script>
+
+</body>
+</html>

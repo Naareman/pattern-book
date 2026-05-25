@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zero-Shot . The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#C2554F; --error-soft:#FBECEB;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  .serif { font-family: 'Fraunces', serif; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 11px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    padding: 5px 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb {
+    font-size: 12.5px;
+    color: var(--faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* ============ TERM DEFINITIONS ============ */
+  .term {
+    background: var(--accent-soft);
+    cursor: pointer;
+    border-bottom: 1px dotted var(--accent);
+    padding: 0 3px;
+    border-radius: 3px;
+    position: relative;
+    font-weight: 500;
+    color: var(--accent-hover);
+  }
+  .term::after {
+    content: attr(data-def);
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: var(--text);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.45;
+    width: max-content;
+    max-width: 260px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 100;
+    text-align: left;
+    box-shadow: var(--shadow);
+  }
+  .term::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    border: 6px solid transparent;
+    border-top-color: var(--text);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 100;
+  }
+  .term.open::after, .term.open::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ============ HEADER ============ */
+  .header {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 8px;
+    scroll-margin-top: 80px;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--accent-hover);
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    scroll-margin-top: 80px;
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 38px;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    margin: 16px 0 0;
+  }
+  .explainer {
+    color: var(--soft);
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 660px;
+    margin-top: 14px;
+  }
+
+  /* ============ SECTIONS ============ */
+  section {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 18px 24px 34px;
+    position: relative;
+    scroll-margin-top: 80px;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 9px;
+  }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 23px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* ============ IDEA CARD ============ */
+  .idea-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  /* ============ DEMO STAGE ============ */
+  .demo-lede {
+    font-size: 15px;
+    color: var(--soft);
+    line-height: 1.6;
+    max-width: 640px;
+    margin-bottom: 18px;
+  }
+  .demo-stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  /* The send row: instruction pill + button */
+  .send-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .prompt-pill {
+    flex: 1;
+    min-width: 0;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 13px 16px;
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--text);
+  }
+  .prompt-pill .label {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 5px;
+  }
+
+  /* The animated reply area */
+  .reply-area {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    min-height: 90px;
+    position: relative;
+  }
+  .reply-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 10px;
+  }
+  .reply-text {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--text);
+    min-height: 28px;
+  }
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.1em;
+    background: var(--accent);
+    border-radius: 1px;
+    vertical-align: text-bottom;
+    animation: blink 0.9s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .cursor.hidden { display: none; }
+
+  /* Contrast badge: zero-shot vs few-shot */
+  .contrast-strip {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .contrast-pill {
+    flex: 1;
+    min-width: 130px;
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    border: 1px solid var(--border);
+  }
+  .contrast-pill .pill-label {
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .contrast-pill.zs { background: var(--accent-soft); border-color: var(--accent); }
+  .contrast-pill.zs .pill-label { color: var(--accent-hover); }
+  .contrast-pill.fs { background: var(--bg-subtle); }
+  .contrast-pill.fs .pill-label { color: var(--soft); }
+
+  /* controls */
+  .board-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 16px;
+    margin-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* prompt selector tabs */
+  .prompt-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .prompt-tab {
+    padding: 7px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 20px;
+    background: var(--surface);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--soft);
+    transition: border-color .18s ease, background .18s ease, color .18s ease;
+  }
+  .prompt-tab:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .prompt-tab.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); font-weight: 600; }
+
+  /* ============ WHEN IT WORKS ============ */
+  .when-stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  .when-instruction {
+    font-size: 14px;
+    color: var(--soft);
+    margin-bottom: 18px;
+  }
+  .queries { display: flex; flex-direction: column; gap: 12px; }
+  .query-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+  }
+  .query-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .query-card .q {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.3;
+    color: var(--text);
+  }
+  .query-card .verdict {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, margin 0.3s ease;
+  }
+  .query-card .verdict span.body {
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--soft);
+    display: block;
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+  .query-card.revealed .verdict { max-height: 220px; margin-top: 14px; }
+  .query-card.good { background: var(--success-soft); border-color: var(--success); }
+  .query-card.reach { background: #FFF9EC; border-color: #D4A017; }
+  .query-card.good:hover { border-color: var(--success); }
+  .query-card.reach:hover { border-color: #D4A017; }
+  .query-card.good .verdict { color: var(--success); }
+  .query-card.reach .verdict { color: #A07010; }
+  .query-tracker {
+    margin-top: 18px;
+    padding: 12px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+  }
+  .query-tracker.complete {
+    background: var(--accent-soft);
+    color: var(--accent-hover);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ============ BACK LINK ============ */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--accent);
+    line-height: 1;
+    transition: transform 0.2s ease;
+  }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    margin-bottom: 3px;
+  }
+  .back-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  /* ============ SOURCES ============ */
+  .sources {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 28px 24px 0;
+  }
+  .sources .sources-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li {
+    font-size: 13px;
+    color: var(--soft);
+    line-height: 1.5;
+  }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* ============ FOOTER ============ */
+  footer {
+    max-width: 920px;
+    margin: 30px auto 48px;
+    padding: 16px 24px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--faint);
+    line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+  }
+  @media (max-width: 480px) {
+    .board-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+    .contrast-strip { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-single-call-control.html">Single-call control</a><span class="sep">/</span><span class="here">Zero-Shot</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M3 12h2M19 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></span>Pattern</span>
+  <h1 class="pattern-title">Zero-Shot</h1>
+  <p class="explainer">Just describe what you want. The model figures it out from what it already knows, with no examples needed.</p>
+</header>
+
+<!-- 01 · THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p><span style="color:var(--accent-hover)">Zero-shot</span> means sending a plain instruction and getting a useful answer back, with <strong style="color:var(--accent-hover)">no examples included in the prompt</strong>. The model relies entirely on what it learned during training across billions of texts. You describe what you want; it knows what to do. "Zero" refers to zero examples given, not zero effort by the model.</p>
+  </div>
+</section>
+
+<!-- 02 · SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Plain words in, <em>answer</em> out.</h2>
+
+  <p class="demo-lede">Pick a task and watch the model answer from training alone. No examples were given.</p>
+
+  <div class="demo-stage">
+    <!-- Prompt selector -->
+    <div class="prompt-tabs" role="tablist" aria-label="Choose a prompt">
+      <button class="prompt-tab active" role="tab" aria-selected="true" data-idx="0">Translate</button>
+      <button class="prompt-tab" role="tab" aria-selected="false" data-idx="1">Summarize</button>
+      <button class="prompt-tab" role="tab" aria-selected="false" data-idx="2">Classify</button>
+    </div>
+
+    <!-- The instruction (no examples) -->
+    <div class="send-row">
+      <div class="prompt-pill">
+        <span class="label">Prompt (zero examples)</span>
+        <span id="promptText">Translate to French: "The meeting starts at nine."</span>
+      </div>
+    </div>
+
+    <!-- Animated reply -->
+    <div class="reply-area" aria-live="polite" aria-label="Model reply">
+      <div class="reply-label">Model reply</div>
+      <div class="reply-text" id="replyText"><span class="cursor hidden" id="cursor" aria-hidden="true"></span></div>
+    </div>
+
+    <!-- Zero-shot vs few-shot contrast -->
+    <div class="contrast-strip">
+      <div class="contrast-pill zs">
+        <span class="pill-label">Zero-Shot (this page)</span>
+        No examples. Faster. Cheaper. Less control over exact format.
+      </div>
+      <div class="contrast-pill fs">
+        <span class="pill-label">Few-Shot</span>
+        1-5 examples included. More control over output style, but longer prompt and higher cost.
+      </div>
+    </div>
+
+    <div class="board-controls">
+      <button class="diagram-btn primary" id="sendBtn">&#9654; Send</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 · WHEN IT MATTERS -->
+<section>
+  <div class="section-label"><span class="num">03</span>When It Matters</div>
+  <h2>Zero-shot by default, <em>or reach further?</em></h2>
+
+  <div class="when-stage">
+    <div class="when-instruction">Tap each task to see whether zero-shot is enough or whether you should reach for few-shot or Chain-of-Thought instead.</div>
+    <div class="queries" id="queries">
+      <div class="query-card" data-verdict="good" data-reason="Translating common phrases is a clear, well-defined task the model has seen countless times in training. Plain instruction is all you need.">
+        <div class="q">"Translate this sentence to Spanish."</div>
+        <div class="verdict">Zero-shot is enough &#10003;<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="good" data-reason="Summarizing a paragraph into one sentence is a common, clearly scoped task. The model does this reliably from plain instructions alone.">
+        <div class="q">"Summarize this paragraph in one sentence."</div>
+        <div class="verdict">Zero-shot is enough &#10003;<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="good" data-reason="Classifying sentiment is a standard NLP task the model has learned deeply. A short instruction produces a reliable label with no examples required.">
+        <div class="q">"Is this review positive, negative, or neutral?"</div>
+        <div class="verdict">Zero-shot is enough &#10003;<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="reach" data-reason="If you need the output in a very specific format (e.g. a particular JSON shape), add 1-2 examples in the prompt. That is few-shot. Zero-shot often gets the content right but may not match the exact structure you need.">
+        <div class="q">"Extract this data into my exact JSON schema."</div>
+        <div class="verdict">Reach for few-shot &#8594;<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="reach" data-reason='Multi-step arithmetic or logic needs the model to show its work to get the right answer. Add "Let&apos;s think step by step" (Chain-of-Thought) instead of leaving it to a single guess.'>
+        <div class="q">"What is 15% of 840, then subtract 22?"</div>
+        <div class="verdict">Reach for Chain-of-Thought &#8594;<span class="body"></span></div>
+      </div>
+    </div>
+    <div class="query-tracker" id="queryTracker" aria-live="polite">0 / 5 tapped</div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-single-call-control.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Single-call control</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Brown et al. (2020). <em>Language Models are Few-Shot Learners.</em> <span class="note">Introduced GPT-3 and established zero-shot as a baseline; showed models can follow plain-language instructions without examples.</span></li>
+    <li>Kojima et al. (2022). <em>Large Language Models are Zero-Shot Reasoners.</em> <span class="note">Showed that adding "Let's think step by step" to a zero-shot prompt dramatically improves multi-step reasoning, pointing to the boundary where zero-shot needs help.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ DEMO DATA ============
+const prompts = [
+  {
+    tab: 0,
+    instruction: 'Translate to French: "The meeting starts at nine."',
+    reply: 'La réunion commence à neuf heures.'
+  },
+  {
+    tab: 1,
+    instruction: 'Summarize in one sentence: "Photosynthesis is the process by which plants use sunlight, water, and carbon dioxide to produce oxygen and energy in the form of glucose."',
+    reply: 'Plants use sunlight, water, and CO₂ to make oxygen and glucose.'
+  },
+  {
+    tab: 2,
+    instruction: 'Classify the sentiment: "The product arrived on time and works perfectly."',
+    reply: 'Sentiment: Positive.'
+  }
+];
+
+let currentIdx = 0;
+let playing = false;
+let playTimer = null;
+
+const promptText = document.getElementById('promptText');
+const replyText = document.getElementById('replyText');
+const cursor = document.getElementById('cursor');
+const sendBtn = document.getElementById('sendBtn');
+const resetBtn = document.getElementById('resetBtn');
+const tabs = document.querySelectorAll('.prompt-tab');
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function setTab(idx) {
+  currentIdx = idx;
+  tabs.forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+    t.setAttribute('aria-selected', i === idx ? 'true' : 'false');
+  });
+  promptText.textContent = prompts[idx].instruction;
+  resetReply();
+}
+
+function resetReply() {
+  if (playTimer) { clearTimeout(playTimer); playTimer = null; }
+  playing = false;
+  replyText.textContent = '';
+  cursor.classList.add('hidden');
+  sendBtn.disabled = false;
+  sendBtn.textContent = '▶ Send';
+}
+
+function typeReply(text) {
+  replyText.textContent = '';
+  cursor.classList.remove('hidden');
+  replyText.appendChild(cursor);
+
+  if (reduceMotion) {
+    // instant reveal
+    replyText.textContent = text;
+    cursor.classList.add('hidden');
+    playing = false;
+    sendBtn.disabled = false;
+    return;
+  }
+
+  const chars = Array.from(text); // handles multi-byte chars
+  let i = 0;
+
+  function tick() {
+    if (i >= chars.length) {
+      // done: remove cursor, show full text clean
+      replyText.textContent = text;
+      cursor.classList.add('hidden');
+      playing = false;
+      sendBtn.disabled = false;
+      return;
+    }
+    // Rebuild text node + cursor
+    const sofar = chars.slice(0, i + 1).join('');
+    replyText.textContent = sofar;
+    replyText.appendChild(cursor);
+    cursor.classList.remove('hidden');
+    i++;
+    // vary speed slightly for a natural feel
+    const delay = 28 + Math.random() * 22;
+    playTimer = setTimeout(tick, delay);
+  }
+  tick();
+}
+
+sendBtn.addEventListener('click', () => {
+  if (playing) return;
+  playing = true;
+  sendBtn.disabled = true;
+  sendBtn.textContent = 'Thinking...';
+  // brief pause then type
+  playTimer = setTimeout(() => {
+    sendBtn.textContent = '▶ Send';
+    typeReply(prompts[currentIdx].reply);
+  }, reduceMotion ? 1 : 500);
+});
+
+resetBtn.addEventListener('click', () => {
+  resetReply();
+});
+
+tabs.forEach((tab, i) => {
+  tab.addEventListener('click', () => {
+    if (playing) { resetReply(); }
+    setTab(i);
+  });
+});
+
+// init
+setTab(0);
+
+// ============ WHEN-IT-MATTERS CARDS ============
+const queryCards = document.querySelectorAll('.query-card');
+const queryTracker = document.getElementById('queryTracker');
+const tested = new Set();
+
+queryCards.forEach(card => {
+  card.addEventListener('click', () => {
+    if (card.classList.contains('revealed')) return;
+    card.classList.add('revealed');
+    card.classList.add(card.dataset.verdict);
+    card.querySelector('.verdict .body').textContent = card.dataset.reason;
+    tested.add(card);
+    const n = tested.size;
+    if (n === queryCards.length) {
+      queryTracker.textContent = '✓ All 5 tapped, pattern clear';
+      queryTracker.classList.add('complete');
+    } else {
+      queryTracker.textContent = `${n} / 5 tapped`;
+    }
+  });
+});
+
+// ============ TERM DEFINITIONS ============
+const terms = document.querySelectorAll('.term');
+function toggleTerm(term) {
+  const wasOpen = term.classList.contains('open');
+  terms.forEach(t => t.classList.remove('open'));
+  if (!wasOpen) term.classList.add('open');
+}
+terms.forEach(term => {
+  term.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleTerm(term);
+  });
+  term.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleTerm(term);
+    }
+  });
+});
+document.addEventListener('click', () => {
+  terms.forEach(t => t.classList.remove('open'));
+});
+</script>
+
+</body>
+</html>

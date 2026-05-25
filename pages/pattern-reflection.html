@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reflection . The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#C2554F; --error-soft:#FBECEB;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --warn:#B45309; --warn-soft:#FEF3C7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  .serif { font-family: 'Fraunces', serif; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* ============ HEADER ============ */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    scroll-margin-top: 80px;
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* ============ SECTIONS ============ */
+  section {
+    max-width: 920px; margin: 0 auto; padding: 18px 24px 34px;
+    position: relative; scroll-margin-top: 80px;
+  }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* ============ IDEA CARD ============ */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.5; color: var(--text); }
+
+  /* ============ DEMO (Section 02) ============ */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+
+  .refine-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
+  }
+
+  /* three beat cards stacked */
+  .beats { display: flex; flex-direction: column; gap: 16px; }
+
+  .beat {
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .beat.shown { opacity: 1; transform: translateY(0); }
+
+  .beat-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .beat-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .beat-label { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+  .beat-body { padding: 14px 16px; font-size: 15px; line-height: 1.6; color: var(--text); }
+
+  /* beat 1: first draft, neutral */
+  .beat-draft .beat-header { background: var(--bg-subtle); }
+  .beat-draft .beat-num { background: var(--faint); color: #fff; }
+  .beat-draft .beat-label { color: var(--soft); }
+
+  /* beat 2: critique, warm orange */
+  .beat-critique .beat-header { background: var(--warn-soft); }
+  .beat-critique .beat-num { background: var(--warn); color: #fff; }
+  .beat-critique .beat-label { color: var(--warn); }
+  .beat-critique { border-color: #FDE68A; }
+  .beat-critique .beat-body { background: #FFFDF5; color: var(--soft); font-style: italic; }
+  .beat-critique .flaw { color: var(--warn); font-weight: 600; font-style: normal; }
+
+  /* beat 3: improved, green */
+  .beat-improved .beat-header { background: var(--success-soft); }
+  .beat-improved .beat-num { background: var(--success); color: #fff; }
+  .beat-improved .beat-label { color: var(--success); }
+  .beat-improved { border-color: #6EE7B7; }
+  /* the fix highlight animates in */
+  .fix {
+    background: transparent;
+    border-radius: 3px;
+    transition: background 0.6s ease;
+    font-weight: 600;
+  }
+  .fix.lit { background: #BBF7D0; }
+
+  /* connector arrow between beats */
+  .beat-connector {
+    text-align: center; font-size: 18px; color: var(--border-strong);
+    line-height: 1; margin: -6px 0;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .beat-connector.shown { opacity: 1; }
+
+  /* controls */
+  .refine-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm); cursor: pointer;
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ WHEN IT HELPS (Section 03) ============ */
+  .when-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
+  .when-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media (max-width: 560px) { .when-grid { grid-template-columns: 1fr; } }
+  .when-card {
+    border-radius: var(--radius-sm); border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .when-card .wc-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .when-card .wc-items { display: flex; flex-direction: column; gap: 8px; }
+  .when-card .wc-item { font-size: 14px; line-height: 1.5; color: var(--soft); }
+  .when-card .wc-item::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+
+  .when-card.helps { background: var(--success-soft); border-color: #6EE7B7; }
+  .when-card.helps .wc-label { color: var(--success); }
+  .when-card.helps .wc-item::before { background: var(--success); }
+
+  .when-card.limits { background: var(--error-soft); border-color: #FECACA; }
+  .when-card.limits .wc-label { color: var(--error); }
+  .when-card.limits .wc-item::before { background: var(--error); }
+
+  .vs-cot {
+    font-size: 14px; color: var(--soft); line-height: 1.6;
+    padding: 14px 16px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent);
+  }
+  .vs-cot strong { color: var(--accent-hover); }
+
+  /* ============ BACK LINK ============ */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* ============ SOURCES ============ */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* ============ FOOTER ============ */
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+  }
+  @media (max-width: 480px) {
+    .refine-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep">/</span>
+      <a href="layers.html">Layers</a>
+      <span class="sep">/</span>
+      <a href="layer-single-call-control.html">Single-call control</a>
+      <span class="sep">/</span>
+      <span class="here">Reflection</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10"/>
+        <path d="M12 8v4l2 2"/>
+        <path d="M17 17l2 2 4-4"/>
+      </svg>
+    </span>Pattern
+  </span>
+  <h1 class="pattern-title">Reflection</h1>
+  <p class="explainer">The model writes a first answer, then reviews and critiques it, then produces an improved version. Three beats, one call.</p>
+</header>
+
+<!-- 01 · THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>You ask the model to do its work twice. First it writes a draft. Then you ask it: <strong style="color:var(--accent-hover)">"What is wrong with that answer? Now fix it."</strong> The model acts as its own critic. The second answer is usually sharper, more complete, and catches at least one thing the first pass missed.</p>
+  </div>
+</section>
+
+<!-- 02 · THE DEMO -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <h2>Three beats, one <em>fix</em>.</h2>
+
+  <p class="demo-lede">Watch the model write a draft, spot its own flaw, then revise. Tap Next to step through, or Play to run all three.</p>
+
+  <div class="refine-stage">
+    <div class="beats" aria-live="polite" aria-label="Reflection demo">
+
+      <!-- Beat 1: First draft -->
+      <div class="beat beat-draft" id="beat1">
+        <div class="beat-header">
+          <span class="beat-num" aria-hidden="true">1</span>
+          <span class="beat-label">First draft</span>
+        </div>
+        <div class="beat-body">
+          To stay focused while studying, remove distractions and set a timer for 25 minutes.
+        </div>
+      </div>
+
+      <div class="beat-connector" id="conn1" aria-hidden="true">&#8595;</div>
+
+      <!-- Beat 2: Self-critique -->
+      <div class="beat beat-critique" id="beat2">
+        <div class="beat-header">
+          <span class="beat-num" aria-hidden="true">2</span>
+          <span class="beat-label">Self-critique</span>
+        </div>
+        <div class="beat-body">
+          The draft mentions <span class="flaw">what to do</span> but not <span class="flaw">why it works</span> or <span class="flaw">what to do when focus breaks</span>. It is too thin for someone who has already tried a timer and still struggles.
+        </div>
+      </div>
+
+      <div class="beat-connector" id="conn2" aria-hidden="true">&#8595;</div>
+
+      <!-- Beat 3: Improved answer -->
+      <div class="beat beat-improved" id="beat3">
+        <div class="beat-header">
+          <span class="beat-num" aria-hidden="true">3</span>
+          <span class="beat-label">Improved answer</span>
+        </div>
+        <div class="beat-body" id="beat3body">
+          To stay focused while studying, remove your phone from the room and set a 25-minute timer (the Pomodoro method). Your brain treats the end of the timer as a reward, which makes starting easier. <span class="fix" id="fix1">If focus breaks mid-session, write down the distraction and return to it after the timer ends</span> rather than acting on it immediately. <span class="fix" id="fix2">After three sessions, take a 15-minute break to let working memory consolidate.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="refine-controls">
+      <button class="diagram-btn" id="stepBtn">&rarr; Next</button>
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 · WHEN IT HELPS AND LIMITS -->
+<section>
+  <div class="section-label"><span class="num">03</span>When it Matters</div>
+  <h2>Helps and <em>limits</em>.</h2>
+
+  <div class="when-stage">
+    <div class="when-grid">
+      <div class="when-card helps">
+        <div class="wc-label">Works well for</div>
+        <div class="wc-items">
+          <div class="wc-item">Writing and prose where completeness is hard to check in one pass</div>
+          <div class="wc-item">Code where the first version compiles but misses edge cases</div>
+          <div class="wc-item">Multi-part answers where one section is weaker than the rest</div>
+        </div>
+      </div>
+      <div class="when-card limits">
+        <div class="wc-label">Known limits</div>
+        <div class="wc-items">
+          <div class="wc-item">The model can miss its own factual errors: the critique is confident but still wrong</div>
+          <div class="wc-item">It costs an extra round of tokens, so latency and price both go up</div>
+          <div class="wc-item">Shallow tasks (a short fact, a one-word answer) rarely benefit</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="vs-cot">
+      <strong>Reflection vs. Chain-of-Thought.</strong> Chain-of-Thought is one forward reasoning pass: the model thinks through steps and lands on an answer. Reflection is a review-and-fix loop: the model finishes an answer, then reads it back and revises. They are different shapes. CoT improves reasoning on the way to an answer; Reflection improves an answer that already exists.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-single-call-control.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Single-call control</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Madaan et al. (2023). <em>Self-Refine: Iterative Refinement with Self-Feedback.</em> <span class="note">NeurIPS 2023. Introduces the self-refine loop: generate, give feedback, refine.</span></li>
+    <li>Shinn et al. (2023). <em>Reflexion: Language Agents with Verbal Reinforcement Learning.</em> <span class="note">NeurIPS 2023. Extends self-critique to agents that persist feedback across episodes.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ REFLECTION DEMO ============
+// Three beats: draft, critique, improved answer with the fixes highlighted.
+// Step / Play / Reset control the reveal sequence.
+
+const beat1 = document.getElementById('beat1');
+const beat2 = document.getElementById('beat2');
+const beat3 = document.getElementById('beat3');
+const conn1 = document.getElementById('conn1');
+const conn2 = document.getElementById('conn2');
+const fix1  = document.getElementById('fix1');
+const fix2  = document.getElementById('fix2');
+
+const stepBtn  = document.getElementById('stepBtn');
+const playBtn  = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// step index: -1 = nothing shown, 0 = beat1, 1 = conn1+beat2, 2 = conn2+beat3, 3 = fixes lit
+let demoStep = -1;
+let playing   = false;
+
+function showBeat(el) {
+  el.classList.add('shown');
+}
+function showConn(el) {
+  el.classList.add('shown');
+}
+function lightFixes() {
+  // small delay so the beat card appears first
+  setTimeout(() => {
+    fix1.classList.add('lit');
+    fix2.classList.add('lit');
+  }, reduceMotion ? 0 : 350);
+}
+function resetDemo() {
+  [beat1, beat2, beat3].forEach(b => b.classList.remove('shown'));
+  [conn1, conn2].forEach(c => c.classList.remove('shown'));
+  [fix1, fix2].forEach(f => f.classList.remove('lit'));
+  demoStep = -1;
+}
+function showAll() {
+  showBeat(beat1);
+  showConn(conn1);
+  showBeat(beat2);
+  showConn(conn2);
+  showBeat(beat3);
+  lightFixes();
+  demoStep = 3;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// Step: one tap advances one beat
+stepBtn.addEventListener('click', async () => {
+  if (playing) return;
+  if (demoStep >= 3) { resetDemo(); return; }
+  demoStep += 1;
+  if (demoStep === 0) { showBeat(beat1); }
+  else if (demoStep === 1) { showConn(conn1); showBeat(beat2); }
+  else if (demoStep === 2) { showConn(conn2); showBeat(beat3); }
+  else if (demoStep === 3) { lightFixes(); }
+});
+
+// Play: reveal each beat with a pause, then light the fixes
+playBtn.addEventListener('click', async () => {
+  if (playing) return;
+  if (reduceMotion) { resetDemo(); showAll(); return; }
+  playing = true;
+  playBtn.disabled = true;
+  stepBtn.disabled = true;
+  resetDemo();
+  await sleep(200);
+  showBeat(beat1);
+  await sleep(900);
+  showConn(conn1);
+  await sleep(300);
+  showBeat(beat2);
+  await sleep(1000);
+  showConn(conn2);
+  await sleep(300);
+  showBeat(beat3);
+  lightFixes();
+  demoStep = 3;
+  playing = false;
+  playBtn.disabled = false;
+  stepBtn.disabled = false;
+});
+
+resetBtn.addEventListener('click', () => {
+  if (playing) return;
+  resetDemo();
+});
+
+// Reduced motion: show everything immediately
+if (reduceMotion) {
+  showAll();
+} else {
+  resetDemo();
+}
+</script>
+
+</body>
+</html>

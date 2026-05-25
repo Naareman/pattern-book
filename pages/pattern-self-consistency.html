@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Self-Consistency . The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#C2554F; --error-soft:#FBECEB;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  .serif { font-family: 'Fraunces', serif; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 11px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    padding: 5px 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb {
+    font-size: 12.5px;
+    color: var(--faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* ============ HEADER ============ */
+  .header {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 8px;
+    scroll-margin-top: 80px;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--accent-hover);
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    scroll-margin-top: 80px;
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 38px;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    margin: 16px 0 0;
+  }
+  .explainer {
+    color: var(--soft);
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 660px;
+    margin-top: 14px;
+  }
+
+  /* ============ SECTIONS ============ */
+  section {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 18px 24px 34px;
+    position: relative;
+    scroll-margin-top: 80px;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 9px;
+  }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 23px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* ============ 01 THE IDEA ============ */
+  .idea-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  /* ============ 02 THE DEMO ============ */
+  .demo-lede {
+    font-size: 15px;
+    color: var(--soft);
+    line-height: 1.6;
+    max-width: 640px;
+    margin-bottom: 18px;
+  }
+  .demo-stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  /* question card */
+  .demo-question {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 18px;
+  }
+  .demo-qlabel {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--faint);
+    margin-bottom: 6px;
+  }
+  .demo-qtext {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--text);
+  }
+
+  /* runs grid */
+  .runs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .run-card {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.3s ease, background 0.3s ease;
+  }
+  .run-card.shown { opacity: 1; transform: translateY(0); }
+  .run-card.winner {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
+  .run-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .run-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--border-strong);
+    color: var(--soft);
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  .run-card.winner .run-badge {
+    background: var(--accent);
+    color: #fff;
+  }
+  .run-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .run-reasoning {
+    font-size: 13px;
+    color: var(--soft);
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+  .run-answer {
+    display: inline-block;
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+  .run-card.winner .run-answer {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* vote tally */
+  .vote-box {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin-bottom: 18px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .vote-box.shown { opacity: 1; transform: translateY(0); }
+  .vote-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 12px;
+  }
+  .vote-rows { display: flex; flex-direction: column; gap: 8px; }
+  .vote-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .vote-option {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text);
+    min-width: 60px;
+  }
+  .vote-bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .vote-bar-fill {
+    height: 100%;
+    background: var(--border-strong);
+    border-radius: 99px;
+    width: 0%;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+  }
+  .vote-bar-fill.winner-bar { background: var(--accent); }
+  .vote-count {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--faint);
+    min-width: 28px;
+    text-align: right;
+    transition: color 0.3s ease;
+  }
+  .vote-count.winner-count { color: var(--accent-hover); }
+
+  /* final verdict */
+  .demo-verdict {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--text);
+    color: #fff;
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    margin-bottom: 18px;
+  }
+  .demo-verdict.shown { opacity: 1; transform: translateY(0) scale(1); }
+  .verdict-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    flex-shrink: 0;
+  }
+  .verdict-text {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  .verdict-note {
+    font-size: 13px;
+    color: var(--soft);
+    line-height: 1.5;
+  }
+
+  /* controls */
+  .board-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 16px;
+    margin-top: 4px;
+    border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ 03 WHEN TO PAY THE PRICE ============ */
+  .test-stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  .test-instruction {
+    font-size: 14px;
+    color: var(--soft);
+    margin-bottom: 18px;
+  }
+  .queries { display: flex; flex-direction: column; gap: 12px; }
+  .query-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+  }
+  .query-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .query-card .q {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.3;
+    color: var(--text);
+  }
+  .query-card .verdict {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, margin 0.3s ease;
+  }
+  .query-card .verdict span.body {
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--soft);
+    display: block;
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+  .query-card.revealed .verdict { max-height: 220px; margin-top: 14px; }
+  .query-card.good { background: var(--success-soft); border-color: var(--success); }
+  .query-card.bad { background: var(--error-soft); border-color: var(--error); }
+  .query-card.good:hover { border-color: var(--success); }
+  .query-card.bad:hover { border-color: var(--error); }
+  .query-card.good .verdict { color: var(--success); }
+  .query-card.bad .verdict { color: var(--error); }
+  .query-tracker {
+    margin-top: 18px;
+    padding: 12px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+  }
+  .query-tracker.complete {
+    background: var(--accent-soft);
+    color: var(--accent-hover);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ============ BACK LINK ============ */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--accent);
+    line-height: 1;
+    transition: transform 0.2s ease;
+  }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    margin-bottom: 3px;
+  }
+  .back-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  /* ============ SOURCES ============ */
+  .sources {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 28px 24px 0;
+  }
+  .sources .sources-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li {
+    font-size: 13px;
+    color: var(--soft);
+    line-height: 1.5;
+  }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* ============ FOOTER ============ */
+  footer {
+    max-width: 920px;
+    margin: 30px auto 48px;
+    padding: 16px 24px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--faint);
+    line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .runs-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .board-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-single-call-control.html">Single-call control</a><span class="sep">/</span><span class="here">Self-Consistency</span></nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg></span>Pattern</span>
+  <h1 class="pattern-title">Self-Consistency</h1>
+  <p class="explainer">Ask the same question several times, let each run reason its own way, then pick the answer that comes up most often. Random mistakes get outvoted.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p><span style="color:var(--accent-hover)">Self-Consistency</span> uses one model, sent the same question several times. Each run reasons step by step and lands on an answer. Because the model is a little random, the paths differ. Collect the answers, count the votes, and return the majority. One wrong chain gets outvoted; the right answer keeps coming up.</p>
+  </div>
+</section>
+
+<!-- 02 THE DEMO -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <h2>Three runs, one <em>vote</em>.</h2>
+
+  <p class="demo-lede">Watch five runs of the same question appear. Each reasons differently and may land on a slightly different answer. Then see the vote resolve.</p>
+
+  <div class="demo-stage">
+    <!-- question -->
+    <div class="demo-question">
+      <span class="demo-qlabel">Question (sent 5 times, same model)</span>
+      <span class="demo-qtext">A train travels 60 km in 45 minutes. What is its speed in km/h?</span>
+    </div>
+
+    <!-- runs -->
+    <div class="runs-grid" id="runsGrid" aria-live="polite">
+      <!-- injected by JS -->
+    </div>
+
+    <!-- vote tally -->
+    <div class="vote-box" id="voteBox" aria-live="polite">
+      <div class="vote-title">Vote tally</div>
+      <div class="vote-rows" id="voteRows"></div>
+    </div>
+
+    <!-- final verdict -->
+    <div class="demo-verdict" id="demoVerdict">
+      <span class="verdict-label">Majority answer</span>
+      <span class="verdict-text" id="verdictText"></span>
+    </div>
+    <p class="verdict-note" id="verdictNote" style="display:none;">Run 3 took a wrong turn, but 4 out of 5 agreed. The majority vote corrects the outlier without any human checking.</p>
+
+    <!-- controls -->
+    <div class="board-controls">
+      <button class="diagram-btn primary" id="demoPlayBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="demoResetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 WHEN TO PAY THE PRICE -->
+<section>
+  <div class="section-label"><span class="num">03</span>When it Matters</div>
+  <h2>Worth the <em>extra cost</em>?</h2>
+  <div class="test-stage">
+    <div class="test-instruction">Running the model five times costs five times as much and takes longer. Tap each case to see when that trade is worth it.</div>
+    <div class="queries" id="queries">
+      <div class="query-card" data-verdict="good" data-reason="Multi-step arithmetic has many places to slip. Five independent chains rarely all make the same mistake, so the majority answer is much more reliable.">
+        <div class="q">"Calculate the compound interest on $5 000 over 3 years at 4.5% per year."</div>
+        <div class="verdict">Worth it &#10003;<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="good" data-reason="Legal or medical decisions are high-stakes and logic-heavy. Sampling many reasoning paths and taking the consensus raises confidence before a human reviews it.">
+        <div class="q">"Does this contract clause create any liability under consumer protection law?"</div>
+        <div class="verdict">Worth it &#10003;<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="good" data-reason="Logical puzzles often have exactly one correct answer, but the model can take wrong shortcuts. Multiple independent attempts average out those shortcuts.">
+        <div class="q">"Which of these five candidates satisfies all three hiring constraints?"</div>
+        <div class="verdict">Worth it &#10003;<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="bad" data-reason="Factual lookup has one correct answer and no reasoning chain to vary. Five runs return the same answer five times, wasting the cost of four extra calls.">
+        <div class="q">"What year was the Eiffel Tower built?"</div>
+        <div class="verdict">Not needed &#10007;<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="bad" data-reason="Creative output has no single right answer, so majority vote is meaningless. Five different drafts are just five different drafts.">
+        <div class="q">"Write a short poem about rain."</div>
+        <div class="verdict">Not needed &#10007;<span class="body"></span></div>
+      </div>
+    </div>
+    <div class="query-tracker" id="queryTracker" aria-live="polite">0 / 5 tested</div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-single-call-control.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Single-call control</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Wang et al. (2022). <em>Self-Consistency Improves Chain of Thought Reasoning in Language Models.</em> <span class="note">The original paper introducing majority-vote sampling over CoT paths.</span></li>
+    <li>Wei et al. (2022). <em>Chain-of-Thought Prompting Elicits Reasoning in Large Language Models.</em> <span class="note">Foundational work that self-consistency builds on.</span></li>
+    <li>Google DeepMind / OpenAI API docs. <span class="note">Temperature and top-p sampling controls that produce the varied paths.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ DEMO DATA ============
+// Five reasoning runs, each takes a slightly different path.
+// Run 2 (index 2) takes a wrong turn to show what gets outvoted.
+const RUNS = [
+  {
+    reasoning: "45 min = 45/60 h = 0.75 h. Speed = distance / time = 60 / 0.75",
+    answer: "80 km/h",
+    correct: true
+  },
+  {
+    reasoning: "Convert: 45 min = 3/4 of an hour. 60 km in 3/4 h, so in 1 h: 60 × (4/3)",
+    answer: "80 km/h",
+    correct: true
+  },
+  {
+    reasoning: "45 min is close to an hour. 60 km per hour is roughly right. Rounding: about 60.",
+    answer: "60 km/h",
+    correct: false   // the outlier
+  },
+  {
+    reasoning: "Speed = km / hours. 45 min = 0.75 h. 60 ÷ 0.75 = 80.",
+    answer: "80 km/h",
+    correct: true
+  },
+  {
+    reasoning: "1 hour = 60 min. In 45 min the train covers 60 km. In 60 min: 60 × (60/45) = 80.",
+    answer: "80 km/h",
+    correct: true
+  }
+];
+
+// Tally votes from RUNS
+function tallyVotes() {
+  const tally = {};
+  RUNS.forEach(r => { tally[r.answer] = (tally[r.answer] || 0) + 1; });
+  return Object.entries(tally).sort((a, b) => b[1] - a[1]);
+}
+
+const VOTE_TALLY = tallyVotes();   // [["80 km/h", 4], ["60 km/h", 1]]
+const WINNER = VOTE_TALLY[0][0];  // "80 km/h"
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ============ BUILD RUN CARDS ============
+const runsGrid = document.getElementById('runsGrid');
+
+RUNS.forEach((run, i) => {
+  const card = document.createElement('div');
+  card.className = 'run-card';
+  card.id = `run-${i}`;
+  card.setAttribute('aria-label', `Run ${i + 1}: answer ${run.answer}`);
+  card.innerHTML = `
+    <div class="run-header">
+      <span class="run-badge" aria-hidden="true">${i + 1}</span>
+      <span class="run-label">Run ${i + 1}</span>
+    </div>
+    <div class="run-reasoning">${run.reasoning}</div>
+    <span class="run-answer">${run.answer}</span>
+  `;
+  runsGrid.appendChild(card);
+});
+
+// ============ BUILD VOTE ROWS ============
+const voteRows = document.getElementById('voteRows');
+const TOTAL_RUNS = RUNS.length;
+
+VOTE_TALLY.forEach(([option, count]) => {
+  const isWinner = option === WINNER;
+  const pct = Math.round((count / TOTAL_RUNS) * 100);
+  const row = document.createElement('div');
+  row.className = 'vote-row';
+  row.innerHTML = `
+    <span class="vote-option">${option}</span>
+    <div class="vote-bar-track">
+      <div class="vote-bar-fill${isWinner ? ' winner-bar' : ''}" data-pct="${pct}" style="width:0%"></div>
+    </div>
+    <span class="vote-count${isWinner ? ' winner-count' : ''}">${count}/${TOTAL_RUNS}</span>
+  `;
+  voteRows.appendChild(row);
+});
+
+// ============ ANIMATION ============
+let playing = false;
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function resetDemo() {
+  // hide all run cards
+  document.querySelectorAll('.run-card').forEach(c => {
+    c.classList.remove('shown', 'winner');
+  });
+  // hide vote box
+  document.getElementById('voteBox').classList.remove('shown');
+  // reset bars
+  document.querySelectorAll('.vote-bar-fill').forEach(b => { b.style.width = '0%'; });
+  // hide verdict
+  const verdict = document.getElementById('demoVerdict');
+  verdict.classList.remove('shown');
+  document.getElementById('verdictText').textContent = '';
+  document.getElementById('verdictNote').style.display = 'none';
+}
+
+async function playDemo() {
+  if (playing) return;
+  playing = true;
+  document.getElementById('demoPlayBtn').disabled = true;
+
+  resetDemo();
+
+  if (reduceMotion) {
+    // show everything instantly
+    document.querySelectorAll('.run-card').forEach((c, i) => {
+      c.classList.add('shown');
+      if (RUNS[i].answer === WINNER) c.classList.add('winner');
+    });
+    document.getElementById('voteBox').classList.add('shown');
+    document.querySelectorAll('.vote-bar-fill').forEach(b => {
+      b.style.width = b.dataset.pct + '%';
+    });
+    document.getElementById('verdictText').textContent = WINNER;
+    document.getElementById('demoVerdict').classList.add('shown');
+    document.getElementById('verdictNote').style.display = 'block';
+  } else {
+    await sleep(300);
+
+    // reveal runs one by one
+    const cards = document.querySelectorAll('.run-card');
+    for (let i = 0; i < cards.length; i++) {
+      cards[i].classList.add('shown');
+      await sleep(520);
+    }
+
+    await sleep(400);
+
+    // show vote box
+    document.getElementById('voteBox').classList.add('shown');
+    await sleep(200);
+
+    // animate bars
+    document.querySelectorAll('.vote-bar-fill').forEach(b => {
+      b.style.width = b.dataset.pct + '%';
+    });
+    await sleep(750);
+
+    // highlight winners
+    cards.forEach((c, i) => {
+      if (RUNS[i].answer === WINNER) c.classList.add('winner');
+    });
+    await sleep(400);
+
+    // show verdict
+    document.getElementById('verdictText').textContent = WINNER;
+    document.getElementById('demoVerdict').classList.add('shown');
+    await sleep(300);
+    document.getElementById('verdictNote').style.display = 'block';
+  }
+
+  playing = false;
+  document.getElementById('demoPlayBtn').disabled = false;
+}
+
+document.getElementById('demoPlayBtn').addEventListener('click', playDemo);
+document.getElementById('demoResetBtn').addEventListener('click', () => {
+  if (playing) return;
+  resetDemo();
+});
+
+// auto-play on load unless reduced motion
+if (!reduceMotion) {
+  playDemo();
+} else {
+  playDemo();  // still show everything, just instantly
+}
+
+// ============ WHEN IT MATTERS ============
+const queryCards = document.querySelectorAll('.query-card');
+const queryTracker = document.getElementById('queryTracker');
+const tested = new Set();
+
+queryCards.forEach(card => {
+  card.addEventListener('click', () => {
+    if (card.classList.contains('revealed')) return;
+    card.classList.add('revealed');
+    card.classList.add(card.dataset.verdict);
+    card.querySelector('.verdict .body').textContent = card.dataset.reason;
+    tested.add(card);
+    const n = tested.size;
+    if (n === queryCards.length) {
+      queryTracker.textContent = '✓ All 5 tested, pattern understood';
+      queryTracker.classList.add('complete');
+    } else {
+      queryTracker.textContent = `${n} / 5 tested`;
+    }
+  });
+});
+</script>
+
+</body>
+</html>
