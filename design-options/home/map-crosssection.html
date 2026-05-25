@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Pattern Book — Cross-Section</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ============ TOKENS (locked light look) ============ */
+  :root {
+    --bg: #FCFCFD;
+    --bg-subtle: #F6F7F9;
+    --surface: #FFFFFF;
+    --text: #15171C;
+    --text-soft: #565C68;
+    --text-faint: #8A909C;
+    --border: #E8EAEE;
+    --border-strong: #D5D9E0;
+    --accent: #7C5CF6;
+    --accent-hover: #6D4DE6;
+    --accent-soft: #F0ECFE;
+    --shadow-sm: 0 2px 4px rgba(16, 24, 40, .04);
+    --shadow-md: 0 6px 20px rgba(16, 24, 40, .07);
+    --shadow-lg: 0 12px 36px rgba(16, 24, 40, .10);
+    --node-glow: 0 6px 22px rgba(124, 92, 246, .28);
+    --nav-bg: rgba(252, 252, 253, .78);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--accent-soft); color: var(--text); }
+  a { color: inherit; text-decoration: none; }
+
+  /* ============ NAV ============ */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 13px clamp(16px, 5vw, 40px);
+    background: var(--nav-bg);
+    backdrop-filter: saturate(160%) blur(14px);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    min-width: 0;
+  }
+  .brand .word {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(16px, 2.6vw, 19px);
+    letter-spacing: -.01em;
+    white-space: nowrap;
+  }
+  .brand .word em { font-style: italic; font-weight: 500; color: var(--accent); }
+  .brand .sub {
+    font-size: 12.5px;
+    color: var(--text-faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .reset-btn {
+    flex: none;
+    height: 32px;
+    padding: 0 13px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-soft);
+    font-size: 12.5px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    transform: translateY(-2px);
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease, border-color .18s ease, color .18s ease;
+  }
+  .reset-btn.show { opacity: 1; transform: none; pointer-events: auto; }
+  .reset-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .reset-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .reset-btn svg { width: 13px; height: 13px; }
+
+  /* ============ STAGE ============ */
+  .stage {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: clamp(20px, 4vw, 40px) clamp(16px, 5vw, 40px) clamp(48px, 8vw, 96px);
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 22px;
+    margin-bottom: clamp(18px, 3vw, 26px);
+    font-size: 12.5px;
+    color: var(--text-soft);
+  }
+  .legend .grp { display: inline-flex; align-items: center; gap: 9px; }
+  .legend .swatch { width: 18px; height: 12px; border-radius: 3px; flex: none; }
+  .legend .swatch.strata { background: var(--surface); border: 1px solid var(--border-strong); }
+  .legend .swatch.conduit {
+    width: 4px; height: 18px; border-radius: 2px;
+    background: linear-gradient(180deg, var(--accent), var(--accent-hover));
+  }
+  .legend .swatch.route {
+    width: 18px; height: 4px; border-radius: 2px;
+    background: var(--accent);
+  }
+  .legend .hint {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  /* layout: cross-section + side rail of build chips */
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 232px;
+    gap: clamp(18px, 3vw, 34px);
+    align-items: start;
+  }
+
+  /* ============ THE CROSS-SECTION (the memorable image) ============ */
+  .section-shell {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    box-shadow: var(--shadow-lg);
+    padding: clamp(16px, 2.4vw, 26px);
+  }
+
+  .xsec {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1.06;
+  }
+
+  /* SVG overlay for conduits + routes (sits above bands, below labels) */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+    overflow: visible;
+  }
+
+  /* band grid lives behind overlay; flex column of 10 equal strata */
+  .bands {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    border-radius: 13px;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .band {
+    position: relative;
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    padding: 0 clamp(14px, 2.4vw, 26px);
+    cursor: pointer;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .band:last-child { border-bottom: 0; }
+  /* faint top-to-bottom shading so the strata read as depth (UX surface -> deep data) */
+  .band[data-depth="0"] { background: #FFFFFF; }
+  .band[data-depth="1"] { background: #FDFDFE; }
+  .band[data-depth="2"] { background: #FBFBFD; }
+  .band[data-depth="3"] { background: #F9FAFC; }
+  .band[data-depth="4"] { background: #F7F8FB; }
+  .band[data-depth="5"] { background: #F5F6FA; }
+  .band[data-depth="6"] { background: #F3F4F9; }
+  .band[data-depth="7"] { background: #F1F2F8; }
+  .band[data-depth="8"] { background: #EFF1F7; }
+  .band[data-depth="9"] { background: #ECEEF5; }
+
+  .band-index {
+    font-family: 'Inter', monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: var(--text-faint);
+    width: 26px;
+    flex: none;
+  }
+  .band-name {
+    font-size: clamp(12px, 1.9vw, 15px);
+    font-weight: 600;
+    letter-spacing: -.01em;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .band-count {
+    margin-left: 10px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+  .band-chev {
+    margin-left: auto;
+    color: var(--text-faint);
+    flex: none;
+    opacity: .5;
+    transition: opacity .18s ease, transform .18s ease, color .18s ease;
+  }
+  .band-chev svg { width: 16px; height: 16px; display: block; }
+
+  .band:hover {
+    background: var(--bg-subtle);
+    z-index: 2;
+  }
+  .band:hover .band-chev { opacity: 1; color: var(--accent); transform: translateX(2px); }
+  .band:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  /* band lit because it is part of an active build route */
+  .band.on-route {
+    background: var(--accent-soft);
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+  .band.on-route .band-name { color: var(--accent-hover); }
+  .band.on-route .band-index { color: var(--accent); }
+
+  /* band dimmed when a discipline conduit or a route is the focus */
+  .xsec.focusing .band:not(.on-route) { opacity: .92; }
+
+  /* ---- conduits (vertical, full-height) drawn in SVG ---- */
+  .conduit-line {
+    stroke: var(--border-strong);
+    stroke-width: 2.4;
+    fill: none;
+    transition: stroke .2s ease, stroke-width .2s ease, opacity .2s ease;
+    opacity: .55;
+  }
+  .conduit-hit {
+    stroke: transparent;
+    stroke-width: 18;
+    fill: none;
+    pointer-events: stroke;
+    cursor: pointer;
+  }
+  .conduit.lit .conduit-line {
+    stroke: var(--accent);
+    stroke-width: 3;
+    opacity: 1;
+    filter: drop-shadow(0 0 5px rgba(124,92,246,.5));
+  }
+  /* conduit cap dots at top + bottom */
+  .conduit-cap { fill: var(--border-strong); transition: fill .2s ease, r .2s ease; }
+  .conduit.lit .conduit-cap { fill: var(--accent); }
+
+  /* travelling pulse along a lit conduit / route */
+  .pulse-dot {
+    fill: var(--accent);
+    opacity: 0;
+  }
+  .conduit.lit .pulse-dot { opacity: 1; }
+
+  /* ---- route line (a build path through the strata) ---- */
+  .route-line {
+    stroke: var(--accent);
+    stroke-width: 2.6;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+    stroke-dasharray: 1;
+    transition: opacity .25s ease;
+  }
+  .route-line.draw {
+    opacity: 1;
+    animation: routeDraw .9s ease forwards;
+  }
+  @keyframes routeDraw {
+    from { stroke-dashoffset: var(--len); }
+    to { stroke-dashoffset: 0; }
+  }
+  .route-node { fill: var(--accent); opacity: 0; }
+  .route-node.draw { opacity: 1; }
+  .route-pulse { fill: #fff; stroke: var(--accent); stroke-width: 2.2; opacity: 0; }
+  .route-pulse.draw { opacity: 1; }
+
+  /* ============ SIDE RAIL ============ */
+  .rail { display: flex; flex-direction: column; gap: 22px; }
+  .rail-block .rail-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 11px;
+  }
+
+  .chips { display: flex; flex-direction: column; gap: 7px; }
+  .chip {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    text-align: left;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
+  }
+  .chip .chip-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex: none;
+    background: var(--border-strong);
+    transition: background .18s ease, box-shadow .18s ease;
+  }
+  .chip .chip-sub {
+    margin-left: auto;
+    font-size: 10.5px;
+    color: var(--text-faint);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .chip:hover { border-color: var(--accent); transform: translateX(2px); }
+  .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .chip.active {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent-hover);
+  }
+  .chip.active .chip-dot { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  /* discipline chips: vertical bar marker instead of dot */
+  .chip.disc .chip-dot {
+    width: 4px; height: 14px; border-radius: 2px;
+  }
+
+  /* ============ DRILL-IN PANEL (details hidden until click) ============ */
+  .panel-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: rgba(16, 24, 40, .28);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .22s ease;
+  }
+  .panel-scrim.open { opacity: 1; pointer-events: auto; }
+
+  .panel {
+    position: fixed;
+    z-index: 81;
+    top: 0; right: 0;
+    height: 100%;
+    width: min(420px, 92vw);
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(102%);
+    transition: transform .28s cubic-bezier(.4,.0,.2,1);
+    display: flex;
+    flex-direction: column;
+    overscroll-behavior: contain;
+  }
+  .panel.open { transform: none; }
+
+  .panel-head {
+    padding: 22px clamp(20px, 4vw, 28px) 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .panel-eyebrow .lyr { font-variant-numeric: tabular-nums; }
+  .panel-head h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(24px, 4vw, 30px);
+    letter-spacing: -.01em;
+    line-height: 1.06;
+  }
+  .panel-head p {
+    margin-top: 8px;
+    font-size: 13.5px;
+    color: var(--text-soft);
+    max-width: 36ch;
+  }
+  .panel-close {
+    position: absolute;
+    top: 18px; right: 18px;
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-soft);
+    cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .panel-close:hover { border-color: var(--accent); color: var(--accent); }
+  .panel-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .panel-close svg { width: 16px; height: 16px; }
+
+  .panel-body {
+    padding: 18px clamp(20px, 4vw, 28px) 28px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .panel-body .grp-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 4px 0 10px;
+  }
+  .pat-list { display: flex; flex-direction: column; gap: 8px; }
+  .pat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-subtle);
+    transition: border-color .16s ease, background .16s ease, transform .16s ease, box-shadow .16s ease;
+  }
+  .pat .pat-text { min-width: 0; }
+  .pat .pat-name { font-size: 14px; font-weight: 600; letter-spacing: -.01em; }
+  .pat .pat-desc { font-size: 12.5px; color: var(--text-soft); margin-top: 2px; }
+  .pat .pat-arr { margin-left: auto; color: var(--text-faint); flex: none; }
+  .pat .pat-arr svg { width: 16px; height: 16px; display: block; }
+  /* clickable pattern (has a real chapter) */
+  a.pat { cursor: pointer; }
+  a.pat:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    transform: translateX(2px);
+    box-shadow: var(--shadow-sm);
+  }
+  a.pat:hover .pat-arr { color: var(--accent); }
+  a.pat:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pat .pat-badge {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px 8px;
+    white-space: nowrap;
+    flex: none;
+  }
+  .panel-foot {
+    padding: 14px clamp(20px, 4vw, 28px);
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .rail {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 20px 28px;
+    }
+    .rail-block { flex: 1 1 240px; min-width: 0; }
+    .chips { gap: 6px; }
+  }
+
+  @media (max-width: 560px) {
+    .xsec { aspect-ratio: 1 / 1.5; }
+    .band-count { display: none; }
+    .legend .hint { display: none; }
+    /* conduits simplify to slim side markers on the left edge */
+    .overlay .conduit-line { stroke-width: 2; }
+  }
+
+  @media (max-width: 420px) {
+    .brand .sub { display: none; }
+    .band-index { width: 20px; }
+    .rail { flex-direction: column; }
+  }
+
+  /* ============ REDUCED MOTION ============ */
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+    .route-line.draw { animation: none; stroke-dashoffset: 0; }
+    .pulse-dot { display: none; }
+    .route-pulse { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="brand">
+      <span class="word">The <em>Pattern</em> Book</span>
+      <span class="sub">a cross-section of an AI system</span>
+    </div>
+    <button class="reset-btn" id="resetBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 4v4h4"/></svg>
+      Clear view
+    </button>
+  </nav>
+
+  <!-- THE STAGE -->
+  <main class="stage">
+
+    <div class="legend">
+      <span class="grp"><span class="swatch strata"></span> Layers</span>
+      <span class="grp"><span class="swatch conduit"></span> Disciplines &middot; cut through every layer</span>
+      <span class="grp"><span class="swatch route"></span> Builds &middot; a path through the layers</span>
+      <span class="hint">click a layer to look inside &middot; hover a discipline or build</span>
+    </div>
+
+    <div class="layout">
+
+      <!-- CROSS-SECTION -->
+      <div class="section-shell">
+        <div class="xsec" id="xsec">
+
+          <!-- the 10 strata -->
+          <div class="bands" id="bands"><!-- injected --></div>
+
+          <!-- conduits + build routes -->
+          <svg class="overlay" id="overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <g id="conduitLayer"></g>
+            <g id="routeLayer"></g>
+          </svg>
+
+        </div>
+      </div>
+
+      <!-- SIDE RAIL -->
+      <aside class="rail">
+        <div class="rail-block">
+          <div class="rail-title">Disciplines</div>
+          <div class="chips" id="discChips"><!-- injected --></div>
+        </div>
+        <div class="rail-block">
+          <div class="rail-title">Builds</div>
+          <div class="chips" id="buildChips"><!-- injected --></div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- DRILL-IN PANEL -->
+  <div class="panel-scrim" id="scrim"></div>
+  <aside class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitle" tabindex="-1">
+    <div class="panel-head">
+      <span class="panel-eyebrow"><span class="lyr" id="panelLyr">Layer</span> &middot; <span id="panelKind">stratum</span></span>
+      <h2 id="panelTitle">Layer</h2>
+      <p id="panelBlurb"></p>
+      <button class="panel-close" id="panelClose" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="panel-body">
+      <div class="grp-label">Patterns in this layer</div>
+      <div class="pat-list" id="patList"></div>
+    </div>
+    <div class="panel-foot" id="panelFoot">Two chapters are live in this preview.</div>
+  </aside>
+
+<script>
+(function () {
+  "use strict";
+
+  var reduceMotion = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- DATA: 10 strata, top -> bottom ---------- */
+  // each pattern: [name, desc, href?]   href present => live chapter
+  var STRATA = [
+    { name: "User Experience", blurb: "Where a person meets the system: turns, surfaces, and trust.",
+      patterns: [
+        ["Streaming Responses", "Show tokens as they arrive"],
+        ["Suggested Prompts", "Offer good first moves"],
+        ["Citations & Sources", "Make answers checkable"],
+        ["Feedback Capture", "Thumbs, edits, corrections"]
+      ] },
+    { name: "Application Patterns", blurb: "Recurring shapes of whole features built on a model.",
+      patterns: [
+        ["Conversational Q&A", "Chat over your domain"],
+        ["Summarisation", "Compress long inputs"],
+        ["Structured Extraction", "Text to clean fields"],
+        ["Classification & Routing", "Sort, label, dispatch"]
+      ] },
+    { name: "Orchestration & Agents", blurb: "Many model calls coordinated toward a goal.",
+      patterns: [
+        ["ReAct Loop", "Reason, act, observe"],
+        ["Planner / Executor", "Split thinking from doing"],
+        ["Tool Use", "Call functions and APIs"],
+        ["Multi-Agent Handoff", "Specialists pass work"]
+      ] },
+    { name: "Single-Call Control", blurb: "Shaping one model call so it behaves the way you need.",
+      patterns: [
+        ["Chain-of-Thought", "Make the steps explicit", "../../patterns/L4-chain-of-thought.html"],
+        ["Few-Shot Prompting", "Teach by example"],
+        ["Output Schemas", "Constrain the response"],
+        ["Self-Consistency", "Sample, then vote"]
+      ] },
+    { name: "Memory", blurb: "What the system carries between turns and sessions.",
+      patterns: [
+        ["Conversation Buffer", "Keep recent turns"],
+        ["Summary Memory", "Compress the history"],
+        ["Entity Memory", "Track people and facts"],
+        ["Long-Term Store", "Persist across sessions"]
+      ] },
+    { name: "Retrieval", blurb: "Finding the right context before the model answers.",
+      patterns: [
+        ["RAG", "Retrieve, then generate", "../../example/rag.html"],
+        ["Hybrid Search", "Dense plus keyword"],
+        ["Re-ranking", "Reorder by relevance"],
+        ["Chunking Strategies", "Split documents well"]
+      ] },
+    { name: "Composition", blurb: "Stitching prompts, context, and tools into one request.",
+      patterns: [
+        ["Prompt Templates", "Reusable, parameterised"],
+        ["Context Assembly", "Pack the window wisely"],
+        ["Function Schemas", "Describe the tools"],
+        ["Guardrail Wrapping", "Validate in and out"]
+      ] },
+    { name: "Training & Adaptation", blurb: "Bending a base model toward your task.",
+      patterns: [
+        ["Fine-Tuning", "Adjust the weights"],
+        ["LoRA / Adapters", "Cheap, modular tuning"],
+        ["Distillation", "Teach a smaller model"],
+        ["Preference Tuning", "Align to feedback"]
+      ] },
+    { name: "Serving & Infrastructure", blurb: "Running models in production, fast and reliably.",
+      patterns: [
+        ["Batching & KV Cache", "Throughput tricks"],
+        ["Model Routing", "Right model per request"],
+        ["Autoscaling", "Follow the load"],
+        ["Caching Layer", "Reuse past answers"]
+      ] },
+    { name: "Data & Artifacts", blurb: "The foundation: corpora, embeddings, indexes, and weights.",
+      patterns: [
+        ["Embedding Stores", "Vectors at rest"],
+        ["Document Corpora", "The source of truth"],
+        ["Versioned Datasets", "Reproducible inputs"],
+        ["Model Registry", "Track every artifact"]
+      ] }
+  ];
+
+  /* ---------- DISCIPLINES: vertical conduits across all layers ---------- */
+  // x is a horizontal position 0..100 across the cross-section
+  var DISCIPLINES = [
+    { name: "Evaluation",    x: 30, sub: "every layer" },
+    { name: "Safety",        x: 44, sub: "every layer" },
+    { name: "Privacy",       x: 56, sub: "every layer" },
+    { name: "Observability", x: 68, sub: "every layer" },
+    { name: "Cost",          x: 82, sub: "every layer" }
+  ];
+
+  /* ---------- BUILDS: a route touching specific strata ---------- */
+  // layers: indexes into STRATA (top=0 .. bottom=9). x: entry column for the route.
+  var BUILDS = [
+    { name: "Doc Q&A Assistant", sub: "5 layers", x: 22, layers: [0, 1, 5, 6, 9] },
+    { name: "Research Agent",    sub: "6 layers", x: 50, layers: [0, 2, 3, 4, 5, 9] },
+    { name: "Support Copilot",   sub: "5 layers", x: 76, layers: [0, 1, 4, 8, 9] }
+  ];
+
+  /* ---------- BUILD bands ---------- */
+  var bandsEl = document.getElementById('bands');
+  var bandEls = [];
+  STRATA.forEach(function (s, i) {
+    var b = document.createElement('button');
+    b.className = 'band';
+    b.type = 'button';
+    b.setAttribute('data-depth', String(i));
+    b.setAttribute('data-layer', String(i));
+    b.setAttribute('aria-label', 'Layer ' + (i + 1) + ': ' + s.name + ', open patterns');
+    b.innerHTML =
+      '<span class="band-index">' + String(i + 1).padStart(2, '0') + '</span>' +
+      '<span class="band-name">' + s.name + '</span>' +
+      '<span class="band-count">' + s.patterns.length + ' patterns</span>' +
+      '<span class="band-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>';
+    bandsEl.appendChild(b);
+    bandEls.push(b);
+  });
+
+  /* band vertical centers in 0..100 viewBox units (10 equal bands) */
+  function bandCenterY(i) { return (i + 0.5) * (100 / STRATA.length); }
+
+  /* ---------- BUILD conduits (SVG) ---------- */
+  var conduitLayer = document.getElementById('conduitLayer');
+  var conduitGroups = [];
+  DISCIPLINES.forEach(function (d, i) {
+    var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('class', 'conduit');
+    g.setAttribute('data-disc', String(i));
+
+    var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('class', 'conduit-line');
+    line.setAttribute('x1', d.x); line.setAttribute('y1', 0.5);
+    line.setAttribute('x2', d.x); line.setAttribute('y2', 99.5);
+    line.setAttribute('vector-effect', 'non-scaling-stroke');
+
+    var capTop = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    capTop.setAttribute('class', 'conduit-cap');
+    capTop.setAttribute('cx', d.x); capTop.setAttribute('cy', 1.4); capTop.setAttribute('r', 1.1);
+    var capBot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    capBot.setAttribute('class', 'conduit-cap');
+    capBot.setAttribute('cx', d.x); capBot.setAttribute('cy', 98.6); capBot.setAttribute('r', 1.1);
+
+    var pulse = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    pulse.setAttribute('class', 'pulse-dot');
+    pulse.setAttribute('cx', d.x); pulse.setAttribute('cy', 0); pulse.setAttribute('r', 1.5);
+
+    var hit = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    hit.setAttribute('class', 'conduit-hit');
+    hit.setAttribute('x1', d.x); hit.setAttribute('y1', 0);
+    hit.setAttribute('x2', d.x); hit.setAttribute('y2', 100);
+    hit.setAttribute('vector-effect', 'non-scaling-stroke');
+
+    g.appendChild(line);
+    g.appendChild(capTop);
+    g.appendChild(capBot);
+    g.appendChild(pulse);
+    g.appendChild(hit);
+    conduitLayer.appendChild(g);
+    conduitGroups.push({ g: g, pulse: pulse, x: d.x });
+  });
+
+  /* ---------- ROUTE layer ---------- */
+  var routeLayer = document.getElementById('routeLayer');
+
+  /* ---------- STATE ---------- */
+  var xsec = document.getElementById('xsec');
+  var activeDisc = -1;
+  var activeBuild = -1;
+  var resetBtn = document.getElementById('resetBtn');
+
+  function syncReset() {
+    var any = activeDisc !== -1 || activeBuild !== -1;
+    resetBtn.classList.toggle('show', any);
+  }
+
+  /* ---- conduit pulse animation (manual rAF, respects reduced motion) ---- */
+  var pulseRAF = null;
+  function animateConduitPulse(idx) {
+    if (reduceMotion) return;
+    cancelAnimationFrame(pulseRAF);
+    var pulse = conduitGroups[idx].pulse;
+    var start = null;
+    var DUR = 2200;
+    function frame(t) {
+      if (start === null) start = t;
+      var p = ((t - start) % DUR) / DUR;
+      pulse.setAttribute('cy', (p * 100).toFixed(2));
+      if (activeDisc === idx) pulseRAF = requestAnimationFrame(frame);
+    }
+    pulseRAF = requestAnimationFrame(frame);
+  }
+
+  function clearDiscipline() {
+    activeDisc = -1;
+    cancelAnimationFrame(pulseRAF);
+    conduitGroups.forEach(function (c) { c.g.classList.remove('lit'); });
+    discChipEls.forEach(function (c) { c.classList.remove('active'); });
+    if (activeBuild === -1) xsec.classList.remove('focusing');
+    syncReset();
+  }
+
+  function lightDiscipline(idx) {
+    clearBuild();      // disciplines and builds are mutually exclusive views
+    activeDisc = idx;
+    conduitGroups.forEach(function (c, i) { c.g.classList.toggle('lit', i === idx); });
+    discChipEls.forEach(function (c, i) { c.classList.toggle('active', i === idx); });
+    xsec.classList.add('focusing');
+    animateConduitPulse(idx);
+    syncReset();
+  }
+
+  /* ---- build route drawing ---- */
+  var routePulseRAF = null;
+  function clearBuild() {
+    activeBuild = -1;
+    cancelAnimationFrame(routePulseRAF);
+    routeLayer.innerHTML = '';
+    bandEls.forEach(function (b) { b.classList.remove('on-route'); });
+    buildChipEls.forEach(function (c) { c.classList.remove('active'); });
+    if (activeDisc === -1) xsec.classList.remove('focusing');
+    syncReset();
+  }
+
+  function lightBuild(idx) {
+    clearDiscipline();
+    activeBuild = idx;
+    var build = BUILDS[idx];
+    routeLayer.innerHTML = '';
+
+    // path points: enter at top, zig through each touched layer
+    var x = build.x;
+    var pts = build.layers.map(function (ly) { return { x: x, y: bandCenterY(ly) }; });
+    // gentle horizontal offset alternation so the route reads as a 3D-ish path
+    pts.forEach(function (pt, i) {
+      pt.x = x + (i % 2 === 0 ? -6 : 6);
+    });
+
+    // build a smooth polyline string
+    var dPath = 'M ' + pts[0].x.toFixed(2) + ' 0';
+    dPath += ' L ' + pts[0].x.toFixed(2) + ' ' + pts[0].y.toFixed(2);
+    for (var i = 1; i < pts.length; i++) {
+      var prev = pts[i - 1], cur = pts[i];
+      var midY = (prev.y + cur.y) / 2;
+      dPath += ' C ' + prev.x.toFixed(2) + ' ' + midY.toFixed(2) +
+               ' ' + cur.x.toFixed(2) + ' ' + midY.toFixed(2) +
+               ' ' + cur.x.toFixed(2) + ' ' + cur.y.toFixed(2);
+    }
+
+    var line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    line.setAttribute('class', 'route-line');
+    line.setAttribute('d', dPath);
+    line.setAttribute('vector-effect', 'non-scaling-stroke');
+    routeLayer.appendChild(line);
+
+    // measure length for dash animation
+    var len = 0;
+    try { len = line.getTotalLength(); } catch (e) { len = 300; }
+    line.style.setProperty('--len', len);
+    line.style.strokeDasharray = len;
+    line.style.strokeDashoffset = reduceMotion ? 0 : len;
+    // force reflow then add draw class
+    void line.getBoundingClientRect();
+    line.classList.add('draw');
+
+    // nodes at each touched layer
+    pts.forEach(function (pt) {
+      var node = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      node.setAttribute('class', 'route-node draw');
+      node.setAttribute('cx', pt.x); node.setAttribute('cy', pt.y);
+      node.setAttribute('r', 1.7);
+      node.setAttribute('vector-effect', 'non-scaling-stroke');
+      routeLayer.appendChild(node);
+    });
+
+    // travelling pulse along route
+    var rp = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    rp.setAttribute('class', 'route-pulse draw');
+    rp.setAttribute('r', 2.1);
+    rp.setAttribute('vector-effect', 'non-scaling-stroke');
+    routeLayer.appendChild(rp);
+
+    // light the touched bands
+    build.layers.forEach(function (ly) { bandEls[ly].classList.add('on-route'); });
+    buildChipEls.forEach(function (c, i) { c.classList.toggle('active', i === idx); });
+    xsec.classList.add('focusing');
+    syncReset();
+
+    // animate pulse traversing path
+    if (!reduceMotion && len > 0) {
+      var start = null;
+      var DUR = 2600;
+      cancelAnimationFrame(routePulseRAF);
+      function frame(t) {
+        if (start === null) start = t;
+        var p = ((t - start) % DUR) / DUR;
+        // wait for the draw to finish before moving (first 0.9s)
+        var pt = line.getPointAtLength(p * len);
+        rp.setAttribute('cx', pt.x);
+        rp.setAttribute('cy', pt.y);
+        if (activeBuild === idx) routePulseRAF = requestAnimationFrame(frame);
+      }
+      routePulseRAF = requestAnimationFrame(frame);
+    }
+  }
+
+  /* ---------- RAIL CHIPS ---------- */
+  var discChipsEl = document.getElementById('discChips');
+  var buildChipsEl = document.getElementById('buildChips');
+  var discChipEls = [];
+  var buildChipEls = [];
+
+  DISCIPLINES.forEach(function (d, i) {
+    var c = document.createElement('button');
+    c.className = 'chip disc';
+    c.type = 'button';
+    c.innerHTML = '<span class="chip-dot"></span><span>' + d.name + '</span><span class="chip-sub">' + d.sub + '</span>';
+    c.addEventListener('mouseenter', function () { if (activeBuild === -1) previewDiscipline(i); });
+    c.addEventListener('mouseleave', function () { if (!chipPinned) restoreView(); });
+    c.addEventListener('focus', function () { previewDiscipline(i); });
+    c.addEventListener('blur', function () { if (!chipPinned) restoreView(); });
+    c.addEventListener('click', function () { toggleDiscipline(i); });
+    discChipsEl.appendChild(c);
+    discChipEls.push(c);
+  });
+
+  BUILDS.forEach(function (b, i) {
+    var c = document.createElement('button');
+    c.className = 'chip';
+    c.type = 'button';
+    c.innerHTML = '<span class="chip-dot"></span><span>' + b.name + '</span><span class="chip-sub">' + b.sub + '</span>';
+    c.addEventListener('mouseenter', function () { if (activeDisc === -1) previewBuild(i); });
+    c.addEventListener('mouseleave', function () { if (!chipPinned) restoreView(); });
+    c.addEventListener('focus', function () { previewBuild(i); });
+    c.addEventListener('blur', function () { if (!chipPinned) restoreView(); });
+    c.addEventListener('click', function () { toggleBuild(i); });
+    buildChipsEl.appendChild(c);
+    buildChipEls.push(c);
+  });
+
+  /* hover = preview, click = pin. Pin survives mouseleave. */
+  var chipPinned = false;
+
+  function previewDiscipline(i) { if (!chipPinned) lightDiscipline(i); }
+  function previewBuild(i) { if (!chipPinned) lightBuild(i); }
+
+  function restoreView() {
+    clearDiscipline();
+    clearBuild();
+  }
+
+  function toggleDiscipline(i) {
+    if (chipPinned && activeDisc === i) { chipPinned = false; restoreView(); return; }
+    chipPinned = true;
+    lightDiscipline(i);
+  }
+  function toggleBuild(i) {
+    if (chipPinned && activeBuild === i) { chipPinned = false; restoreView(); return; }
+    chipPinned = true;
+    lightBuild(i);
+  }
+
+  /* conduit click in the SVG also pins the discipline */
+  conduitGroups.forEach(function (c, i) {
+    c.g.addEventListener('click', function () { toggleDiscipline(i); });
+    c.g.addEventListener('mouseenter', function () { if (!chipPinned && activeBuild === -1) lightDiscipline(i); });
+    c.g.addEventListener('mouseleave', function () { if (!chipPinned) restoreView(); });
+  });
+
+  resetBtn.addEventListener('click', function () {
+    chipPinned = false;
+    restoreView();
+  });
+
+  /* ---------- DRILL-IN PANEL ---------- */
+  var scrim = document.getElementById('scrim');
+  var panel = document.getElementById('panel');
+  var panelClose = document.getElementById('panelClose');
+  var panelTitle = document.getElementById('panelTitle');
+  var panelLyr = document.getElementById('panelLyr');
+  var panelKind = document.getElementById('panelKind');
+  var panelBlurb = document.getElementById('panelBlurb');
+  var panelFoot = document.getElementById('panelFoot');
+  var patList = document.getElementById('patList');
+  var lastFocused = null;
+
+  function openLayer(i) {
+    var s = STRATA[i];
+    panelLyr.textContent = 'Layer ' + String(i + 1).padStart(2, '0');
+    panelKind.textContent = 'stratum';
+    panelTitle.textContent = s.name;
+    panelBlurb.textContent = s.blurb;
+
+    patList.innerHTML = '';
+    var liveCount = 0;
+    s.patterns.forEach(function (p) {
+      var name = p[0], desc = p[1], href = p[2];
+      var node;
+      if (href) {
+        node = document.createElement('a');
+        node.className = 'pat';
+        node.href = href;
+        liveCount++;
+        node.innerHTML =
+          '<div class="pat-text">' +
+            '<div class="pat-name">' + name + '</div>' +
+            '<div class="pat-desc">' + desc + '</div>' +
+          '</div>' +
+          '<span class="pat-badge">Open chapter</span>' +
+          '<span class="pat-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>';
+      } else {
+        node = document.createElement('div');
+        node.className = 'pat';
+        node.innerHTML =
+          '<div class="pat-text">' +
+            '<div class="pat-name">' + name + '</div>' +
+            '<div class="pat-desc">' + desc + '</div>' +
+          '</div>';
+      }
+      patList.appendChild(node);
+    });
+
+    panelFoot.textContent = liveCount > 0
+      ? 'This chapter is live in the preview — the rest are coming.'
+      : 'Chapters for this layer are coming soon.';
+
+    lastFocused = document.activeElement;
+    scrim.classList.add('open');
+    panel.classList.add('open');
+    panel.focus();
+  }
+
+  function closePanel() {
+    scrim.classList.remove('open');
+    panel.classList.remove('open');
+    if (lastFocused && lastFocused.focus) lastFocused.focus();
+  }
+
+  bandEls.forEach(function (b, i) {
+    b.addEventListener('click', function () { openLayer(i); });
+  });
+  scrim.addEventListener('click', closePanel);
+  panelClose.addEventListener('click', closePanel);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      if (panel.classList.contains('open')) closePanel();
+      else if (chipPinned || activeDisc !== -1 || activeBuild !== -1) { chipPinned = false; restoreView(); }
+    }
+  });
+
+  syncReset();
+})();
+</script>
+</body>
+</html>
