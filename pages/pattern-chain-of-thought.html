@@ -9,14 +9,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:#FCFCFD; --bg-subtle:#F6F7F9; --surface:#FFFFFF;
-    --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    /* core palette: aligned to the rest of The Pattern Book */
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
     --border:#E8EAEE; --border-strong:#D5D9E0;
     --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
-    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#C2554F; --error-soft:#FBECEB;
-    --radius:16px; --radius-sm:11px;
-    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    /* extra tokens the interactive widgets need */
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#C2554F; --error-soft:#FBECEB;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
     --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,64 +40,53 @@
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
 
-  /* ============ TOP BAR ============ */
+  /* ============ TOP BAR (matches the layer page: slim, blurred, hairline) ============ */
   .topbar {
     position: sticky;
     top: 0;
     z-index: 200;
-    background: rgba(252,252,253,0.85);
-    backdrop-filter: saturate(180%) blur(12px);
-    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
     border-bottom: 1px solid var(--border);
   }
   .topbar-inner {
-    max-width: 900px;
+    max-width: 920px;
     margin: 0 auto;
-    padding: 13px 32px;
+    padding: 11px 24px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
     flex-wrap: wrap;
   }
-  .brand {
-    display: flex;
+  .back {
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
-    text-decoration: none;
-    flex: none;
-  }
-  .brand-mark {
-    width: 29px;
-    height: 29px;
-    border-radius: 8px;
-    display: grid;
-    place-items: center;
-    background: linear-gradient(145deg, #7C5CF6, #6D4DE6);
-    box-shadow: 0 4px 14px rgba(124,92,246,.25);
-    flex: none;
-  }
-  .brand-mark svg { width: 16px; height: 16px; display: block; }
-  .wordmark {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 19px;
-    letter-spacing: -0.01em;
-    color: var(--text);
-  }
-  .topbar .crumbs {
-    margin-left: auto;
+    gap: 6px;
     font-size: 13px;
     font-weight: 500;
-    color: var(--faint);
-    display: flex;
-    gap: 7px;
-    align-items: center;
-    flex-wrap: wrap;
+    color: var(--text);
+    text-decoration: none;
+    padding: 5px 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
   }
-  .topbar .crumbs a { color: var(--faint); text-decoration: none; transition: color 0.15s ease; }
-  .topbar .crumbs a:hover { color: var(--accent); }
-  .topbar .crumbs .sep { color: var(--border-strong); }
-  .topbar .crumbs .current { color: var(--soft); font-weight: 600; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb {
+    font-size: 12.5px;
+    color: var(--faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
 
   /* ============ TERM DEFINITIONS ============ */
   .term {
@@ -149,95 +140,88 @@
     transform: translateX(-50%) translateY(0);
   }
 
-  /* ============ HEADER ============ */
+  /* ============ HEADER (matches the layer page: eyebrow pill + clean title + intro) ============ */
   .header {
-    max-width: 900px;
+    max-width: 920px;
     margin: 0 auto;
-    padding: 48px 32px 24px;
+    padding: 40px 24px 8px;
     scroll-margin-top: 80px;
   }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--accent-hover);
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
   h1.pattern-title {
     scroll-margin-top: 80px;
     font-family: 'Fraunces', serif;
     font-weight: 500;
-    font-size: clamp(40px, 8vw, 72px);
-    line-height: 1.0;
-    letter-spacing: -0.02em;
-    margin-bottom: 10px;
+    font-size: 38px;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    margin: 16px 0 0;
   }
-  .full-name {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-weight: 400;
-    font-size: 22px;
+  .explainer {
     color: var(--soft);
-    margin-bottom: 32px;
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 660px;
+    margin-top: 14px;
   }
-  .meta-strip {
-    display: flex;
-    gap: 36px;
-    flex-wrap: wrap;
-    padding: 20px 0;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    font-size: 14px;
-  }
-  .meta-strip .item { color: var(--soft); }
-  .meta-strip .item strong {
-    display: block;
-    color: var(--faint);
-    font-size: 12px;
-    font-weight: 500;
-    margin-bottom: 5px;
-  }
-  .complexity-dots { display: inline-flex; gap: 5px; align-items: center; }
-  .complexity-dots span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--border-strong);
-  }
-  .complexity-dots span.on { background: var(--accent); }
 
-  /* ============ SECTIONS ============ */
+  /* ============ SECTIONS (calmer rhythm to match the lighter pages) ============ */
   section {
-    max-width: 900px;
+    max-width: 920px;
     margin: 0 auto;
-    padding: 52px 32px;
+    padding: 22px 24px 34px;
     position: relative;
     scroll-margin-top: 80px;
   }
   .section-label {
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
     color: var(--faint);
-    margin-bottom: 10px;
+    margin-bottom: 9px;
   }
-  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 6px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
   h2 {
     font-family: 'Fraunces', serif;
     font-weight: 500;
-    font-size: clamp(26px, 5vw, 38px);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    margin-bottom: 26px;
+    font-size: 23px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 18px;
   }
   h2 em { font-style: italic; color: var(--accent); }
 
   /* ============ THE IDEA ============ */
   .idea-stage {
-    background: var(--bg-subtle);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 36px;
+    box-shadow: var(--shadow);
+    padding: 30px 28px;
   }
   .tagline-big {
     font-family: 'Fraunces', serif;
     font-weight: 400;
-    font-size: clamp(24px, 4vw, 34px);
-    line-height: 1.3;
+    font-size: clamp(22px, 3.4vw, 28px);
+    line-height: 1.35;
     color: var(--text);
-    letter-spacing: -0.015em;
+    letter-spacing: -0.01em;
   }
   .tagline-big strong { color: var(--accent); font-weight: 500; }
   .idea-tip {
@@ -249,99 +233,181 @@
     color: var(--faint);
   }
 
-  /* ============ DATA FLOW ============ */
-  .diagram-stage {
+  /* ============ HOW IT WORKS: SYNCED DEMO (Section 02) ============ */
+  .demo-lede {
+    font-size: 15px;
+    color: var(--soft);
+    line-height: 1.6;
+    max-width: 640px;
+    margin-bottom: 18px;
+  }
+  .demo-stage {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 36px 28px 28px;
+    padding: 28px;
     box-shadow: var(--shadow);
   }
-  .diagram {
+  /* the question being worked on */
+  .demo-question {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin-bottom: 18px;
+  }
+  .demo-qlabel {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--faint);
+    margin-bottom: 6px;
+  }
+  .demo-qtext {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 19px;
+    line-height: 1.35;
+    color: var(--text);
+  }
+  /* the "paper" the model writes its reasoning on */
+  .demo-paper {
+    background: var(--bg-subtle);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    min-height: 168px;
     display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+  }
+  .demo-placeholder {
+    color: var(--faint);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    margin: auto;
+  }
+  .demo-placeholder.hidden { display: none; }
+  /* each reasoning line: hidden until its step, then fades / slides in */
+  .demo-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.3s ease;
+  }
+  .demo-line.shown { opacity: 1; transform: translateY(0); }
+  /* the line being written right now gets a soft highlight */
+  .demo-line.writing {
+    background: var(--accent-soft);
+    box-shadow: 0 4px 16px rgba(124,92,246,.16);
+  }
+  .demo-bullet {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    min-height: 120px;
-    padding: 8px 0;
-    margin-bottom: 28px;
-  }
-  .node {
-    background: var(--surface);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-sm);
-    padding: 16px 20px;
-    font-size: 13px;
-    font-weight: 600;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-    min-width: 92px;
-    text-align: center;
-    will-change: transform;
-  }
-  .node .sub {
-    display: block;
-    margin-top: 5px;
-    font-size: 12px;
-    color: var(--faint);
-    font-weight: 400;
-  }
-  .node.active {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
     background: var(--accent);
     color: #fff;
-    border-color: var(--accent);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 22px rgba(124,92,246,.28);
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 1px;
   }
-  .node.active .sub { color: rgba(255,255,255,0.85); }
-  .node.done {
-    background: var(--success-soft);
-    border-color: var(--success);
+  .demo-line-text {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text);
   }
-  .arrow-mark {
-    color: var(--faint);
-    font-size: 20px;
-    transition: color 0.3s ease;
+  .demo-line-text strong { font-weight: 600; color: var(--text); }
+  /* the final answer: clearly comes OUT of the last reasoning line */
+  .demo-answer {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-top: 4px;
+    margin-left: 26px;
+    padding: 14px 18px;
+    background: var(--text);
+    color: #fff;
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    position: relative;
   }
-  .arrow-mark .down { display: none; }
-  .arrow-mark.active { color: var(--accent); }
-  .arrow-mark.done { color: var(--success); }
-
-  .diagram-controls {
+  /* a small connector showing the answer drops out of the last line */
+  .demo-answer::before {
+    content: '';
+    position: absolute;
+    left: -14px;
+    top: -10px;
+    width: 2px;
+    height: 18px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.45s ease;
+  }
+  .demo-answer.shown { opacity: 1; transform: translateY(0) scale(1); }
+  .demo-answer.shown::before { opacity: 1; }
+  .demo-answer-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    flex-shrink: 0;
+  }
+  .demo-answer-text {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.4;
+  }
+  /* controls: caption (synced narration) + buttons */
+  .demo-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 20px;
+    padding-top: 18px;
+    margin-top: 18px;
     border-top: 1px solid var(--border);
     gap: 16px;
     flex-wrap: wrap;
-    min-height: 60px;
   }
-  .step-info {
+  .demo-caption {
     flex: 1;
-    min-width: 200px;
+    min-width: 220px;
     min-height: 52px;
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
-  .step-info .step-num {
+  .demo-caption-step {
     font-size: 12px;
     font-weight: 500;
-    color: var(--faint);
+    color: var(--accent-hover);
     margin-bottom: 4px;
+    min-height: 1em;
   }
-  .step-info .step-text {
+  .demo-caption-text {
     font-family: 'Fraunces', serif;
     font-weight: 400;
     font-size: 18px;
     color: var(--text);
     line-height: 1.35;
-    min-height: 1.35em;
   }
-  .diagram-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .demo-btns { display: flex; gap: 10px; flex-wrap: wrap; }
   .diagram-btn {
     padding: 10px 16px;
     border: 1px solid var(--border-strong);
@@ -358,57 +424,6 @@
   .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
   .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
   .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-
-  /* ============ REASONING TRACE (Section 02) ============ */
-  .trace {
-    background: var(--bg-subtle);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 16px 18px;
-    margin-top: 18px;
-    font-size: 14px;
-    color: var(--soft);
-    line-height: 1.6;
-    min-height: 84px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 6px;
-  }
-  .trace-empty {
-    color: var(--faint);
-    font-size: 13px;
-    font-weight: 500;
-    text-align: center;
-  }
-  .trace-empty.hidden { display: none; }
-  .trace-row {
-    padding: 8px 12px;
-    border-radius: var(--radius-sm);
-    background: var(--accent-soft);
-    border-left: 3px solid var(--accent);
-    opacity: 0;
-    transform: translateX(-6px);
-    transition: opacity 0.35s ease, transform 0.35s ease;
-    font-size: 14px;
-    line-height: 1.45;
-    color: var(--text);
-  }
-  .trace-row.shown { opacity: 1; transform: translateX(0); }
-  .trace-row .lead {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    margin-right: 9px;
-    flex-shrink: 0;
-  }
 
   /* ============ TOKENS CHIP STRIP (always visible, no hover) ============ */
   .tokens-explain {
@@ -821,9 +836,9 @@
 
   /* ============ SOURCES ============ */
   .sources {
-    max-width: 900px;
+    max-width: 920px;
     margin: 0 auto;
-    padding: 28px 32px 0;
+    padding: 28px 24px 0;
   }
   .sources .sources-title {
     font-size: 13px;
@@ -844,9 +859,9 @@
 
   /* ============ FOOTER ============ */
   footer {
-    max-width: 900px;
-    margin: 32px auto 60px;
-    padding: 28px 32px 0;
+    max-width: 920px;
+    margin: 30px auto 48px;
+    padding: 16px 24px 0;
     text-align: center;
     border-top: 1px solid var(--border);
     font-size: 12px;
@@ -856,23 +871,17 @@
   footer strong { color: var(--soft); font-weight: 500; }
 
   /* ============ RESPONSIVE ============ */
-  @media (max-width: 640px) {
-    .topbar .crumbs { margin-left: 0; width: 100%; }
-  }
   @media (max-width: 560px) {
-    .diagram { flex-direction: column; gap: 6px; }
-    .node { width: 100%; max-width: 280px; }
-    .arrow-mark { transform: rotate(90deg); font-size: 18px; }
-    .arrow-mark .right { display: none; }
-    .arrow-mark .down { display: inline; }
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
   }
   @media (max-width: 480px) {
-    .header, section, footer, .sources, .topbar-inner { padding-left: 20px; padding-right: 20px; }
     .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
     .tradeoff-label { min-width: 0; }
     .tradeoff-bars { width: 100%; }
-    .diagram-controls { flex-direction: column; align-items: stretch; }
-    .diagram-btns { justify-content: stretch; }
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .demo-btns { justify-content: stretch; }
     .diagram-btn { flex: 1; }
   }
 </style>
@@ -883,26 +892,15 @@
 <!-- TOP BAR -->
 <nav class="topbar">
   <div class="topbar-inner">
-    <a class="brand" href="../index.html">
-      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M12 3v18"/></svg></span>
-      <span class="wordmark">The Pattern Book</span>
-    </a>
-    <div class="crumbs">
-      <a href="../index.html">The Pattern Book</a>
-      <span class="sep">/</span>
-      <a href="layers.html">Layers</a>
-      <span class="sep">/</span>
-      <a href="layer-single-call-control.html">Single-call control</a>
-      <span class="sep">/</span>
-      <span class="current">Chain-of-Thought</span>
-    </div>
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-single-call-control.html">Single-call control</a><span class="sep">/</span><span class="here">Chain-of-Thought</span></nav>
   </div>
 </nav>
 
 <!-- HEADER -->
 <header class="header" id="main">
-  <h1 class="pattern-title"><span aria-hidden="true">CoT.</span><span class="sr-only">Chain-of-Thought</span></h1>
-  <div class="full-name">Chain-of-Thought</div>
+  <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>Pattern</span>
+  <h1 class="pattern-title">Chain-of-Thought</h1>
 </header>
 
 <!-- 01 · THE IDEA -->
@@ -921,32 +919,49 @@
   <div class="section-label"><span class="num">02</span>Data Flow</div>
   <h2>How it <em>works</em>.</h2>
 
-  <div class="diagram-stage">
-    <div class="diagram" id="diagram">
-      <div class="node" data-step="0">USER<span class="sub">Hard question</span></div>
-      <span class="arrow-mark" data-step="0" aria-hidden="true"><span class="right">&rarr;</span><span class="down">&darr;</span></span>
-      <div class="node" data-step="1">MODEL<span class="sub">Reasons first</span></div>
-      <span class="arrow-mark" data-step="1" aria-hidden="true"><span class="right">&rarr;</span><span class="down">&darr;</span></span>
-      <div class="node" data-step="2">ANSWER<span class="sub">From the steps</span></div>
+  <p class="demo-lede">Watch the model answer one small question. Instead of jumping to a number, it writes its thinking out loud, line by line, and the answer falls out of the last line.</p>
+
+  <div class="demo-stage">
+    <!-- The question being worked on -->
+    <div class="demo-question">
+      <span class="demo-qlabel">Question</span>
+      <span class="demo-qtext">3 baskets, each with 6 apples. I eat 4 apples. How many are left?</span>
     </div>
-    <div class="diagram-controls">
-      <div class="step-info" aria-live="polite">
-        <div class="step-num" id="stepNum">Step 0 of 3</div>
-        <div class="step-text" id="stepText">Press play, or tap Step, to walk through it.</div>
+
+    <!-- The model's reasoning, written one line at a time, with the answer at the end -->
+    <div class="demo-paper" id="demoPaper" aria-live="polite">
+      <div class="demo-placeholder" id="demoPlaceholder">Press Play to watch the model write its thinking.</div>
+
+      <div class="demo-line" data-reveal="0">
+        <span class="demo-bullet" aria-hidden="true">1</span>
+        <span class="demo-line-text">There are <strong>3 baskets</strong>, and each one has <strong>6 apples</strong>.</span>
       </div>
-      <div class="diagram-btns">
-        <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
-        <button class="diagram-btn primary" id="playFlowBtn">&#9654; Play</button>
-        <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+      <div class="demo-line" data-reveal="1">
+        <span class="demo-bullet" aria-hidden="true">2</span>
+        <span class="demo-line-text">So in total: <strong>3 &times; 6 = 18 apples</strong>.</span>
+      </div>
+      <div class="demo-line" data-reveal="2">
+        <span class="demo-bullet" aria-hidden="true">3</span>
+        <span class="demo-line-text">I eat 4 of those 18, so <strong>18 &minus; 4 = 14</strong>.</span>
+      </div>
+
+      <div class="demo-answer" data-reveal="3" id="demoAnswer">
+        <span class="demo-answer-label">Answer</span>
+        <span class="demo-answer-text"><strong>14 apples are left.</strong></span>
       </div>
     </div>
 
-    <!-- The three points. Each reveals on its matching step. -->
-    <div class="trace" id="trace">
-      <div class="trace-empty" id="traceEmpty">Step through the flow above. Each idea below lights up on its step.</div>
-      <div class="trace-row" data-reveal="0"><span class="lead" aria-hidden="true">1</span>Instead of answering at once, it writes its thinking out as <span class="term" tabindex="0" role="button" aria-label="tokens: The small word-sized pieces of text a model reads and writes, one after another. See the chips just below this box." data-def="The small word-sized pieces of text a model reads and writes, one after another. See the chips just below.">tokens</span>, left to right.</div>
-      <div class="trace-row" data-reveal="1"><span class="lead" aria-hidden="true">2</span>Each step it writes, it reads back, so each one builds on the last.</div>
-      <div class="trace-row" data-reveal="2"><span class="lead" aria-hidden="true">3</span>By the end, the answer comes straight out of that thinking, not a guess.</div>
+    <div class="demo-controls">
+      <!-- one caption that narrates exactly what is on screen right now -->
+      <div class="demo-caption" aria-live="polite">
+        <div class="demo-caption-step" id="demoCapStep">&nbsp;</div>
+        <div class="demo-caption-text" id="demoCapText">An apple problem with two small steps. A guess could miss it. Watch what the model does instead.</div>
+      </div>
+      <div class="demo-btns">
+        <button class="diagram-btn" id="demoStepBtn">&rarr; Step</button>
+        <button class="diagram-btn primary" id="demoPlayBtn">&#9654; Play</button>
+        <button class="diagram-btn" id="demoResetBtn">&#8635; Reset</button>
+      </div>
     </div>
   </div>
 
@@ -1146,87 +1161,116 @@
 </footer>
 
 <script>
-// ============ DIAGRAM ============
-const TOTAL = 3;
-const nodes = document.querySelectorAll('.node');
-const arrows = document.querySelectorAll('.arrow-mark');
-const stepNum = document.getElementById('stepNum');
-const stepText = document.getElementById('stepText');
-const stepBtn = document.getElementById('stepBtn');
-const playFlowBtn = document.getElementById('playFlowBtn');
-const resetBtn = document.getElementById('resetBtn');
-const traceRows = document.querySelectorAll('.trace-row');
-const traceEmpty = document.getElementById('traceEmpty');
+// ============ HOW IT WORKS: SYNCED DEMO ============
+// One reveal at a time. Each reveal lights up a reasoning line (or the answer)
+// AND swaps the single caption so the words match exactly what just appeared.
+const demoPlaceholder = document.getElementById('demoPlaceholder');
+const demoLines = document.querySelectorAll('.demo-line');     // 3 reasoning lines, data-reveal 0..2
+const demoAnswer = document.getElementById('demoAnswer');       // the answer, data-reveal 3
+const demoCapStep = document.getElementById('demoCapStep');
+const demoCapText = document.getElementById('demoCapText');
+const demoStepBtn = document.getElementById('demoStepBtn');
+const demoPlayBtn = document.getElementById('demoPlayBtn');
+const demoResetBtn = document.getElementById('demoResetBtn');
 
-// One label AND one trace point per node, indices 0,1,2 lined up.
-const stepLabels = [
-  { num: 'Step 1 of 3', text: 'The user asks something you have to work out, not just remember.' },
-  { num: 'Step 2 of 3', text: 'Instead of answering, the model writes its reasoning first.' },
-  { num: 'Step 3 of 3', text: 'The answer comes out of the last step, not a guess.' }
+// 4 reveals (3 reasoning lines + 1 answer). The caption narrates what is on
+// screen at that exact moment. These are the old three ideas, now synced.
+const DEMO_TOTAL = 4;
+const demoCaptions = [
+  { step: 'Writing its thinking', text: 'Instead of answering at once, it writes its thinking out, one step at a time.' },
+  { step: 'Building on the step before', text: 'Each step it writes, it reads back, so this one builds on the last: 3 × 6 = 18.' },
+  { step: 'Still building, step by step', text: 'It carries that 18 forward, takes away the 4, and lands on the last step.' },
+  { step: 'The answer falls out', text: 'The answer comes straight out of that last step, not a guess: 18 − 4 = 14.' }
 ];
+const demoStart = { step: '', text: 'An apple problem with two small steps. A guess could miss it. Watch what the model does instead.' };
+const demoEnd = { step: 'Done', text: '✓ It wrote out its working first, and the right answer fell out of it.' };
 
-let currentStep = -1;
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Reveal trace points up to and including the current step.
-// Each .trace-row has data-reveal 0,1,2 matching the three steps.
-function setTrace(uptoStep) {
-  traceRows.forEach(r => {
-    const at = parseInt(r.dataset.reveal, 10);
-    r.classList.toggle('shown', uptoStep >= 0 && at <= uptoStep);
-  });
-  if (traceEmpty) traceEmpty.classList.toggle('hidden', uptoStep >= 0);
+// reveal index r: 0..2 = reasoning lines, 3 = answer.
+function demoReveal(r, isWriting) {
+  if (demoPlaceholder) demoPlaceholder.classList.add('hidden');
+  if (r < 3) {
+    demoLines.forEach(l => l.classList.remove('writing'));
+    demoLines[r].classList.add('shown');
+    if (isWriting) demoLines[r].classList.add('writing');
+  } else {
+    demoLines.forEach(l => l.classList.remove('writing'));
+    demoAnswer.classList.add('shown');
+  }
+  const c = demoCaptions[r];
+  demoCapStep.textContent = c.step || ' ';
+  demoCapText.textContent = c.text;
 }
 
-function setStep(s) {
-  nodes.forEach(n => n.classList.remove('active', 'done'));
-  arrows.forEach(a => a.classList.remove('active', 'done'));
-  if (s < 0) {
-    stepNum.textContent = 'Step 0 of 3';
-    stepText.textContent = 'Press play, or tap Step, to walk through it.';
-    setTrace(-1);
-    return;
-  }
-  for (let i = 0; i < s; i++) {
-    nodes[i].classList.add('done');
-    if (arrows[i]) arrows[i].classList.add('done');
-  }
-  nodes[s].classList.add('active');
-  if (arrows[s]) arrows[s].classList.add('active');
-  stepNum.textContent = stepLabels[s].num;
-  stepText.textContent = stepLabels[s].text;
-  // reveal each point as we reach its step, so every step (incl. 2) fills the box
-  setTrace(s);
+function demoReset() {
+  demoLines.forEach(l => l.classList.remove('shown', 'writing'));
+  demoAnswer.classList.remove('shown');
+  if (demoPlaceholder) demoPlaceholder.classList.remove('hidden');
+  demoCapStep.textContent = demoStart.step || ' ';
+  demoCapText.textContent = demoStart.text;
+  demoStep = -1;
 }
 
-stepBtn.addEventListener('click', () => {
-  currentStep = (currentStep + 1) % TOTAL;
-  setStep(currentStep);
-});
+// show the whole thing at once (used for reduced-motion and as a final state)
+function demoShowAll() {
+  if (demoPlaceholder) demoPlaceholder.classList.add('hidden');
+  demoLines.forEach(l => { l.classList.add('shown'); l.classList.remove('writing'); });
+  demoAnswer.classList.add('shown');
+  demoCapStep.textContent = demoEnd.step;
+  demoCapText.textContent = demoEnd.text;
+  demoStep = DEMO_TOTAL - 1;
+}
 
-let playing = false;
-playFlowBtn.addEventListener('click', async () => {
-  if (playing) return;
-  playing = true;
-  playFlowBtn.disabled = true;
-  for (let i = 0; i < TOTAL; i++) {
-    currentStep = i;
-    setStep(i);
-    await sleep(i === 1 ? 1400 : 850);
+let demoStep = -1;     // last revealed index
+let demoPlaying = false;
+
+// Step button: reveal the next line/answer, one tap at a time
+demoStepBtn.addEventListener('click', () => {
+  if (demoPlaying) return;
+  if (demoStep >= DEMO_TOTAL - 1) { demoReset(); return; }
+  demoStep += 1;
+  // when stepping, mark a reasoning line as "writing" only if it's the newest one
+  demoReveal(demoStep, demoStep < 3);
+  if (demoStep === DEMO_TOTAL - 1) {
+    // settle on the end caption once the answer is up
+    demoLines.forEach(l => l.classList.remove('writing'));
   }
-  await sleep(300);
-  nodes.forEach(n => { n.classList.remove('active'); n.classList.add('done'); });
-  arrows.forEach(a => { a.classList.remove('active'); a.classList.add('done'); });
-  setTrace(2); // keep all three points visible at the end
-  stepNum.textContent = 'Complete';
-  stepText.textContent = '✓ Steps shown, answer built from them.';
-  playing = false;
-  playFlowBtn.disabled = false;
 });
 
-resetBtn.addEventListener('click', () => {
-  currentStep = -1;
-  setStep(-1);
+// Play button: auto-reveal each line, then the answer, captions in lockstep
+demoPlayBtn.addEventListener('click', async () => {
+  if (demoPlaying) return;
+  if (reduceMotion) { demoShowAll(); return; }
+  demoPlaying = true;
+  demoPlayBtn.disabled = true;
+  demoStepBtn.disabled = true;
+  demoReset();
+  await sleep(250);
+  for (let r = 0; r < 3; r++) {
+    demoReveal(r, true);          // line appears + its caption, highlighted as "being written"
+    await sleep(1500);
+    demoLines[r].classList.remove('writing');
+    await sleep(200);
+  }
+  await sleep(250);
+  demoReveal(3, false);           // answer drops out of the last line + final caption
+  demoPlaying = false;
+  demoPlayBtn.disabled = false;
+  demoStepBtn.disabled = false;
 });
+
+demoResetBtn.addEventListener('click', () => {
+  if (demoPlaying) return;
+  demoReset();
+});
+
+// Reduced motion: teach immediately, no animation needed.
+if (reduceMotion) {
+  demoShowAll();
+} else {
+  demoReset();
+}
 
 // ============ QUERIES ============
 const queryCards = document.querySelectorAll('.query-card');
