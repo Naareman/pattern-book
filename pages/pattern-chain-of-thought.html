@@ -144,8 +144,6 @@
     transition: opacity 0.18s ease, transform 0.18s ease;
     z-index: 100;
   }
-  .term:hover::after, .term:hover::before,
-  .term:focus::after, .term:focus::before,
   .term.open::after, .term.open::before {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
@@ -397,7 +395,63 @@
     color: var(--text);
   }
   .trace-row.shown { opacity: 1; transform: translateX(0); }
-  .trace-row .lead { color: var(--accent); font-weight: 600; margin-right: 8px; }
+  .trace-row .lead {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 9px;
+    flex-shrink: 0;
+  }
+
+  /* ============ TOKENS CHIP STRIP (always visible, no hover) ============ */
+  .tokens-explain {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin-bottom: 22px;
+  }
+  .tokens-explain .lede {
+    font-size: 14px;
+    color: var(--soft);
+    line-height: 1.55;
+    margin-bottom: 12px;
+  }
+  .tokens-explain .lede b { color: var(--accent-hover); font-weight: 600; }
+  .token-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+  .token-chip {
+    display: inline-block;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 7px;
+    padding: 5px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    box-shadow: var(--shadow-sm);
+    animation: chip-pop 0.4s ease both;
+  }
+  @keyframes chip-pop { from { opacity: 0; transform: translateY(4px) scale(0.96); } to { opacity: 1; transform: none; } }
+  .token-caption {
+    margin-top: 11px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--faint);
+    line-height: 1.5;
+  }
 
   /* ============ WHEN IT WORKS / FAILS ============ */
   .test-stage {
@@ -849,23 +903,6 @@
 <header class="header" id="main">
   <h1 class="pattern-title"><span aria-hidden="true">CoT.</span><span class="sr-only">Chain-of-Thought</span></h1>
   <div class="full-name">Chain-of-Thought</div>
-  <div class="meta-strip">
-    <div class="item">
-      <strong>Layer</strong>Single-call control
-    </div>
-    <div class="item">
-      <strong>Complexity</strong>
-      <div class="complexity-dots">
-        <span class="on"></span><span class="on"></span><span></span><span></span><span></span>
-      </div>
-    </div>
-    <div class="item">
-      <strong>Tags</strong>in-prompt . reasoning . zero-shot
-    </div>
-    <div class="item">
-      <strong>Updated</strong>May 2026
-    </div>
-  </div>
 </header>
 
 <!-- 01 · THE IDEA -->
@@ -874,16 +911,16 @@
   <h2>What is <em>Chain-of-Thought</em>?</h2>
   <div class="idea-stage">
     <div class="tagline-big">
-      Models blurt the first answer that comes to mind. Chain-of-Thought makes them <strong>show their work first</strong>, and writing the steps is what makes the answer right.
+      Models jump straight to the first answer that comes to mind. Chain-of-Thought makes them <strong>show their work first</strong>, and writing the steps is what makes the answer right.
     </div>
-    <div class="idea-tip">How it works lives in Section 02</div>
   </div>
 </section>
 
 <!-- 02 · DATA FLOW -->
 <section>
   <div class="section-label"><span class="num">02</span>Data Flow</div>
-  <h2>How it <em>moves</em>.</h2>
+  <h2>How it <em>works</em>.</h2>
+
   <div class="diagram-stage">
     <div class="diagram" id="diagram">
       <div class="node" data-step="0">USER<span class="sub">Hard question</span></div>
@@ -895,7 +932,7 @@
     <div class="diagram-controls">
       <div class="step-info" aria-live="polite">
         <div class="step-num" id="stepNum">Step 0 of 3</div>
-        <div class="step-text" id="stepText">Press play to walk through each step.</div>
+        <div class="step-text" id="stepText">Press play, or tap Step, to walk through it.</div>
       </div>
       <div class="diagram-btns">
         <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
@@ -903,12 +940,29 @@
         <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
       </div>
     </div>
+
+    <!-- The three points. Each reveals on its matching step. -->
     <div class="trace" id="trace">
-      <div class="trace-empty" id="traceEmpty">Step to the model. Its reasoning appears here.</div>
-      <div class="trace-row" data-step="1"><span class="lead">1</span>It writes the steps out as <span class="term" tabindex="0" role="button" aria-label="tokens: The pieces of text a model reads and writes, roughly word-sized, produced one after another." data-def="The pieces of text a model reads and writes, roughly word-sized, produced one after another.">tokens</span>, left to right, like talking out loud.</div>
-      <div class="trace-row" data-step="1"><span class="lead">2</span>Each step it writes becomes part of what it reads next.</div>
-      <div class="trace-row" data-step="1"><span class="lead">3</span>By the final step, the answer is forced by the work, not guessed.</div>
+      <div class="trace-empty" id="traceEmpty">Step through the flow above. Each idea below lights up on its step.</div>
+      <div class="trace-row" data-reveal="0"><span class="lead" aria-hidden="true">1</span>It writes the steps out as <span class="term" tabindex="0" role="button" aria-label="tokens: The small word-sized pieces of text a model reads and writes, one after another. See the chips just below this box." data-def="The small word-sized pieces of text a model reads and writes, one after another. See the chips just below.">tokens</span>, left to right, like talking out loud.</div>
+      <div class="trace-row" data-reveal="1"><span class="lead" aria-hidden="true">2</span>Each step it writes becomes part of what it reads next, so the reasoning feeds itself.</div>
+      <div class="trace-row" data-reveal="2"><span class="lead" aria-hidden="true">3</span>By the final step, the answer is forced by the work, not guessed.</div>
     </div>
+  </div>
+
+  <!-- What "tokens" are, always visible -->
+  <div class="tokens-explain">
+    <div class="lede">A token is a small piece of text, about a word:</div>
+    <div class="token-chips" aria-label="The sentence broken into tokens">
+      <span class="token-chip">Let</span>
+      <span class="token-chip">'s</span>
+      <span class="token-chip">think</span>
+      <span class="token-chip">step</span>
+      <span class="token-chip">by</span>
+      <span class="token-chip">step</span>
+      <span class="token-chip">.</span>
+    </div>
+    <div class="token-caption">The model writes one at a time, left to right.</div>
   </div>
 </section>
 
@@ -998,7 +1052,7 @@
 
     <div class="dossier-final" data-row="4">
       <div class="label">Answer returned to user</div>
-      <div class="answer">"10 rooms are left unpainted." The answer is just the last step, and every step before it was easy to check. <span class="cite">Asked cold, with no steps, models often blurt a wrong number here.</span></div>
+      <div class="answer">"10 rooms are left unpainted." The answer is just the last step, and every step before it was easy to check. <span class="cite">Asked cold, with no steps, models often jump to a wrong number here.</span></div>
     </div>
 
     <div class="dossier-replay">
@@ -1015,13 +1069,11 @@
     <div class="code-hint">Tap a line to see what it does. The whole pattern is one change to the <span class="term" tabindex="0" role="button" aria-label="prompt: The text you send the model. Everything it sees before it starts writing." data-def="The text you send the model. Everything it sees before it starts writing.">prompt</span>.</div>
     <pre class="code"><code id="codeBlock"><span class="code-line" data-line="0"><span class="comment"># the trick: ask for the reasoning before the answer</span></span>
 <span class="code-line" data-line="1">prompt = question + <span class="str">"\nLet's think step by step."</span></span>
-<span class="code-line" data-line="2"> </span>
-<span class="code-line" data-line="3"><span class="comment"># the model writes its steps, then lands on an answer</span></span>
-<span class="code-line" data-line="4">response = model(prompt)</span>
-<span class="code-line" data-line="5"> </span>
-<span class="code-line" data-line="6"><span class="comment"># reasoning is everything above; the answer is the last line</span></span>
-<span class="code-line" data-line="7">answer = response.splitlines()[<span class="str">-1</span>]</span>
-<span class="code-line" data-line="8"><span class="kw">return</span> answer, response</span></code></pre>
+<span class="code-line" data-line="2"><span class="comment"># the model writes its steps, then lands on an answer</span></span>
+<span class="code-line" data-line="3">response = model(prompt)</span>
+<span class="code-line" data-line="4"><span class="comment"># reasoning is everything above; the answer is the last line</span></span>
+<span class="code-line" data-line="5">answer = response.splitlines()[<span class="str">-1</span>]</span>
+<span class="code-line" data-line="6"><span class="kw">return</span> answer, response</span></code></pre>
     <div class="code-explainer" id="codeExplainer" aria-live="polite">
       <div class="hint">Tap a line above</div>
     </div>
@@ -1064,7 +1116,7 @@
       </div>
     </div>
     <div class="tradeoff-quote">
-      One sentence in the prompt buys the model's reasoning. Gold on hard problems, noise on easy ones.
+      Asking the AI to think step by step helps a lot on hard problems, but is wasted on easy ones.
     </div>
   </div>
 </section>
@@ -1106,6 +1158,7 @@ const resetBtn = document.getElementById('resetBtn');
 const traceRows = document.querySelectorAll('.trace-row');
 const traceEmpty = document.getElementById('traceEmpty');
 
+// One label AND one trace point per node, indices 0,1,2 lined up.
 const stepLabels = [
   { num: 'Step 1 of 3', text: 'The user asks something that takes more than recall.' },
   { num: 'Step 2 of 3', text: 'Instead of answering, the model writes its reasoning first.' },
@@ -1114,9 +1167,14 @@ const stepLabels = [
 
 let currentStep = -1;
 
-function setTrace(active) {
-  traceRows.forEach(r => r.classList.toggle('shown', active));
-  if (traceEmpty) traceEmpty.classList.toggle('hidden', active);
+// Reveal trace points up to and including the current step.
+// Each .trace-row has data-reveal 0,1,2 matching the three steps.
+function setTrace(uptoStep) {
+  traceRows.forEach(r => {
+    const at = parseInt(r.dataset.reveal, 10);
+    r.classList.toggle('shown', uptoStep >= 0 && at <= uptoStep);
+  });
+  if (traceEmpty) traceEmpty.classList.toggle('hidden', uptoStep >= 0);
 }
 
 function setStep(s) {
@@ -1124,8 +1182,8 @@ function setStep(s) {
   arrows.forEach(a => a.classList.remove('active', 'done'));
   if (s < 0) {
     stepNum.textContent = 'Step 0 of 3';
-    stepText.textContent = 'Press play to walk through each step.';
-    setTrace(false);
+    stepText.textContent = 'Press play, or tap Step, to walk through it.';
+    setTrace(-1);
     return;
   }
   for (let i = 0; i < s; i++) {
@@ -1136,8 +1194,8 @@ function setStep(s) {
   if (arrows[s]) arrows[s].classList.add('active');
   stepNum.textContent = stepLabels[s].num;
   stepText.textContent = stepLabels[s].text;
-  // the reasoning trace belongs to the MODEL step (index 1)
-  setTrace(s === 1);
+  // reveal each point as we reach its step, so every step (incl. 2) fills the box
+  setTrace(s);
 }
 
 stepBtn.addEventListener('click', () => {
@@ -1158,7 +1216,7 @@ playFlowBtn.addEventListener('click', async () => {
   await sleep(300);
   nodes.forEach(n => { n.classList.remove('active'); n.classList.add('done'); });
   arrows.forEach(a => { a.classList.remove('active'); a.classList.add('done'); });
-  setTrace(false);
+  setTrace(2); // keep all three points visible at the end
   stepNum.textContent = 'Complete';
   stepText.textContent = '✓ Reasoning shown, answer grounded in it.';
   playing = false;
@@ -1228,11 +1286,7 @@ const codeExplainer = document.getElementById('codeExplainer');
 const codeExplanations = [
   "The one move that makes it Chain-of-Thought: ask the model to reason before it answers.",
   "Append the trigger phrase. 'Let's think step by step' is enough to switch on reasoning, no examples needed.",
-  "",
-  "Comment for the model call.",
   "Send it. The model writes its reasoning, then lands on a final answer.",
-  "",
-  "Comment: where the answer is.",
   "Take the last line as the answer. The lines above it are the reasoning that produced it.",
   "Return both, so you can check the work, not just the result."
 ];
@@ -1243,12 +1297,7 @@ function showExplanation(line) {
   codeLines.forEach(l => l.classList.remove('active'));
   line.classList.add('active');
   const idx = parseInt(line.dataset.line);
-  const text = codeExplanations[idx];
-  if (text) {
-    codeExplainer.textContent = text;
-  } else {
-    codeExplainer.innerHTML = '<div class="hint">(blank line)</div>';
-  }
+  codeExplainer.textContent = codeExplanations[idx];
 }
 
 codeLines.forEach(line => {
@@ -1268,14 +1317,24 @@ codeLines.forEach(line => {
   });
 });
 
-// ============ TERM TOOLTIPS (tap toggle on touch) ============
+// ============ TERM DEFINITIONS (tap / Enter / Space to toggle) ============
 const terms = document.querySelectorAll('.term');
+function toggleTerm(term) {
+  const wasOpen = term.classList.contains('open');
+  terms.forEach(t => t.classList.remove('open'));
+  if (!wasOpen) term.classList.add('open');
+}
 terms.forEach(term => {
   term.addEventListener('click', (e) => {
     e.stopPropagation();
-    const wasOpen = term.classList.contains('open');
-    terms.forEach(t => t.classList.remove('open'));
-    if (!wasOpen) term.classList.add('open');
+    toggleTerm(term);
+  });
+  term.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleTerm(term);
+    }
   });
 });
 document.addEventListener('click', () => {
