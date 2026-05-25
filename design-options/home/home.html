@@ -46,9 +46,23 @@
   .item.more:hover{background:none;border-color:transparent;color:var(--accent)}
   /* interaction: a concern lights every layer; a build lights the layers it is made from */
   .layers .item.lit{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover);box-shadow:inset 0 0 0 1px var(--accent)}
-  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-  .layers .item{animation:rise .45s ease both}
-  @media (prefers-reduced-motion:reduce){.layers .item{animation:none}}
+  /* a demoed build reuses the hover look */
+  .builds .item.demo{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
+
+  /* orchestrated on-load reveal: hidden initial state + .shown reveal, layout space reserved */
+  .reveal{opacity:0;transform:translateY(8px);transition:opacity .45s ease,transform .45s ease}
+  .reveal.shown{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){
+    .reveal{opacity:1!important;transform:none!important;transition:none!important}
+  }
+
+  /* Replay button: locked, subtle, centered */
+  .replay-row{display:flex;justify-content:center;margin-top:22px;min-height:34px}
+  .replay-btn{display:inline-flex;align-items:center;gap:7px;font-family:'Inter',system-ui,sans-serif;font-size:12.5px;font-weight:500;color:var(--accent);background:#fff;border:1px solid var(--border-strong);border-radius:20px;padding:7px 15px;cursor:pointer;opacity:0;transition:opacity .45s ease,background .14s ease,border-color .14s ease,color .14s ease}
+  .replay-btn.shown{opacity:1}
+  .replay-btn:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
+  .replay-btn svg{width:14px;height:14px;display:block}
+  @media (prefers-reduced-motion:reduce){.replay-row{display:none}}
 
   /* TOP: layers (with axis on the RIGHT) + builds output centered vertically */
   .top{display:grid;grid-template-columns:1fr 96px 210px;align-items:start;column-gap:0}
@@ -110,15 +124,15 @@
             <button class="box-head" data-go="layers"><span class="name">Layers</span><span class="what">what it's built from</span><span class="open">›</span></button>
             <div class="body">
               <div class="items">
-                <button class="item" data-go="layer"><span class="num">1</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4zM2 20h20M9.5 16v4M14.5 16v4"/></svg></span>User experience</button>
-                <button class="item" data-go="layer"><span class="num">2</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span>Application patterns</button>
-                <button class="item" data-go="layer"><span class="num">3</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M10.5 7.5L7.5 16M13.5 7.5l3 8.5M8.5 18h7"/></svg></span>Orchestration &amp; agents</button>
-                <button class="item" data-go="layer"><span class="num">4</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>Single-call control</button>
-                <button class="item" data-go="layer"><span class="num">5</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4"/></svg></span>Knowledge &amp; memory</button>
-                <button class="item" data-go="layer"><span class="num">6</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 3v18M4 7.5l8 4.5 8-4.5"/></svg></span>Composition</button>
-                <button class="item" data-go="layer"><span class="num">7</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V9M12 19V5M19 19v-7"/><path d="M3 19h18"/></svg></span>Training &amp; adaptation</button>
-                <button class="item" data-go="layer"><span class="num">8</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/><path d="M8 7h.01M8 17h.01"/></svg></span>Serving &amp; infrastructure</button>
-                <button class="item" data-go="layer"><span class="num">9</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></span>Data &amp; artifacts</button>
+                <button class="item reveal" data-go="layer"><span class="num">1</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4zM2 20h20M9.5 16v4M14.5 16v4"/></svg></span>User experience</button>
+                <button class="item reveal" data-go="layer"><span class="num">2</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span>Application patterns</button>
+                <button class="item reveal" data-go="layer"><span class="num">3</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M10.5 7.5L7.5 16M13.5 7.5l3 8.5M8.5 18h7"/></svg></span>Orchestration &amp; agents</button>
+                <button class="item reveal" data-go="layer"><span class="num">4</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>Single-call control</button>
+                <button class="item reveal" data-go="layer"><span class="num">5</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4"/></svg></span>Knowledge &amp; memory</button>
+                <button class="item reveal" data-go="layer"><span class="num">6</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 3v18M4 7.5l8 4.5 8-4.5"/></svg></span>Composition</button>
+                <button class="item reveal" data-go="layer"><span class="num">7</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V9M12 19V5M19 19v-7"/><path d="M3 19h18"/></svg></span>Training &amp; adaptation</button>
+                <button class="item reveal" data-go="layer"><span class="num">8</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/><path d="M8 7h.01M8 17h.01"/></svg></span>Serving &amp; infrastructure</button>
+                <button class="item reveal" data-go="layer"><span class="num">9</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></span>Data &amp; artifacts</button>
               </div>
               <div class="axis">
                 <div class="cap"><b>User-facing</b>what people touch</div>
@@ -129,13 +143,13 @@
           </div>
 
           <!-- produces (centered, next to builds) -->
-          <div class="produces">
+          <div class="produces reveal">
             <div class="flow flow-x"><span class="spark"></span></div>
             <span>produces</span>
           </div>
 
           <!-- BUILDS output (centered vertically) -->
-          <div class="box builds">
+          <div class="box builds reveal">
             <button class="box-head" data-go="builds"><span class="name">Builds</span><span class="what">what it produces</span><span class="open">›</span></button>
             <div class="items">
               <button class="item" data-go="build"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12"/></svg></span>Coding Agent</button>
@@ -149,8 +163,8 @@
         </div>
 
         <!-- across -> full-width concerns band -->
-        <div class="across"><div class="flow flow-y"><span class="spark"></span></div>across<div class="flow flow-y"><span class="spark"></span></div></div>
-        <div class="box concerns">
+        <div class="across reveal"><div class="flow flow-y"><span class="spark"></span></div>across<div class="flow flow-y"><span class="spark"></span></div></div>
+        <div class="box concerns reveal">
           <button class="box-head" data-go="concerns"><span class="name">Concerns</span><span class="what">what every layer must get right</span><span class="open">›</span></button>
           <div class="items">
             <button class="item" data-go="concern"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13a9 9 0 0 1 18 0"/><path d="M12 13l4-3"/><circle cx="12" cy="13" r="1.3" fill="currentColor" stroke="none"/></svg></span>Evaluation</button>
@@ -163,18 +177,91 @@
           </div>
         </div>
       </div>
+      <div class="replay-row">
+        <button class="replay-btn" id="replay" type="button" aria-label="Replay intro animation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 4v4h4"/></svg>
+          Replay
+        </button>
+      </div>
     </div>
     <footer class="foot"><strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.</footer>
   </div>
 
 <script>
   const layerItems = Array.from(document.querySelectorAll('.layers .item'));
-  layerItems.forEach((el,i)=>{ el.style.animationDelay = (i*45) + 'ms'; });
+  const buildItems = Array.from(document.querySelectorAll('.builds .item'));
+  const across     = document.querySelector('.across');
+  const concerns   = document.querySelector('.box.concerns');
+  const produces   = document.querySelector('.produces');
+  const builds     = document.querySelector('.box.builds');
+  const replayBtn  = document.getElementById('replay');
+  const reduced    = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 
   // click / tap = navigate to the item's own page (placeholder until pages are built)
   document.querySelectorAll('[data-go]').forEach(el=>{
     el.addEventListener('click',()=> console.log('navigate ->', el.dataset.go, el.textContent.trim()));
   });
+
+  // --- orchestrated on-load intro (additive; layout space is reserved via opacity/transform) ---
+  let timers = [];
+  const wait = (ms, fn)=> timers.push(setTimeout(fn, ms));
+  const clearTimers = ()=>{ timers.forEach(clearTimeout); timers = []; };
+
+  function resetIntro(){
+    clearTimers();
+    [...layerItems, across, concerns, produces, builds].forEach(el=> el.classList.remove('shown'));
+    layerItems.forEach(el=> el.classList.remove('lit'));
+    buildItems.forEach(el=> el.classList.remove('demo'));
+    replayBtn.classList.remove('shown');
+  }
+
+  function playIntro(){
+    resetIntro();
+    let t = 150;
+
+    // 1. layer items appear one by one, FOUNDATION up (item 9 -> item 1), ~110ms apart
+    for(let i = layerItems.length - 1; i >= 0; i--){
+      wait(t, ()=> layerItems[i].classList.add('shown'));
+      t += 110;
+    }
+
+    // 2. across + concerns fade in, then sweep .lit across all layers (~900ms)
+    t += 250;
+    wait(t, ()=>{ across.classList.add('shown'); concerns.classList.add('shown'); });
+    t += 300; // let the concerns box settle in before the sweep
+    wait(t, ()=> layerItems.forEach(el=> el.classList.add('lit')));
+    t += 900;
+    wait(t, ()=> layerItems.forEach(el=> el.classList.remove('lit')));
+
+    // 3. produces + builds fade in (the output)
+    t += 150;
+    wait(t, ()=>{ produces.classList.add('shown'); builds.classList.add('shown'); });
+
+    // 4. demo a build: highlight first build, light layers 3,4,5, hold ~1600ms, then clear
+    t += 400;
+    const litLayers = [3,4,5];
+    wait(t, ()=>{
+      buildItems[0].classList.add('demo');
+      litLayers.forEach(n=> layerItems[n-1].classList.add('lit'));
+    });
+    t += 1600;
+    wait(t, ()=>{
+      buildItems[0].classList.remove('demo');
+      litLayers.forEach(n=> layerItems[n-1].classList.remove('lit'));
+    });
+
+    // 5. Replay button appears
+    t += 250;
+    wait(t, ()=> replayBtn.classList.add('shown'));
+  }
+
+  if(reduced){
+    // show everything immediately, no auto-lighting, no replay
+    [...layerItems, across, concerns, produces, builds].forEach(el=> el.classList.add('shown'));
+  } else {
+    replayBtn.addEventListener('click', playIntro);
+    playIntro();
+  }
 </script>
 </body>
 </html>
