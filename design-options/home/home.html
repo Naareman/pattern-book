@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#8A909C;
+    --border:#E8EAEE; --border-strong:#D5D9E0; --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px}
+
+  header{padding:42px 0 8px}
+  .wordmark{font-family:'Fraunces',serif;font-weight:500;font-size:25px;letter-spacing:-.01em}
+  .strap{color:var(--soft);font-size:15px;margin-top:4px}
+
+  .stage{padding:34px 0 64px}
+  /* fixed-width canvas so the composition scales as one unit and does not reflow on zoom */
+  .canvas{width:840px;max-width:100%;margin:0 auto}
+
+  /* identical box treatment for all three */
+  .box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .box-head{display:flex;align-items:center;gap:8px;width:100%;padding:13px 16px;border:none;border-bottom:1px solid var(--border);background:#fff;cursor:pointer;text-align:left}
+  .box-head:hover{background:var(--accent-soft)}
+  .box-head .name{font-family:'Fraunces',serif;font-weight:500;font-size:18px}
+  .box-head .what{font-size:12.5px;color:var(--soft)}
+  .box-head .open{margin-left:auto;color:var(--faint);font-size:14px}
+  .box-head:hover .name{color:var(--accent-hover)} .box-head:hover .open{color:var(--accent)}
+
+  .items{padding:8px}
+  .item{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:9px 11px;border-radius:9px;border:1px solid transparent;background:none;font-family:'Inter';font-size:14px;font-weight:500;color:var(--text);cursor:pointer;transition:background .14s ease,border-color .14s ease}
+  .item + .item{margin-top:3px}
+  .item:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
+  .item .num{flex:none;width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent-hover);font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+  .item .dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--accent);opacity:.55}
+
+  /* TOP: layers (with attached axis) + builds output. Fixed grid columns = stable on zoom. */
+  .top{display:grid;grid-template-columns:1fr 96px 210px;align-items:start;column-gap:0}
+  .layers .body{display:grid;grid-template-columns:96px 1fr}
+  /* natural direction arrow: labels top + bottom, one clean line with an arrowhead */
+  .axis{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;padding:16px 10px 16px 4px;position:relative}
+  .axis .cap{font-size:11px;color:var(--soft);line-height:1.25}
+  .axis .cap b{display:block;color:var(--text);font-size:12px;font-weight:600}
+  .axis .rail{position:absolute;left:14px;top:42px;bottom:42px;width:1.5px;background:var(--accent);opacity:.45}
+  .axis .rail::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);border-left:4px solid transparent;border-right:4px solid transparent;border-top:7px solid var(--accent);opacity:.8}
+
+  /* produces sits right against the builds box */
+  .produces{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--faint);font-size:12px;gap:4px;padding-top:46px}
+  .builds{align-self:start}
+
+  /* across -> a FULL-WIDTH concerns band that visibly cuts across everything */
+  .across{display:flex;flex-direction:column;align-items:center;margin-top:16px;color:var(--faint);font-size:12px;gap:5px}
+  .across .leg{width:1.5px;height:15px;background:var(--border-strong)}
+  .concerns{width:100%;margin-top:5px}
+  .concerns .items{display:flex;flex-wrap:wrap;gap:9px;padding:14px 16px}
+  .concerns .item{width:auto;border:1px solid var(--border-strong);border-radius:22px;padding:8px 16px}
+  .concerns .item:hover{border-color:var(--accent)}
+
+  @media(max-width:720px){
+    .canvas{width:100%}
+    .top{grid-template-columns:1fr}
+    .produces{flex-direction:row;padding:10px 0}
+    .produces svg{transform:rotate(90deg)}
+    .builds{width:100%}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="wordmark">The Pattern Book</div>
+      <div class="strap">How AI systems are built.</div>
+    </header>
+
+    <div class="stage">
+      <div class="canvas">
+        <div class="top">
+          <!-- LAYERS with attached axis, numbered -->
+          <div class="box layers">
+            <button class="box-head" data-go="layers"><span class="name">Layers</span><span class="what">the parts it is built from</span><span class="open">›</span></button>
+            <div class="body">
+              <div class="axis">
+                <div class="cap"><b>User-facing</b>what people touch</div>
+                <div class="rail"></div>
+                <div class="cap"><b>Foundation</b>what it rests on</div>
+              </div>
+              <div class="items">
+                <button class="item" data-go="layer"><span class="num">1</span>User experience</button>
+                <button class="item" data-go="layer"><span class="num">2</span>Application patterns</button>
+                <button class="item" data-go="layer"><span class="num">3</span>Orchestration &amp; agents</button>
+                <button class="item" data-go="layer"><span class="num">4</span>Single-call control</button>
+                <button class="item" data-go="layer"><span class="num">5</span>Memory</button>
+                <button class="item" data-go="layer"><span class="num">6</span>Retrieval</button>
+                <button class="item" data-go="layer"><span class="num">7</span>Composition</button>
+                <button class="item" data-go="layer"><span class="num">8</span>Training &amp; adaptation</button>
+                <button class="item" data-go="layer"><span class="num">9</span>Serving &amp; infrastructure</button>
+                <button class="item" data-go="layer"><span class="num">10</span>Data &amp; artifacts</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- produces (right next to builds) -->
+          <div class="produces">
+            <svg width="40" height="14" viewBox="0 0 40 14"><path d="M0 7 H30" stroke="#9b94b0" stroke-width="2" fill="none"/><path d="M30 7 l-9 -5 v10 z" fill="#9b94b0"/></svg>
+            <span>produces</span>
+          </div>
+
+          <!-- BUILDS output -->
+          <div class="box builds">
+            <button class="box-head" data-go="builds"><span class="name">Builds</span><span class="what">what it produces</span><span class="open">›</span></button>
+            <div class="items">
+              <button class="item" data-go="build"><span class="dot"></span>Coding Agent</button>
+              <button class="item" data-go="build"><span class="dot"></span>Document Q&amp;A</button>
+              <button class="item" data-go="build"><span class="dot"></span>Research Agent</button>
+              <button class="item" data-go="build"><span class="dot"></span>Support Agent</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- across -> full-width concerns band -->
+        <div class="across"><div class="leg"></div>across<div class="leg"></div></div>
+        <div class="box concerns">
+          <button class="box-head" data-go="concerns"><span class="name">Concerns</span><span class="what">every layer has to get these right</span><span class="open">›</span></button>
+          <div class="items">
+            <button class="item" data-go="concern"><span class="dot"></span>Evaluation</button>
+            <button class="item" data-go="concern"><span class="dot"></span>Safety</button>
+            <button class="item" data-go="concern"><span class="dot"></span>Privacy</button>
+            <button class="item" data-go="concern"><span class="dot"></span>Observability</button>
+            <button class="item" data-go="concern"><span class="dot"></span>Cost</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  document.querySelectorAll('[data-go]').forEach(el=>{
+    el.addEventListener('click',()=>{ console.log('open', el.dataset.go, el.textContent.trim()); });
+  });
+</script>
+</body>
+</html>
