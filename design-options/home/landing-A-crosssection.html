@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ============ TOKENS (locked light-violet) ============ */
+  :root {
+    --bg: #FCFCFD;
+    --bg-subtle: #F6F7F9;
+    --surface: #FFFFFF;
+    --text: #15171C;
+    --text-soft: #565C68;
+    --text-faint: #8A909C;
+    --border: #E8EAEE;
+    --border-strong: #D5D9E0;
+    --accent: #7C5CF6;
+    --accent-hover: #6D4DE6;
+    --accent-soft: #F0ECFE;
+    --shadow-sm: 0 2px 4px rgba(16, 24, 40, .04);
+    --shadow-md: 0 6px 20px rgba(16, 24, 40, .07);
+    --shadow-lg: 0 12px 36px rgba(16, 24, 40, .10);
+    --glow: 0 0 0 rgba(124, 92, 246, 0);
+    --grid-line: rgba(16, 24, 40, .035);
+    --nav-bg: rgba(252, 252, 253, .72);
+  }
+
+  /* ============ RESET / BASE ============ */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  ::selection { background: var(--accent-soft); color: var(--text); }
+  a { color: inherit; text-decoration: none; }
+
+  /* faint background grid, fades out */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 38%, #000 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 38%, #000 30%, transparent 80%);
+  }
+
+  .wrap { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; }
+
+  /* ============ HEADER ============ */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px clamp(20px, 5vw, 48px);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+  .brand-mark {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    display: grid; place-items: center;
+    background: linear-gradient(145deg, var(--accent), var(--accent-hover));
+    box-shadow: 0 4px 14px rgba(124, 92, 246, .25);
+    flex: none;
+  }
+  .brand-mark svg { width: 16px; height: 16px; display: block; }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.18; }
+  .brand-name {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 500;
+    font-size: 17px;
+    letter-spacing: -.01em;
+    color: var(--text);
+  }
+  .brand-sub {
+    font-size: 12px;
+    color: var(--text-soft);
+    letter-spacing: -.005em;
+  }
+
+  /* ============ STAGE (the one diagram) ============ */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(24px, 5vw, 56px) clamp(20px, 5vw, 48px) clamp(40px, 6vw, 72px);
+    width: 100%;
+  }
+
+  .intro {
+    text-align: center;
+    max-width: 540px;
+    margin: 0 auto clamp(28px, 5vw, 48px);
+  }
+  .intro h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(26px, 5vw, 38px);
+    line-height: 1.12;
+    letter-spacing: -.015em;
+    margin-bottom: 12px;
+  }
+  .intro h1 em { font-style: italic; font-weight: 500; color: var(--accent); }
+  .intro p {
+    font-size: clamp(14.5px, 2vw, 16px);
+    color: var(--text-soft);
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  /* the diagram + captions together form a centered column */
+  .figure {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .diagram {
+    position: relative;
+    width: 100%;
+  }
+  .diagram svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+  /* --- SVG element base styles (driven by classes for hover) --- */
+  .layer-bar {
+    fill: var(--surface);
+    stroke: var(--border-strong);
+    stroke-width: 1;
+    transition: fill .25s ease, stroke .25s ease;
+  }
+  .discipline-line {
+    stroke: var(--border-strong);
+    stroke-width: 1.4;
+    fill: none;
+    transition: stroke .25s ease, stroke-width .25s ease, filter .25s ease;
+    opacity: .9;
+  }
+  .build-connector {
+    stroke: var(--border-strong);
+    stroke-width: 1.4;
+    fill: none;
+    transition: stroke .25s ease, stroke-width .25s ease, filter .25s ease, opacity .25s ease;
+    opacity: .9;
+  }
+  .build-tap {
+    fill: var(--border-strong);
+    transition: fill .25s ease;
+  }
+  .build-node {
+    fill: var(--surface);
+    stroke: var(--border-strong);
+    stroke-width: 1.2;
+    transition: fill .25s ease, stroke .25s ease, filter .25s ease;
+  }
+  .build-node-label {
+    fill: var(--text-soft);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    transition: fill .25s ease;
+  }
+  .build-node-dot {
+    fill: var(--accent);
+    opacity: .55;
+    transition: opacity .25s ease;
+  }
+
+  /* hit areas for interaction (invisible, generous) */
+  .hit { fill: transparent; cursor: pointer; }
+
+  /* ===== STATE: LAYERS active ===== */
+  .diagram.on-layers .layer-bar {
+    fill: var(--accent-soft);
+    stroke: var(--accent);
+  }
+
+  /* ===== STATE: DISCIPLINES active ===== */
+  .diagram.on-disciplines .discipline-line {
+    stroke: var(--accent);
+    stroke-width: 2;
+    opacity: 1;
+    filter: drop-shadow(0 0 5px rgba(124, 92, 246, .55));
+  }
+
+  /* ===== STATE: BUILDS active ===== */
+  .diagram.on-builds .build-connector {
+    stroke: var(--accent);
+    stroke-width: 2;
+    opacity: 1;
+    filter: drop-shadow(0 0 5px rgba(124, 92, 246, .5));
+  }
+  .diagram.on-builds .build-tap { fill: var(--accent); }
+  .diagram.on-builds .build-node {
+    fill: var(--accent-soft);
+    stroke: var(--accent);
+    filter: drop-shadow(0 6px 18px rgba(124, 92, 246, .25));
+  }
+  .diagram.on-builds .build-node-label { fill: var(--accent); }
+  .diagram.on-builds .build-node-dot { opacity: 1; }
+
+  /* signature slow pulse travelling one discipline line + one build connector */
+  .pulse-dot {
+    fill: var(--accent);
+    opacity: 0;
+  }
+  @keyframes travelDiscipline {
+    0%   { opacity: 0; }
+    8%   { opacity: 1; }
+    50%  { opacity: 1; }
+    58%  { opacity: 0; }
+    100% { opacity: 0; }
+  }
+  .pulse-discipline {
+    animation: travelDiscipline 7.5s ease-in-out infinite;
+    offset-path: var(--mp-disc);
+    offset-rotate: 0deg;
+  }
+  @keyframes travelBuild {
+    0%   { opacity: 0; }
+    52%  { opacity: 0; }
+    60%  { opacity: 1; }
+    92%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  .pulse-build {
+    animation: travelBuild 7.5s ease-in-out infinite;
+    offset-path: var(--mp-build);
+    offset-rotate: 0deg;
+  }
+
+  /* ============ CAPTIONS ============ */
+  .captions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(12px, 2.5vw, 22px);
+    margin-top: clamp(32px, 5vw, 52px);
+  }
+  .cap {
+    text-align: left;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    padding: 16px 16px 18px;
+    cursor: pointer;
+    background: transparent;
+    transition: background .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+    display: block;
+    width: 100%;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+  }
+  .cap:hover, .cap:focus-visible {
+    background: var(--surface);
+    border-color: var(--border);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-2px);
+    outline: none;
+  }
+  .cap:focus-visible { border-color: var(--accent); }
+  .cap-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 8px;
+  }
+  .cap-swatch {
+    width: 11px; height: 11px;
+    border-radius: 3px;
+    flex: none;
+    transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+  }
+  /* distinct glyph shapes per object so they read even without color */
+  .cap[data-obj="layers"] .cap-swatch { background: var(--border-strong); border-radius: 2px; }
+  .cap[data-obj="disciplines"] .cap-swatch { background: var(--border-strong); width: 4px; height: 13px; border-radius: 2px; }
+  .cap[data-obj="builds"] .cap-swatch { background: var(--border-strong); border-radius: 50%; }
+
+  .cap:hover .cap-swatch, .cap:focus-visible .cap-swatch {
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+  .cap-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    color: var(--text);
+  }
+  .cap p {
+    font-size: 12.8px;
+    color: var(--text-soft);
+    line-height: 1.5;
+  }
+  .cap-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 11px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text-faint);
+    opacity: 0;
+    transform: translateY(2px);
+    transition: opacity .2s ease, transform .2s ease, color .2s ease;
+  }
+  .cap:hover .cap-hint, .cap:focus-visible .cap-hint {
+    opacity: 1;
+    transform: translateY(0);
+    color: var(--accent);
+  }
+  .cap-hint .arr { transition: transform .2s ease; }
+  .cap:hover .cap-hint .arr { transform: translateX(3px); }
+
+  /* ============ FOOTER ============ */
+  .foot {
+    border-top: 1px solid var(--border);
+    padding: 20px clamp(20px, 5vw, 48px);
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .foot strong { color: var(--text-soft); font-weight: 500; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 680px) {
+    .captions { grid-template-columns: 1fr; gap: 8px; }
+    .cap { padding: 14px 14px 16px; }
+    .cap-hint { opacity: 1; transform: none; color: var(--accent); } /* always show hint on touch */
+    .brand-sub { display: none; }
+  }
+
+  @media (max-width: 380px) {
+    .intro h1 { font-size: 24px; }
+  }
+
+  /* ============ REDUCED MOTION ============ */
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition-duration: .001ms !important; }
+    .pulse-dot { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="nav">
+    <a class="brand" href="#" aria-label="The Pattern Book home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21z"/>
+          <path d="M12 3v18"/>
+        </svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">The Pattern Book</span>
+        <span class="brand-sub">How AI systems are built, layer by layer.</span>
+      </span>
+    </a>
+  </header>
+
+  <!-- THE ONE DIAGRAM -->
+  <main class="main">
+    <div class="intro">
+      <h1>Three ways to read the <em>map</em>.</h1>
+      <p>Every pattern lives somewhere on this picture. Pick a lens to see how the pieces fit.</p>
+    </div>
+
+    <div class="figure">
+      <div class="diagram" id="diagram">
+        <!--
+          viewBox 0 0 760 360
+          Stack: 5 bars, centred, x 250..510 (width 260), the visual spine.
+          Disciplines: 3 vertical lines cutting through the full stack height.
+          Builds: a rounded node on the right, 3 connectors into 3 different bars.
+        -->
+        <svg viewBox="0 0 760 360" role="img"
+             aria-label="A central stack of five layers. Vertical discipline lines cut across all layers. A build node to the right draws connectors from several layers.">
+
+          <!-- ===== BUILD CONNECTORS (drawn first, sit behind bars edges) ===== -->
+          <g>
+            <!-- node anchor approx (600, 180); reach into bars at left-ish x=300 -->
+            <path id="bc1" class="build-connector" d="M598 168 C 470 150, 420 96, 320 96" />
+            <path id="bc2" class="build-connector" d="M600 180 C 500 180, 440 180, 320 180" />
+            <path id="bc3" class="build-connector" d="M598 192 C 470 210, 420 264, 320 264" />
+            <!-- taps where connectors meet bars -->
+            <circle class="build-tap" cx="320" cy="96"  r="3.4" />
+            <circle class="build-tap" cx="320" cy="180" r="3.4" />
+            <circle class="build-tap" cx="320" cy="264" r="3.4" />
+          </g>
+
+          <!-- ===== LAYER STACK (5 bars, the spine) ===== -->
+          <!-- bars centred horizontally: x=250, width=260; rows at y 66,108,150,192,234 (h 30, gap 12) -->
+          <g id="stackBars">
+            <rect class="layer-bar" x="250" y="66"  width="260" height="30" rx="8" />
+            <rect class="layer-bar" x="250" y="108" width="260" height="30" rx="8" />
+            <rect class="layer-bar" x="250" y="150" width="260" height="30" rx="8" />
+            <rect class="layer-bar" x="250" y="192" width="260" height="30" rx="8" />
+            <rect class="layer-bar" x="250" y="234" width="260" height="30" rx="8" />
+          </g>
+
+          <!-- ===== DISCIPLINE LINES (vertical, cut through full stack) ===== -->
+          <!-- stack spans y 66..264; lines run y 52..278 (slightly past for cross-cut feel) -->
+          <g id="disciplineLines">
+            <line id="dl1" class="discipline-line" x1="312" y1="52" x2="312" y2="278" />
+            <line id="dl2" class="discipline-line" x1="380" y1="52" x2="380" y2="278" />
+            <line id="dl3" class="discipline-line" x1="448" y1="52" x2="448" y2="278" />
+          </g>
+
+          <!-- ===== BUILD NODE (rounded chip on the right) ===== -->
+          <g id="buildNode">
+            <rect class="build-node" x="572" y="158" width="118" height="44" rx="22" />
+            <circle class="build-node-dot" cx="595" cy="180" r="5" />
+            <text class="build-node-label" x="612" y="185">Build</text>
+          </g>
+
+          <!-- ===== SIGNATURE PULSE DOTS (motion-path travellers) ===== -->
+          <circle class="pulse-dot pulse-discipline" r="3.2" />
+          <circle class="pulse-dot pulse-build" r="3.2" />
+
+          <!-- ===== INVISIBLE HIT AREAS (generous, on top) ===== -->
+          <!-- layers hit: covers the bar block -->
+          <rect class="hit" id="hitLayers" x="240" y="58" width="280" height="214" rx="14"
+                tabindex="0" role="button"
+                aria-label="Layers. Where each pattern runs, from data up to the user. Opens the Layers page." />
+          <!-- disciplines hit: tall thin band around the 3 vertical lines -->
+          <rect class="hit" id="hitDisc" x="300" y="48" width="160" height="234"
+                tabindex="0" role="button"
+                aria-label="Disciplines. Concerns that apply across every layer. Opens the Disciplines page." />
+          <!-- builds hit: around node + a bit of its reach -->
+          <rect class="hit" id="hitBuild" x="560" y="148" width="142" height="64" rx="22"
+                tabindex="0" role="button"
+                aria-label="Builds. Real systems assembled from patterns across layers. Opens the Builds page." />
+        </svg>
+      </div>
+
+      <!-- THREE ONE-LINE CAPTIONS (also the clickable objects) -->
+      <div class="captions">
+        <a class="cap" data-obj="layers" href="#" id="capLayers"
+           aria-describedby="hintLayers">
+          <span class="cap-head">
+            <span class="cap-swatch" aria-hidden="true"></span>
+            <span class="cap-title">Layers</span>
+          </span>
+          <p>Where each pattern runs, from data up to the user.</p>
+          <span class="cap-hint" id="hintLayers">Opens the Layers page <span class="arr" aria-hidden="true">&rarr;</span></span>
+        </a>
+
+        <a class="cap" data-obj="disciplines" href="#" id="capDisc"
+           aria-describedby="hintDisc">
+          <span class="cap-head">
+            <span class="cap-swatch" aria-hidden="true"></span>
+            <span class="cap-title">Disciplines</span>
+          </span>
+          <p>Concerns that apply across every layer (evaluation, safety, cost&hellip;).</p>
+          <span class="cap-hint" id="hintDisc">Opens the Disciplines page <span class="arr" aria-hidden="true">&rarr;</span></span>
+        </a>
+
+        <a class="cap" data-obj="builds" href="#" id="capBuild"
+           aria-describedby="hintBuild">
+          <span class="cap-head">
+            <span class="cap-swatch" aria-hidden="true"></span>
+            <span class="cap-title">Builds</span>
+          </span>
+          <p>Real systems assembled from patterns across layers.</p>
+          <span class="cap-hint" id="hintBuild">Opens the Builds page <span class="arr" aria-hidden="true">&rarr;</span></span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="foot">
+    <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; Layers, Disciplines, Builds
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var diagram = document.getElementById('diagram');
+
+  /* ---------- map each object to its diagram highlight state ---------- */
+  var STATE = {
+    layers:      'on-layers',
+    disciplines: 'on-disciplines',
+    builds:      'on-builds'
+  };
+
+  function setActive(obj) {
+    diagram.classList.remove('on-layers', 'on-disciplines', 'on-builds');
+    if (obj && STATE[obj]) diagram.classList.add(STATE[obj]);
+  }
+  function clearActive() {
+    diagram.classList.remove('on-layers', 'on-disciplines', 'on-builds');
+  }
+
+  /* ---------- wire captions <-> diagram (two-way) ---------- */
+  var caps = {
+    layers:      document.getElementById('capLayers'),
+    disciplines: document.getElementById('capDisc'),
+    builds:      document.getElementById('capBuild')
+  };
+  var hits = {
+    layers:      document.getElementById('hitLayers'),
+    disciplines: document.getElementById('hitDisc'),
+    builds:      document.getElementById('hitBuild')
+  };
+
+  function highlightCap(obj, on) {
+    var el = caps[obj];
+    if (!el) return;
+    // reuse the :hover look by toggling a class that mirrors it
+    el.classList.toggle('is-mirror', on);
+  }
+
+  Object.keys(caps).forEach(function (obj) {
+    var cap = caps[obj];
+    var hit = hits[obj];
+
+    function enter() { setActive(obj); if (hit) hit.classList.add('is-peer'); }
+    function leave() { clearActive(); }
+
+    // caption hover -> light diagram
+    cap.addEventListener('mouseenter', enter);
+    cap.addEventListener('mouseleave', leave);
+    cap.addEventListener('focus', enter);
+    cap.addEventListener('blur', leave);
+
+    // diagram hit-area hover -> light diagram + caption
+    if (hit) {
+      hit.addEventListener('mouseenter', function () { setActive(obj); highlightCapVisual(obj, true); });
+      hit.addEventListener('mouseleave', function () { clearActive(); highlightCapVisual(obj, false); });
+      hit.addEventListener('focus', function () { setActive(obj); highlightCapVisual(obj, true); });
+      hit.addEventListener('blur', function () { clearActive(); highlightCapVisual(obj, false); });
+      // keyboard activate -> follow the caption link target (#)
+      hit.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          window.location.hash = '';   // placeholder route, never 404s
+        }
+      });
+      hit.addEventListener('click', function () { window.location.hash = ''; });
+    }
+  });
+
+  // give the caption a temporary hover-like emphasis when the diagram is hovered
+  function highlightCapVisual(obj, on) {
+    var el = caps[obj];
+    if (!el) return;
+    if (on) {
+      el.style.background = 'var(--surface)';
+      el.style.borderColor = 'var(--accent)';
+      el.style.boxShadow = 'var(--shadow-sm)';
+      el.style.transform = 'translateY(-2px)';
+      var hint = el.querySelector('.cap-hint');
+      var sw = el.querySelector('.cap-swatch');
+      if (hint) { hint.style.opacity = '1'; hint.style.transform = 'translateY(0)'; hint.style.color = 'var(--accent)'; }
+      if (sw) { sw.style.background = 'var(--accent)'; sw.style.boxShadow = '0 0 0 4px var(--accent-soft)'; }
+    } else {
+      el.removeAttribute('style');
+      var hint2 = el.querySelector('.cap-hint');
+      var sw2 = el.querySelector('.cap-swatch');
+      if (hint2) hint2.removeAttribute('style');
+      if (sw2) sw2.removeAttribute('style');
+    }
+  }
+
+  /* ---------- attach motion paths for the signature pulse ---------- */
+  // we read the d/coords from the SVG and feed them as offset-path to the dots
+  function setMotionPaths() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // discipline pulse travels down the middle discipline line dl2 (x=380, y 52->278)
+    diagram.style.setProperty('--mp-disc', 'path("M380 52 L 380 278")');
+    // build pulse travels along the middle build connector bc2
+    var bc2 = document.getElementById('bc2');
+    if (bc2) {
+      var d = bc2.getAttribute('d');
+      diagram.style.setProperty('--mp-build', 'path("' + d + '")');
+    }
+  }
+  setMotionPaths();
+
+  // graceful fallback: if offset-path unsupported, just hide pulse dots
+  var supportsOffset = (CSS && CSS.supports && (CSS.supports('offset-path', 'path("M0 0 L1 1")') || CSS.supports('motion-path', 'path("M0 0 L1 1")')));
+  if (!supportsOffset) {
+    Array.prototype.forEach.call(document.querySelectorAll('.pulse-dot'), function (d) {
+      d.style.display = 'none';
+    });
+  }
+})();
+</script>
+</body>
+</html>
