@@ -909,7 +909,7 @@
   <h2>What is <em>Chain-of-Thought</em>?</h2>
   <div class="idea-stage">
     <div class="tagline-big">
-      Chain-of-Thought is one line you add to your prompt: ask the model to <strong>think step by step</strong>. It then shows its working before answering, and that working is what makes the answer right.
+      Chain-of-Thought is one line you add to your prompt, like <strong>"Let's think step by step."</strong> The model then shows its working before answering, and that working is what makes the answer right.
     </div>
   </div>
 </section>
@@ -1131,7 +1131,7 @@
       </div>
     </div>
     <div class="tradeoff-quote">
-      Asking the AI to think step by step helps a lot on hard problems, but is wasted on easy ones.
+      Asking the model to think step by step helps a lot on hard problems. On a simple question it just adds extra words, so you pay more (tokens) for no better answer.
     </div>
   </div>
 </section>
@@ -1328,10 +1328,12 @@ const codeLines = document.querySelectorAll('.code-line');
 const codeExplainer = document.getElementById('codeExplainer');
 
 const codeExplanations = [
-  "The one move that makes it Chain-of-Thought: ask the model to reason before it answers.",
-  "Add the phrase to the end. 'Let's think step by step' is enough to get the model reasoning, with no examples needed.",
-  "Send it. The model writes its steps, then ends with a final answer.",
-  "Take the last line as the answer. The lines above it are the steps that led to it.",
+  "The whole trick: ask for the reasoning before the answer.",
+  "Add one line to the prompt. 'Let's think step by step' is enough to get the model reasoning, no examples needed.",
+  "What happens next: the model writes its steps, then ends with a final answer.",
+  "Send the prompt. The reply comes back with the steps, then the answer.",
+  "How to read the reply: the steps are everything above, the answer is the last line.",
+  "Take that last line as the answer.",
   "Return both, so you can check the steps, not just the answer."
 ];
 
