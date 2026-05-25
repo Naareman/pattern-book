@@ -266,7 +266,6 @@
     color: var(--text);
   }
   /* the narrating caption, on the board, right by the writing */
-  .board-caption { display: none; }
   /* where the working is written */
   .board-work {
     display: flex;
@@ -505,6 +504,7 @@
   .code-line .comment { color: var(--faint); }
   .code-line .kw { color: var(--accent); font-weight: 500; }
   .code-line .str { color: var(--success); }
+  .code-note { font-size: 12px; color: var(--faint); margin-top: 10px; line-height: 1.5; }
   .code-explainer {
     background: var(--bg-subtle);
     border: 1px solid var(--border);
@@ -697,9 +697,6 @@
         <span class="board-qtext">3 baskets, each with 6 apples. I eat 4 apples. How many are left?</span>
       </div>
 
-      <!-- the narrating caption sits on the board, right by the writing -->
-      <div class="board-caption" id="boardCaption">Press Play, and watch the model write its working out.</div>
-
       <!-- the model's working, written one token at a time, left to right -->
       <div class="board-work">
         <div class="board-line" data-reveal="0">
@@ -717,7 +714,7 @@
 
         <div class="board-answer" id="boardAnswer">
           <span class="board-answer-label">Answer</span>
-          <span class="board-answer-text">14 apples are left.</span>
+          <span class="board-answer-text"></span>
         </div>
         <div class="board-insight">The answer falls out of the last line, not a guess. Without the steps, models often jump to a wrong number.</div>
       </div>
@@ -774,6 +771,7 @@
     <div class="code-explainer" id="codeExplainer" aria-live="polite">
       <div class="hint">Tap a line above</div>
     </div>
+    <p class="code-note">A sketch: real code parses the answer out more carefully than just taking the last line.</p>
   </div>
 </section>
 
@@ -851,10 +849,10 @@
 // and updates as each line is written. The answer falls out of the last line.
 const boardLines = document.querySelectorAll('.board-line');   // 3 lines, data-reveal 0..2
 const boardAnswer = document.getElementById('boardAnswer');     // the answer, data-reveal 3
-const boardCaption = document.getElementById('boardCaption');
 const boardStepBtn = document.getElementById('boardStepBtn');
 const boardPlayBtn = document.getElementById('boardPlayBtn');
 const boardResetBtn = document.getElementById('boardResetBtn');
+const ANSWER_TEXT = '14 apples are left.';
 
 // each line's working, split into tokens written left to right
 const boardWork = [
@@ -862,14 +860,11 @@ const boardWork = [
   ['3', '×', '6', '=', '18', 'apples', 'in', 'all', '.'],
   ['I', 'ate', '4', 'of', 'those', ',', 'so', '18', '−', '4', '=', '14', 'left', '.']
 ];
-// the caption narrates exactly what is happening, line by line
-const boardCaptions = [
-  'It reads the question in small pieces (tokens), left to right.',
-  'It works out a result: 3 × 6 = 18.',
-  'It carries that 18 forward, takes away the 4, and reaches the answer.'
-];
-const boardStart = 'Press Play, and watch the model write its working out.';
-const boardEnd = 'The answer falls out of the last line, not a guess. Without the steps, models often jump to a wrong number.';
+// reveal the answer by injecting its text, so the aria-live board announces it to screen readers
+function revealAnswer() {
+  boardAnswer.querySelector('.board-answer-text').textContent = ANSWER_TEXT;
+  boardAnswer.classList.add('shown');
+}
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -891,7 +886,6 @@ async function writeLine(r, animate) {
   slot.innerHTML = '';
   boardLines.forEach(l => l.classList.remove('writing'));
   line.classList.add('shown', 'writing');
-  boardCaption.textContent = boardCaptions[r];
   const tokens = boardWork[r];
   for (let i = 0; i < tokens.length; i++) {
     addTok(slot, tokens[i], i, animate);
@@ -915,7 +909,7 @@ function boardReset() {
     l.querySelector('.board-tokens').innerHTML = '';
   });
   boardAnswer.classList.remove('shown');
-  boardCaption.textContent = boardStart;
+  boardAnswer.querySelector('.board-answer-text').textContent = '';
   boardStep = -1;
 }
 
@@ -923,8 +917,7 @@ function boardReset() {
 function boardShowAll() {
   for (let r = 0; r < boardLines.length; r++) fillLine(r);
   boardLines.forEach(l => l.classList.remove('writing'));
-  boardAnswer.classList.add('shown');
-  boardCaption.textContent = boardEnd;
+  revealAnswer();
   boardStep = BOARD_TOTAL - 1;
 }
 
@@ -945,8 +938,7 @@ boardStepBtn.addEventListener('click', async () => {
     boardPlaying = false;
   } else {
     boardLines.forEach(l => l.classList.remove('writing'));
-    boardAnswer.classList.add('shown');
-    boardCaption.textContent = boardEnd;
+    revealAnswer();
   }
 });
 
@@ -964,8 +956,7 @@ boardPlayBtn.addEventListener('click', async () => {
     await sleep(600);
   }
   await sleep(250);
-  boardAnswer.classList.add('shown');
-  boardCaption.textContent = boardEnd;
+  revealAnswer();
   boardStep = BOARD_TOTAL - 1;
   boardPlaying = false;
   boardPlayBtn.disabled = false;
