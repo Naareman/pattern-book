@@ -58,41 +58,36 @@
 
   /* intent guide */
   .section{padding:18px 0 40px}
-  .guide-head{font-family:'Fraunces',serif;font-weight:500;font-size:23px;letter-spacing:-.01em;margin:4px 4px 4px;line-height:1.15}
-  .guide-sub{font-size:13.5px;color:var(--faint);margin:0 4px 18px;line-height:1.5}
+  .guide-head{font-family:'Fraunces',serif;font-weight:500;font-size:23px;letter-spacing:-.01em;margin:4px 4px 14px;line-height:1.15}
 
-  .guide{display:flex;flex-direction:column;gap:10px}
-  .goal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  /* goal -> method map */
+  .map{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
 
-  .goal-btn{display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:16px 16px 6px;border:0;background:none;color:var(--text);font-family:inherit}
-  .goal-num{flex:none;width:28px;height:28px;border-radius:9px;background:var(--accent-soft);color:var(--accent-hover);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
-  .goal-q{flex:1;min-width:0;font-family:'Fraunces',serif;font-weight:500;font-size:17px;letter-spacing:-.005em;line-height:1.25}
+  .map-head{display:grid;grid-template-columns:1fr 34px 1.3fr;align-items:center;gap:16px;padding:13px 20px;border-bottom:1px solid var(--border);background:var(--bg)}
+  .map-head span{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+  .map-head .h-method{grid-column:3}
 
-  /* revealed answer */
-  .answer{display:block}
-  .answer-in{overflow:hidden;min-height:0}
-  .answer-card{margin:0 12px 12px;padding:14px 15px;background:var(--bg);border:1px solid var(--border);border-radius:12px;display:flex;align-items:flex-start;gap:13px}
-  .answer-ico{flex:none;width:34px;height:34px;border-radius:10px;background:var(--accent-soft);color:var(--accent-hover);display:flex;align-items:center;justify-content:center}
-  .answer-ico svg{width:18px;height:18px;display:block}
-  .answer-txt{min-width:0;flex:1}
-  .answer-lead{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:3px}
-  .answer-name{font-family:'Fraunces',serif;font-weight:500;font-size:18px;letter-spacing:-.005em;line-height:1.2;color:var(--text)}
-  .answer-what{display:block;font-size:13.5px;color:var(--soft);margin-top:4px;line-height:1.5}
-  .answer-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:13px;font-weight:600;color:var(--accent-hover)}
-  .answer-link:hover{text-decoration:underline}
-  .answer-link .arr{transition:transform .2s ease}
-  .answer-link:hover .arr{transform:translateX(3px)}
+  .map-row{display:grid;grid-template-columns:1fr 34px 1.3fr;align-items:center;gap:16px;padding:16px 20px;border-top:1px solid var(--border);transition:background .15s ease}
+  .map-row:first-child{border-top:0}
+  .map-row:hover{background:var(--accent-soft)}
+
+  .row-goal{font-family:'Fraunces',serif;font-weight:500;font-size:17px;letter-spacing:-.005em;line-height:1.25;color:var(--text);min-width:0}
+  .row-arrow{justify-self:center;color:var(--accent);font-size:18px;line-height:1}
+  .row-method{min-width:0}
+  .row-name{display:block;font-weight:600;font-size:15px;letter-spacing:-.005em;color:var(--accent-hover);line-height:1.3}
+  .row-what{display:block;font-size:13.5px;color:var(--soft);margin-top:3px;line-height:1.5}
 
   .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
   .foot strong{color:var(--soft);font-weight:500}
 
-  @media(max-width:480px){
+  @media(max-width:560px){
     .title{font-size:30px}
     .explainer{font-size:15px}
     .guide-head{font-size:21px}
-    .goal-btn{padding:14px 13px;gap:11px}
-    .goal-q{font-size:16px}
-    .answer-card{flex-direction:column;gap:10px;margin:0 10px 10px}
+    .map-head{display:none}
+    .map-row{grid-template-columns:1fr;gap:7px;padding:15px 16px}
+    .row-arrow{display:none}
+    .row-goal{font-size:16px}
   }
 </style>
 </head>
@@ -111,143 +106,72 @@
     <header>
       <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>Layer 6</span>
       <h1 class="title">Single-call control</h1>
-      <p class="explainer">How do you get the best answer out of a single message, before reaching for tools or memory?</p>
-      <div class="flow" aria-hidden="true">
-        <div class="flow-cell">Your message</div>
-        <div class="flow-arrow">&rarr;</div>
-        <div class="flow-cell is-ai">The AI</div>
-        <div class="flow-arrow">&rarr;</div>
-        <div class="flow-cell">One answer</div>
-      </div>
+      <p class="explainer">How do you get the best answer out of a single message to the AI?</p>
     </header>
 
     <div class="section" id="main" role="main">
 
       <h2 class="guide-head">What do you want to do?</h2>
-      <p class="guide-sub">Pick a goal. We will point you to the method that fits.</p>
 
-      <div class="guide">
-
-        <div class="goal">
-          <div class="goal-btn">
-            <span class="goal-num" aria-hidden="true">1</span>
-            <span class="goal-q">Show it the exact style I want</span>
-          </div>
-          <div class="answer">
-            <div class="answer-in">
-              <div class="answer-card">
-                <span class="answer-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1.5"/><rect x="3" y="12" width="18" height="5" rx="1.5"/><path d="M6 6.5h4M6 14.5h4"/></svg></span>
-                <span class="answer-txt">
-                  <span class="answer-lead">Use</span>
-                  <span class="answer-name">Few-Shot</span>
-                  <span class="answer-what">Give it a few finished examples to copy.</span>
-                  <a class="answer-link" href="#">Learn Few-Shot <span class="arr" aria-hidden="true">&rarr;</span></a>
-                </span>
-              </div>
-            </div>
-          </div>
+      <div class="map">
+        <div class="map-head" aria-hidden="true">
+          <span>What you want</span>
+          <span class="h-method">Use this</span>
         </div>
 
-        <div class="goal">
-          <div class="goal-btn">
-            <span class="goal-num" aria-hidden="true">2</span>
-            <span class="goal-q">Just ask in plain words</span>
-          </div>
-          <div class="answer">
-            <div class="answer-in">
-              <div class="answer-card">
-                <span class="answer-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 11h16M4 16h10"/></svg></span>
-                <span class="answer-txt">
-                  <span class="answer-lead">Use</span>
-                  <span class="answer-name">Zero-Shot</span>
-                  <span class="answer-what">Simply describe what you want, no examples.</span>
-                  <a class="answer-link" href="#">Learn Zero-Shot <span class="arr" aria-hidden="true">&rarr;</span></a>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <a class="map-row" href="#">
+          <span class="row-goal">Get it to copy a style I show</span>
+          <span class="row-arrow" aria-hidden="true">&rarr;</span>
+          <span class="row-method">
+            <span class="row-name">Few-Shot</span>
+            <span class="row-what">Give it a few examples to copy.</span>
+          </span>
+        </a>
 
-        <div class="goal">
-          <div class="goal-btn">
-            <span class="goal-num" aria-hidden="true">3</span>
-            <span class="goal-q">Get a hard, multi-step problem right</span>
-          </div>
-          <div class="answer">
-            <div class="answer-in">
-              <div class="answer-card">
-                <span class="answer-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M6 8.4v3.6a3 3 0 0 0 3 3h6.6"/></svg></span>
-                <span class="answer-txt">
-                  <span class="answer-lead">Use</span>
-                  <span class="answer-name">Chain-of-Thought</span>
-                  <span class="answer-what">Ask it to think step by step before answering.</span>
-                  <a class="answer-link" href="pattern-chain-of-thought.html">Learn Chain-of-Thought <span class="arr" aria-hidden="true">&rarr;</span></a>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <a class="map-row" href="#">
+          <span class="row-goal">Get an answer by just asking</span>
+          <span class="row-arrow" aria-hidden="true">&rarr;</span>
+          <span class="row-method">
+            <span class="row-name">Zero-Shot</span>
+            <span class="row-what">Describe what you want, no examples.</span>
+          </span>
+        </a>
 
-        <div class="goal">
-          <div class="goal-btn">
-            <span class="goal-num" aria-hidden="true">4</span>
-            <span class="goal-q">Get a more reliable answer</span>
-          </div>
-          <div class="answer">
-            <div class="answer-in">
-              <div class="answer-card">
-                <span class="answer-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 3L8 6M12 3l4 3"/><path d="M5 9l-2 4 2 1M19 9l2 4-2 1M12 9v6"/><path d="M5 14h14M9 20h6"/></svg></span>
-                <span class="answer-txt">
-                  <span class="answer-lead">Use</span>
-                  <span class="answer-name">Self-Consistency</span>
-                  <span class="answer-what">Ask a few times and take the answer that comes up most.</span>
-                  <a class="answer-link" href="#">Learn Self-Consistency <span class="arr" aria-hidden="true">&rarr;</span></a>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <a class="map-row" href="pattern-chain-of-thought.html">
+          <span class="row-goal">Get a hard problem right</span>
+          <span class="row-arrow" aria-hidden="true">&rarr;</span>
+          <span class="row-method">
+            <span class="row-name">Chain-of-Thought</span>
+            <span class="row-what">Ask it to think step by step.</span>
+          </span>
+        </a>
 
-        <div class="goal">
-          <div class="goal-btn">
-            <span class="goal-num" aria-hidden="true">5</span>
-            <span class="goal-q">Get the answer in a fixed format</span>
-          </div>
-          <div class="answer">
-            <div class="answer-in">
-              <div class="answer-card">
-                <span class="answer-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H7a3 3 0 0 0-3 3v2a2 2 0 0 1-2 2 2 2 0 0 1 2 2v2a3 3 0 0 0 3 3h2"/><path d="M15 4h2a3 3 0 0 1 3 3v2a2 2 0 0 0 2 2 2 2 0 0 0-2 2v2a3 3 0 0 1-3 3h-2"/></svg></span>
-                <span class="answer-txt">
-                  <span class="answer-lead">Use</span>
-                  <span class="answer-name">Structured output</span>
-                  <span class="answer-what">Tell it the exact shape to return, like a filled-in form.</span>
-                  <a class="answer-link" href="#">Learn Structured output <span class="arr" aria-hidden="true">&rarr;</span></a>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <a class="map-row" href="#">
+          <span class="row-goal">Get a more reliable answer</span>
+          <span class="row-arrow" aria-hidden="true">&rarr;</span>
+          <span class="row-method">
+            <span class="row-name">Self-Consistency</span>
+            <span class="row-what">Ask a few times, take the most common.</span>
+          </span>
+        </a>
 
-        <div class="goal">
-          <div class="goal-btn">
-            <span class="goal-num" aria-hidden="true">6</span>
-            <span class="goal-q">Catch its own mistakes</span>
-          </div>
-          <div class="answer">
-            <div class="answer-in">
-              <div class="answer-card">
-                <span class="answer-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v4h-4"/><path d="M9 12l2 2 4-4"/></svg></span>
-                <span class="answer-txt">
-                  <span class="answer-lead">Use</span>
-                  <span class="answer-name">Reflection</span>
-                  <span class="answer-what">Ask it to look back at its answer and fix it.</span>
-                  <a class="answer-link" href="#">Learn Reflection <span class="arr" aria-hidden="true">&rarr;</span></a>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <a class="map-row" href="#">
+          <span class="row-goal">Get the answer in a fixed format</span>
+          <span class="row-arrow" aria-hidden="true">&rarr;</span>
+          <span class="row-method">
+            <span class="row-name">Structured output</span>
+            <span class="row-what">Tell it the exact shape to return.</span>
+          </span>
+        </a>
 
+        <a class="map-row" href="#">
+          <span class="row-goal">Get it to fix its own mistakes</span>
+          <span class="row-arrow" aria-hidden="true">&rarr;</span>
+          <span class="row-method">
+            <span class="row-name">Reflection</span>
+            <span class="row-what">Ask it to review and fix its answer.</span>
+          </span>
+        </a>
       </div>
 
     </div>

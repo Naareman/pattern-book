@@ -911,7 +911,7 @@
   <h2>What is <em>Chain-of-Thought</em>?</h2>
   <div class="idea-stage">
     <div class="tagline-big">
-      Models jump straight to the first answer that comes to mind. Chain-of-Thought makes them <strong>show their work first</strong>, and writing the steps is what makes the answer right.
+      Chain-of-Thought is one line you add to your prompt: ask the model to <strong>think step by step</strong>. It then shows its working before answering, and that working is what makes the answer right.
     </div>
   </div>
 </section>
@@ -944,9 +944,9 @@
     <!-- The three points. Each reveals on its matching step. -->
     <div class="trace" id="trace">
       <div class="trace-empty" id="traceEmpty">Step through the flow above. Each idea below lights up on its step.</div>
-      <div class="trace-row" data-reveal="0"><span class="lead" aria-hidden="true">1</span>It writes the steps out as <span class="term" tabindex="0" role="button" aria-label="tokens: The small word-sized pieces of text a model reads and writes, one after another. See the chips just below this box." data-def="The small word-sized pieces of text a model reads and writes, one after another. See the chips just below.">tokens</span>, left to right, like talking out loud.</div>
-      <div class="trace-row" data-reveal="1"><span class="lead" aria-hidden="true">2</span>Each step it writes becomes part of what it reads next, so it builds on its own work.</div>
-      <div class="trace-row" data-reveal="2"><span class="lead" aria-hidden="true">3</span>By the last step, the answer follows from the work, instead of being a guess.</div>
+      <div class="trace-row" data-reveal="0"><span class="lead" aria-hidden="true">1</span>Instead of answering at once, it writes its thinking out as <span class="term" tabindex="0" role="button" aria-label="tokens: The small word-sized pieces of text a model reads and writes, one after another. See the chips just below this box." data-def="The small word-sized pieces of text a model reads and writes, one after another. See the chips just below.">tokens</span>, left to right.</div>
+      <div class="trace-row" data-reveal="1"><span class="lead" aria-hidden="true">2</span>Each step it writes, it reads back, so each one builds on the last.</div>
+      <div class="trace-row" data-reveal="2"><span class="lead" aria-hidden="true">3</span>By the end, the answer comes straight out of that thinking, not a guess.</div>
     </div>
   </div>
 
