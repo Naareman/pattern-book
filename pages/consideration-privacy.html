@@ -6,169 +6,637 @@
 <title>Privacy . The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#FCFCFD; --surface:#FFFFFF; --bg-subtle:#F6F7F9; --text:#15171C; --soft:#565C68; --faint:#6B7280;
-    --border:#E8EAEE; --border-strong:#D5D9E0; --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
-    --radius:16px; --radius-sm:11px;
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#C2554F; --error-soft:#FBECEB;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --redact:#15171C;
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-padding-top:72px}
-  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-  body{overflow-x:hidden}
-  .wrap{max-width:920px;margin:0 auto;padding:0 24px}
-  a{color:inherit;text-decoration:none}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
 
-  a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
-  .skip-link{position:absolute;left:8px;top:-48px;z-index:100;background:var(--surface);color:var(--accent-hover);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:top .15s ease}
-  .skip-link:focus{top:8px}
-  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}}
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
 
-  .topbar{position:sticky;top:0;z-index:10;background:rgba(252,252,253,.86);backdrop-filter:saturate(180%) blur(10px);-webkit-backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--border)}
-  .topbar-in{max-width:920px;margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;padding:5px 11px;border:1px solid var(--border-strong);border-radius:20px;background:#fff;transition:border-color .2s ease,color .2s ease,background .2s ease;white-space:nowrap}
-  .back:hover{border-color:var(--accent);color:var(--accent-hover);background:var(--accent-soft)}
-  .crumb{font-size:12.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .crumb a{color:var(--faint);text-decoration:none}
-  .crumb a:hover{color:var(--accent)}
-  .crumb .sep{margin:0 7px;color:var(--border-strong)}
-  .crumb .here{color:var(--soft)}
+  /* TOP BAR */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
 
-  header{padding:36px 0 6px;scroll-margin-top:72px}
-  .wordmark{font-family:'Fraunces',serif;font-weight:500;font-size:25px;letter-spacing:-.01em}
-  .strap{color:var(--soft);font-size:15px;margin-top:4px}
-
-  .stage{padding:22px 0 34px}
-  .canvas{max-width:680px;margin:0 auto}
-
-  .pagehead{margin-bottom:8px}
-  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--border);border-radius:20px;padding:5px 12px;margin-bottom:14px}
-  .eyebrow .ico{width:15px;height:15px;display:block;color:var(--accent)}
-  .eyebrow .ico svg{width:15px;height:15px;display:block}
-  .pagehead h1{font-family:'Fraunces',serif;font-weight:500;font-size:38px;letter-spacing:-.015em;line-height:1.05;scroll-margin-top:72px}
-  .pagehead .intro{color:var(--soft);font-size:16px;line-height:1.6;margin-top:12px;max-width:580px}
-
-  .block{margin-top:26px}
-  .block h2{font-family:'Fraunces',serif;font-weight:500;font-size:21px;letter-spacing:-.01em;line-height:1.2;margin-bottom:10px}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px}
-  .card p{font-size:15px;line-height:1.65;color:var(--soft)}
-  .card p + p{margin-top:10px}
-  .card p strong{color:var(--text);font-weight:600}
-
-  .note{background:var(--bg-subtle);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius-sm)}
-  .note .tag{display:block;font-size:12px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
-
-  .bars{display:flex;flex-direction:column;gap:10px}
-  .bar-row{display:flex;align-items:center;gap:14px}
-  .bar-label{flex:none;width:180px;font-size:13.5px;color:var(--soft);text-align:right}
-  .bar-track{flex:1;height:18px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:6px;overflow:hidden}
-  .bar-fill{height:100%;background:var(--accent);border-radius:5px 0 0 5px}
-  .bar-fill.mid{background:#A892F2}
-  .bar-fill.low{background:#CFC3F6}
-  .bars-note{font-size:12.5px;color:var(--faint);margin-top:14px;line-height:1.5}
-  @media(max-width:560px){
-    .bar-label{width:118px;font-size:12px}
+  /* HEADER */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    scroll-margin-top: 80px;
+    font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer {
+    color: var(--soft); font-size: 16px; line-height: 1.6;
+    max-width: 660px; margin-top: 14px;
   }
 
-  .ex-list{display:flex;flex-direction:column;gap:12px}
-  .ex{display:flex;gap:13px;align-items:flex-start}
-  .ex .dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:7px}
-  .ex .ex-text{font-size:15px;line-height:1.55;color:var(--soft)}
-  .ex .ex-text strong{color:var(--text);font-weight:600}
+  /* SECTIONS */
+  section {
+    max-width: 920px; margin: 0 auto; padding: 18px 24px 34px;
+    position: relative; scroll-margin-top: 80px;
+  }
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--faint); margin-bottom: 9px;
+  }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
 
-  .links{list-style:none;display:flex;flex-direction:column;gap:9px}
-  .links li{font-size:14px;line-height:1.5}
-  .links a{color:var(--accent-hover);font-weight:500;border-bottom:1px solid var(--accent-soft)}
-  .links a:hover{border-bottom-color:var(--accent)}
-  .links .src{color:var(--soft)}
+  /* IDEA CARD */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif; font-weight: 400;
+    font-size: 18px; line-height: 1.55; color: var(--text);
+  }
 
-  .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
-  .foot strong{color:var(--soft);font-weight:500}
+  /* DEMO (Section 02) */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
 
-  @media(max-width:560px){
-    .pagehead h1{font-size:30px}
-    .card{padding:17px 16px}
+  .scan-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
+
+  .msg-box {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 18px 20px;
+    font-size: 16px; line-height: 1.75; color: var(--text);
+    font-family: 'Fraunces', serif; font-weight: 400;
+    position: relative; overflow: hidden;
+  }
+
+  /* scanner line that sweeps top to bottom */
+  .scanner-line {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--accent) 30%, var(--accent-hover) 70%, transparent 100%);
+    top: -4px; opacity: 0;
+    transition: top 0.6s linear, opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 2;
+    box-shadow: 0 0 10px 2px rgba(124,92,246,0.3);
+  }
+  .scanner-line.scanning { opacity: 1; }
+
+  /* each sensitive span */
+  .pii {
+    position: relative; border-radius: 3px;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+  .pii .pii-label {
+    position: absolute; bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent); color: #fff;
+    font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
+    letter-spacing: .05em; text-transform: uppercase;
+    padding: 3px 7px; border-radius: 4px;
+    white-space: nowrap; pointer-events: none;
+    opacity: 0; transition: opacity 0.2s ease;
+    z-index: 3;
+  }
+  .pii .pii-label::after {
+    content: ''; position: absolute; top: 100%; left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: var(--accent);
+  }
+  /* highlighted: accent background, label visible */
+  .pii.highlight {
+    background: var(--accent-soft); color: var(--accent-hover);
+  }
+  .pii.highlight .pii-label { opacity: 1; }
+  /* redacted: black bar */
+  .pii.redacted {
+    background: var(--redact); color: var(--redact);
+    border-radius: 3px; cursor: default;
+    user-select: none;
+  }
+  .pii.redacted .pii-label { opacity: 0; }
+
+  /* status row below the message */
+  .scan-status {
+    margin-top: 14px; padding: 10px 14px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 500; color: var(--faint);
+    display: flex; align-items: center; gap: 10px;
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  .scan-status.found {
+    background: #FFF7ED; border-color: #F59E0B; color: #B45309;
+  }
+  .scan-status.clean {
+    background: var(--success-soft); border-color: var(--success); color: var(--success);
+  }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--faint);
+    flex-shrink: 0; transition: background 0.3s ease;
+  }
+  .scan-status.found .status-dot { background: #F59E0B; }
+  .scan-status.clean .status-dot { background: var(--success); }
+
+  /* controls */
+  .board-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* Section 03: real example */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
+  .flow {
+    display: flex; flex-direction: column; gap: 0;
+  }
+  .flow-step {
+    display: flex; gap: 14px; align-items: flex-start; padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .flow-step:last-child { border-bottom: none; }
+  .flow-num {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent-hover);
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .flow-body { flex: 1; }
+  .flow-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .flow-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+
+  /* Section 04: tradeoffs */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); min-width: 130px; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg {
+    flex: 1; height: 22px; background: var(--bg-subtle);
+    border: 1px solid var(--border); border-radius: 5px;
+  }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { min-width: 130px; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* BACK LINK */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm);
+    text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* SOURCES */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title {
+    font-size: 13px; font-weight: 500; color: var(--faint);
+    padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px;
+  }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li a { color: var(--accent-hover); border-bottom: 1px solid var(--accent-soft); text-decoration: none; }
+  .sources li a:hover { border-bottom-color: var(--accent); }
+  .sources li .note { color: var(--faint); }
+
+  /* FOOTER */
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* RESPONSIVE */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .board-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
   }
 </style>
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <div class="topbar">
-    <div class="topbar-in">
-      <a class="back" href="considerations.html"><span aria-hidden="true">&larr;</span> Considerations</a>
-      <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Privacy</span></nav>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="considerations.html"><span aria-hidden="true">&larr;</span> Considerations</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep">/</span>
+      <a href="considerations.html">Considerations</a>
+      <span class="sep">/</span>
+      <span class="here">Privacy</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="11" width="14" height="9" rx="2"/>
+        <path d="M8 11V8a4 4 0 0 1 8 0v3"/>
+      </svg>
+    </span>
+    Consideration
+  </span>
+  <h1 class="pattern-title">Privacy</h1>
+  <p class="explainer">Personal details belong to people, not to models. Detect them, hide them, and never let one person's data reach another.</p>
+</header>
+
+<!-- 01 · THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>When someone talks to an AI, they often share private things: their name, email, phone number, ID. <span style="color:var(--accent-hover);font-weight:500">Privacy</span> means the system detects those personal details and hides them before storing the message or sending it to the model. One person's data never leaks to another person's session.</p>
+  </div>
+</section>
+
+<!-- 02 · DEMO -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <h2>Watch a message get <em>scanned</em>.</h2>
+
+  <p class="demo-lede">A customer support message arrives. The system scans it and redacts every piece of personal information before it reaches the AI or the database. Tap Play to watch.</p>
+
+  <div class="scan-stage">
+    <div class="msg-box" id="msgBox" aria-live="polite" aria-label="Customer message with personal information">
+      <div class="scanner-line" id="scannerLine" aria-hidden="true"></div>
+      Hi, my name is <span class="pii" data-label="Name" id="pii0">Sarah Chen</span> and my account email is <span class="pii" data-label="Email" id="pii1">sarah.chen@email.com</span>. My phone is <span class="pii" data-label="Phone" id="pii2">+1 (555) 204-8831</span> and my ID number is <span class="pii" data-label="ID" id="pii3">SSN-472-90-1138</span>. Please help me reset my password.
+    </div>
+
+    <div class="scan-status" id="scanStatus" role="status">
+      <div class="status-dot" aria-hidden="true"></div>
+      <span id="scanStatusText">Ready. Tap Play to scan the message.</span>
+    </div>
+
+    <div class="board-controls">
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
     </div>
   </div>
+</section>
 
-  <div class="wrap">
-    <header>
-      <div class="wordmark">The Pattern Book</div>
-      <div class="strap">What every part of an AI must get right.</div>
-    </header>
-
-    <div class="stage" id="main" role="main">
-      <div class="canvas">
-        <div class="pagehead">
-          <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>Consideration</span>
-          <h1>Privacy</h1>
-          <p class="intro">Keeping people's personal information safe and not sharing it without permission.</p>
+<!-- 03 · REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>How a <em>support tool</em> applies this.</h2>
+  <div class="example-stage">
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num" aria-hidden="true">1</div>
+        <div class="flow-body">
+          <div class="flow-title">User sends a message</div>
+          <div class="flow-desc">A customer types freely, often including their name, order number, or phone number without thinking.</div>
         </div>
-
-        <div class="block">
-          <h2>In plain words</h2>
-          <div class="card">
-            <p>People share private things with an AI: their name, address, health, messages. Privacy means that data is only used for what was agreed, kept secure, and never leaked to strangers. The AI should not remember and repeat your secrets to someone else.</p>
-          </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num" aria-hidden="true">2</div>
+        <div class="flow-body">
+          <div class="flow-title">PII scanner runs before anything else</div>
+          <div class="flow-desc">A regex or ML classifier finds names, emails, phone numbers, and government IDs. Each is replaced with a neutral tag like <code style="font-size:12px;background:var(--bg-subtle);padding:1px 5px;border-radius:3px;border:1px solid var(--border)">[EMAIL]</code> before the text moves forward.</div>
         </div>
-
-        <div class="block">
-          <h2>Why it matters</h2>
-          <div class="card note">
-            <span class="tag">What goes wrong if you ignore it</span>
-            <p>An app feeds private customer chats into its AI training data without telling anyone. Later, the model starts repeating real names, phone numbers, and account details to other users. The company faces lawsuits, fines under data protection laws, and customers who never trust it again.</p>
-          </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num" aria-hidden="true">3</div>
+        <div class="flow-body">
+          <div class="flow-title">Redacted message goes to the model</div>
+          <div class="flow-desc">The AI sees the topic and intent (password reset), but never the real personal details. It can answer helpfully without needing them.</div>
         </div>
-
-        <div class="block">
-          <h2>Where it shows up most</h2>
-          <div class="card">
-            <div class="bars">
-              <div class="bar-row"><span class="bar-label">Knowledge &amp; memory</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">Data &amp; artifacts</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">User experience</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">Application patterns</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">Serving &amp; infrastructure</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
-            </div>
-            <p class="bars-note">Rough editorial estimate of where this matters most, not a measured score. Privacy bites hardest wherever personal data is stored or remembered, which is why knowledge, memory, and raw data are the front line.</p>
-          </div>
-        </div>
-
-        <div class="block">
-          <h2>Examples</h2>
-          <div class="card">
-            <div class="ex-list">
-              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>Health apps</strong> must protect medical records under rules like HIPAA in the US.</span></div>
-              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>The GDPR</strong> in Europe gives people the right to see, correct, and delete data companies hold about them.</span></div>
-              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>On-device features</strong> like phone keyboards learn from your typing without sending the raw text to a server.</span></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="block">
-          <h2>Learn more</h2>
-          <div class="card">
-            <ul class="links">
-              <li><a href="https://en.wikipedia.org/wiki/General_Data_Protection_Regulation" target="_blank" rel="noopener">General Data Protection Regulation</a> <span class="src">. Wikipedia, Europe's data protection law.</span></li>
-              <li><a href="https://en.wikipedia.org/wiki/Information_privacy" target="_blank" rel="noopener">Information privacy</a> <span class="src">. Wikipedia, the broad idea of protecting personal data.</span></li>
-            </ul>
-          </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num" aria-hidden="true">4</div>
+        <div class="flow-body">
+          <div class="flow-title">Original is stored only in a protected log</div>
+          <div class="flow-desc">If needed for audit, the unredacted version sits in an access-controlled store, not mixed in with training data or conversation history.</div>
         </div>
       </div>
     </div>
-
-    <footer class="foot"><strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.</footer>
   </div>
+</section>
+
+<!-- 04 · TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>What privacy <em>costs</em>.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Engineering effort</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div>
+        <div class="seg on"></div>
+        <div class="seg on"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency added</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Missed detections</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div>
+        <div class="seg on"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Context lost to model</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div>
+        <div class="seg on"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Redaction is fast and worth it. The hard part is recall: catching unusual formats, nicknames, and new types of identifiers. Missed detections are the real risk, not the latency.
+    </div>
+  </div>
+</section>
+
+<!-- BACK LINK -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="considerations.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Considerations</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>
+      <a href="https://gdpr-info.eu/" target="_blank" rel="noopener">General Data Protection Regulation (GDPR)</a>.
+      EU regulation defining personal data and the obligation to protect it.
+    </li>
+    <li>
+      Lison et al. (2021). <em>Anonymisation Models for Text: State of the Art, Challenges and Future Directions.</em>
+      <span class="note">ACL Anthology. Survey of NLP-based PII detection methods.</span>
+    </li>
+    <li>
+      <a href="https://cloud.google.com/sensitive-data-protection/docs/concepts-infotypes-reference" target="_blank" rel="noopener">Google Cloud Sensitive Data Protection: infoTypes reference.</a>
+      <span class="note">Real-world list of detectable PII categories.</span>
+    </li>
+    <li>
+      <a href="https://arxiv.org/abs/2012.12348" target="_blank" rel="noopener">Carlini et al. (2021). <em>Extracting Training Data from Large Language Models.</em></a>
+      <span class="note">Demonstrates why private data must not enter training data in the first place.</span>
+    </li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ REDACTION DEMO ============
+// The scanner line sweeps top to bottom. As it crosses each PII span:
+//   1. the span gets highlighted (accent background + label popup)
+//   2. after a brief pause, it gets redacted (black bar)
+// Reset restores original text and removes all state.
+
+const msgBox = document.getElementById('msgBox');
+const scannerLine = document.getElementById('scannerLine');
+const scanStatus = document.getElementById('scanStatus');
+const scanStatusText = document.getElementById('scanStatusText');
+const playBtn = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+const piiSpans = Array.from(document.querySelectorAll('.pii'));
+const piiLabels = ['Name', 'Email', 'Phone', 'ID'];
+
+// inject label elements
+piiSpans.forEach((span, i) => {
+  span.setAttribute('data-label', piiLabels[i]);
+  const lbl = document.createElement('span');
+  lbl.className = 'pii-label';
+  lbl.textContent = piiLabels[i];
+  lbl.setAttribute('aria-hidden', 'true');
+  span.insertBefore(lbl, span.firstChild);
+});
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function setStatus(state, text) {
+  scanStatus.className = 'scan-status' + (state ? ' ' + state : '');
+  scanStatusText.textContent = text;
+}
+
+function resetDemo() {
+  // remove scanner
+  scannerLine.style.top = '-4px';
+  scannerLine.classList.remove('scanning');
+  // restore all spans
+  piiSpans.forEach(span => {
+    span.classList.remove('highlight', 'redacted');
+  });
+  setStatus('', 'Ready. Tap Play to scan the message.');
+  playBtn.disabled = false;
+  resetBtn.disabled = false;
+}
+
+async function runScan() {
+  playBtn.disabled = true;
+  resetBtn.disabled = true;
+
+  if (reduceMotion) {
+    // instant: highlight all, then redact all
+    piiSpans.forEach(s => s.classList.add('highlight'));
+    setStatus('found', `Found ${piiSpans.length} personal details: Name, Email, Phone, ID.`);
+    await sleep(5);
+    piiSpans.forEach(s => { s.classList.remove('highlight'); s.classList.add('redacted'); });
+    setStatus('clean', 'All personal details redacted. Safe to process.');
+    playBtn.disabled = false;
+    resetBtn.disabled = false;
+    return;
+  }
+
+  // 1. sweep scanner line top to bottom
+  const boxRect = msgBox.getBoundingClientRect();
+  const boxHeight = msgBox.offsetHeight;
+
+  setStatus('', 'Scanning...');
+  scannerLine.style.top = '-4px';
+  scannerLine.classList.add('scanning');
+
+  // get each span's vertical midpoint relative to msgBox
+  const spanMids = piiSpans.map(span => {
+    const r = span.getBoundingClientRect();
+    return r.top - boxRect.top + r.height / 2;
+  });
+
+  const SCAN_DURATION = 1600; // ms to cross the full box
+  const startTime = performance.now();
+  let highlighted = new Array(piiSpans.length).fill(false);
+
+  await new Promise(resolve => {
+    function frame(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / SCAN_DURATION, 1);
+      const lineY = progress * (boxHeight + 4);
+      scannerLine.style.top = lineY + 'px';
+
+      // highlight any span the line has crossed
+      piiSpans.forEach((span, i) => {
+        if (!highlighted[i] && lineY >= spanMids[i]) {
+          highlighted[i] = true;
+          span.classList.add('highlight');
+        }
+      });
+
+      if (progress < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        resolve();
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+
+  // 2. scanner done — show count
+  const found = highlighted.filter(Boolean).length;
+  setStatus('found', `Found ${found} personal detail${found !== 1 ? 's' : ''}: Name, Email, Phone, ID.`);
+  scannerLine.classList.remove('scanning');
+
+  await sleep(700);
+
+  // 3. redact each span one by one with a small stagger
+  for (let i = 0; i < piiSpans.length; i++) {
+    piiSpans[i].classList.remove('highlight');
+    piiSpans[i].classList.add('redacted');
+    await sleep(160);
+  }
+
+  await sleep(300);
+  setStatus('clean', 'All personal details redacted. Safe to process.');
+  playBtn.disabled = false;
+  resetBtn.disabled = false;
+}
+
+playBtn.addEventListener('click', () => {
+  // reset silently first if already run
+  piiSpans.forEach(s => s.classList.remove('highlight', 'redacted'));
+  scannerLine.style.top = '-4px';
+  scannerLine.classList.remove('scanning');
+  setStatus('', 'Scanning...');
+  runScan();
+});
+
+resetBtn.addEventListener('click', () => {
+  resetDemo();
+});
+</script>
 </body>
 </html>
