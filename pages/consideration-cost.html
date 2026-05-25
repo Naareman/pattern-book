@@ -6,169 +6,662 @@
 <title>Cost . The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#FCFCFD; --surface:#FFFFFF; --bg-subtle:#F6F7F9; --text:#15171C; --soft:#565C68; --faint:#6B7280;
-    --border:#E8EAEE; --border-strong:#D5D9E0; --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.10);
     --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --warn:#B45309; --warn-soft:#FEF3C7;
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-padding-top:72px}
-  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-  body{overflow-x:hidden}
-  .wrap{max-width:920px;margin:0 auto;padding:0 24px}
-  a{color:inherit;text-decoration:none}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
 
-  a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
-  .skip-link{position:absolute;left:8px;top:-48px;z-index:100;background:var(--surface);color:var(--accent-hover);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:top .15s ease}
-  .skip-link:focus{top:8px}
-  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}}
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
 
-  .topbar{position:sticky;top:0;z-index:10;background:rgba(252,252,253,.86);backdrop-filter:saturate(180%) blur(10px);-webkit-backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--border)}
-  .topbar-in{max-width:920px;margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;padding:5px 11px;border:1px solid var(--border-strong);border-radius:20px;background:#fff;transition:border-color .2s ease,color .2s ease,background .2s ease;white-space:nowrap}
-  .back:hover{border-color:var(--accent);color:var(--accent-hover);background:var(--accent-soft)}
-  .crumb{font-size:12.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .crumb a{color:var(--faint);text-decoration:none}
-  .crumb a:hover{color:var(--accent)}
-  .crumb .sep{margin:0 7px;color:var(--border-strong)}
-  .crumb .here{color:var(--soft)}
+  /* TOP BAR */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none; padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
 
-  header{padding:36px 0 6px;scroll-margin-top:72px}
-  .wordmark{font-family:'Fraunces',serif;font-weight:500;font-size:25px;letter-spacing:-.01em}
-  .strap{color:var(--soft);font-size:15px;margin-top:4px}
+  /* HEADER */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 600px; margin-top: 14px; }
 
-  .stage{padding:22px 0 34px}
-  .canvas{max-width:680px;margin:0 auto}
+  /* SECTIONS */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
 
-  .pagehead{margin-bottom:8px}
-  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--border);border-radius:20px;padding:5px 12px;margin-bottom:14px}
-  .eyebrow .ico{width:15px;height:15px;display:block;color:var(--accent)}
-  .eyebrow .ico svg{width:15px;height:15px;display:block}
-  .pagehead h1{font-family:'Fraunces',serif;font-weight:500;font-size:38px;letter-spacing:-.015em;line-height:1.05;scroll-margin-top:72px}
-  .pagehead .intro{color:var(--soft);font-size:16px;line-height:1.6;margin-top:12px;max-width:580px}
+  /* 01 THE IDEA */
+  .idea-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
+  .idea-card p + p { margin-top: 14px; }
 
-  .block{margin-top:26px}
-  .block h2{font-family:'Fraunces',serif;font-weight:500;font-size:21px;letter-spacing:-.01em;line-height:1.2;margin-bottom:10px}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px}
-  .card p{font-size:15px;line-height:1.65;color:var(--soft)}
-  .card p + p{margin-top:10px}
-  .card p strong{color:var(--text);font-weight:600}
+  /* 02 INTERACTIVE COST METER */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
 
-  .note{background:var(--bg-subtle);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius-sm)}
-  .note .tag{display:block;font-size:12px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
-
-  .bars{display:flex;flex-direction:column;gap:10px}
-  .bar-row{display:flex;align-items:center;gap:14px}
-  .bar-label{flex:none;width:180px;font-size:13.5px;color:var(--soft);text-align:right}
-  .bar-track{flex:1;height:18px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:6px;overflow:hidden}
-  .bar-fill{height:100%;background:var(--accent);border-radius:5px 0 0 5px}
-  .bar-fill.mid{background:#A892F2}
-  .bar-fill.low{background:#CFC3F6}
-  .bars-note{font-size:12.5px;color:var(--faint);margin-top:14px;line-height:1.5}
-  @media(max-width:560px){
-    .bar-label{width:118px;font-size:12px}
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 24px 26px;
   }
 
-  .ex-list{display:flex;flex-direction:column;gap:12px}
-  .ex{display:flex;gap:13px;align-items:flex-start}
-  .ex .dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:7px}
-  .ex .ex-text{font-size:15px;line-height:1.55;color:var(--soft)}
-  .ex .ex-text strong{color:var(--text);font-weight:600}
+  /* Controls */
+  .controls { display: flex; flex-direction: column; gap: 22px; }
 
-  .links{list-style:none;display:flex;flex-direction:column;gap:9px}
-  .links li{font-size:14px;line-height:1.5}
-  .links a{color:var(--accent-hover);font-weight:500;border-bottom:1px solid var(--accent-soft)}
-  .links a:hover{border-bottom-color:var(--accent)}
-  .links .src{color:var(--soft)}
+  .ctrl-row { display: flex; flex-direction: column; gap: 8px; }
+  .ctrl-label { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; justify-content: space-between; }
+  .ctrl-label-name { display: flex; align-items: center; gap: 7px; }
+  .ctrl-label-name svg { width: 14px; height: 14px; color: var(--accent); flex-shrink: 0; }
+  .ctrl-value { font-family: 'Fraunces', serif; font-size: 15px; color: var(--accent-hover); font-weight: 500; }
 
-  .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
-  .foot strong{color:var(--soft);font-weight:500}
+  /* Slider */
+  .slider-wrap { position: relative; }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 6px; border-radius: 3px; outline: none; cursor: pointer;
+    background: linear-gradient(to right, var(--accent) var(--pct, 0%), var(--border-strong) var(--pct, 0%));
+    transition: background .1s;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 22px; height: 22px; border-radius: 50%; background: var(--accent);
+    border: 3px solid #fff; box-shadow: 0 0 0 1px var(--accent), var(--shadow-sm);
+    transition: transform .15s ease;
+  }
+  input[type=range]:active::-webkit-slider-thumb { transform: scale(1.15); }
+  input[type=range]::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--accent);
+    border: 3px solid #fff; box-shadow: 0 0 0 1px var(--accent);
+  }
+  .slider-ticks { display: flex; justify-content: space-between; margin-top: 5px; }
+  .slider-ticks span { font-size: 11px; color: var(--faint); font-weight: 500; }
 
-  @media(max-width:560px){
-    .pagehead h1{font-size:30px}
-    .card{padding:17px 16px}
+  /* Toggle group */
+  .toggle-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .toggle-btn {
+    padding: 7px 14px; border: 1px solid var(--border-strong); background: var(--bg-subtle);
+    border-radius: 20px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 13px;
+    font-weight: 600; color: var(--soft);
+    transition: border-color .18s ease, background .18s ease, color .18s ease, transform .15s ease;
+    white-space: nowrap;
+  }
+  .toggle-btn:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .toggle-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .toggle-btn:active { transform: scale(0.97); }
+
+  /* Cache toggle (on/off) */
+  .cache-row { display: flex; align-items: center; gap: 12px; }
+  .cache-row .desc { font-size: 13px; color: var(--soft); line-height: 1.4; flex: 1; }
+  .switch-wrap { flex-shrink: 0; }
+  .switch { display: inline-flex; align-items: center; gap: 9px; cursor: pointer; user-select: none; }
+  .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .switch-track {
+    width: 44px; height: 24px; border-radius: 12px; background: var(--border-strong);
+    position: relative; transition: background .2s ease;
+    flex-shrink: 0;
+  }
+  .switch-track::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 18px; height: 18px; border-radius: 50%; background: #fff;
+    box-shadow: var(--shadow-sm); transition: transform .2s ease;
+  }
+  .switch input:checked + .switch-track { background: var(--accent); }
+  .switch input:checked + .switch-track::after { transform: translateX(20px); }
+  .switch-label { font-size: 13px; font-weight: 600; color: var(--soft); }
+
+  /* COST METER */
+  .meter-divider { height: 1px; background: var(--border); margin: 22px 0; }
+
+  .meter-box {
+    background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 18px 20px; position: relative; overflow: hidden;
+  }
+  .meter-row { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+  .meter-cost-block { flex: 1; min-width: 120px; }
+  .meter-label { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .meter-amount {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 36px; line-height: 1;
+    letter-spacing: -0.02em; color: var(--text);
+    transition: color .3s ease;
+  }
+  .meter-amount.cheap { color: var(--success); }
+  .meter-amount.mid { color: var(--warn); }
+  .meter-amount.expensive { color: #C2554F; }
+  .meter-unit { font-size: 14px; color: var(--soft); margin-left: 4px; font-family: 'Inter', sans-serif; font-weight: 500; }
+
+  .meter-breakdown { flex: 2; min-width: 200px; display: flex; flex-direction: column; gap: 7px; }
+  .breakdown-row { display: flex; align-items: center; gap: 10px; }
+  .breakdown-name { font-size: 12px; color: var(--soft); min-width: 96px; flex-shrink: 0; }
+  .breakdown-bar-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .breakdown-bar-fill { height: 100%; border-radius: 4px; background: var(--accent); transition: width .4s ease; }
+  .breakdown-bar-fill.saved { background: var(--success); }
+  .breakdown-num { font-size: 12px; font-weight: 600; color: var(--text); min-width: 56px; text-align: right; font-family: 'Fraunces', serif; transition: color .3s ease; }
+  .breakdown-num.saved { color: var(--success); }
+
+  .meter-note { margin-top: 14px; font-size: 12px; color: var(--faint); line-height: 1.5; }
+  .meter-note strong { color: var(--soft); }
+
+  /* savings badge */
+  .savings-badge {
+    display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;
+    background: var(--success-soft); border: 1px solid var(--success);
+    border-radius: 20px; font-size: 12px; font-weight: 600; color: var(--success);
+    margin-top: 10px;
+    opacity: 0; transform: translateY(4px);
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .savings-badge.visible { opacity: 1; transform: translateY(0); }
+
+  /* 03 REAL EXAMPLE */
+  .example-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 22px; }
+  .example-lede { font-size: 14px; color: var(--soft); margin-bottom: 18px; line-height: 1.5; }
+
+  .scenario-cards { display: flex; flex-direction: column; gap: 12px; }
+  .scenario { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; cursor: pointer; transition: border-color .18s ease, background .18s ease, transform .18s ease, box-shadow .18s ease; box-shadow: var(--shadow-sm); }
+  .scenario:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .scenario-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .scenario-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; color: var(--text); }
+  .scenario-badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+  .scenario-badge.bad { background: #FBECEB; color: #C2554F; border: 1px solid #C2554F; }
+  .scenario-badge.good { background: var(--success-soft); color: var(--success); border: 1px solid var(--success); }
+  .scenario-detail {
+    max-height: 0; overflow: hidden; font-size: 14px; color: var(--soft); line-height: 1.55;
+    transition: max-height .35s ease, margin .3s ease;
+  }
+  .scenario.open .scenario-detail { max-height: 180px; margin-top: 10px; }
+  .scenario-detail strong { color: var(--text); }
+  .scenario-hint { font-size: 12px; color: var(--faint); margin-top: 16px; }
+
+  /* 04 TRADEOFFS */
+  .tradeoffs-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); min-width: 130px; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-bars .seg.on-g { background: var(--success); border-color: var(--success); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { min-width: 130px; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* BACK LINK */
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* SOURCES */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li a { color: var(--accent-hover); font-weight: 500; text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+  .sources li a:hover { border-bottom-color: var(--accent); }
+  .sources li .note { color: var(--faint); }
+
+  /* FOOTER */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    h1.page-title { font-size: 30px; }
+    h2 { font-size: 21px; }
+    .idea-card { padding: 20px; }
+    .idea-card p { font-size: 16px; }
+    .demo-stage { padding: 18px 16px; }
+    .meter-row { flex-direction: column; align-items: stretch; gap: 14px; }
+    .meter-amount { font-size: 30px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+    .tradeoff-scale .spacer { min-width: 0; }
   }
 </style>
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <div class="topbar">
-    <div class="topbar-in">
-      <a class="back" href="considerations.html"><span aria-hidden="true">&larr;</span> Considerations</a>
-      <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Cost</span></nav>
-    </div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="considerations.html"><span aria-hidden="true">&larr;</span> Considerations</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Cost</span>
+    </nav>
   </div>
+</nav>
 
-  <div class="wrap">
-    <header>
-      <div class="wordmark">The Pattern Book</div>
-      <div class="strap">What every part of an AI must get right.</div>
-    </header>
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-1.7 2.5-1.7s2.5.6 2.5 1.9c0 2.6-5 1.4-5 4 0 1.3 1.1 2 2.5 2s2.5-.5 2.5-1.7"/>
+      </svg>
+    </span>
+    Consideration
+  </span>
+  <h1 class="page-title">Cost</h1>
+  <p class="explainer">Every word the AI reads or writes costs real money. Keep it cheap enough and everyone can use it. Let it run unchecked and the bill ends the product.</p>
+</header>
 
-    <div class="stage" id="main" role="main">
-      <div class="canvas">
-        <div class="pagehead">
-          <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-1.7 2.5-1.7s2.5.6 2.5 1.9c0 2.6-5 1.4-5 4 0 1.3 1.1 2 2.5 2s2.5-.5 2.5-1.7"/></svg></span>Consideration</span>
-          <h1>Cost</h1>
-          <p class="intro">Keeping the AI cheap enough to run that everyone can use it without breaking the bank.</p>
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>costs</em> money?</h2>
+  <div class="idea-card">
+    <p>AI models charge per <span style="color:var(--accent-hover);font-weight:600">token</span>: roughly one word, in or out. Every character you send and every character the model writes adds to the bill. A longer prompt, a bigger model, or a thousand users asking the same question all drive the cost up.</p>
+    <p>Three levers bring it back down: write <strong>shorter prompts</strong> (fewer tokens in), pick a <strong>smaller model</strong> for easy tasks (cheaper per token), and <strong>cache</strong> repeated answers (pay once, serve many).</p>
+  </div>
+</section>
+
+<!-- 02 INTERACTIVE DEMO -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Turn the <em>dials</em>.</h2>
+  <p class="demo-lede">Adjust prompt length, model size, and caching. Watch the cost meter update instantly.</p>
+
+  <div class="demo-stage">
+    <div class="controls">
+
+      <!-- Prompt length -->
+      <div class="ctrl-row">
+        <div class="ctrl-label">
+          <span class="ctrl-label-name">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"/></svg>
+            Prompt length
+          </span>
+          <span class="ctrl-value" id="promptVal">500 tokens</span>
         </div>
-
-        <div class="block">
-          <h2>In plain words</h2>
-          <div class="card">
-            <p>Every answer an AI gives costs real money: computer time, electricity, and rented hardware. Cost means watching that bill and finding ways to do the same work for less. A smart system uses a small, cheap model when it can and saves the expensive one for hard questions.</p>
-          </div>
+        <div class="slider-wrap">
+          <input type="range" id="promptSlider" min="50" max="2000" step="50" value="500"
+            aria-label="Prompt length in tokens" aria-valuemin="50" aria-valuemax="2000" aria-valuenow="500">
         </div>
+        <div class="slider-ticks"><span>50 tokens</span><span>2 000 tokens</span></div>
+      </div>
 
-        <div class="block">
-          <h2>Why it matters</h2>
-          <div class="card note">
-            <span class="tag">What goes wrong if you ignore it</span>
-            <p>A startup uses the largest, most expensive model for every single request, even simple ones. The product takes off, usage explodes, and the monthly bill jumps to far more than they earn. They either run out of money or have to shut features off for users.</p>
-          </div>
+      <!-- Model size -->
+      <div class="ctrl-row">
+        <div class="ctrl-label">
+          <span class="ctrl-label-name">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Model size
+          </span>
+          <span class="ctrl-value" id="modelVal">Medium</span>
         </div>
-
-        <div class="block">
-          <h2>Where it shows up most</h2>
-          <div class="card">
-            <div class="bars">
-              <div class="bar-row"><span class="bar-label">Training &amp; adaptation</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">Serving &amp; infrastructure</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">Orchestration &amp; agents</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">Single-call control</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">Knowledge &amp; memory</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
-            </div>
-            <p class="bars-note">Rough editorial estimate of where this matters most, not a measured score. The biggest bills come from training models and from serving them at scale, so those are where cost discipline pays off most.</p>
-          </div>
+        <div class="toggle-group" role="group" aria-label="Model size">
+          <button class="toggle-btn" data-model="small" aria-pressed="false">Small</button>
+          <button class="toggle-btn active" data-model="medium" aria-pressed="true">Medium</button>
+          <button class="toggle-btn" data-model="large" aria-pressed="false">Large</button>
         </div>
+      </div>
 
-        <div class="block">
-          <h2>Examples</h2>
-          <div class="card">
-            <div class="ex-list">
-              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>Model routing:</strong> products send easy questions to a small cheap model and only hard ones to the big model.</span></div>
-              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>Caching:</strong> if many people ask the same thing, the answer is stored and reused instead of recomputed.</span></div>
-              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>Smaller distilled models</strong> are trained to copy a big model's behavior at a fraction of the running cost.</span></div>
-            </div>
-          </div>
+      <!-- Caching -->
+      <div class="ctrl-row">
+        <div class="ctrl-label">
+          <span class="ctrl-label-name">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            Caching
+          </span>
+          <span class="ctrl-value" id="cacheVal">Off</span>
         </div>
-
-        <div class="block">
-          <h2>Learn more</h2>
-          <div class="card">
-            <ul class="links">
-              <li><a href="https://en.wikipedia.org/wiki/Knowledge_distillation" target="_blank" rel="noopener">Knowledge distillation</a> <span class="src">. Wikipedia, shrinking a big model into a cheaper small one.</span></li>
-              <li><a href="https://en.wikipedia.org/wiki/Cache_(computing)" target="_blank" rel="noopener">Cache (computing)</a> <span class="src">. Wikipedia, reusing past results to avoid redoing work.</span></li>
-            </ul>
+        <div class="cache-row">
+          <span class="desc">Store the answer to repeated questions and serve it for free instead of running the model again.</span>
+          <div class="switch-wrap">
+            <label class="switch">
+              <input type="checkbox" id="cacheToggle" role="switch" aria-checked="false">
+              <span class="switch-track"></span>
+              <span class="switch-label sr-only">Enable caching</span>
+            </label>
           </div>
         </div>
       </div>
     </div>
 
-    <footer class="foot"><strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.</footer>
+    <div class="meter-divider"></div>
+
+    <!-- Cost meter -->
+    <div class="meter-box" aria-live="polite" aria-atomic="true" aria-label="Cost meter">
+      <div class="meter-row">
+        <div class="meter-cost-block">
+          <div class="meter-label">Cost per 1 000 queries</div>
+          <div class="meter-amount" id="meterAmount">$0.00</div>
+          <div class="savings-badge" id="savingsBadge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="savingsText">Cache saves 0%</span>
+          </div>
+        </div>
+        <div class="meter-breakdown">
+          <div class="breakdown-row">
+            <span class="breakdown-name">Input tokens</span>
+            <div class="breakdown-bar-track"><div class="breakdown-bar-fill" id="barInput" style="width:0%"></div></div>
+            <span class="breakdown-num" id="numInput">$0.00</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-name">Output tokens</span>
+            <div class="breakdown-bar-track"><div class="breakdown-bar-fill" id="barOutput" style="width:0%"></div></div>
+            <span class="breakdown-num" id="numOutput">$0.00</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-name">Cache savings</span>
+            <div class="breakdown-bar-track"><div class="breakdown-bar-fill saved" id="barSaved" style="width:0%"></div></div>
+            <span class="breakdown-num saved" id="numSaved">$0.00</span>
+          </div>
+        </div>
+      </div>
+      <p class="meter-note" id="meterNote"></p>
+    </div>
   </div>
+</section>
+
+<!-- 03 REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>Two products, <em>same feature</em>.</h2>
+  <div class="example-stage">
+    <p class="example-lede">Tap a scenario to see how cost discipline (or lack of it) plays out in practice.</p>
+    <div class="scenario-cards">
+      <div class="scenario" role="button" tabindex="0" aria-expanded="false" data-id="a">
+        <div class="scenario-top">
+          <span class="scenario-name">Startup A: big model, every request</span>
+          <span class="scenario-badge bad">Costly</span>
+        </div>
+        <div class="scenario-detail">
+          Routes every query, including "what's the capital of France?", through the largest frontier model. At 10 000 daily users the bill hits <strong>$12 000/month</strong>. Revenue: $4 000/month. Forced to shut the product to new sign-ups within 60 days.
+        </div>
+      </div>
+      <div class="scenario" role="button" tabindex="0" aria-expanded="false" data-id="b">
+        <div class="scenario-top">
+          <span class="scenario-name">Startup B: route by complexity + cache</span>
+          <span class="scenario-badge good">Sustainable</span>
+        </div>
+        <div class="scenario-detail">
+          Simple questions go to a small cheap model. Complex ones go to the large model. Answers to the 200 most common questions are cached. Same 10 000 daily users, same features. Bill: <strong>$1 400/month</strong>. The product stays open and grows.
+        </div>
+      </div>
+      <div class="scenario" role="button" tabindex="0" aria-expanded="false" data-id="c">
+        <div class="scenario-top">
+          <span class="scenario-name">Enterprise: shorter system prompts</span>
+          <span class="scenario-badge good">Quick win</span>
+        </div>
+        <div class="scenario-detail">
+          The system prompt (instructions sent with every query) was 2 400 tokens of verbose policy text. After trimming it to 600 tokens without changing behavior, input costs dropped <strong>by 75%</strong> across millions of monthly calls. No model change, no caching, just fewer words.
+        </div>
+      </div>
+    </div>
+    <p class="scenario-hint">Tap any row to expand it.</p>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>What you <em>give up</em>.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Shorter prompts</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-g"></div><div class="seg on-g"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Smaller model</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-g"></div><div class="seg on-g"></div><div class="seg on-g"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Caching</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-g"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Shorter prompts risk losing important context. Smaller models may miss nuance on hard questions. Caching only helps when queries repeat, and cached answers can go stale. None of these is free. The skill is knowing when the savings outweigh the loss.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="considerations.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div>
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Considerations</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Anthropic (2024). <em>Prompt caching.</em> <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching" target="_blank" rel="noopener">docs.anthropic.com</a> <span class="note">. Official docs on caching repeated prompt prefixes to cut input costs.</span></li>
+    <li>Chen et al. (2023). <em>FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance.</em> <span class="note">arXiv:2305.05176. Empirical study of model routing and cascade strategies for cost reduction.</span></li>
+    <li>OpenAI (2024). <em>Pricing.</em> <a href="https://openai.com/pricing" target="_blank" rel="noopener">openai.com/pricing</a> <span class="note">. Real per-token pricing across model sizes, illustrating the cost gap between small and large models.</span></li>
+    <li>Samyam Rajbhandari et al. (2020). <em>ZeRO: Memory Optimizations Toward Training Trillion Parameter Models.</em> <span class="note">SC '20. Foundational work on reducing the compute cost of training large models.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ COST METER ============
+// Illustrative per-token rates (USD per 1M tokens). Not real API pricing, but realistic ratios.
+// Input and output token counts are illustrative for the demo.
+const MODELS = {
+  small:  { label: 'Small',  inputRate: 0.10,  outputRate: 0.30  },  // e.g. small fast model
+  medium: { label: 'Medium', inputRate: 0.50,  outputRate: 1.50  },  // e.g. mid-tier model
+  large:  { label: 'Large',  inputRate: 3.00,  outputRate: 15.00 }   // e.g. frontier model
+};
+
+// Assume output is ~40% of input length (typical for Q&A)
+const OUTPUT_RATIO = 0.4;
+// Cache hit rate: ~60% of 1000 queries hit the cache when caching is on
+const CACHE_HIT_RATE = 0.60;
+// Queries per batch shown in the meter
+const QUERIES = 1000;
+
+let state = {
+  promptTokens: 500,
+  model: 'medium',
+  cacheOn: false
+};
+
+function computeCost(s) {
+  const m = MODELS[s.model];
+  const inputTokens = s.promptTokens;
+  const outputTokens = Math.round(inputTokens * OUTPUT_RATIO);
+  const totalInputM = (inputTokens / 1_000_000) * QUERIES;
+  const totalOutputM = (outputTokens / 1_000_000) * QUERIES;
+
+  const rawInput = totalInputM * m.inputRate;
+  const rawOutput = totalOutputM * m.outputRate;
+  const rawTotal = rawInput + rawOutput;
+
+  let cacheSaving = 0;
+  if (s.cacheOn) {
+    // cache hits avoid running the model entirely for that fraction
+    cacheSaving = rawTotal * CACHE_HIT_RATE;
+  }
+
+  const netTotal = Math.max(0, rawTotal - cacheSaving);
+  return { rawInput, rawOutput, rawTotal, cacheSaving, netTotal };
+}
+
+function fmt(n) {
+  if (n < 0.01) return '$0.00';
+  if (n < 10) return '$' + n.toFixed(2);
+  if (n < 1000) return '$' + Math.round(n).toLocaleString();
+  return '$' + Math.round(n).toLocaleString();
+}
+
+function pct(part, whole) {
+  if (whole === 0) return 0;
+  return Math.min(100, Math.round((part / whole) * 100));
+}
+
+function meterClass(net) {
+  if (net < 2) return 'cheap';
+  if (net < 15) return 'mid';
+  return 'expensive';
+}
+
+function updateMeter() {
+  const c = computeCost(state);
+  const amountEl = document.getElementById('meterAmount');
+  const badgeEl = document.getElementById('savingsBadge');
+  const savingsTextEl = document.getElementById('savingsText');
+  const meterNoteEl = document.getElementById('meterNote');
+
+  // Total cost display
+  amountEl.textContent = fmt(c.netTotal);
+  amountEl.className = 'meter-amount ' + meterClass(c.netTotal);
+
+  // Breakdown bars (relative to rawTotal as 100%)
+  const maxBar = c.rawTotal || 1;
+  document.getElementById('barInput').style.width = pct(c.rawInput, maxBar) + '%';
+  document.getElementById('barOutput').style.width = pct(c.rawOutput, maxBar) + '%';
+  document.getElementById('barSaved').style.width = pct(c.cacheSaving, maxBar) + '%';
+  document.getElementById('numInput').textContent = fmt(c.rawInput);
+  document.getElementById('numOutput').textContent = fmt(c.rawOutput);
+  document.getElementById('numSaved').textContent = state.cacheOn ? '-' + fmt(c.cacheSaving) : '$0.00';
+
+  // Savings badge
+  if (state.cacheOn && c.cacheSaving > 0) {
+    const savePct = Math.round((c.cacheSaving / c.rawTotal) * 100);
+    savingsTextEl.textContent = 'Cache saves ' + savePct + '%';
+    badgeEl.classList.add('visible');
+  } else {
+    badgeEl.classList.remove('visible');
+  }
+
+  // Contextual note
+  let note = '';
+  const m = MODELS[state.model];
+  if (state.model === 'large' && state.promptTokens > 1000) {
+    note = 'Largest model + long prompt: the most expensive combination. Consider routing simpler queries to a smaller model.';
+  } else if (state.model === 'small' && state.cacheOn) {
+    note = 'Small model with caching: the lowest-cost configuration. Good for high-volume, repetitive tasks.';
+  } else if (state.promptTokens > 1500) {
+    note = 'Long prompts drive up input costs fast. Even a 30% trim can meaningfully reduce the bill.';
+  } else if (state.model === 'large') {
+    note = 'Large models are 6-50x more expensive per token than small ones. Reserve them for questions that need it.';
+  } else if (state.cacheOn) {
+    note = 'Caching repeated answers means those queries cost nothing extra after the first time.';
+  } else {
+    note = 'Illustrative costs based on realistic per-token ratios. Actual rates vary by provider and model.';
+  }
+  meterNoteEl.textContent = note;
+}
+
+// Prompt slider
+const promptSlider = document.getElementById('promptSlider');
+const promptVal = document.getElementById('promptVal');
+
+function updateSliderFill() {
+  const min = parseInt(promptSlider.min);
+  const max = parseInt(promptSlider.max);
+  const val = parseInt(promptSlider.value);
+  const pctFill = ((val - min) / (max - min)) * 100;
+  promptSlider.style.setProperty('--pct', pctFill + '%');
+}
+
+promptSlider.addEventListener('input', () => {
+  state.promptTokens = parseInt(promptSlider.value);
+  promptSlider.setAttribute('aria-valuenow', state.promptTokens);
+  promptVal.textContent = state.promptTokens.toLocaleString() + ' tokens';
+  updateSliderFill();
+  updateMeter();
+});
+
+// Model toggles
+const modelBtns = document.querySelectorAll('.toggle-btn[data-model]');
+const modelVal = document.getElementById('modelVal');
+modelBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    modelBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+    state.model = btn.dataset.model;
+    modelVal.textContent = MODELS[state.model].label;
+    updateMeter();
+  });
+});
+
+// Cache toggle
+const cacheToggle = document.getElementById('cacheToggle');
+const cacheVal = document.getElementById('cacheVal');
+cacheToggle.addEventListener('change', () => {
+  state.cacheOn = cacheToggle.checked;
+  cacheToggle.setAttribute('aria-checked', state.cacheOn ? 'true' : 'false');
+  cacheVal.textContent = state.cacheOn ? 'On' : 'Off';
+  updateMeter();
+});
+
+// Init
+updateSliderFill();
+updateMeter();
+
+// ============ SCENARIO CARDS ============
+const scenarios = document.querySelectorAll('.scenario');
+scenarios.forEach(s => {
+  function toggle() {
+    const isOpen = s.classList.contains('open');
+    scenarios.forEach(x => { x.classList.remove('open'); x.setAttribute('aria-expanded', 'false'); });
+    if (!isOpen) { s.classList.add('open'); s.setAttribute('aria-expanded', 'true'); }
+  }
+  s.addEventListener('click', toggle);
+  s.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+  });
+});
+</script>
 </body>
 </html>

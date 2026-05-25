@@ -6,169 +6,793 @@
 <title>Multimodal . The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#FCFCFD; --surface:#FFFFFF; --bg-subtle:#F6F7F9; --text:#15171C; --soft:#565C68; --faint:#6B7280;
-    --border:#E8EAEE; --border-strong:#D5D9E0; --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
-    --radius:16px; --radius-sm:11px;
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --c-img:#E67E22; --c-img-soft:#FEF3E7;
+    --c-audio:#2ECC71; --c-audio-soft:#E8FAF2;
+    --c-text:#7C5CF6; --c-text-soft:#F0ECFE;
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-padding-top:72px}
-  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-  body{overflow-x:hidden}
-  .wrap{max-width:920px;margin:0 auto;padding:0 24px}
-  a{color:inherit;text-decoration:none}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
 
-  a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
-  .skip-link{position:absolute;left:8px;top:-48px;z-index:100;background:var(--surface);color:var(--accent-hover);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:top .15s ease}
-  .skip-link:focus{top:8px}
-  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}}
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
 
-  .topbar{position:sticky;top:0;z-index:10;background:rgba(252,252,253,.86);backdrop-filter:saturate(180%) blur(10px);-webkit-backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--border)}
-  .topbar-in{max-width:920px;margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;padding:5px 11px;border:1px solid var(--border-strong);border-radius:20px;background:#fff;transition:border-color .2s ease,color .2s ease,background .2s ease;white-space:nowrap}
-  .back:hover{border-color:var(--accent);color:var(--accent-hover);background:var(--accent-soft)}
-  .crumb{font-size:12.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .crumb a{color:var(--faint);text-decoration:none}
-  .crumb a:hover{color:var(--accent)}
-  .crumb .sep{margin:0 7px;color:var(--border-strong)}
-  .crumb .here{color:var(--soft)}
+  /* TOP BAR */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none;
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
 
-  header{padding:36px 0 6px;scroll-margin-top:72px}
-  .wordmark{font-family:'Fraunces',serif;font-weight:500;font-size:25px;letter-spacing:-.01em}
-  .strap{color:var(--soft);font-size:15px;margin-top:4px}
-
-  .stage{padding:22px 0 34px}
-  .canvas{max-width:680px;margin:0 auto}
-
-  .pagehead{margin-bottom:8px}
-  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--border);border-radius:20px;padding:5px 12px;margin-bottom:14px}
-  .eyebrow .ico{width:15px;height:15px;display:block;color:var(--accent)}
-  .eyebrow .ico svg{width:15px;height:15px;display:block}
-  .pagehead h1{font-family:'Fraunces',serif;font-weight:500;font-size:38px;letter-spacing:-.015em;line-height:1.05;scroll-margin-top:72px}
-  .pagehead .intro{color:var(--soft);font-size:16px;line-height:1.6;margin-top:12px;max-width:580px}
-
-  .block{margin-top:26px}
-  .block h2{font-family:'Fraunces',serif;font-weight:500;font-size:21px;letter-spacing:-.01em;line-height:1.2;margin-bottom:10px}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px}
-  .card p{font-size:15px;line-height:1.65;color:var(--soft)}
-  .card p + p{margin-top:10px}
-  .card p strong{color:var(--text);font-weight:600}
-
-  .note{background:var(--bg-subtle);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius-sm)}
-  .note .tag{display:block;font-size:12px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
-
-  .bars{display:flex;flex-direction:column;gap:10px}
-  .bar-row{display:flex;align-items:center;gap:14px}
-  .bar-label{flex:none;width:180px;font-size:13.5px;color:var(--soft);text-align:right}
-  .bar-track{flex:1;height:18px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:6px;overflow:hidden}
-  .bar-fill{height:100%;background:var(--accent);border-radius:5px 0 0 5px}
-  .bar-fill.mid{background:#A892F2}
-  .bar-fill.low{background:#CFC3F6}
-  .bars-note{font-size:12.5px;color:var(--faint);margin-top:14px;line-height:1.5}
-  @media(max-width:560px){
-    .bar-label{width:118px;font-size:12px}
+  /* HEADER */
+  .header {
+    max-width: 920px; margin: 0 auto; padding: 40px 24px 8px;
+    scroll-margin-top: 80px;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    scroll-margin-top: 80px;
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer {
+    color: var(--soft); font-size: 16px; line-height: 1.6;
+    max-width: 660px; margin-top: 14px;
   }
 
-  .ex-list{display:flex;flex-direction:column;gap:12px}
-  .ex{display:flex;gap:13px;align-items:flex-start}
-  .ex .dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:7px}
-  .ex .ex-text{font-size:15px;line-height:1.55;color:var(--soft)}
-  .ex .ex-text strong{color:var(--text);font-weight:600}
+  /* SECTIONS */
+  section {
+    max-width: 920px; margin: 0 auto;
+    padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px;
+  }
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--faint); margin-bottom: 9px;
+  }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
+    line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
 
-  .links{list-style:none;display:flex;flex-direction:column;gap:9px}
-  .links li{font-size:14px;line-height:1.5}
-  .links a{color:var(--accent-hover);font-weight:500;border-bottom:1px solid var(--accent-soft)}
-  .links a:hover{border-bottom-color:var(--accent)}
-  .links .src{color:var(--soft)}
+  /* IDEA CARD */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif; font-weight: 400;
+    font-size: 18px; line-height: 1.55; color: var(--text);
+  }
 
-  .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
-  .foot strong{color:var(--soft);font-weight:500}
+  /* DEMO */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .board-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
 
-  @media(max-width:560px){
-    .pagehead h1{font-size:30px}
-    .card{padding:17px 16px}
+  /* Input picker */
+  .input-picker {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin-bottom: 20px;
+  }
+  .input-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 16px 10px; border-radius: var(--radius-sm);
+    border: 2px solid var(--border); background: var(--bg-subtle);
+    cursor: pointer; transition: border-color .2s ease, background .2s ease, transform .18s ease, box-shadow .18s ease;
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: var(--soft);
+    position: relative; user-select: none;
+  }
+  .input-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+  .input-btn .ib-icon { font-size: 26px; line-height: 1; }
+  .input-btn.active-img { border-color: var(--c-img); background: var(--c-img-soft); color: var(--c-img); }
+  .input-btn.active-audio { border-color: var(--c-audio); background: var(--c-audio-soft); color: var(--c-audio); }
+  .input-btn.active-text { border-color: var(--c-text); background: var(--c-text-soft); color: var(--c-text); }
+  .input-btn .ib-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    padding: 2px 6px; border-radius: 20px; background: currentColor;
+    color: #fff; opacity: 0; transition: opacity .2s ease;
+    position: absolute; top: 6px; right: 6px;
+  }
+  .input-btn.active-img .ib-tag, .input-btn.active-audio .ib-tag, .input-btn.active-text .ib-tag { opacity: 1; }
+
+  /* Pipeline board */
+  .pipeline-board {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 18px; min-height: 220px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+
+  /* Raw input row */
+  .raw-row {
+    display: flex; align-items: center; gap: 12px;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .raw-row.shown { opacity: 1; transform: translateY(0); }
+  .raw-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    flex: none; width: 64px; text-align: right;
+  }
+  .raw-label.img { color: var(--c-img); }
+  .raw-label.audio { color: var(--c-audio); }
+  .raw-label.txt { color: var(--c-text); }
+  .raw-content {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px; flex: 1; font-size: 13px; color: var(--soft);
+    min-height: 40px;
+  }
+  .raw-icon { font-size: 20px; flex: none; }
+
+  /* Encoder arrow */
+  .encoder-row {
+    display: flex; align-items: center; gap: 10px;
+    opacity: 0; transform: translateY(4px);
+    transition: opacity .3s ease .12s, transform .3s ease .12s;
+  }
+  .encoder-row.shown { opacity: 1; transform: translateY(0); }
+  .enc-spacer { width: 64px; flex: none; }
+  .enc-arrow {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--faint);
+  }
+  .enc-arrow svg { width: 16px; height: 16px; flex: none; }
+
+  /* Token stream */
+  .token-stream-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .35s ease .24s, transform .35s ease .24s;
+  }
+  .token-stream-row.shown { opacity: 1; transform: translateY(0); }
+  .stream-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--faint); flex: none; width: 64px; text-align: right;
+    padding-top: 6px;
+  }
+  .token-stream {
+    display: flex; flex-wrap: wrap; gap: 5px; flex: 1;
+    min-height: 36px;
+  }
+  .tok-chip {
+    display: inline-flex; align-items: center;
+    padding: 4px 9px; border-radius: 20px;
+    font-size: 12px; font-weight: 600; line-height: 1.2;
+    opacity: 0; transform: scale(0.8);
+    transition: opacity .22s ease, transform .22s ease, background .3s ease;
+  }
+  .tok-chip.in { opacity: 1; transform: scale(1); }
+  .tok-chip.img-tok { background: var(--c-img-soft); color: var(--c-img); border: 1px solid rgba(230,126,34,.25); }
+  .tok-chip.audio-tok { background: var(--c-audio-soft); color: #1a9c54; border: 1px solid rgba(46,204,113,.25); }
+  .tok-chip.text-tok { background: var(--c-text-soft); color: var(--c-text); border: 1px solid rgba(124,92,246,.25); }
+  .tok-chip.unified { background: var(--bg-subtle); color: var(--soft); border: 1px solid var(--border-strong); }
+  .tok-chip.writing { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,92,246,.15); }
+
+  /* Merge divider */
+  .merge-divider {
+    display: flex; align-items: center; gap: 10px;
+    opacity: 0; transform: translateY(4px);
+    transition: opacity .3s ease .3s, transform .3s ease .3s;
+  }
+  .merge-divider.shown { opacity: 1; transform: translateY(0); }
+  .merge-line { flex: 1; height: 1px; background: var(--border-strong); }
+  .merge-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); white-space: nowrap; }
+
+  /* Model reads row */
+  .model-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .35s ease .36s, transform .35s ease .36s;
+  }
+  .model-row.shown { opacity: 1; transform: translateY(0); }
+  .model-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--accent-hover); flex: none; width: 64px; text-align: right; padding-top: 6px;
+  }
+  .model-stream { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; min-height: 36px; }
+
+  /* Insight */
+  .demo-insight {
+    margin-top: 6px; font-size: 13px; color: var(--faint); line-height: 1.5;
+    opacity: 0; transition: opacity .4s ease .45s;
+  }
+  .demo-insight.shown { opacity: 1; }
+
+  /* Controls */
+  .board-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm); cursor: pointer;
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* SECTION 03: example */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .example-tabs {
+    display: flex; border-bottom: 1px solid var(--border);
+  }
+  .ex-tab {
+    flex: 1; padding: 12px 10px; font-size: 13px; font-weight: 600;
+    color: var(--faint); background: transparent; border: none; cursor: pointer;
+    border-bottom: 2px solid transparent; transition: color .2s ease, border-color .2s ease;
+    font-family: 'Inter', sans-serif;
+  }
+  .ex-tab:hover { color: var(--soft); }
+  .ex-tab.active { color: var(--accent-hover); border-bottom-color: var(--accent); }
+  .example-body { padding: 20px 22px; }
+  .ex-panel { display: none; }
+  .ex-panel.active { display: block; }
+  .ex-scenario {
+    font-family: 'Fraunces', serif; font-size: 16px; line-height: 1.5;
+    color: var(--text); margin-bottom: 12px;
+  }
+  .ex-what {
+    font-size: 14px; line-height: 1.6; color: var(--soft);
+  }
+  .ex-what strong { color: var(--text); font-weight: 600; }
+
+  /* TRADEOFFS */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); min-width: 100px; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { min-width: 100px; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* BACK LINK */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* SOURCES */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  .sources li a { color: var(--accent-hover); font-weight: 500; }
+
+  /* FOOTER */
+  footer {
+    max-width: 920px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* RESPONSIVE */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .input-picker { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .input-btn { padding: 12px 6px; font-size: 12px; }
+    .input-btn .ib-icon { font-size: 22px; }
+    .raw-label, .stream-label, .model-label, .enc-spacer { width: 48px; }
+  }
+  @media (max-width: 420px) {
+    .board-controls { flex-direction: column; align-items: stretch; }
   }
 </style>
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <div class="topbar">
-    <div class="topbar-in">
-      <a class="back" href="considerations.html"><span aria-hidden="true">&larr;</span> Considerations</a>
-      <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Multimodal</span></nav>
-    </div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="considerations.html"><span aria-hidden="true">&larr;</span> Considerations</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep">/</span>
+      <a href="considerations.html">Considerations</a>
+      <span class="sep">/</span>
+      <span class="here">Multimodal</span>
+    </nav>
   </div>
+</nav>
 
-  <div class="wrap">
-    <header>
-      <div class="wordmark">The Pattern Book</div>
-      <div class="strap">What every part of an AI must get right.</div>
-    </header>
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="14" rx="2"/>
+        <circle cx="8.5" cy="10" r="1.6"/>
+        <path d="M21 16l-5-4-9 7"/>
+      </svg>
+    </span>
+    Consideration
+  </span>
+  <h1 class="pattern-title">Multimodal</h1>
+  <p class="explainer">Handling pictures, sound, and video, not just words.</p>
+</header>
 
-    <div class="stage" id="main" role="main">
-      <div class="canvas">
-        <div class="pagehead">
-          <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 16l-5-4-9 7"/></svg></span>Consideration</span>
-          <h1>Multimodal</h1>
-          <p class="intro">Handling pictures, sound, and video, not just words.</p>
-        </div>
+<!-- 01 · THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>A <span style="color:var(--accent-hover);font-weight:600">multimodal model</span> can read more than one kind of input. Not just words, but also images, audio, and video. The trick is that everything, a photo, a spoken word, a block of text, gets converted into the same kind of numbers (called <span style="color:var(--accent-hover);font-weight:600">tokens</span>) before the model ever sees it. One unified stream. One model.</p>
+  </div>
+</section>
 
-        <div class="block">
-          <h2>In plain words</h2>
-          <div class="card">
-            <p>A "mode" is a kind of input: text, images, audio, or video. A multimodal AI can take in more than one of these and mix them together. You can show it a photo and ask a question about it out loud, and it understands both at once.</p>
-          </div>
-        </div>
+<!-- 02 · THE DEMO -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <h2>Everything <em>becomes</em> tokens.</h2>
 
-        <div class="block">
-          <h2>Why it matters</h2>
-          <div class="card note">
-            <span class="tag">What goes wrong if you ignore it</span>
-            <p>A help app only accepts typed text. A user snaps a photo of a broken part and asks "what is this and how do I fix it?" The app cannot see the picture, so it gives a useless generic reply. The person gives up and calls a human instead, which costs more and frustrates everyone.</p>
-          </div>
-        </div>
+  <p class="demo-lede">Tap an input type below. Watch it get converted into tokens and merged into the stream the model reads.</p>
 
-        <div class="block">
-          <h2>Where it shows up most</h2>
-          <div class="card">
-            <div class="bars">
-              <div class="bar-row"><span class="bar-label">User experience</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">Application patterns</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">Single-call control</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">Knowledge &amp; memory</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">Training &amp; adaptation</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
-            </div>
-            <p class="bars-note">Rough editorial estimate of where this matters most, not a measured score. Multimodal is spread fairly evenly: it shapes how people interact, how a single request is built, and what the model was trained to handle.</p>
-          </div>
-        </div>
+  <div class="board-stage">
+    <!-- Input picker -->
+    <div class="input-picker" role="group" aria-label="Choose an input type">
+      <button class="input-btn" id="btn-img" aria-pressed="false" data-type="img">
+        <span class="ib-icon" aria-hidden="true">🖼️</span>
+        <span>Image</span>
+        <span class="ib-tag" aria-hidden="true">selected</span>
+      </button>
+      <button class="input-btn" id="btn-audio" aria-pressed="false" data-type="audio">
+        <span class="ib-icon" aria-hidden="true">🔊</span>
+        <span>Audio</span>
+        <span class="ib-tag" aria-hidden="true">selected</span>
+      </button>
+      <button class="input-btn" id="btn-text" aria-pressed="false" data-type="text">
+        <span class="ib-icon" aria-hidden="true">💬</span>
+        <span>Text</span>
+        <span class="ib-tag" aria-hidden="true">selected</span>
+      </button>
+    </div>
 
-        <div class="block">
-          <h2>Examples</h2>
-          <div class="card">
-            <div class="ex-list">
-              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>Voice assistants</strong> hear your spoken question and answer back in speech.</span></div>
-              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>Photo search:</strong> you snap a plant or landmark and the app tells you what it is.</span></div>
-              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>Live captions</strong> turn the audio of a video into on-screen text in real time.</span></div>
-            </div>
-          </div>
-        </div>
+    <!-- Pipeline board -->
+    <div class="pipeline-board" id="pipelineBoard" aria-live="polite" aria-label="Tokenization pipeline">
 
-        <div class="block">
-          <h2>Learn more</h2>
-          <div class="card">
-            <ul class="links">
-              <li><a href="https://en.wikipedia.org/wiki/Multimodal_learning" target="_blank" rel="noopener">Multimodal learning</a> <span class="src">. Wikipedia, AI that combines several kinds of input.</span></li>
-              <li><a href="https://en.wikipedia.org/wiki/Speech_recognition" target="_blank" rel="noopener">Speech recognition</a> <span class="src">. Wikipedia, turning spoken audio into text.</span></li>
-            </ul>
-          </div>
+      <!-- Step 1: raw input -->
+      <div class="raw-row" id="rawRow">
+        <span class="raw-label img" id="rawLabel">Input</span>
+        <div class="raw-content" id="rawContent">
+          <span class="raw-icon" id="rawIcon" aria-hidden="true"></span>
+          <span id="rawText" style="font-size:13.5px"></span>
         </div>
       </div>
+
+      <!-- Step 2: encoder arrow -->
+      <div class="encoder-row" id="encoderRow">
+        <div class="enc-spacer"></div>
+        <div class="enc-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          <span id="encoderLabel">Image encoder</span>
+          <span style="color:var(--faint);font-weight:400;font-size:11px">(patches → vectors)</span>
+        </div>
+      </div>
+
+      <!-- Step 3: per-type tokens -->
+      <div class="token-stream-row" id="tokenRow">
+        <span class="stream-label" id="tokenRowLabel">Tokens</span>
+        <div class="token-stream" id="tokenStream"></div>
+      </div>
+
+      <!-- Merge divider -->
+      <div class="merge-divider" id="mergeDivider">
+        <div class="merge-line"></div>
+        <span class="merge-label">merged into one stream</span>
+        <div class="merge-line"></div>
+      </div>
+
+      <!-- Step 4: unified tokens the model reads -->
+      <div class="model-row" id="modelRow">
+        <span class="model-label">Model</span>
+        <div class="model-stream" id="modelStream"></div>
+      </div>
+
+      <!-- insight line -->
+      <p class="demo-insight" id="demoInsight"></p>
     </div>
 
-    <footer class="foot"><strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.</footer>
+    <div class="board-controls">
+      <button class="diagram-btn primary" id="runBtn">&#9654; Run</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
   </div>
+</section>
+
+<!-- 03 · REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>In the <em>wild</em>.</h2>
+  <div class="example-stage">
+    <div class="example-tabs" role="tablist">
+      <button class="ex-tab active" role="tab" aria-selected="true" data-panel="p1">Visual Q&amp;A</button>
+      <button class="ex-tab" role="tab" aria-selected="false" data-panel="p2">Transcription</button>
+      <button class="ex-tab" role="tab" aria-selected="false" data-panel="p3">Video recap</button>
+    </div>
+    <div class="example-body">
+      <div class="ex-panel active" id="p1">
+        <p class="ex-scenario">"Here is a photo of a rash. Is it something I should see a doctor about?"</p>
+        <p class="ex-what">The model receives an image <strong>and</strong> a text question together. It encodes the photo into patch tokens, mixes them with the word tokens, and reasons across both at once to give a medically grounded answer.</p>
+      </div>
+      <div class="ex-panel" id="p2">
+        <p class="ex-scenario">"Transcribe this meeting recording and summarize the action items."</p>
+        <p class="ex-what">Audio frames are encoded into spectrogram tokens. The model reads those tokens alongside any text prompt, then writes the transcript and summary as a single pass, no separate speech-to-text step needed.</p>
+      </div>
+      <div class="ex-panel" id="p3">
+        <p class="ex-scenario">"Watch this 30-second product demo and write the key selling points."</p>
+        <p class="ex-what">Video is sampled into frames; each frame is encoded like an image. Those frame tokens are laid out in time order, so the model sees what changed and when, then writes a narrative across the full clip.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 · TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Token cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Model size</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Error modes</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      A high-res image can add thousands of tokens to a single request. Video multiplies that by the number of frames sampled. And misaligned encoders (trained separately) can cause the model to "hallucinate" objects that are not there. Multimodal is powerful, but every extra modality is extra cost, weight, and a new class of mistake.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="considerations.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Considerations</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Alayrac et al. (2022). <em>Flamingo: a Visual Language Model for Few-Shot Learning.</em> <span class="note">DeepMind. Introduced cross-attention between vision and language tokens.</span></li>
+    <li>Radford et al. (2022). <em>Robust Speech Recognition via Large-Scale Weak Supervision (Whisper).</em> <span class="note">OpenAI. Spectrogram-to-token encoding for audio.</span></li>
+    <li>OpenAI (2023). <a href="https://openai.com/research/gpt-4v-system-card" target="_blank" rel="noopener">GPT-4V System Card.</a> <span class="note">Describes image tokenization via patch embeddings in a production model.</span></li>
+    <li>Google DeepMind (2023). <em>Gemini: A Family of Highly Capable Multimodal Models.</em> <span class="note">Native multimodal training across text, image, audio, and video from the start.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// =============================================
+// DATA: what each modality looks like and becomes
+// =============================================
+const MODALITIES = {
+  img: {
+    btnClass: 'active-img',
+    rawLabelClass: 'img',
+    rawIcon: '🖼️',
+    rawText: 'A photo of a broken bicycle wheel.',
+    encoderLabel: 'Image encoder',
+    encoderSub: '(patches → vectors)',
+    tokenClass: 'img-tok',
+    tokenRowLabelText: 'Tokens',
+    tokens: ['[IMG/0]','[IMG/1]','[IMG/2]','[IMG/3]','[IMG/4]','[IMG/5]','[IMG/6]','[IMG/7]'],
+    insight: 'The image is sliced into patches. Each patch becomes one token. The model reads them left to right, just like words.',
+  },
+  audio: {
+    btnClass: 'active-audio',
+    rawLabelClass: 'audio',
+    rawIcon: '🔊',
+    rawText: '"Is the wheel fixable?"  (spoken aloud)',
+    encoderLabel: 'Audio encoder',
+    encoderSub: '(spectrogram → vectors)',
+    tokenClass: 'audio-tok',
+    tokenRowLabelText: 'Tokens',
+    tokens: ['[AUD/0]','[AUD/1]','[AUD/2]','[AUD/3]','[AUD/4]','[AUD/5]'],
+    insight: 'Audio frames are turned into a spectrogram and split into time-slice tokens. Same shape as the image tokens.',
+  },
+  text: {
+    btnClass: 'active-text',
+    rawLabelClass: 'txt',
+    rawIcon: '💬',
+    rawText: '"Is the wheel fixable?"  (typed)',
+    encoderLabel: 'Text tokeniser',
+    encoderSub: '(words → word-pieces)',
+    tokenClass: 'text-tok',
+    tokenRowLabelText: 'Tokens',
+    tokens: ['Is','the','wheel','fix','able','?'],
+    insight: 'Text is split into word-pieces (sub-words). Each piece is one token, the same kind the model was originally trained on.',
+  }
+};
+
+// The model sees all selected tokens merged in order: img first, then audio, then text
+const UNIFIED_TOKENS = [
+  {label:'[IMG/0]',cls:'img-tok'},{label:'[IMG/1]',cls:'img-tok'},{label:'[IMG/2]',cls:'img-tok'},
+  {label:'…',cls:'unified'},
+  {label:'[AUD/0]',cls:'audio-tok'},{label:'[AUD/1]',cls:'audio-tok'},
+  {label:'…',cls:'unified'},
+  {label:'Is',cls:'text-tok'},{label:'the',cls:'text-tok'},{label:'wheel',cls:'text-tok'},
+  {label:'fix',cls:'text-tok'},{label:'able',cls:'text-tok'},{label:'?',cls:'text-tok'},
+];
+
+// =============================================
+// STATE
+// =============================================
+let selectedType = null;
+let isRunning = false;
+let reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// =============================================
+// ELEMENTS
+// =============================================
+const btnImg   = document.getElementById('btn-img');
+const btnAudio = document.getElementById('btn-audio');
+const btnText  = document.getElementById('btn-text');
+const runBtn   = document.getElementById('runBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+const rawRow      = document.getElementById('rawRow');
+const rawLabel    = document.getElementById('rawLabel');
+const rawIcon     = document.getElementById('rawIcon');
+const rawText     = document.getElementById('rawText');
+const encoderRow  = document.getElementById('encoderRow');
+const encoderLabel = document.getElementById('encoderLabel');
+const encoderSub  = encoderRow.querySelector('span[style]');
+const tokenRow    = document.getElementById('tokenRow');
+const tokenRowLabel = document.getElementById('tokenRowLabel');
+const tokenStream  = document.getElementById('tokenStream');
+const mergeDivider = document.getElementById('mergeDivider');
+const modelRow    = document.getElementById('modelRow');
+const modelStream  = document.getElementById('modelStream');
+const demoInsight  = document.getElementById('demoInsight');
+
+// =============================================
+// HELPERS
+// =============================================
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function clearPipeline() {
+  [rawRow, encoderRow, tokenRow, mergeDivider, modelRow].forEach(el => el.classList.remove('shown'));
+  tokenStream.innerHTML = '';
+  modelStream.innerHTML = '';
+  demoInsight.classList.remove('shown');
+  demoInsight.textContent = '';
+}
+
+function setSelected(type) {
+  selectedType = type;
+  [btnImg, btnAudio, btnText].forEach(b => {
+    const t = b.dataset.type;
+    b.className = 'input-btn' + (t === type ? ` ${MODALITIES[t].btnClass}` : '');
+    b.setAttribute('aria-pressed', t === type ? 'true' : 'false');
+  });
+}
+
+async function addChip(container, label, cls, animate) {
+  const chip = document.createElement('span');
+  chip.className = `tok-chip ${cls}`;
+  chip.textContent = label;
+  container.appendChild(chip);
+  if (animate) {
+    chip.classList.add('writing');
+    await sleep(60);
+    chip.classList.add('in');
+    await sleep(260);
+    chip.classList.remove('writing');
+  } else {
+    chip.classList.add('in');
+  }
+}
+
+// =============================================
+// RUN ANIMATION
+// =============================================
+async function runDemo() {
+  if (!selectedType) return;
+  if (isRunning) return;
+  isRunning = true;
+  runBtn.disabled = true;
+
+  const M = MODALITIES[selectedType];
+  clearPipeline();
+
+  // Fill raw row content
+  rawLabel.className = `raw-label ${M.rawLabelClass}`;
+  rawIcon.textContent = M.rawIcon;
+  rawText.textContent = M.rawText;
+  encoderLabel.textContent = M.encoderLabel;
+  if (encoderSub) encoderSub.textContent = `(${M.encoderSub.replace(/[()]/g,'')})`;
+  tokenRowLabel.textContent = M.tokenRowLabelText;
+  demoInsight.textContent = M.insight;
+
+  if (reduceMotion) {
+    // Instant reveal
+    [rawRow, encoderRow, tokenRow, mergeDivider, modelRow].forEach(el => el.classList.add('shown'));
+    M.tokens.forEach(t => addChip(tokenStream, t, M.tokenClass, false));
+    UNIFIED_TOKENS.forEach(u => addChip(modelStream, u.label, u.cls, false));
+    demoInsight.classList.add('shown');
+    isRunning = false;
+    runBtn.disabled = false;
+    return;
+  }
+
+  // Step 1: raw input appears
+  rawRow.classList.add('shown');
+  await sleep(420);
+
+  // Step 2: encoder arrow
+  encoderRow.classList.add('shown');
+  await sleep(500);
+
+  // Step 3: tokens appear one by one
+  tokenRow.classList.add('shown');
+  await sleep(200);
+  for (const tok of M.tokens) {
+    await addChip(tokenStream, tok, M.tokenClass, true);
+    await sleep(110);
+  }
+  await sleep(380);
+
+  // Step 4: merge divider + model stream (all unified tokens)
+  mergeDivider.classList.add('shown');
+  await sleep(320);
+  modelRow.classList.add('shown');
+  await sleep(160);
+  for (const u of UNIFIED_TOKENS) {
+    await addChip(modelStream, u.label, u.cls, true);
+    await sleep(70);
+  }
+  await sleep(300);
+
+  // Insight
+  demoInsight.classList.add('shown');
+
+  isRunning = false;
+  runBtn.disabled = false;
+}
+
+// =============================================
+// BUTTON WIRING
+// =============================================
+[btnImg, btnAudio, btnText].forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (isRunning) return;
+    const t = btn.dataset.type;
+    setSelected(t);
+    clearPipeline();
+  });
+});
+
+runBtn.addEventListener('click', () => { runDemo(); });
+
+resetBtn.addEventListener('click', () => {
+  if (isRunning) return;
+  clearPipeline();
+  selectedType = null;
+  [btnImg, btnAudio, btnText].forEach(b => {
+    b.className = 'input-btn';
+    b.setAttribute('aria-pressed', 'false');
+  });
+});
+
+// =============================================
+// EXAMPLE TABS
+// =============================================
+const tabs = document.querySelectorAll('.ex-tab');
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+    tab.classList.add('active');
+    tab.setAttribute('aria-selected','true');
+    document.querySelectorAll('.ex-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(tab.dataset.panel).classList.add('active');
+  });
+});
+</script>
 </body>
 </html>

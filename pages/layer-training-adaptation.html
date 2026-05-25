@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training &amp; adaptation · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-padding-top:80px}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body{min-height:100vh}
+
+  /* a11y */
+  a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+  .skip-link{position:absolute;left:8px;top:-48px;z-index:300;background:var(--surface);color:var(--accent-hover);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:top .15s ease}
+  .skip-link:focus{top:8px}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}}
+
+  /* top bar */
+  .topbar{position:sticky;top:0;z-index:200;background:rgba(252,252,253,.86);backdrop-filter:saturate(180%) blur(10px);-webkit-backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--border)}
+  .topbar-inner{max-width:920px;margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;padding:5px 11px;border:1px solid var(--border-strong);border-radius:20px;background:#fff;transition:border-color .2s ease,color .2s ease,background .2s ease;white-space:nowrap}
+  .back:hover{border-color:var(--accent);color:var(--accent-hover);background:var(--accent-soft)}
+  .crumb{font-size:12.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .crumb a{color:var(--faint);text-decoration:none}
+  .crumb a:hover{color:var(--accent)}
+  .crumb .sep{margin:0 7px;color:var(--border-strong)}
+  .crumb .here{color:var(--soft)}
+
+  /* header */
+  .header{max-width:920px;margin:0 auto;padding:40px 24px 8px;scroll-margin-top:80px}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--border);border-radius:20px;padding:5px 12px}
+  .eyebrow .ico{width:15px;height:15px;display:block;color:var(--accent)}
+  .eyebrow .ico svg{width:15px;height:15px;display:block}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:500;font-size:38px;line-height:1.08;letter-spacing:-.015em;margin:16px 0 0}
+  .explainer{color:var(--soft);font-size:16px;line-height:1.6;max-width:660px;margin-top:14px}
+
+  /* sections */
+  section{max-width:920px;margin:0 auto;padding:18px 24px 34px;position:relative;scroll-margin-top:80px}
+  .section-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin-bottom:9px}
+  .section-label .num{color:var(--accent);font-weight:600;margin-right:7px}
+  h2{font-family:'Fraunces',serif;font-weight:500;font-size:23px;line-height:1.15;letter-spacing:-.01em;margin-bottom:14px}
+  h2 em{font-style:italic;color:var(--accent)}
+
+  /* idea card */
+  .idea-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 28px}
+  .idea-card p{font-family:'Fraunces',serif;font-weight:400;font-size:18px;line-height:1.55;color:var(--text)}
+
+  /* ======== PIPELINE DEMO (section 02) ======== */
+  .demo-lede{font-size:15px;color:var(--soft);line-height:1.6;max-width:640px;margin-bottom:18px}
+
+  .pipeline-stage{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+
+  /* stage nodes */
+  .pipeline-nodes{display:flex;align-items:stretch;gap:0;margin-bottom:20px}
+  .p-node{flex:1;padding:14px 12px;text-align:center;border:1px solid var(--border);position:relative;cursor:pointer;transition:background .2s ease,border-color .2s ease}
+  .p-node:first-child{border-radius:var(--radius-sm) 0 0 var(--radius-sm)}
+  .p-node:last-child{border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+  .p-node + .p-node{border-left:none}
+  .p-node .node-icon{font-size:20px;line-height:1;margin-bottom:6px}
+  .p-node .node-label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
+  .p-node .node-name{font-family:'Fraunces',serif;font-weight:500;font-size:15px;color:var(--text);margin-top:3px;line-height:1.2}
+  .p-node.active{background:var(--accent-soft);border-color:var(--accent)}
+  .p-node.active .node-label{color:var(--accent-hover)}
+  .p-node.active .node-name{color:var(--accent-hover)}
+  .p-node.done{background:var(--success-soft);border-color:var(--success)}
+  .p-node.done .node-label{color:var(--success)}
+  .p-node.done .node-name{color:#0a7a54}
+
+  /* arrow between nodes */
+  .p-arrow{align-self:center;color:var(--border-strong);font-size:18px;padding:0 4px;flex:none;pointer-events:none}
+  .p-arrow.lit{color:var(--accent)}
+
+  /* answer evolution box */
+  .answer-box{background:var(--bg-subtle);border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:18px 20px;min-height:96px;position:relative;overflow:hidden}
+  .answer-box-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+
+  /* each stage answer layer */
+  .answer-layer{position:absolute;left:20px;right:20px;top:38px;opacity:0;transform:translateY(6px);transition:opacity .45s ease,transform .45s ease;font-family:'Fraunces',serif;font-weight:400;font-size:16px;line-height:1.55;color:var(--text)}
+  .answer-layer.shown{opacity:1;transform:translateY(0);position:relative;top:auto;left:auto;right:auto}
+  /* highlight the improved part */
+  .delta{background:var(--accent-soft);color:var(--accent-hover);border-radius:3px;padding:0 2px;font-weight:500}
+
+  /* stage caption */
+  .stage-caption{margin-top:14px;min-height:54px;font-size:14px;color:var(--soft);line-height:1.6;padding:12px 14px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-sm);transition:all .3s ease}
+  .stage-caption strong{color:var(--text);font-weight:600}
+
+  /* controls */
+  .pipeline-controls{display:flex;gap:10px;flex-wrap:wrap;padding-top:16px;margin-top:16px;border-top:1px solid var(--border)}
+  .diagram-btn{padding:10px 16px;border:1px solid var(--border-strong);background:var(--surface);border-radius:var(--radius-sm);cursor:pointer;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:var(--text);transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease}
+  .diagram-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-sm);border-color:var(--accent)}
+  .diagram-btn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+  .diagram-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .diagram-btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+
+  /* ======== SECTION 03: real example ======== */
+  .example-cards{display:flex;flex-direction:column;gap:12px}
+  .ex-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm);padding:18px 20px;display:flex;gap:16px;align-items:flex-start}
+  .ex-tag{flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1}
+  .ex-tag.pretrain{background:#EDE9FE}
+  .ex-tag.finetune{background:#DBEAFE}
+  .ex-tag.rlhf{background:#D1FAE5}
+  .ex-body{}
+  .ex-name{font-size:13px;font-weight:600;color:var(--soft);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+  .ex-text{font-family:'Fraunces',serif;font-weight:400;font-size:16px;color:var(--text);line-height:1.5}
+  .ex-detail{font-size:13px;color:var(--soft);line-height:1.5;margin-top:5px}
+
+  /* ======== SECTION 04: tradeoffs ======== */
+  .tradeoffs-grid{display:flex;flex-direction:column;gap:12px}
+  .tradeoff-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;display:flex;gap:14px;align-items:flex-start;box-shadow:var(--shadow-sm)}
+  .tradeoff-dot{flex:none;width:10px;height:10px;border-radius:50%;margin-top:5px}
+  .tradeoff-dot.pro{background:var(--success)}
+  .tradeoff-dot.con{background:#C2554F}
+  .tradeoff-text{font-size:14px;line-height:1.6;color:var(--soft)}
+  .tradeoff-text strong{color:var(--text);font-weight:600}
+
+  /* ======== BACK LINK ======== */
+  .back-link{display:inline-flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);text-decoration:none;color:var(--text);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;cursor:pointer}
+  .back-link:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+  .back-arrow{font-family:'Fraunces',serif;font-size:22px;color:var(--accent);line-height:1;transition:transform .2s ease}
+  .back-link:hover .back-arrow{transform:translateX(-3px)}
+  .back-hint{font-size:13px;font-weight:500;color:var(--faint);margin-bottom:3px}
+  .back-name{font-family:'Fraunces',serif;font-weight:500;font-size:18px;line-height:1;letter-spacing:-.01em}
+
+  /* sources */
+  .sources{max-width:920px;margin:0 auto;padding:28px 24px 0}
+  .sources-title{font-size:13px;font-weight:500;color:var(--faint);padding-top:24px;border-top:1px solid var(--border);margin-bottom:12px}
+  .sources ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .sources li{font-size:13px;color:var(--soft);line-height:1.5}
+  .sources li em{font-style:italic;color:var(--text)}
+  .sources li .note{color:var(--faint)}
+
+  /* footer */
+  footer{max-width:920px;margin:30px auto 48px;padding:16px 24px 0;text-align:center;border-top:1px solid var(--border);font-size:12px;color:var(--faint);line-height:1.8}
+  footer strong{color:var(--soft);font-weight:500}
+
+  /* responsive */
+  @media(max-width:560px){
+    h1.page-title{font-size:30px}
+    .explainer{font-size:15px}
+    h2{font-size:21px}
+    .pipeline-nodes{flex-direction:column;gap:0}
+    .p-node:first-child{border-radius:var(--radius-sm) var(--radius-sm) 0 0}
+    .p-node:last-child{border-radius:0 0 var(--radius-sm) var(--radius-sm)}
+    .p-node + .p-node{border-left:1px solid var(--border);border-top:none}
+    .p-arrow{transform:rotate(90deg);text-align:center}
+    .pipeline-controls{flex-direction:column;align-items:stretch}
+    .diagram-btn{flex:1}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">Training &amp; adaptation</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+    </span>
+    Layer 3
+  </span>
+  <h1 class="page-title">Training &amp; adaptation</h1>
+  <p class="explainer">How the AI is taught and shaped before you ever talk to it.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>Before you send a single message, the AI goes through three rounds of school. First it reads an enormous pile of text from the internet to learn language (<strong style="color:var(--accent-hover)">pretraining</strong>). Then it studies worked examples for a specific job (<strong style="color:var(--accent-hover)">fine-tuning</strong>). Finally, humans rate its answers and it adjusts to match their preferences (<strong style="color:var(--accent-hover)">RLHF</strong>). Each round builds on the last, making the answer a little better.</p>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it work</div>
+  <h2>Watch the answer <em>improve</em>.</h2>
+
+  <p class="demo-lede">Tap a stage (or press Play) to see how the same question gets a better answer at each step of training.</p>
+
+  <div class="pipeline-stage">
+    <!-- stage nodes -->
+    <div class="pipeline-nodes" role="group" aria-label="Training pipeline stages">
+      <div class="p-node" id="node-0" tabindex="0" role="button" aria-pressed="false" aria-label="Stage: Pretraining">
+        <div class="node-icon" aria-hidden="true">📚</div>
+        <div class="node-label">Stage 1</div>
+        <div class="node-name">Pretraining</div>
+      </div>
+      <div class="p-arrow" id="arrow-0" aria-hidden="true">&rarr;</div>
+      <div class="p-node" id="node-1" tabindex="0" role="button" aria-pressed="false" aria-label="Stage: Fine-tuning">
+        <div class="node-icon" aria-hidden="true">🎯</div>
+        <div class="node-label">Stage 2</div>
+        <div class="node-name">Fine-tuning</div>
+      </div>
+      <div class="p-arrow" id="arrow-1" aria-hidden="true">&rarr;</div>
+      <div class="p-node" id="node-2" tabindex="0" role="button" aria-pressed="false" aria-label="Stage: RLHF">
+        <div class="node-icon" aria-hidden="true">👍</div>
+        <div class="node-label">Stage 3</div>
+        <div class="node-name">RLHF</div>
+      </div>
+    </div>
+
+    <!-- evolving answer box -->
+    <div class="answer-box" aria-live="polite" aria-atomic="true">
+      <div class="answer-box-label">Answer to: "How do I stay focused while studying?"</div>
+      <div class="answer-layer" id="layer-idle">
+        <span style="color:var(--faint);font-family:'Inter',sans-serif;font-size:14px">Press Play or tap a stage above.</span>
+      </div>
+      <div class="answer-layer" id="layer-0">
+        Staying focused can involve various strategies. <span class="delta">Some people find it helpful to remove distractions and take regular breaks.</span> The environment matters too.
+      </div>
+      <div class="answer-layer" id="layer-1">
+        To stay focused while studying: <span class="delta">remove your phone from the room, work in 25-minute blocks, and take a 5-minute break between each block.</span> A quiet space helps a lot.
+      </div>
+      <div class="answer-layer" id="layer-2">
+        <span class="delta">Great question.</span> To stay focused while studying: remove your phone from the room, work in 25-minute blocks, and take a 5-minute break between each block. <span class="delta">This method, called the Pomodoro technique, is backed by research on attention.</span>
+      </div>
+    </div>
+
+    <!-- stage caption -->
+    <div class="stage-caption" id="stage-caption" aria-live="polite">
+      Tap a stage or press Play to see how training improves the answer.
+    </div>
+
+    <!-- controls -->
+    <div class="pipeline-controls">
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A real example</div>
+  <h2>GPT-4, <em>stage by stage</em>.</h2>
+  <div class="example-cards">
+    <div class="ex-card">
+      <div class="ex-tag pretrain" aria-hidden="true">📚</div>
+      <div class="ex-body">
+        <div class="ex-name">Pretraining</div>
+        <div class="ex-text">GPT-4 trained on roughly a trillion words: books, Wikipedia, code, websites.</div>
+        <div class="ex-detail">This gave it general knowledge and the ability to produce fluent text in many languages and styles.</div>
+      </div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-tag finetune" aria-hidden="true">🎯</div>
+      <div class="ex-body">
+        <div class="ex-name">Fine-tuning</div>
+        <div class="ex-text">OpenAI staff wrote thousands of ideal question-and-answer pairs and trained GPT-4 to copy that style.</div>
+        <div class="ex-detail">This is what turned a next-word predictor into a conversational assistant that follows instructions.</div>
+      </div>
+    </div>
+    <div class="ex-card">
+      <div class="ex-tag rlhf" aria-hidden="true">👍</div>
+      <div class="ex-body">
+        <div class="ex-name">RLHF</div>
+        <div class="ex-text">Human raters compared pairs of answers and chose the better one. The model learned to predict those ratings, then optimised for them.</div>
+        <div class="ex-detail">This is what made it helpful, honest, and less likely to say harmful things.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>What training <em>can't</em> fix.</h2>
+  <div class="tradeoffs-grid">
+    <div class="tradeoff-item">
+      <div class="tradeoff-dot pro" aria-label="advantage"></div>
+      <div class="tradeoff-text"><strong>Knowledge cutoff.</strong> Pretraining ends at a date. Anything after that date the model simply does not know, no matter how you prompt it.</div>
+    </div>
+    <div class="tradeoff-item">
+      <div class="tradeoff-dot pro" aria-label="advantage"></div>
+      <div class="tradeoff-text"><strong>Fine-tuning costs money.</strong> Retraining on new examples is expensive. Most teams only fine-tune once, then rely on prompting for the rest.</div>
+    </div>
+    <div class="tradeoff-item">
+      <div class="tradeoff-dot con" aria-label="caution"></div>
+      <div class="tradeoff-text"><strong>RLHF can over-optimise.</strong> If raters prefer confident-sounding answers, the model learns to sound confident even when it is wrong. The human signal is not perfect.</div>
+    </div>
+    <div class="tradeoff-item">
+      <div class="tradeoff-dot con" aria-label="caution"></div>
+      <div class="tradeoff-text"><strong>Training is not the last word.</strong> How you prompt the trained model matters just as much. A well-trained model still gives poor answers to poorly written questions.</div>
+    </div>
+  </div>
+</section>
+
+<!-- BACK LINK -->
+<section style="padding-top:20px;padding-bottom:40px">
+  <a href="layers.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div>
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Layers</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Ouyang et al. (2022). <em>Training language models to follow instructions with human feedback.</em> <span class="note">The InstructGPT paper that introduced RLHF for language models.</span></li>
+    <li>Brown et al. (2020). <em>Language Models are Few-Shot Learners (GPT-3).</em> <span class="note">Foundational large-scale pretraining result.</span></li>
+    <li>OpenAI (2023). <em>GPT-4 Technical Report.</em> <span class="note">Describes the full pretraining + RLHF pipeline for GPT-4.</span></li>
+    <li>Ziegler et al. (2019). <em>Fine-Tuning Language Models from Human Preferences.</em> <span class="note">Early work showing human preference signals improve generation.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ======== PIPELINE DEMO ========
+// Three stages. Tapping a node or pressing Play reveals that stage's
+// version of the answer, with the improvement highlighted, and updates
+// the caption below. Play steps through all three automatically.
+
+const nodes    = [0,1,2].map(i => document.getElementById('node-' + i));
+const arrows   = [0,1].map(i => document.getElementById('arrow-' + i));
+const layers   = ['idle',0,1,2].map(k => document.getElementById('layer-' + k));
+const caption  = document.getElementById('stage-caption');
+const playBtn  = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+const captions = [
+  '<strong>Pretraining:</strong> The model has read huge amounts of text, so it can produce a relevant answer. But it is vague and generic — it has not been told what a good answer looks like.',
+  '<strong>Fine-tuning:</strong> The model has studied worked examples of good answers. Now it gives concrete steps instead of vague advice. It knows the shape of a helpful reply.',
+  '<strong>RLHF:</strong> Human raters preferred answers that were warm and referenced real research. The model learned from that signal, adding a greeting and naming the Pomodoro technique.'
+];
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let currentStage = -1;
+let playing = false;
+
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+function showLayer(idx) {
+  // idx: 0..2 for stages; -1 for idle
+  layers.forEach(l => {
+    l.classList.remove('shown');
+  });
+  if(idx === -1){
+    layers[0].classList.add('shown'); // idle prompt
+  } else {
+    layers[idx + 1].classList.add('shown'); // layer-0, layer-1, layer-2
+  }
+}
+
+function activateNode(idx) {
+  // idx: 0..2
+  nodes.forEach((n, i) => {
+    n.classList.remove('active','done');
+    n.setAttribute('aria-pressed','false');
+    if(i < idx) { n.classList.add('done'); }
+    if(i === idx){ n.classList.add('active'); n.setAttribute('aria-pressed','true'); }
+  });
+  arrows.forEach((a, i) => {
+    a.classList.toggle('lit', i < idx);
+  });
+}
+
+function setCaption(text){
+  caption.innerHTML = text;
+}
+
+function goToStage(idx){
+  currentStage = idx;
+  activateNode(idx);
+  showLayer(idx);
+  setCaption(captions[idx]);
+}
+
+function reset(){
+  currentStage = -1;
+  nodes.forEach(n => { n.classList.remove('active','done'); n.setAttribute('aria-pressed','false'); });
+  arrows.forEach(a => a.classList.remove('lit'));
+  showLayer(-1);
+  setCaption('Tap a stage or press Play to see how training improves the answer.');
+}
+
+// tap a node
+nodes.forEach((node, i) => {
+  node.addEventListener('click', () => {
+    if(playing) return;
+    goToStage(i);
+  });
+  node.addEventListener('keydown', e => {
+    if(e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar'){
+      e.preventDefault();
+      if(playing) return;
+      goToStage(i);
+    }
+  });
+});
+
+// play button: steps through stages automatically
+playBtn.addEventListener('click', async () => {
+  if(playing) return;
+  playing = true;
+  playBtn.disabled = true;
+  resetBtn.disabled = true;
+  reset();
+  if(reduceMotion){
+    // show final stage immediately
+    goToStage(2);
+  } else {
+    await sleep(400);
+    for(let i = 0; i < 3; i++){
+      goToStage(i);
+      await sleep(i < 2 ? 2200 : 1800);
+    }
+  }
+  playing = false;
+  playBtn.disabled = false;
+  resetBtn.disabled = false;
+});
+
+resetBtn.addEventListener('click', () => {
+  if(playing) return;
+  reset();
+});
+
+// init
+reset();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knowledge &amp; Memory · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* TOP BAR */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none;
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* HEADER */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    scroll-margin-top: 80px;
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* SECTIONS */
+  section {
+    max-width: 920px; margin: 0 auto; padding: 18px 24px 34px;
+    position: relative; scroll-margin-top: 80px;
+  }
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 9px;
+  }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
+    line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* IDEA CARD */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.5; color: var(--text);
+  }
+
+  /* DEMO STAGE */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* Query input row */
+  .query-row { display: flex; gap: 10px; margin-bottom: 18px; }
+  .query-input {
+    flex: 1; padding: 11px 14px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif; font-size: 14px; color: var(--text); background: var(--bg-subtle);
+    outline: none; transition: border-color .2s;
+  }
+  .query-input:focus { border-color: var(--accent); background: var(--surface); }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong); background: var(--surface);
+    border-radius: var(--radius-sm); cursor: pointer;
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+    white-space: nowrap;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .diagram-btn:disabled { opacity: .45; cursor: default; transform: none; box-shadow: none; }
+
+  /* Document chunks panel */
+  .panel-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 9px;
+  }
+  .docs-panel {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px; margin-bottom: 14px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .doc-chunk {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 9px;
+    padding: 12px 14px; font-size: 13.5px; line-height: 1.55; color: var(--soft);
+    position: relative; transition: border-color .3s ease, background .3s ease, box-shadow .3s ease;
+  }
+  .doc-chunk .chunk-label {
+    display: block; font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 5px;
+  }
+  .doc-chunk .chunk-text { color: var(--text); }
+  .doc-chunk mark {
+    background: var(--accent-soft); color: var(--accent-hover);
+    border-radius: 3px; padding: 0 2px; font-weight: 500;
+    transition: background .3s ease;
+  }
+  .doc-chunk.scanning {
+    border-color: var(--border-strong); box-shadow: 0 0 0 2px rgba(124,92,246,.08);
+  }
+  .doc-chunk.matched {
+    border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 2px rgba(124,92,246,.12);
+  }
+  .doc-chunk.matched .chunk-label { color: var(--accent-hover); }
+  .doc-chunk.matched mark { background: rgba(124,92,246,.22); }
+  .doc-chunk.faded { opacity: .35; }
+
+  /* Score badge */
+  .score-badge {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 11px; font-weight: 700; letter-spacing: .03em;
+    background: var(--accent); color: #fff;
+    border-radius: 20px; padding: 2px 8px;
+    opacity: 0; transform: scale(.8);
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .doc-chunk.matched .score-badge { opacity: 1; transform: scale(1); }
+
+  /* Pipeline flow */
+  .pipeline {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .pipe-step {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border);
+    font-size: 12px; font-weight: 600; color: var(--soft); background: var(--surface);
+    transition: border-color .3s ease, color .3s ease, background .3s ease;
+  }
+  .pipe-step.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .pipe-step.done { background: var(--success-soft); border-color: var(--success); color: var(--success); }
+  .pipe-arrow { color: var(--border-strong); font-size: 14px; transition: color .3s ease; }
+  .pipe-arrow.lit { color: var(--accent); }
+
+  /* Answer box */
+  .answer-box {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    min-height: 60px;
+    transition: border-color .4s ease, background .4s ease;
+  }
+  .answer-box.ready { border-color: var(--accent); background: var(--surface); }
+  .answer-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 6px;
+  }
+  .answer-text {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 16px;
+    line-height: 1.5; color: var(--text); min-height: 24px;
+  }
+  .answer-hint { font-size: 13px; color: var(--faint); font-family: 'Inter', sans-serif; font-weight: 500; }
+
+  /* Memory section */
+  .memory-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .memory-turns { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .turn {
+    display: flex; gap: 10px; align-items: flex-start;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .turn.shown { opacity: 1; transform: translateY(0); }
+  .turn-role {
+    flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .turn-role.user { background: var(--accent-soft); color: var(--accent-hover); }
+  .turn-role.ai { background: var(--bg-subtle); color: var(--soft); border: 1px solid var(--border); }
+  .turn-body {
+    flex: 1; background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 13px;
+    font-size: 14px; line-height: 1.55; color: var(--text);
+  }
+  .turn-body.memory-highlight {
+    background: var(--accent-soft); border-color: var(--accent);
+  }
+  .turn-body strong { color: var(--accent-hover); font-weight: 600; }
+  .memory-note {
+    font-size: 13px; color: var(--soft); line-height: 1.6;
+    padding-top: 14px; border-top: 1px solid var(--border);
+  }
+  .memory-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; }
+
+  /* TRADEOFFS */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { min-width: 110px; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); min-width: 110px; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* BACK LINK */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none;
+    color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* SOURCES */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* FOOTER */
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* RESPONSIVE */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .query-row { flex-direction: column; }
+    .pipeline { gap: 4px; }
+    .pipe-step { font-size: 11px; padding: 4px 9px; }
+  }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+    .memory-controls { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">Knowledge &amp; Memory</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v4c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 9v4c0 1.66 4.03 3 9 3s9-1.34 9-3V9"/><path d="M3 13v4c0 1.66 4.03 3 9 3s9-1.34 9-3v-4"/>
+      </svg>
+    </span>
+    Layer 5
+  </span>
+  <h1 class="pattern-title">Knowledge &amp; Memory</h1>
+  <p class="explainer">How the AI looks things up and remembers what you already said.</p>
+</header>
+
+<!-- 01: THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>An AI only knows what is in its prompt. So when you ask a question about your own documents, the system first searches a store of text chunks for the most relevant ones, then drops those chunks into the prompt. That is <strong style="color:var(--accent-hover)">retrieval</strong> (also called RAG). Alongside that, the system keeps a record of earlier turns in the conversation and adds those too, so the AI always knows what was already said. That is <strong style="color:var(--accent-hover)">memory</strong>. Together, they give the AI the right context to answer well.</p>
+  </div>
+</section>
+
+<!-- 02: SEE IT WORK (retrieval demo) -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Type a question. Watch it <em>find</em> the answer.</h2>
+  <p class="demo-lede">The system searches three document chunks for the ones that match. Matching chunks get highlighted and pulled into the prompt.</p>
+
+  <div class="demo-stage">
+    <!-- Pipeline flow indicator -->
+    <div class="pipeline" aria-label="Retrieval pipeline steps" role="list">
+      <div class="pipe-step" id="pipeQuery" role="listitem">1. Question</div>
+      <div class="pipe-arrow" id="arrow1" aria-hidden="true">&rarr;</div>
+      <div class="pipe-step" id="pipeSearch" role="listitem">2. Search chunks</div>
+      <div class="pipe-arrow" id="arrow2" aria-hidden="true">&rarr;</div>
+      <div class="pipe-step" id="pipeRetrieve" role="listitem">3. Retrieve matches</div>
+      <div class="pipe-arrow" id="arrow3" aria-hidden="true">&rarr;</div>
+      <div class="pipe-step" id="pipeAnswer" role="listitem">4. Answer</div>
+    </div>
+
+    <!-- Query input -->
+    <div class="query-row">
+      <label for="queryInput" class="sr-only">Type your question</label>
+      <input id="queryInput" class="query-input" type="text" placeholder="e.g. How do neural networks learn?" maxlength="100" aria-label="Ask a question about the documents" />
+      <button class="diagram-btn primary" id="searchBtn">Search</button>
+      <button class="diagram-btn" id="resetBtn">Reset</button>
+    </div>
+
+    <!-- Document chunks -->
+    <div class="panel-label">Document store (3 chunks)</div>
+    <div class="docs-panel" id="docsPanel" aria-live="polite" aria-label="Document chunks">
+      <div class="doc-chunk" id="chunk0">
+        <span class="chunk-label">Chunk A</span>
+        <span class="chunk-text">Neural networks learn by adjusting their internal weights. They compare their output to the correct answer and nudge the weights to reduce the error, a process called <mark>backpropagation</mark>.</span>
+        <span class="score-badge" aria-hidden="true">Best match</span>
+      </div>
+      <div class="doc-chunk" id="chunk1">
+        <span class="chunk-label">Chunk B</span>
+        <span class="chunk-text">A <mark>transformer</mark> model processes all tokens in a sequence at once using self-attention, which lets it weigh the importance of each word relative to every other word.</span>
+        <span class="score-badge" aria-hidden="true">Partial match</span>
+      </div>
+      <div class="doc-chunk" id="chunk2">
+        <span class="chunk-label">Chunk C</span>
+        <span class="chunk-text">The history of deep learning stretches back to the 1980s, but practical breakthroughs came after 2012 when large datasets and fast GPUs became widely available.</span>
+        <span class="score-badge" aria-hidden="true">No match</span>
+      </div>
+    </div>
+
+    <!-- Answer box -->
+    <div class="answer-box" id="answerBox">
+      <div class="answer-label">Answer (from matched chunks)</div>
+      <div class="answer-text" id="answerText" aria-live="polite">
+        <span class="answer-hint">Run a search to see the answer appear here.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03: MEMORY (separate from retrieval, MECE) -->
+<section>
+  <div class="section-label"><span class="num">03</span>The Memory Side</div>
+  <h2>How the AI keeps track of <em>earlier turns</em>.</h2>
+  <div class="memory-stage">
+    <p style="font-size:14px;color:var(--soft);margin-bottom:16px;">
+      Retrieval finds knowledge from documents. Memory tracks the conversation itself. Watch how a follow-up question works because the AI still has the first answer in its prompt.
+    </p>
+    <div class="memory-turns" id="memoryTurns" aria-live="polite">
+      <!-- turns rendered by JS -->
+    </div>
+    <div class="memory-note" id="memoryNote"></div>
+    <div class="memory-controls">
+      <button class="diagram-btn primary" id="memNextBtn">Next turn &rarr;</button>
+      <button class="diagram-btn" id="memResetBtn">Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 04: TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>What you <em>gain and pay</em>.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Accuracy gain</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Prompt size</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Complexity</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Retrieval lets the AI answer questions about your documents without retraining. The cost: every retrieved chunk plus every prior turn adds tokens to the prompt, which increases latency and API cost. Good systems rank carefully so only the most useful context goes in.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layers.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Layers</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Lewis et al. (2020). <em>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.</em> <span class="note">NeurIPS. The paper that named RAG.</span></li>
+    <li>Guu et al. (2020). <em>REALM: Retrieval-Augmented Language Model Pre-Training.</em> <span class="note">Google Research. Retrieval integrated into pre-training.</span></li>
+    <li>OpenAI. <em>Best Practices for RAG.</em> <span class="note">openai.com/docs. Practical guidance on chunk size and retrieval strategies.</span></li>
+    <li>Xu et al. (2023). <em>A Comprehensive Survey of Memory in LLM-Based Agents.</em> <span class="note">Survey of short-term, long-term, and episodic memory patterns.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ RETRIEVAL DEMO ============
+// Keywords that each chunk "matches" on, for illustrative scoring.
+// Real RAG uses vector similarity; this demo uses keyword overlap to teach the same idea.
+const CHUNKS = [
+  {
+    id: 'chunk0',
+    keywords: ['neural', 'network', 'learn', 'weight', 'backprop', 'train', 'adjust', 'error'],
+    bestLabel: 'Best match',
+    answer: 'Neural networks learn by adjusting their internal weights through backpropagation: the network compares its output to the correct answer and nudges its weights to reduce the error.'
+  },
+  {
+    id: 'chunk1',
+    keywords: ['transformer', 'attention', 'token', 'sequence', 'self-attention', 'bert', 'gpt', 'model'],
+    bestLabel: 'Partial match',
+    answer: 'A transformer processes all tokens at once using self-attention, letting it weigh each word against every other.'
+  },
+  {
+    id: 'chunk2',
+    keywords: ['history', 'gpu', 'dataset', '1980', '2012', 'breakthrough', 'deep learning timeline'],
+    bestLabel: 'No match',
+    answer: null
+  }
+];
+
+const PRESET_QUERIES = [
+  'How do neural networks learn?',
+  'What is a transformer model?',
+  'History of deep learning'
+];
+
+const queryInput = document.getElementById('queryInput');
+const searchBtn = document.getElementById('searchBtn');
+const resetBtn = document.getElementById('resetBtn');
+const answerText = document.getElementById('answerText');
+const answerBox = document.getElementById('answerBox');
+
+const pipeSteps = {
+  query: document.getElementById('pipeQuery'),
+  search: document.getElementById('pipeSearch'),
+  retrieve: document.getElementById('pipeRetrieve'),
+  answer: document.getElementById('pipeAnswer'),
+  arrow1: document.getElementById('arrow1'),
+  arrow2: document.getElementById('arrow2'),
+  arrow3: document.getElementById('arrow3'),
+};
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let running = false;
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function scoreQuery(q) {
+  const words = q.toLowerCase().split(/\s+/);
+  return CHUNKS.map(chunk => {
+    const hits = words.filter(w => chunk.keywords.some(k => k.includes(w) || w.includes(k))).length;
+    return { chunk, score: hits };
+  });
+}
+
+function activatePipe(step) {
+  ['query','search','retrieve','answer'].forEach(s => {
+    pipeSteps[s].classList.remove('active','done');
+  });
+  ['arrow1','arrow2','arrow3'].forEach(a => pipeSteps[a].classList.remove('lit'));
+  if (step === 'query') { pipeSteps.query.classList.add('active'); }
+  else if (step === 'search') { pipeSteps.query.classList.add('done'); pipeSteps.arrow1.classList.add('lit'); pipeSteps.search.classList.add('active'); }
+  else if (step === 'retrieve') { pipeSteps.query.classList.add('done'); pipeSteps.search.classList.add('done'); pipeSteps.arrow1.classList.add('lit'); pipeSteps.arrow2.classList.add('lit'); pipeSteps.retrieve.classList.add('active'); }
+  else if (step === 'answer') { pipeSteps.query.classList.add('done'); pipeSteps.search.classList.add('done'); pipeSteps.retrieve.classList.add('done'); ['arrow1','arrow2','arrow3'].forEach(a => pipeSteps[a].classList.add('lit')); pipeSteps.answer.classList.add('active'); }
+  else if (step === 'done') { ['query','search','retrieve','answer'].forEach(s => pipeSteps[s].classList.add('done')); ['arrow1','arrow2','arrow3'].forEach(a => pipeSteps[a].classList.add('lit')); }
+}
+
+function resetChunks() {
+  CHUNKS.forEach(c => {
+    const el = document.getElementById(c.id);
+    el.classList.remove('matched','faded','scanning');
+  });
+}
+
+function resetDemo() {
+  resetChunks();
+  answerBox.classList.remove('ready');
+  answerText.innerHTML = '<span class="answer-hint">Run a search to see the answer appear here.</span>';
+  activatePipe('');
+}
+
+async function runSearch() {
+  if (running) return;
+  const q = queryInput.value.trim();
+  if (!q) { queryInput.focus(); return; }
+
+  running = true;
+  searchBtn.disabled = true;
+
+  // Step 1: mark query active
+  resetChunks();
+  answerBox.classList.remove('ready');
+  answerText.innerHTML = '<span class="answer-hint">Searching...</span>';
+  activatePipe('query');
+
+  const delay = reduceMotion ? 0 : 500;
+
+  await sleep(delay);
+  activatePipe('search');
+
+  // Scan chunks one at a time
+  for (let i = 0; i < CHUNKS.length; i++) {
+    const el = document.getElementById(CHUNKS[i].id);
+    el.classList.add('scanning');
+    await sleep(delay * 0.7);
+    el.classList.remove('scanning');
+  }
+
+  await sleep(delay * 0.5);
+  activatePipe('retrieve');
+
+  // Score and classify
+  const scores = scoreQuery(q);
+  const maxScore = Math.max(...scores.map(s => s.score));
+
+  if (maxScore === 0) {
+    // No match: show all as faded
+    CHUNKS.forEach(c => document.getElementById(c.id).classList.add('faded'));
+    await sleep(delay * 0.5);
+    activatePipe('done');
+    answerBox.classList.add('ready');
+    answerText.textContent = 'No closely matching chunks found. The AI would answer from general knowledge, which may be less reliable.';
+  } else {
+    scores.forEach(({ chunk, score }) => {
+      const el = document.getElementById(chunk.id);
+      const badge = el.querySelector('.score-badge');
+      if (score === maxScore) {
+        el.classList.add('matched');
+        badge.textContent = 'Best match';
+      } else if (score > 0) {
+        el.classList.add('matched');
+        el.style.opacity = '0.7';
+        badge.textContent = 'Partial match';
+      } else {
+        el.classList.add('faded');
+      }
+    });
+
+    await sleep(delay * 0.5);
+    activatePipe('answer');
+
+    // Build answer from matched chunks
+    const matched = scores.filter(s => s.score > 0 && s.chunk.answer).sort((a,b) => b.score - a.score);
+    await sleep(delay * 0.5);
+    activatePipe('done');
+    answerBox.classList.add('ready');
+    if (matched.length > 0) {
+      answerText.textContent = matched[0].chunk.answer;
+    } else {
+      answerText.textContent = 'No closely matching chunks found.';
+    }
+  }
+
+  running = false;
+  searchBtn.disabled = false;
+}
+
+searchBtn.addEventListener('click', runSearch);
+resetBtn.addEventListener('click', () => {
+  if (running) return;
+  resetDemo();
+  queryInput.value = '';
+});
+queryInput.addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(); });
+
+// Cycle preset queries on focus for discoverability
+let presetIdx = 0;
+queryInput.addEventListener('focus', () => {
+  if (!queryInput.value) {
+    queryInput.placeholder = PRESET_QUERIES[presetIdx % PRESET_QUERIES.length];
+    presetIdx++;
+  }
+});
+
+// ============ MEMORY DEMO ============
+const TURNS = [
+  {
+    role: 'user',
+    text: 'What is backpropagation?',
+    note: 'Turn 1: the user asks a question. The prompt contains: the question.'
+  },
+  {
+    role: 'ai',
+    text: 'Backpropagation is how a neural network learns. It compares its output to the correct answer and works backwards to nudge the weights that caused the error.',
+    note: 'The AI answers. Its answer is now added to the conversation history.'
+  },
+  {
+    role: 'user',
+    text: 'And how fast does it converge?',
+    note: 'Turn 2: the follow-up says "it" without explaining what. The prompt now contains: <strong>the earlier Q&amp;A plus this new question</strong>. The AI knows what "it" refers to because the history is in the prompt.',
+    highlight: true
+  },
+  {
+    role: 'ai',
+    text: 'It depends on the learning rate and the problem. Simple networks can converge in a few hundred iterations; deep ones can take thousands.',
+    note: 'The AI answers correctly because "it" (backpropagation) was defined two turns ago and is still in the prompt.'
+  }
+];
+
+const memoryTurns = document.getElementById('memoryTurns');
+const memoryNote = document.getElementById('memoryNote');
+const memNextBtn = document.getElementById('memNextBtn');
+const memResetBtn = document.getElementById('memResetBtn');
+
+let memStep = -1;
+
+function renderMemTurn(t) {
+  const turn = document.createElement('div');
+  turn.className = 'turn';
+  turn.innerHTML = `
+    <div class="turn-role ${t.role}" aria-label="${t.role === 'user' ? 'User' : 'AI'}">${t.role === 'user' ? 'You' : 'AI'}</div>
+    <div class="turn-body ${t.highlight ? 'memory-highlight' : ''}">${t.text}</div>
+  `;
+  memoryTurns.appendChild(turn);
+  // animate in
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => turn.classList.add('shown'));
+  });
+}
+
+function advanceMem() {
+  if (memStep >= TURNS.length - 1) return;
+  memStep++;
+  renderMemTurn(TURNS[memStep]);
+  memoryNote.innerHTML = TURNS[memStep].note;
+  if (memStep >= TURNS.length - 1) {
+    memNextBtn.disabled = true;
+    memNextBtn.textContent = 'Done';
+  }
+}
+
+function resetMem() {
+  memoryTurns.innerHTML = '';
+  memoryNote.innerHTML = '';
+  memStep = -1;
+  memNextBtn.disabled = false;
+  memNextBtn.textContent = 'Next turn →';
+}
+
+memNextBtn.addEventListener('click', advanceMem);
+memResetBtn.addEventListener('click', resetMem);
+
+// On reduced motion, show all turns immediately
+if (reduceMotion) {
+  TURNS.forEach(t => { memStep++; renderMemTurn(t); });
+  memoryNote.innerHTML = TURNS[TURNS.length - 1].note;
+  memNextBtn.disabled = true;
+  memNextBtn.textContent = 'Done';
+}
+</script>
+</body>
+</html>

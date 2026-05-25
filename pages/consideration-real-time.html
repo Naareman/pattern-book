@@ -6,169 +6,601 @@
 <title>Real-time . The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#FCFCFD; --surface:#FFFFFF; --bg-subtle:#F6F7F9; --text:#15171C; --soft:#565C68; --faint:#6B7280;
-    --border:#E8EAEE; --border-strong:#D5D9E0; --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
-    --radius:16px; --radius-sm:11px;
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-padding-top:72px}
-  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-  body{overflow-x:hidden}
-  .wrap{max-width:920px;margin:0 auto;padding:0 24px}
-  a{color:inherit;text-decoration:none}
-
-  a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
-  .skip-link{position:absolute;left:8px;top:-48px;z-index:100;background:var(--surface);color:var(--accent-hover);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:top .15s ease}
-  .skip-link:focus{top:8px}
-  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}}
-
-  .topbar{position:sticky;top:0;z-index:10;background:rgba(252,252,253,.86);backdrop-filter:saturate(180%) blur(10px);-webkit-backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--border)}
-  .topbar-in{max-width:920px;margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;padding:5px 11px;border:1px solid var(--border-strong);border-radius:20px;background:#fff;transition:border-color .2s ease,color .2s ease,background .2s ease;white-space:nowrap}
-  .back:hover{border-color:var(--accent);color:var(--accent-hover);background:var(--accent-soft)}
-  .crumb{font-size:12.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .crumb a{color:var(--faint);text-decoration:none}
-  .crumb a:hover{color:var(--accent)}
-  .crumb .sep{margin:0 7px;color:var(--border-strong)}
-  .crumb .here{color:var(--soft)}
-
-  header{padding:36px 0 6px;scroll-margin-top:72px}
-  .wordmark{font-family:'Fraunces',serif;font-weight:500;font-size:25px;letter-spacing:-.01em}
-  .strap{color:var(--soft);font-size:15px;margin-top:4px}
-
-  .stage{padding:22px 0 34px}
-  .canvas{max-width:680px;margin:0 auto}
-
-  .pagehead{margin-bottom:8px}
-  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--border);border-radius:20px;padding:5px 12px;margin-bottom:14px}
-  .eyebrow .ico{width:15px;height:15px;display:block;color:var(--accent)}
-  .eyebrow .ico svg{width:15px;height:15px;display:block}
-  .pagehead h1{font-family:'Fraunces',serif;font-weight:500;font-size:38px;letter-spacing:-.015em;line-height:1.05;scroll-margin-top:72px}
-  .pagehead .intro{color:var(--soft);font-size:16px;line-height:1.6;margin-top:12px;max-width:580px}
-
-  .block{margin-top:26px}
-  .block h2{font-family:'Fraunces',serif;font-weight:500;font-size:21px;letter-spacing:-.01em;line-height:1.2;margin-bottom:10px}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px}
-  .card p{font-size:15px;line-height:1.65;color:var(--soft)}
-  .card p + p{margin-top:10px}
-  .card p strong{color:var(--text);font-weight:600}
-
-  .note{background:var(--bg-subtle);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius-sm)}
-  .note .tag{display:block;font-size:12px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
-
-  .bars{display:flex;flex-direction:column;gap:10px}
-  .bar-row{display:flex;align-items:center;gap:14px}
-  .bar-label{flex:none;width:180px;font-size:13.5px;color:var(--soft);text-align:right}
-  .bar-track{flex:1;height:18px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:6px;overflow:hidden}
-  .bar-fill{height:100%;background:var(--accent);border-radius:5px 0 0 5px}
-  .bar-fill.mid{background:#A892F2}
-  .bar-fill.low{background:#CFC3F6}
-  .bars-note{font-size:12.5px;color:var(--faint);margin-top:14px;line-height:1.5}
-  @media(max-width:560px){
-    .bar-label{width:118px;font-size:12px}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
+  body { min-height: 100vh; }
 
-  .ex-list{display:flex;flex-direction:column;gap:12px}
-  .ex{display:flex;gap:13px;align-items:flex-start}
-  .ex .dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:7px}
-  .ex .ex-text{font-size:15px;line-height:1.55;color:var(--soft)}
-  .ex .ex-text strong{color:var(--text);font-weight:600}
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
 
-  .links{list-style:none;display:flex;flex-direction:column;gap:9px}
-  .links li{font-size:14px;line-height:1.5}
-  .links a{color:var(--accent-hover);font-weight:500;border-bottom:1px solid var(--accent-soft)}
-  .links a:hover{border-bottom-color:var(--accent)}
-  .links .src{color:var(--soft)}
+  /* TOP BAR */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none; padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
 
-  .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
-  .foot strong{color:var(--soft);font-weight:500}
+  /* HEADER */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.page-title { scroll-margin-top: 80px; font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
-  @media(max-width:560px){
-    .pagehead h1{font-size:30px}
-    .card{padding:17px 16px}
+  /* SECTIONS */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* 01 IDEA CARD */
+  .idea-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
+
+  /* 02 DEMO */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .demo-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+
+  /* mode toggle */
+  .mode-toggle { display: flex; gap: 0; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; padding: 3px; margin-bottom: 20px; width: fit-content; }
+  .mode-btn { padding: 7px 16px; border-radius: 8px; border: none; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: var(--soft); background: transparent; cursor: pointer; transition: background .2s ease, color .2s ease, box-shadow .2s ease; white-space: nowrap; }
+  .mode-btn.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); font-weight: 600; }
+
+  /* the chat bubble */
+  .chat-pane { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-subtle); padding: 16px; min-height: 120px; position: relative; }
+  .chat-label { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--faint); margin-bottom: 10px; }
+  .chat-bubble { background: var(--surface); border: 1px solid var(--border); border-radius: 12px 12px 12px 4px; padding: 14px 16px; max-width: 88%; position: relative; }
+  .chat-text { font-size: 15px; line-height: 1.7; color: var(--text); min-height: 22px; word-break: break-word; }
+  .chat-cursor { display: inline-block; width: 2px; height: 1.1em; background: var(--accent); border-radius: 1px; vertical-align: text-bottom; margin-left: 2px; animation: blink 1s step-end infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .chat-cursor.hidden { display: none; }
+
+  /* wait overlay */
+  .wait-overlay { position: absolute; inset: 0; border-radius: var(--radius-sm); background: var(--bg-subtle); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+  .wait-overlay.hidden { display: none; }
+  .wait-spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .wait-label { font-size: 13px; font-weight: 500; color: var(--soft); }
+  .wait-timer { font-size: 22px; font-weight: 600; font-family: 'Fraunces', serif; color: var(--text); letter-spacing: -0.02em; }
+
+  /* TTFT badge */
+  .ttft-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; padding: 6px 12px; background: var(--success-soft); border: 1px solid var(--success); border-radius: 20px; font-size: 13px; font-weight: 600; color: var(--success); opacity: 0; transition: opacity .3s ease; }
+  .ttft-badge.shown { opacity: 1; }
+  .ttft-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+  /* progress bar at bottom of chat pane */
+  .gen-bar-wrap { margin-top: 12px; }
+  .gen-bar-label { font-size: 12px; color: var(--faint); margin-bottom: 5px; display: flex; justify-content: space-between; }
+  .gen-bar-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .gen-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; width: 0%; transition: width 0.18s linear; }
+  .gen-bar-wrap.hidden { display: none; }
+
+  /* feel meter */
+  .feel-row { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .feel-label { font-size: 13px; color: var(--soft); min-width: 72px; }
+  .feel-pips { display: flex; gap: 5px; }
+  .pip { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-subtle); transition: background .25s ease, border-color .25s ease; }
+  .pip.on { background: var(--accent); border-color: var(--accent); }
+  .pip.half { background: #A892F2; border-color: #A892F2; }
+  .feel-desc { font-size: 13px; color: var(--soft); }
+
+  /* controls */
+  .demo-controls { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border); }
+  .diagram-btn { padding: 10px 16px; border: 1px solid var(--border-strong); background: var(--surface); border-radius: var(--radius-sm); cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease; }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .demo-status { font-size: 13px; color: var(--faint); align-self: center; }
+
+  /* 03 WHEN IT MATTERS */
+  .examples-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .example-row { display: flex; gap: 14px; align-items: flex-start; padding: 13px 0; border-bottom: 1px solid var(--border); }
+  .example-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .example-row:first-child { padding-top: 0; }
+  .ex-icon { flex: none; width: 34px; height: 34px; border-radius: 9px; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; }
+  .ex-icon svg { width: 17px; height: 17px; color: var(--accent); }
+  .ex-body { flex: 1; }
+  .ex-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .ex-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .ex-tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border-radius: 20px; padding: 2px 8px; margin-top: 6px; }
+
+  /* 04 TRADEOFFS */
+  .tradeoffs-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); min-width: 130px; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-bars .seg.on-y { background: #A892F2; border-color: #A892F2; }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { min-width: 130px; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-note { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* BACK LINK */
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; cursor: pointer; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* SOURCES */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  .sources li a { color: var(--accent-hover); border-bottom: 1px solid var(--accent-soft); text-decoration: none; }
+  .sources li a:hover { border-bottom-color: var(--accent); }
+
+  /* FOOTER */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
   }
 </style>
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <div class="topbar">
-    <div class="topbar-in">
-      <a class="back" href="considerations.html"><span aria-hidden="true">&larr;</span> Considerations</a>
-      <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Real-time</span></nav>
-    </div>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="considerations.html"><span aria-hidden="true">&larr;</span> Considerations</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Real-time</span>
+    </nav>
   </div>
+</nav>
 
-  <div class="wrap">
-    <header>
-      <div class="wordmark">The Pattern Book</div>
-      <div class="strap">What every part of an AI must get right.</div>
-    </header>
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/>
+      </svg>
+    </span>Consideration
+  </span>
+  <h1 class="page-title">Real-time</h1>
+  <p class="explainer">Answering fast enough that it feels instant. The gap before the first word matters far more than the total time.</p>
+</header>
 
-    <div class="stage" id="main" role="main">
-      <div class="canvas">
-        <div class="pagehead">
-          <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg></span>Consideration</span>
-          <h1>Real-time</h1>
-          <p class="intro">Answering fast enough that it feels instant, like talking to a person.</p>
-        </div>
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What does <em>real-time</em> mean?</h2>
+  <div class="idea-card">
+    <p>When you ask an AI something, it has to generate every word before sending it. The wait from "I sent the question" to "I saw the first word" is called <strong style="color:var(--accent-hover)">time-to-first-token</strong>. It is the number that determines whether an AI feels instant or sluggish. One trick changes everything: <strong style="color:var(--accent-hover)">streaming</strong>, which sends each word as it is generated instead of waiting for the full answer. The total time is the same. The felt wait drops to almost nothing.</p>
+  </div>
+</section>
 
-        <div class="block">
-          <h2>In plain words</h2>
-          <div class="card">
-            <p>People do not like waiting. Real-time means the AI replies quickly, often starting to answer within a second. The time you wait for a reply is called latency, and keeping it low is what makes an AI feel snappy instead of sluggish.</p>
-          </div>
-        </div>
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <h2>Wait vs. <em>stream</em>.</h2>
+  <p class="demo-lede">The same answer, at the same speed. Toggle the mode and press Play to feel the difference.</p>
 
-        <div class="block">
-          <h2>Why it matters</h2>
-          <div class="card note">
-            <span class="tag">What goes wrong if you ignore it</span>
-            <p>A voice assistant takes eight seconds to answer a simple question. By the time it speaks, the user has already repeated themselves or given up. For things like live translation or self-driving, a slow answer is not just annoying, it can be useless or unsafe.</p>
-          </div>
-        </div>
+  <div class="demo-stage">
+    <!-- mode selector -->
+    <div class="mode-toggle" role="group" aria-label="Response mode">
+      <button class="mode-btn active" id="btnWait" aria-pressed="true">Wait for the full answer</button>
+      <button class="mode-btn" id="btnStream" aria-pressed="false">Stream word by word</button>
+    </div>
 
-        <div class="block">
-          <h2>Where it shows up most</h2>
-          <div class="card">
-            <div class="bars">
-              <div class="bar-row"><span class="bar-label">Serving &amp; infrastructure</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">User experience</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">Orchestration &amp; agents</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">Application patterns</span><div class="bar-track"><div class="bar-fill low" style="width:33%"></div></div></div>
-              <div class="bar-row"><span class="bar-label">Single-call control</span><div class="bar-track"><div class="bar-fill low" style="width:33%"></div></div></div>
-            </div>
-            <p class="bars-note">Rough editorial estimate of where this matters most, not a measured score. Speed is won or lost mostly in serving and infrastructure, where the model actually runs, with a strong knock-on effect on how the experience feels.</p>
-          </div>
-        </div>
+    <!-- the simulated chat pane -->
+    <div class="chat-pane" id="chatPane" aria-live="polite" aria-atomic="false">
+      <div class="chat-label">AI response</div>
 
-        <div class="block">
-          <h2>Examples</h2>
-          <div class="card">
-            <div class="ex-list">
-              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>Streaming replies:</strong> chatbots show words as they are generated so you start reading right away.</span></div>
-              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>Live translation</strong> in video calls converts speech almost as fast as people talk.</span></div>
-              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>Fraud detection</strong> must approve or block a card payment in the moment it happens.</span></div>
-            </div>
-          </div>
-        </div>
+      <!-- spinner shown while waiting -->
+      <div class="wait-overlay" id="waitOverlay">
+        <div class="wait-spinner" aria-hidden="true"></div>
+        <div class="wait-timer" id="waitTimer">0.0s</div>
+        <div class="wait-label">generating, please wait&hellip;</div>
+      </div>
 
-        <div class="block">
-          <h2>Learn more</h2>
-          <div class="card">
-            <ul class="links">
-              <li><a href="https://en.wikipedia.org/wiki/Latency_(engineering)" target="_blank" rel="noopener">Latency (engineering)</a> <span class="src">. Wikipedia, the delay between a request and a response.</span></li>
-              <li><a href="https://en.wikipedia.org/wiki/Real-time_computing" target="_blank" rel="noopener">Real-time computing</a> <span class="src">. Wikipedia, systems that must respond within a time limit.</span></li>
-            </ul>
-          </div>
-        </div>
+      <!-- the actual bubble, hidden until first token arrives -->
+      <div class="chat-bubble" id="chatBubble" style="display:none;">
+        <div class="chat-text" id="chatText"></div>
+        <span class="chat-cursor hidden" id="chatCursor" aria-hidden="true"></span>
       </div>
     </div>
 
-    <footer class="foot"><strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.</footer>
+    <!-- TTFT badge, appears the moment first token lands in stream mode -->
+    <div class="ttft-badge" id="ttftBadge" aria-live="polite">
+      <span class="dot" aria-hidden="true"></span>
+      <span id="ttftText">First word in 0.0s</span>
+    </div>
+
+    <!-- progress bar, shown during generation -->
+    <div class="gen-bar-wrap hidden" id="genBarWrap">
+      <div class="gen-bar-label"><span>Generating</span><span id="genPct">0%</span></div>
+      <div class="gen-bar-track"><div class="gen-bar-fill" id="genBarFill"></div></div>
+    </div>
+
+    <!-- perceived feel meter -->
+    <div class="feel-row">
+      <div class="feel-label">Feels like</div>
+      <div class="feel-pips" aria-hidden="true">
+        <div class="pip" id="pip0"></div>
+        <div class="pip" id="pip1"></div>
+        <div class="pip" id="pip2"></div>
+        <div class="pip" id="pip3"></div>
+        <div class="pip" id="pip4"></div>
+      </div>
+      <div class="feel-desc" id="feelDesc">press Play to start</div>
+    </div>
+
+    <div class="demo-controls">
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+      <span class="demo-status" id="demoStatus"></span>
+    </div>
   </div>
+</section>
+
+<!-- 03 WHEN IT MATTERS -->
+<section>
+  <div class="section-label"><span class="num">03</span>When it Matters</div>
+  <h2>Where <em>every millisecond</em> counts.</h2>
+  <div class="examples-stage">
+    <div class="example-row">
+      <div class="ex-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 1 3 3v4a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10a7 7 0 0 1-14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+      </div>
+      <div class="ex-body">
+        <div class="ex-title">Voice assistants</div>
+        <div class="ex-desc">People expect a spoken reply to start within about 500ms. A two-second pause breaks the illusion of conversation entirely. Streaming audio lets the AI speak the first sentence while still generating the rest.</div>
+        <span class="ex-tag">time-to-first-token critical</span>
+      </div>
+    </div>
+    <div class="example-row">
+      <div class="ex-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8L2 7h20l-6-4z"/></svg>
+      </div>
+      <div class="ex-body">
+        <div class="ex-title">AI code editors (autocomplete)</div>
+        <div class="ex-desc">Suggestions that arrive in under 100ms feel like the editor is reading your mind. Suggestions that arrive after a second feel like an interruption. Speed here is the product.</div>
+        <span class="ex-tag">sub-100ms target</span>
+      </div>
+    </div>
+    <div class="example-row">
+      <div class="ex-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
+      </div>
+      <div class="ex-body">
+        <div class="ex-title">Fraud detection</div>
+        <div class="ex-desc">A payment must be approved or blocked while the customer is still at the register. A correct decision that arrives five seconds late is a failed product. Latency here is measured in tens of milliseconds.</div>
+        <span class="ex-tag">hard latency deadline</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>What you give up for <em>speed</em>.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Infrastructure cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Complexity added</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Model quality impact</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-y"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-note">
+      Faster hardware and more replicas cost real money. Streaming requires clients to handle partial responses. But the quality of the answer is not affected by streaming: the model generates the same tokens either way. Speed and correctness are separate knobs.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="considerations.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Considerations</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Anthropic. <em>Streaming Messages.</em> <span class="note"><a href="https://docs.anthropic.com/en/api/messages-streaming" target="_blank" rel="noopener">docs.anthropic.com</a> — official streaming API reference.</span></li>
+    <li>Google. <em>Streaming responses in the Gemini API.</em> <span class="note"><a href="https://ai.google.dev/gemini-api/docs/text-generation#streaming" target="_blank" rel="noopener">ai.google.dev</a> — explains why TTFT matters for perceived performance.</span></li>
+    <li>Nielsen Norman Group. <em>Response Times: The 3 Important Limits.</em> <span class="note"><a href="https://www.nngroup.com/articles/response-times-3-important-limits/" target="_blank" rel="noopener">nngroup.com</a> — 0.1s feels instant, 1s loses flow, 10s loses attention.</span></li>
+    <li>Sardana et al. (2024). <em>Beyond Throughput: Time-to-First-Token in LLM Serving.</em> <span class="note">MLSys workshop paper analysing TTFT as the primary user-perceived latency metric.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============================================================
+// DEMO: Wait vs. Stream
+// Same 28-word answer, same simulated generation speed.
+// In Wait mode: spinner until all tokens ready, then full text appears.
+// In Stream mode: first token shows at TTFT_MS, rest trickles in word by word.
+// ============================================================
+
+const ANSWER_WORDS = [
+  'The', 'Nile', 'is', 'the', 'longest', 'river', 'in', 'the', 'world,',
+  'stretching', 'about', '6,650', 'kilometres', 'through', 'northeastern',
+  'Africa,', 'flowing', 'north', 'from', 'its', 'source', 'in', 'Burundi',
+  'to', 'the', 'Mediterranean', 'Sea.'
+];
+const QUESTION_TEXT = "What is the longest river in the world?";
+
+// Simulated timings (ms)
+const TTFT_MS = 800;          // time before first token appears in stream mode
+const WORD_INTERVAL_MS = 130; // ms between each word in stream mode
+const TOTAL_GEN_MS = TTFT_MS + ANSWER_WORDS.length * WORD_INTERVAL_MS; // same total in both modes
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// State
+let mode = 'wait'; // 'wait' | 'stream'
+let running = false;
+let timers = [];
+
+// Elements
+const btnWait   = document.getElementById('btnWait');
+const btnStream = document.getElementById('btnStream');
+const chatPane  = document.getElementById('chatPane');
+const waitOverlay = document.getElementById('waitOverlay');
+const waitTimer   = document.getElementById('waitTimer');
+const chatBubble  = document.getElementById('chatBubble');
+const chatText    = document.getElementById('chatText');
+const chatCursor  = document.getElementById('chatCursor');
+const ttftBadge   = document.getElementById('ttftBadge');
+const ttftText    = document.getElementById('ttftText');
+const genBarWrap  = document.getElementById('genBarWrap');
+const genBarFill  = document.getElementById('genBarFill');
+const genPct      = document.getElementById('genPct');
+const feelDesc    = document.getElementById('feelDesc');
+const playBtn     = document.getElementById('playBtn');
+const resetBtn    = document.getElementById('resetBtn');
+const demoStatus  = document.getElementById('demoStatus');
+const pips        = [0,1,2,3,4].map(i => document.getElementById('pip' + i));
+
+function setMode(m) {
+  if (running) return;
+  mode = m;
+  btnWait.classList.toggle('active', m === 'wait');
+  btnStream.classList.toggle('active', m === 'stream');
+  btnWait.setAttribute('aria-pressed', m === 'wait');
+  btnStream.setAttribute('aria-pressed', m === 'stream');
+  doReset();
+}
+btnWait.addEventListener('click', () => setMode('wait'));
+btnStream.addEventListener('click', () => setMode('stream'));
+
+function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+function doReset() {
+  clearTimers();
+  running = false;
+  // overlay
+  waitOverlay.classList.remove('hidden');
+  waitOverlay.querySelector('.wait-spinner').style.display = '';
+  waitOverlay.querySelector('.wait-label').style.display = '';
+  waitTimer.textContent = '0.0s';
+  // bubble
+  chatBubble.style.display = 'none';
+  chatText.textContent = '';
+  chatCursor.classList.add('hidden');
+  // ttft badge
+  ttftBadge.classList.remove('shown');
+  // gen bar
+  genBarFill.style.width = '0%';
+  genPct.textContent = '0%';
+  genBarWrap.classList.add('hidden');
+  // feel
+  pips.forEach(p => { p.classList.remove('on', 'half'); });
+  feelDesc.textContent = 'press Play to start';
+  // buttons
+  playBtn.disabled = false;
+  demoStatus.textContent = '';
+}
+
+function setFeel(level) {
+  // level 0 = waiting (all grey), 1-2 = impatient, 3-4 = ok, 5 = instant
+  pips.forEach((p, i) => {
+    p.classList.remove('on', 'half');
+    if (i < level) p.classList.add('on');
+  });
+  if (level <= 1)      feelDesc.textContent = 'impatient — where is it?';
+  else if (level <= 2) feelDesc.textContent = 'slow — something is happening...';
+  else if (level <= 3) feelDesc.textContent = 'ok — it is coming';
+  else if (level <= 4) feelDesc.textContent = 'good — reading already';
+  else                 feelDesc.textContent = 'instant — feels like talking';
+}
+
+function sleep(ms) { return new Promise(r => { const t = setTimeout(r, ms); timers.push(t); }); }
+
+async function runWait() {
+  // Show spinner + counting clock for the full generation time, then dump all text at once.
+  running = true;
+  playBtn.disabled = true;
+  genBarWrap.classList.remove('hidden');
+
+  const start = performance.now();
+  const tick = 80; // ms between clock refreshes
+
+  setFeel(0);
+
+  // update clock + feel meter while waiting
+  let elapsed = 0;
+  while (elapsed < TOTAL_GEN_MS) {
+    if (reduceMotion) break;
+    await sleep(tick);
+    elapsed = performance.now() - start;
+    const secs = Math.min(elapsed / 1000, TOTAL_GEN_MS / 1000);
+    waitTimer.textContent = secs.toFixed(1) + 's';
+    const pct = Math.min(elapsed / TOTAL_GEN_MS, 1);
+    genBarFill.style.width = (pct * 100).toFixed(1) + '%';
+    genPct.textContent = Math.round(pct * 100) + '%';
+    // feel meter climbs grudgingly — never past 2 in wait mode
+    if (pct < 0.4) setFeel(0);
+    else if (pct < 0.8) setFeel(1);
+    else setFeel(2);
+  }
+
+  // all done — hide overlay, show full text
+  waitOverlay.classList.add('hidden');
+  chatBubble.style.display = '';
+  chatText.textContent = ANSWER_WORDS.join(' ');
+  genBarFill.style.width = '100%';
+  genPct.textContent = '100%';
+  demoStatus.textContent = 'Full answer arrived after ' + (TOTAL_GEN_MS / 1000).toFixed(1) + 's';
+  setFeel(3); // meh — it showed up, but you waited
+  running = false;
+  playBtn.disabled = false;
+}
+
+async function runStream() {
+  // Spinner for TTFT_MS, then first word pops in immediately, rest trickle.
+  running = true;
+  playBtn.disabled = true;
+  genBarWrap.classList.remove('hidden');
+
+  const start = performance.now();
+  const tick = 80;
+
+  setFeel(0);
+
+  // count up to TTFT
+  let elapsed = 0;
+  while (elapsed < TTFT_MS) {
+    if (reduceMotion) break;
+    await sleep(tick);
+    elapsed = performance.now() - start;
+    const secs = Math.min(elapsed / 1000, TTFT_MS / 1000);
+    waitTimer.textContent = secs.toFixed(1) + 's';
+    const pct = elapsed / TOTAL_GEN_MS;
+    genBarFill.style.width = (pct * 100).toFixed(1) + '%';
+    genPct.textContent = Math.round(pct * 100) + '%';
+    setFeel(1);
+  }
+
+  // first token: hide overlay, show bubble, badge pops
+  waitOverlay.classList.add('hidden');
+  chatBubble.style.display = '';
+  chatText.textContent = '';
+  chatCursor.classList.remove('hidden');
+
+  const ttftSecs = ((performance.now() - start) / 1000).toFixed(1);
+  ttftText.textContent = 'First word in ' + ttftSecs + 's';
+  ttftBadge.classList.add('shown');
+  setFeel(4);
+
+  // stream words
+  for (let i = 0; i < ANSWER_WORDS.length; i++) {
+    if (reduceMotion) {
+      chatText.textContent = ANSWER_WORDS.slice(0, i + 1).join(' ');
+    } else {
+      await sleep(WORD_INTERVAL_MS);
+      chatText.textContent = ANSWER_WORDS.slice(0, i + 1).join(' ');
+    }
+    const pct = (TTFT_MS + (i + 1) * WORD_INTERVAL_MS) / TOTAL_GEN_MS;
+    genBarFill.style.width = (Math.min(pct, 1) * 100).toFixed(1) + '%';
+    genPct.textContent = Math.round(Math.min(pct, 1) * 100) + '%';
+    setFeel(5);
+  }
+
+  chatCursor.classList.add('hidden');
+  genBarFill.style.width = '100%';
+  genPct.textContent = '100%';
+  demoStatus.textContent = 'Same total time (' + (TOTAL_GEN_MS / 1000).toFixed(1) + 's), felt instant.';
+  running = false;
+  playBtn.disabled = false;
+}
+
+playBtn.addEventListener('click', () => {
+  if (running) return;
+  doReset();
+  // brief delay so reset is visible before play starts
+  const t = setTimeout(() => {
+    if (mode === 'wait') runWait();
+    else runStream();
+  }, reduceMotion ? 0 : 120);
+  timers.push(t);
+});
+
+resetBtn.addEventListener('click', () => {
+  if (!running) doReset();
+});
+
+// initial state
+doReset();
+</script>
 </body>
 </html>

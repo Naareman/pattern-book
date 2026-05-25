@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Application patterns · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.10);
+    --radius:16px; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --bg-subtle:#F6F7F9;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-padding-top:72px}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{overflow-x:hidden;min-height:100vh}
+
+  /* a11y */
+  a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+  .skip-link{position:absolute;left:8px;top:-48px;z-index:300;background:var(--surface);color:var(--accent-hover);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:top .15s ease}
+  .skip-link:focus{top:8px}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}}
+
+  /* topbar */
+  .topbar{position:sticky;top:0;z-index:200;background:rgba(252,252,253,.86);backdrop-filter:saturate(180%) blur(10px);-webkit-backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--border)}
+  .topbar-inner{max-width:920px;margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;padding:5px 11px;border:1px solid var(--border-strong);border-radius:20px;background:#fff;transition:border-color .2s,color .2s,background .2s;white-space:nowrap}
+  .back:hover{border-color:var(--accent);color:var(--accent-hover);background:var(--accent-soft)}
+  .crumb{font-size:12.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .crumb a{color:var(--faint);text-decoration:none}
+  .crumb a:hover{color:var(--accent)}
+  .crumb .sep{margin:0 7px;color:var(--border-strong)}
+  .crumb .here{color:var(--soft)}
+
+  /* header */
+  .header{max-width:920px;margin:0 auto;padding:40px 24px 8px;scroll-margin-top:80px}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--border);border-radius:20px;padding:5px 12px}
+  .eyebrow .ico{width:15px;height:15px;display:block;color:var(--accent)}
+  .eyebrow .ico svg{width:15px;height:15px;display:block}
+  h1.page-title{font-family:'Fraunces',serif;font-weight:500;font-size:38px;line-height:1.08;letter-spacing:-.015em;margin:16px 0 0}
+  .explainer{color:var(--soft);font-size:16px;line-height:1.6;max-width:660px;margin-top:14px}
+
+  /* sections */
+  section{max-width:920px;margin:0 auto;padding:18px 24px 34px;position:relative;scroll-margin-top:80px}
+  .section-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin-bottom:9px}
+  .section-label .num{color:var(--accent);font-weight:600;margin-right:7px}
+  h2{font-family:'Fraunces',serif;font-weight:500;font-size:23px;line-height:1.15;letter-spacing:-.01em;margin-bottom:14px}
+  h2 em{font-style:italic;color:var(--accent)}
+
+  /* 01 idea card */
+  .idea-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 28px}
+  .idea-card p{font-family:'Fraunces',serif;font-weight:400;font-size:18px;line-height:1.55;color:var(--text)}
+
+  /* 02 demo */
+  .demo-stage{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+  .demo-lede{font-size:15px;color:var(--soft);line-height:1.6;max-width:640px;margin-bottom:18px}
+
+  /* task selector tabs */
+  .task-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .task-tab{padding:8px 16px;border:1px solid var(--border-strong);border-radius:20px;background:var(--surface);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--soft);cursor:pointer;transition:border-color .18s,color .18s,background .18s}
+  .task-tab:hover{border-color:var(--accent);color:var(--accent-hover);background:var(--accent-soft)}
+  .task-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  /* input panel */
+  .input-panel{background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:14px}
+  .panel-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+  .input-text{font-family:'Fraunces',serif;font-weight:400;font-size:16px;line-height:1.55;color:var(--text)}
+
+  /* output panel */
+  .output-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;min-height:80px;position:relative;overflow:hidden}
+  .output-inner{opacity:0;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease}
+  .output-inner.visible{opacity:1;transform:translateY(0)}
+  .output-task-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-hover);margin-bottom:8px}
+  .output-text{font-size:15px;line-height:1.6;color:var(--text)}
+  .output-text strong{color:var(--accent-hover);font-weight:600}
+  .output-placeholder{font-size:14px;color:var(--faint);font-style:italic}
+
+  /* writing cursor */
+  .cursor{display:inline-block;width:2px;height:1em;background:var(--accent);border-radius:1px;vertical-align:text-bottom;animation:blink 1s step-end infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+  /* 03 real example */
+  .example-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .example-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm);padding:18px 20px}
+  .example-app{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+  .example-task-name{font-family:'Fraunces',serif;font-weight:500;font-size:16px;color:var(--accent-hover);margin-bottom:6px}
+  .example-body{font-size:14px;color:var(--soft);line-height:1.5}
+
+  /* 04 tradeoffs */
+  .task-matrix{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .matrix-head{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;padding:11px 18px;border-bottom:1px solid var(--border);background:var(--bg-subtle)}
+  .matrix-head span{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+  .matrix-row{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;padding:14px 18px;border-top:1px solid var(--border);align-items:center}
+  .matrix-row:first-child{border-top:0}
+  .matrix-name{font-family:'Fraunces',serif;font-weight:500;font-size:16px;color:var(--text)}
+  .matrix-cell{font-size:13px;color:var(--soft)}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
+  .dot.low{background:#C8D6E5}
+  .dot.med{background:var(--accent)}
+  .dot.high{background:var(--accent-hover)}
+
+  /* back link */
+  .back-link{display:inline-flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);text-decoration:none;color:var(--text);transition:transform .18s,box-shadow .18s,border-color .18s;cursor:pointer}
+  .back-link:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+  .back-arrow{font-family:'Fraunces',serif;font-size:22px;color:var(--accent);line-height:1;transition:transform .2s}
+  .back-link:hover .back-arrow{transform:translateX(-3px)}
+  .back-hint{font-size:13px;font-weight:500;color:var(--faint);margin-bottom:3px}
+  .back-name{font-family:'Fraunces',serif;font-weight:500;font-size:18px;line-height:1;letter-spacing:-.01em}
+
+  /* sources */
+  .sources{max-width:920px;margin:0 auto;padding:28px 24px 0}
+  .sources-title{font-size:13px;font-weight:500;color:var(--faint);padding-top:24px;border-top:1px solid var(--border);margin-bottom:12px}
+  .sources ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .sources li{font-size:13px;color:var(--soft);line-height:1.5}
+  .sources li em{font-style:italic;color:var(--text)}
+  .sources li .note{color:var(--faint)}
+
+  /* footer */
+  footer{max-width:920px;margin:30px auto 48px;padding:16px 24px 0;text-align:center;border-top:1px solid var(--border);font-size:12px;color:var(--faint);line-height:1.8}
+  footer strong{color:var(--soft);font-weight:500}
+
+  /* responsive */
+  @media(max-width:640px){
+    .example-grid{grid-template-columns:1fr}
+    .matrix-head{display:none}
+    .matrix-row{grid-template-columns:1fr 1fr;gap:6px;padding:12px 14px}
+    .matrix-name{grid-column:1/-1;font-size:15px}
+  }
+  @media(max-width:560px){
+    h1.page-title{font-size:30px}
+    .explainer{font-size:15px}
+    h2{font-size:21px}
+    .task-tabs{gap:6px}
+    .task-tab{font-size:12px;padding:7px 13px}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">Application patterns</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <path d="M3 9h18M9 21V9"/>
+      </svg>
+    </span>
+    Layer 8
+  </span>
+  <h1 class="page-title">Application patterns</h1>
+  <p class="explainer">The five things AI apps actually do: answering, extracting, summarizing, classifying, and generating.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>Five jobs, one <em>model</em>.</h2>
+  <div class="idea-card">
+    <p>Almost every AI feature is one of five tasks. <span style="color:var(--accent-hover);font-weight:500">Answering</span> replies to a question. <span style="color:var(--accent-hover);font-weight:500">Extraction</span> pulls specific facts out of a block of text. <span style="color:var(--accent-hover);font-weight:500">Summarizing</span> condenses it. <span style="color:var(--accent-hover);font-weight:500">Classification</span> sorts it into a bucket. <span style="color:var(--accent-hover);font-weight:500">Generation</span> writes something new. The same AI model can do all five. What changes is the prompt you give it and what you do with the output.</p>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <h2>Same text, <em>different</em> job.</h2>
+
+  <p class="demo-lede">Pick a task. Watch the AI handle the same paragraph differently each time.</p>
+
+  <div class="demo-stage">
+    <div class="task-tabs" role="group" aria-label="Task type">
+      <button class="task-tab active" data-task="answer" aria-pressed="true">Answer</button>
+      <button class="task-tab" data-task="extract" aria-pressed="false">Extract</button>
+      <button class="task-tab" data-task="summarize" aria-pressed="false">Summarize</button>
+      <button class="task-tab" data-task="classify" aria-pressed="false">Classify</button>
+      <button class="task-tab" data-task="generate" aria-pressed="false">Generate</button>
+    </div>
+
+    <div class="input-panel">
+      <div class="panel-label">Input text</div>
+      <div class="input-text" id="inputText">
+        On 14 March 2023, a study in <em>Nature</em> reported that the Amazon rainforest lost 11,568 sq km of cover that year, up 22% from the prior year. Researchers blamed illegal logging and a prolonged dry season.
+      </div>
+    </div>
+
+    <div class="output-panel" aria-live="polite" aria-atomic="true">
+      <div class="output-inner" id="outputInner">
+        <div class="output-placeholder" id="outputPlaceholder">Choose a task above to see the output.</div>
+        <div id="outputContent" style="display:none">
+          <div class="output-task-label" id="outputTaskLabel"></div>
+          <div class="output-text" id="outputText"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 REAL EXAMPLES -->
+<section>
+  <div class="section-label"><span class="num">03</span>Real examples</div>
+  <h2>Where each one <em>lives</em>.</h2>
+
+  <div class="example-grid">
+    <div class="example-card">
+      <div class="example-app">Customer support chatbot</div>
+      <div class="example-task-name">Answering</div>
+      <div class="example-body">A user asks "where is my order?" The app answers from live order data.</div>
+    </div>
+    <div class="example-card">
+      <div class="example-app">Legal contract tool</div>
+      <div class="example-task-name">Extraction</div>
+      <div class="example-body">Pull every date, party name, and payment amount out of a 40-page PDF.</div>
+    </div>
+    <div class="example-card">
+      <div class="example-app">News reader</div>
+      <div class="example-task-name">Summarizing</div>
+      <div class="example-body">Turn a 1,200-word article into a 3-sentence brief for a push notification.</div>
+    </div>
+    <div class="example-card">
+      <div class="example-app">Inbox triage</div>
+      <div class="example-task-name">Classification</div>
+      <div class="example-body">Label each email as urgent, FYI, or spam so the inbox sorts itself.</div>
+    </div>
+    <div class="example-card" style="grid-column:1/-1">
+      <div class="example-app">Marketing tool</div>
+      <div class="example-task-name">Generation</div>
+      <div class="example-body">Write three ad variants from a product brief. The human picks one.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>How they compare.</h2>
+
+  <div class="task-matrix" role="table" aria-label="Task comparison">
+    <div class="matrix-head" role="row">
+      <span role="columnheader">Task</span>
+      <span role="columnheader">Output size</span>
+      <span role="columnheader">Needs ground truth</span>
+      <span role="columnheader">Easy to verify</span>
+    </div>
+    <div class="matrix-row" role="row">
+      <div class="matrix-name" role="cell">Answering</div>
+      <div class="matrix-cell" role="cell"><span class="dot med" aria-hidden="true"></span>Medium</div>
+      <div class="matrix-cell" role="cell">Sometimes</div>
+      <div class="matrix-cell" role="cell">Hard</div>
+    </div>
+    <div class="matrix-row" role="row">
+      <div class="matrix-name" role="cell">Extraction</div>
+      <div class="matrix-cell" role="cell"><span class="dot low" aria-hidden="true"></span>Small</div>
+      <div class="matrix-cell" role="cell">Yes, source text</div>
+      <div class="matrix-cell" role="cell">Easy</div>
+    </div>
+    <div class="matrix-row" role="row">
+      <div class="matrix-name" role="cell">Summarizing</div>
+      <div class="matrix-cell" role="cell"><span class="dot low" aria-hidden="true"></span>Small</div>
+      <div class="matrix-cell" role="cell">Yes, source text</div>
+      <div class="matrix-cell" role="cell">Medium</div>
+    </div>
+    <div class="matrix-row" role="row">
+      <div class="matrix-name" role="cell">Classification</div>
+      <div class="matrix-cell" role="cell"><span class="dot low" aria-hidden="true"></span>One label</div>
+      <div class="matrix-cell" role="cell">Yes, fixed labels</div>
+      <div class="matrix-cell" role="cell">Very easy</div>
+    </div>
+    <div class="matrix-row" role="row">
+      <div class="matrix-name" role="cell">Generation</div>
+      <div class="matrix-cell" role="cell"><span class="dot high" aria-hidden="true"></span>Large</div>
+      <div class="matrix-cell" role="cell">No</div>
+      <div class="matrix-cell" role="cell">Hard</div>
+    </div>
+  </div>
+
+  <p style="margin-top:16px;font-size:14px;color:var(--soft);line-height:1.6">Extraction and classification are easiest to test automatically because right and wrong are clear. Generation is hardest: you need a human or a judge model to say if the output is good.</p>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top:20px;padding-bottom:40px">
+  <a href="layers.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div>
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Layers</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Brown et al. (2020). <em>Language Models are Few-Shot Learners.</em> <span class="note">Demonstrates zero- and few-shot task transfer across QA, summarization, and generation.</span></li>
+    <li>Wei et al. (2022). <em>Emergent Abilities of Large Language Models.</em> <span class="note">Shows how a single model handles diverse task types as scale grows.</span></li>
+    <li>Narayan et al. (2018). <em>Don't Give Me the Details, Just the Summary!</em> <span class="note">Extreme summarization benchmark (XSum), a canonical summarization reference.</span></li>
+    <li>OpenAI (2023). <em>GPT-4 Technical Report.</em> <span class="note">Section on task evals covers answering, extraction, classification, and generation.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ TASK DEMO ============
+// Each task has: a prompt label, output text (written token by token), and the tokens themselves.
+const TASKS = {
+  answer: {
+    label: 'Answering',
+    prompt: 'What caused the increase in Amazon deforestation?',
+    output: 'Illegal logging and a prolonged dry season caused the 22% rise in Amazon forest loss reported in March 2023.',
+  },
+  extract: {
+    label: 'Extraction',
+    prompt: 'Pull out: date, data source, number, and cause.',
+    output: 'Date: 14 March 2023\nSource: Nature\nArea lost: 11,568 sq km (up 22%)\nCauses: illegal logging, prolonged dry season',
+  },
+  summarize: {
+    label: 'Summarizing',
+    prompt: 'Condense this to one sentence.',
+    output: 'A 2023 Nature study found Amazon deforestation jumped 22%, driven by illegal logging and drought.',
+  },
+  classify: {
+    label: 'Classification',
+    prompt: 'Pick the best category: Environment / Science / Politics / Business.',
+    output: 'Environment',
+  },
+  generate: {
+    label: 'Generation',
+    prompt: 'Write a tweet about this finding.',
+    output: 'New data: the Amazon lost 11,568 sq km of forest last year, 22% more than the year before. Illegal logging and drought are the culprits. Time to act.',
+  },
+};
+
+const tabs = document.querySelectorAll('.task-tab');
+const outputInner = document.getElementById('outputInner');
+const outputPlaceholder = document.getElementById('outputPlaceholder');
+const outputContent = document.getElementById('outputContent');
+const outputTaskLabel = document.getElementById('outputTaskLabel');
+const outputText = document.getElementById('outputText');
+
+let writing = false;
+let writeAbort = false;
+let activeTask = null;
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+// Tokenise by splitting on spaces but keeping newlines as a special token
+function tokenise(str){
+  const result = [];
+  const parts = str.split('\n');
+  parts.forEach((part, pi) => {
+    part.split(' ').forEach((w, wi) => {
+      if(wi > 0) result.push(' ');
+      if(w) result.push(w);
+    });
+    if(pi < parts.length - 1) result.push('\n');
+  });
+  return result;
+}
+
+async function runTask(taskKey){
+  if(writing){ writeAbort = true; await sleep(60); }
+  writeAbort = false;
+  writing = true;
+
+  const task = TASKS[taskKey];
+
+  // hide old content
+  outputInner.classList.remove('visible');
+  await sleep(reduceMotion ? 0 : 180);
+
+  outputPlaceholder.style.display = 'none';
+  outputContent.style.display = 'block';
+  outputTaskLabel.textContent = task.label;
+  outputText.innerHTML = '';
+
+  outputInner.classList.add('visible');
+  await sleep(reduceMotion ? 0 : 80);
+
+  if(reduceMotion){
+    // render whitespace/newlines as text nodes
+    const lines = task.output.split('\n');
+    lines.forEach((line, i) => {
+      if(i > 0) outputText.appendChild(document.createElement('br'));
+      outputText.appendChild(document.createTextNode(line));
+    });
+    writing = false;
+    return;
+  }
+
+  // write token by token
+  const tokens = tokenise(task.output);
+  for(let i = 0; i < tokens.length; i++){
+    if(writeAbort) break;
+    const t = tokens[i];
+    if(t === '\n'){
+      outputText.appendChild(document.createElement('br'));
+    } else {
+      outputText.appendChild(document.createTextNode(t));
+    }
+    await sleep(28);
+  }
+
+  writing = false;
+}
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    const key = tab.dataset.task;
+    if(key === activeTask) return;
+    activeTask = key;
+
+    tabs.forEach(t => {
+      t.classList.remove('active');
+      t.setAttribute('aria-pressed','false');
+    });
+    tab.classList.add('active');
+    tab.setAttribute('aria-pressed','true');
+
+    runTask(key);
+  });
+});
+
+// Kick off with "answer" on load
+(function(){
+  activeTask = 'answer';
+  runTask('answer');
+})();
+</script>
+</body>
+</html>

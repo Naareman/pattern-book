@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Composition · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    scroll-margin-top: 80px;
+    font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
+
+  /* ---- DEMO: vote stage ---- */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+
+  .vote-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* question pill at top */
+  .vote-question {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 18px;
+  }
+  .vote-qlabel { display: block; font-size: 12px; font-weight: 500; color: var(--faint); margin-bottom: 6px; }
+  .vote-qtext { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; line-height: 1.4; color: var(--text); }
+
+  /* three answer cards */
+  .answers { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+  .ans-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    display: flex; align-items: flex-start; gap: 12px;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity .4s ease, transform .4s ease, border-color .3s ease, background .3s ease;
+  }
+  .ans-card.shown { opacity: 1; transform: translateY(0); }
+  .ans-card.winner { background: var(--success-soft); border-color: var(--success); }
+
+  .ans-label {
+    flex: none; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent-hover);
+    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px; transition: background .3s ease, color .3s ease;
+  }
+  .ans-card.winner .ans-label { background: var(--success); color: #fff; }
+
+  .ans-body { flex: 1; min-width: 0; }
+  .ans-run { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--faint); margin-bottom: 5px; }
+  .ans-text { font-size: 15px; line-height: 1.5; color: var(--text); }
+  .ans-tag {
+    display: inline-block; margin-top: 7px;
+    font-size: 12px; font-weight: 600; padding: 2px 8px;
+    border-radius: 20px;
+    background: var(--accent-soft); color: var(--accent-hover);
+    opacity: 0; transition: opacity .3s ease;
+  }
+  .ans-tag.visible { opacity: 1; }
+  .ans-tag.match { background: var(--success-soft); color: var(--success); }
+
+  /* tally */
+  .tally {
+    border-top: 1px solid var(--border); padding-top: 14px; margin-top: 6px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .tally-label { font-size: 13px; font-weight: 500; color: var(--soft); flex: none; }
+  .tally-options { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+  .tally-option {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 14px; padding: 7px 13px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: background .3s ease, border-color .3s ease;
+  }
+  .tally-option .tally-ans { font-weight: 600; color: var(--text); }
+  .tally-option .tally-count {
+    background: var(--border); color: var(--soft);
+    font-size: 12px; font-weight: 700;
+    width: 20px; height: 20px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .3s ease, color .3s ease;
+  }
+  .tally-option.winner-opt { background: var(--success-soft); border-color: var(--success); }
+  .tally-option.winner-opt .tally-count { background: var(--success); color: #fff; }
+
+  /* verdict banner */
+  .verdict-banner {
+    display: flex; align-items: center; gap: 12px;
+    margin-top: 14px; padding: 13px 16px;
+    background: var(--text); color: #fff;
+    border-radius: var(--radius-sm);
+    opacity: 0; transform: translateY(8px) scale(0.98);
+    transition: opacity .4s ease, transform .4s ease;
+  }
+  .verdict-banner.shown { opacity: 1; transform: translateY(0) scale(1); }
+  .verdict-icon { font-size: 20px; flex: none; }
+  .verdict-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; line-height: 1.4; }
+  .verdict-sub { font-size: 12.5px; color: rgba(255,255,255,.65); margin-top: 2px; }
+
+  /* controls */
+  .board-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ---- section 03: when it matters ---- */
+  .examples-grid { display: flex; flex-direction: column; gap: 10px; }
+  .eg-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);
+    padding: 16px 18px; display: flex; align-items: flex-start; gap: 14px;
+    cursor: pointer;
+    transition: border-color .2s ease, background .2s ease, transform .15s ease, box-shadow .15s ease;
+  }
+  .eg-card:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+  .eg-icon { font-size: 22px; flex: none; line-height: 1; margin-top: 1px; }
+  .eg-body { flex: 1; min-width: 0; }
+  .eg-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; line-height: 1.3; color: var(--text); }
+  .eg-sub { font-size: 13.5px; color: var(--soft); line-height: 1.5; margin-top: 4px; }
+  .eg-detail {
+    font-size: 13px; color: var(--soft); line-height: 1.55;
+    max-height: 0; overflow: hidden;
+    transition: max-height .35s ease, margin .3s ease;
+  }
+  .eg-card.open .eg-detail { max-height: 200px; margin-top: 10px; }
+
+  /* ---- section 04: tradeoffs ---- */
+  .tradeoffs-grid { display: flex; flex-direction: column; gap: 10px; }
+  .tr-row {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 15px 18px;
+    display: grid; grid-template-columns: 140px 1fr; gap: 14px; align-items: center;
+  }
+  .tr-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .tr-bar-wrap { display: flex; flex-direction: column; gap: 5px; }
+  .tr-bars { display: flex; gap: 4px; }
+  .tr-seg {
+    flex: 1; height: 18px; background: var(--bg-subtle);
+    border: 1px solid var(--border); border-radius: 4px;
+  }
+  .tr-seg.on { background: var(--accent); border-color: var(--accent); }
+  .tr-note { font-size: 12px; color: var(--faint); line-height: 1.4; }
+
+  /* ---- back link ---- */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .tr-row { grid-template-columns: 1fr; gap: 8px; }
+    .board-controls { flex-direction: column; align-items: stretch; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep">/</span>
+      <a href="layers.html">Layers</a>
+      <span class="sep">/</span>
+      <span class="here">Composition</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/>
+        <path d="M12 3v18M4 7.5l8 4.5 8-4.5"/>
+      </svg>
+    </span>Layer 4
+  </span>
+  <h1 class="pattern-title">Composition</h1>
+  <p class="explainer">How several AI answers are joined into one good result.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>One answer from one AI call can be wrong. <span style="color:var(--accent-hover);font-weight:500">Composition</span> fixes that by combining multiple answers into something better. The three main moves: chain one answer into the next question, ask the same question several times and take the answer that comes up most (voting), or send the question to the model best suited for it (routing).</p>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <h2>Ask three times, <em>vote</em>.</h2>
+
+  <p class="demo-lede">The same question goes to the model three times. Each run gives a slightly different answer. Then a vote picks the most common one.</p>
+
+  <div class="vote-stage" aria-live="polite">
+    <div class="vote-question">
+      <span class="vote-qlabel">Question</span>
+      <span class="vote-qtext">A train leaves at 14:00 and arrives 2 hours 40 minutes later. What time does it arrive?</span>
+    </div>
+
+    <div class="answers" id="answers">
+      <div class="ans-card" id="ans0">
+        <div class="ans-label" aria-hidden="true">A</div>
+        <div class="ans-body">
+          <div class="ans-run">Run 1</div>
+          <div class="ans-text">14:00 + 2 h 40 min = <strong>16:40</strong></div>
+          <span class="ans-tag" id="tag0">16:40</span>
+        </div>
+      </div>
+      <div class="ans-card" id="ans1">
+        <div class="ans-label" aria-hidden="true">B</div>
+        <div class="ans-body">
+          <div class="ans-run">Run 2</div>
+          <div class="ans-text">2 hours after 14:00 is 16:00, plus 40 minutes is <strong>16:40</strong></div>
+          <span class="ans-tag" id="tag1">16:40</span>
+        </div>
+      </div>
+      <div class="ans-card" id="ans2">
+        <div class="ans-label" aria-hidden="true">C</div>
+        <div class="ans-body">
+          <div class="ans-run">Run 3</div>
+          <div class="ans-text">14 + 2 = 16, then 0 + 40 = 40 ... so <strong>16:30</strong></div>
+          <span class="ans-tag" id="tag2">16:30</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tally" id="tally" style="opacity:0;transition:opacity .4s ease">
+      <span class="tally-label">Vote count:</span>
+      <div class="tally-options">
+        <div class="tally-option" id="opt-a">
+          <span class="tally-ans">16:40</span>
+          <span class="tally-count" id="count-a">0</span>
+        </div>
+        <div class="tally-option" id="opt-b">
+          <span class="tally-ans">16:30</span>
+          <span class="tally-count" id="count-b">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="verdict-banner" id="verdict">
+      <div class="verdict-icon" aria-hidden="true">&#10003;</div>
+      <div>
+        <div class="verdict-text">16:40 wins (2 votes to 1).</div>
+        <div class="verdict-sub">The majority answer is chosen, and the lone outlier is discarded.</div>
+      </div>
+    </div>
+
+    <div class="board-controls">
+      <button class="diagram-btn primary" id="playBtn">&#9654; Run the vote</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 WHEN IT MATTERS -->
+<section>
+  <div class="section-label"><span class="num">03</span>When it Matters</div>
+  <h2>Real <em>examples</em>.</h2>
+
+  <div class="examples-grid" id="examples">
+    <div class="eg-card" tabindex="0" role="button" aria-expanded="false">
+      <div class="eg-icon" aria-hidden="true">&#x1F517;</div>
+      <div class="eg-body">
+        <div class="eg-title">Chaining</div>
+        <div class="eg-sub">The output of one step becomes the input of the next.</div>
+        <div class="eg-detail">A research tool first asks the model to find the key claim in an article, then passes that claim into a second call that checks whether it is supported by a cited source. Each step is narrow and easy; together they do something neither could alone.</div>
+      </div>
+    </div>
+
+    <div class="eg-card" tabindex="0" role="button" aria-expanded="false">
+      <div class="eg-icon" aria-hidden="true">&#x1F5F3;</div>
+      <div class="eg-body">
+        <div class="eg-title">Voting (self-consistency)</div>
+        <div class="eg-sub">Run the same question several times, take the most common answer.</div>
+        <div class="eg-detail">Medical triage software asks its diagnosis model three times with slightly different prompts. If two out of three agree, that answer goes forward. The disagreeing run is discarded. This catches the cases where a single run would give an unlucky wrong answer.</div>
+      </div>
+    </div>
+
+    <div class="eg-card" tabindex="0" role="button" aria-expanded="false">
+      <div class="eg-icon" aria-hidden="true">&#x1F500;</div>
+      <div class="eg-body">
+        <div class="eg-title">Routing</div>
+        <div class="eg-sub">Send the question to the model best suited for it.</div>
+        <div class="eg-detail">A customer service platform classifies incoming messages first. Simple greetings go to a small fast model. Legal or billing questions go to a bigger, more careful model. The user gets the right quality at the right cost without seeing any of that complexity.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>What each move <em>costs</em>.</h2>
+
+  <div class="tradeoffs-grid">
+    <div class="tr-row">
+      <div class="tr-name">Chaining</div>
+      <div class="tr-bar-wrap">
+        <div class="tr-bars" aria-label="Cost: low (1 of 5)">
+          <div class="tr-seg on"></div><div class="tr-seg"></div><div class="tr-seg"></div><div class="tr-seg"></div><div class="tr-seg"></div>
+        </div>
+        <div class="tr-note">1 call per step. Errors in early steps carry forward.</div>
+      </div>
+    </div>
+    <div class="tr-row">
+      <div class="tr-name">Voting</div>
+      <div class="tr-bar-wrap">
+        <div class="tr-bars" aria-label="Cost: high (3 of 5)">
+          <div class="tr-seg on"></div><div class="tr-seg on"></div><div class="tr-seg on"></div><div class="tr-seg"></div><div class="tr-seg"></div>
+        </div>
+        <div class="tr-note">3x (or more) the calls, 3x the cost and wait time. Accuracy gain is worth it on high-stakes questions.</div>
+      </div>
+    </div>
+    <div class="tr-row">
+      <div class="tr-name">Routing</div>
+      <div class="tr-bar-wrap">
+        <div class="tr-bars" aria-label="Cost: low-medium (2 of 5)">
+          <div class="tr-seg on"></div><div class="tr-seg on"></div><div class="tr-seg"></div><div class="tr-seg"></div><div class="tr-seg"></div>
+        </div>
+        <div class="tr-note">Needs a classifier. When it works, it cuts cost by sending easy questions to cheap models.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BACK LINK -->
+<section style="padding-top:20px;padding-bottom:40px">
+  <a href="layers.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Layers</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Wang et al. (2023). <em>Self-Consistency Improves Chain of Thought Reasoning in Language Models.</em> <span class="note">ICLR 2023. Origin of the majority-vote approach.</span></li>
+    <li>Chase (2022). <em>LangChain: Building applications with LLMs through composability.</em> <span class="note">Popularized chaining and routing as first-class patterns.</span></li>
+    <li>Anthropic (2024). <em>Building effective agents.</em> <span class="note">Covers chaining, routing, and parallelisation in production systems.</span></li>
+    <li>Shen et al. (2024). <em>Small LLMs are Weak Tool Learners: A Multi-LLM Agent.</em> <span class="note">Shows routing between models improving quality over a single-model approach.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ====== helpers ======
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ====== VOTE DEMO ======
+const ans0 = document.getElementById('ans0');
+const ans1 = document.getElementById('ans1');
+const ans2 = document.getElementById('ans2');
+const tag0 = document.getElementById('tag0');
+const tag1 = document.getElementById('tag1');
+const tag2 = document.getElementById('tag2');
+const tallyEl = document.getElementById('tally');
+const countA = document.getElementById('count-a');
+const countB = document.getElementById('count-b');
+const optA = document.getElementById('opt-a');
+const optB = document.getElementById('opt-b');
+const verdict = document.getElementById('verdict');
+const playBtn = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+// ans0 and ans1 agree on 16:40; ans2 has 16:30 (the mistake)
+// tag classes: match = correct group, default = accent (minority)
+tag0.classList.add('match');
+tag1.classList.add('match');
+
+let running = false;
+
+function demoReset() {
+  [ans0, ans1, ans2].forEach(c => { c.classList.remove('shown', 'winner'); });
+  [tag0, tag1, tag2].forEach(t => { t.classList.remove('visible'); });
+  tallyEl.style.opacity = '0';
+  countA.textContent = '0'; countB.textContent = '0';
+  optA.classList.remove('winner-opt'); optB.classList.remove('winner-opt');
+  verdict.classList.remove('shown');
+  playBtn.disabled = false;
+}
+
+async function demoPlay() {
+  if (running) return;
+  running = true;
+  playBtn.disabled = true;
+
+  if (reduceMotion) {
+    // instant: show everything
+    [ans0, ans1, ans2].forEach(c => c.classList.add('shown'));
+    [tag0, tag1, tag2].forEach(t => t.classList.add('visible'));
+    tallyEl.style.opacity = '1';
+    countA.textContent = '2'; countB.textContent = '1';
+    optA.classList.add('winner-opt');
+    ans0.classList.add('winner'); ans1.classList.add('winner');
+    verdict.classList.add('shown');
+    running = false;
+    playBtn.disabled = false;
+    return;
+  }
+
+  // step 1: show answer cards one by one
+  ans0.classList.add('shown');
+  await sleep(550);
+  ans1.classList.add('shown');
+  await sleep(550);
+  ans2.classList.add('shown');
+  await sleep(700);
+
+  // step 2: reveal answer tags
+  tag0.classList.add('visible');
+  await sleep(300);
+  tag1.classList.add('visible');
+  await sleep(300);
+  tag2.classList.add('visible');
+  await sleep(600);
+
+  // step 3: show tally, count up
+  tallyEl.style.opacity = '1';
+  await sleep(400);
+
+  countA.textContent = '1';
+  await sleep(320);
+  countA.textContent = '2';
+  await sleep(320);
+  countB.textContent = '1';
+  await sleep(500);
+
+  // step 4: mark winner
+  optA.classList.add('winner-opt');
+  ans0.classList.add('winner');
+  ans1.classList.add('winner');
+  await sleep(400);
+
+  // step 5: verdict
+  verdict.classList.add('shown');
+
+  running = false;
+  playBtn.disabled = false;
+}
+
+playBtn.addEventListener('click', demoPlay);
+resetBtn.addEventListener('click', () => { if (running) return; demoReset(); });
+
+// ====== EXAMPLE CARDS (tap to expand) ======
+document.querySelectorAll('.eg-card').forEach(card => {
+  function toggle() {
+    const isOpen = card.classList.contains('open');
+    document.querySelectorAll('.eg-card').forEach(c => {
+      c.classList.remove('open');
+      c.setAttribute('aria-expanded', 'false');
+    });
+    if (!isOpen) {
+      card.classList.add('open');
+      card.setAttribute('aria-expanded', 'true');
+    }
+  }
+  card.addEventListener('click', toggle);
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+  });
+});
+</script>
+</body>
+</html>

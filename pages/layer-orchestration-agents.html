@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orchestration &amp; Agents · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.10);
+    --radius:16px; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section {
+    max-width: 920px; margin: 0 auto;
+    padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px;
+  }
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 9px;
+  }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
+    line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif; font-weight: 400;
+    font-size: 18px; line-height: 1.55; color: var(--text);
+  }
+
+  /* ============ AGENT LOOP DEMO ============ */
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+
+  /* the task bubble */
+  .task-bubble {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 20px;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .task-icon {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--accent);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .task-icon svg { width: 16px; height: 16px; color: #fff; }
+  .task-label { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
+  .task-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; line-height: 1.35; color: var(--text); }
+
+  /* the loop track */
+  .loop-track { display: flex; flex-direction: column; gap: 10px; min-height: 280px; }
+
+  /* each step card */
+  .step-card {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; background: var(--surface);
+    opacity: 0; transform: translateY(10px);
+    transition: opacity 0.35s ease, transform 0.35s ease, border-color 0.3s, background 0.3s, box-shadow 0.3s;
+    position: relative; overflow: hidden;
+  }
+  .step-card.shown { opacity: 1; transform: translateY(0); }
+  .step-card.active { border-color: var(--accent); box-shadow: 0 4px 18px rgba(124,92,246,.14); }
+  .step-card.done { border-color: var(--border-strong); }
+
+  /* left colored stripe by phase */
+  .step-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  }
+  .step-card.phase-think::before { background: #7C5CF6; }
+  .step-card.phase-act::before   { background: #F59E0B; }
+  .step-card.phase-observe::before { background: var(--success); }
+  .step-card.phase-answer::before { background: var(--text); }
+
+  .step-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .phase-pill {
+    font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 12px;
+  }
+  .phase-pill.think   { background: var(--accent-soft); color: var(--accent-hover); }
+  .phase-pill.act     { background: #FEF3C7; color: #92400E; }
+  .phase-pill.observe { background: var(--success-soft); color: #065F46; }
+  .phase-pill.answer  { background: var(--text); color: #fff; }
+
+  .step-num { font-size: 11px; font-weight: 600; color: var(--faint); margin-left: auto; }
+  .step-body { font-size: 14.5px; line-height: 1.55; color: var(--text); }
+  .step-body .tool-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D;
+    border-radius: 6px; font-size: 12px; font-weight: 600;
+    padding: 2px 8px; margin: 0 3px; vertical-align: middle;
+  }
+  .step-body .tool-badge svg { width: 11px; height: 11px; }
+  .step-body .result-badge {
+    display: inline; background: var(--success-soft); color: #065F46;
+    border-radius: 4px; padding: 1px 6px; font-weight: 600;
+  }
+
+  /* the final answer card */
+  .answer-card {
+    background: var(--text); color: #fff;
+    border-radius: var(--radius-sm); padding: 16px 18px;
+    opacity: 0; transform: translateY(10px) scale(0.98);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    margin-top: 2px;
+  }
+  .answer-card.shown { opacity: 1; transform: translateY(0) scale(1); }
+  .answer-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: rgba(255,255,255,.55); margin-bottom: 6px; }
+  .answer-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; line-height: 1.4; }
+
+  /* loop arrow connector */
+  .loop-arrow {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--faint); padding: 2px 16px;
+    opacity: 0; transition: opacity 0.4s ease;
+  }
+  .loop-arrow.shown { opacity: 1; }
+  .loop-arrow .arr-line { flex: 1; height: 1px; background: var(--border-strong); }
+  .loop-arrow.loop-back { color: var(--accent); }
+  .loop-arrow.loop-back .arr-line { background: var(--accent); opacity: 0.4; }
+
+  /* controls */
+  .demo-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .demo-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform 0.18s, box-shadow 0.18s, background 0.18s, border-color 0.18s;
+  }
+  .demo-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .demo-btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
+  .demo-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .demo-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ WHEN IT MATTERS ============ */
+  .example-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .example-row {
+    display: grid; grid-template-columns: 200px 1fr;
+    border-top: 1px solid var(--border);
+  }
+  .example-row:first-child { border-top: none; }
+  .example-key {
+    padding: 16px 20px; background: var(--bg);
+    font-size: 13px; font-weight: 600; color: var(--soft);
+    border-right: 1px solid var(--border);
+    display: flex; align-items: flex-start;
+  }
+  .example-val {
+    padding: 16px 20px; font-size: 14.5px; line-height: 1.55; color: var(--text);
+  }
+  .example-val strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* ============ TRADEOFFS ============ */
+  .tradeoffs-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .tradeoff-cell {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 18px 20px;
+  }
+  .tradeoff-cell .tc-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .tradeoff-cell.tc-good .tc-label { color: var(--success); }
+  .tradeoff-cell.tc-cost .tc-label { color: #92400E; }
+  .tradeoff-cell .tc-body { font-size: 14px; line-height: 1.55; color: var(--soft); }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title {
+    font-size: 13px; font-weight: 500; color: var(--faint);
+    padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px;
+  }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* footer */
+  footer {
+    max-width: 920px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .tradeoffs-grid { grid-template-columns: 1fr; }
+    .example-row { grid-template-columns: 1fr; }
+    .example-key { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+  @media (max-width: 480px) {
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .demo-btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">Orchestration &amp; agents</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/>
+      </svg>
+    </span>Layer 7
+  </span>
+  <h1 class="pattern-title">Orchestration &amp; agents</h1>
+  <p class="explainer">The AI plans its own steps, picks the right tool for each one, checks what came back, and keeps going until the task is done.</p>
+</header>
+
+<!-- 01 · THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>
+      An <strong style="color:var(--accent-hover)">agent</strong> does not just answer a question. It runs a loop:
+      it <em>thinks</em> about what to do next, <em>acts</em> by calling a tool (a search engine, a calculator, some code), and <em>observes</em> the result.
+      Then it loops back and thinks again. When it finally has enough, it gives you the answer.
+      This loop is called <strong style="color:var(--accent-hover)">Think - Act - Observe</strong>, and it lets the AI solve tasks that would need many separate steps from you.
+    </p>
+  </div>
+</section>
+
+<!-- 02 · SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it work</div>
+  <h2>Watch the <em>loop</em>.</h2>
+
+  <p class="demo-lede">An agent is solving a small task. Tap Step to go one step at a time, or Play to run the whole loop.</p>
+
+  <div class="demo-stage">
+    <!-- task -->
+    <div class="task-bubble">
+      <div class="task-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="task-label">Task</div>
+        <div class="task-text">"Who won the 2023 Nobel Prize in Physics, and what is their country's capital?"</div>
+      </div>
+    </div>
+
+    <!-- loop track -->
+    <div class="loop-track" id="loopTrack" aria-live="polite" aria-atomic="false">
+      <!-- steps injected by JS -->
+    </div>
+
+    <div class="demo-controls">
+      <button class="demo-btn" id="stepBtn">&rarr; Step</button>
+      <button class="demo-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="demo-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 · REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A real example</div>
+  <h2>Where it <em>matters</em>.</h2>
+
+  <div class="example-card">
+    <div class="example-row">
+      <div class="example-key">The task</div>
+      <div class="example-val">A user asks: <strong>"Book me a flight to Madrid next Friday and add it to my calendar."</strong></div>
+    </div>
+    <div class="example-row">
+      <div class="example-key">One call is not enough</div>
+      <div class="example-val">The AI needs to search flights, pick the best option, confirm the booking, and then write the calendar event. Each step depends on the one before.</div>
+    </div>
+    <div class="example-row">
+      <div class="example-key">The agent loop</div>
+      <div class="example-val">Think: search for flights. Act: call the flights tool. Observe: three options returned. Think: pick the cheapest. Act: call the booking tool. Observe: confirmed. Act: call the calendar tool. Done.</div>
+    </div>
+    <div class="example-row">
+      <div class="example-key">Why it works</div>
+      <div class="example-val">The AI carries information forward across steps, the same way a person would. <strong>No human in the loop needed for each step.</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 · TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-grid">
+    <div class="tradeoff-cell tc-good">
+      <div class="tc-label">What you gain</div>
+      <div class="tc-body">Tasks that need many steps, decisions, or real-world data can now run on their own. The AI does the work you would have had to do manually, step by step.</div>
+    </div>
+    <div class="tradeoff-cell tc-cost">
+      <div class="tc-label">What you give up</div>
+      <div class="tc-body">More steps cost more time and money. The agent can get stuck in a loop or take a wrong turn. Each tool call is a point where something can go wrong.</div>
+    </div>
+    <div class="tradeoff-cell tc-good">
+      <div class="tc-label">Best fit</div>
+      <div class="tc-body">Multi-step tasks, tasks that need live data, or tasks where the right path is not known in advance.</div>
+    </div>
+    <div class="tradeoff-cell tc-cost">
+      <div class="tc-label">Not worth it</div>
+      <div class="tc-body">Simple questions. If one call gives the answer, adding a loop just wastes time and money.</div>
+    </div>
+  </div>
+</section>
+
+<!-- BACK LINK -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layers.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Layers</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Yao et al. (2022). <em>ReAct: Synergizing Reasoning and Acting in Language Models.</em> <span class="note">The paper that named the Think-Act-Observe loop.</span></li>
+    <li>Shinn et al. (2023). <em>Reflexion: Language Agents with Verbal Reinforcement Learning.</em> <span class="note">Agents that improve by observing their own mistakes.</span></li>
+    <li>Anthropic (2024). <em>Claude's Tool Use documentation.</em> <span class="note">How tool-calling is implemented in practice.</span></li>
+    <li>OpenAI (2023). <em>Function Calling and Agents — developer documentation.</em></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ AGENT LOOP DEMO ============
+// Each entry in STEPS is one beat of the think-act-observe loop.
+// phase: think | act | observe | answer
+// The last step is the final answer card.
+
+const STEPS = [
+  {
+    phase: 'think',
+    pillLabel: 'Think',
+    body: 'I need to find who won the 2023 Nobel Prize in Physics. I will search for that.',
+    connector: null,
+    num: '1'
+  },
+  {
+    phase: 'act',
+    pillLabel: 'Act',
+    body: 'Calling tool: <span class="tool-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search</span> "2023 Nobel Prize Physics winner"',
+    connector: { label: 'calls tool', loopBack: false },
+    num: '2'
+  },
+  {
+    phase: 'observe',
+    pillLabel: 'Observe',
+    body: 'Result: <span class="result-badge">Pierre Agostini, Ferenc Krausz, Anne L\'Huillier</span> won for experiments with attosecond pulses of light.',
+    connector: { label: 'gets result', loopBack: false },
+    num: '3'
+  },
+  {
+    phase: 'think',
+    pillLabel: 'Think',
+    body: 'I have the winners. Now I need their countries. L\'Huillier is French. I need to find the capital of France.',
+    connector: { label: 'loops back', loopBack: true },
+    num: '4'
+  },
+  {
+    phase: 'act',
+    pillLabel: 'Act',
+    body: 'Calling tool: <span class="tool-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search</span> "capital of France"',
+    connector: { label: 'calls tool', loopBack: false },
+    num: '5'
+  },
+  {
+    phase: 'observe',
+    pillLabel: 'Observe',
+    body: 'Result: <span class="result-badge">Paris</span>. Now I have everything.',
+    connector: { label: 'gets result', loopBack: false },
+    num: '6'
+  },
+  {
+    phase: 'answer',
+    pillLabel: 'Answer',
+    body: null, // rendered as answer card
+    answerText: 'The 2023 Nobel Prize in Physics went to Agostini, Krausz, and L\'Huillier. L\'Huillier is from France. The capital of France is Paris.',
+    connector: { label: 'done', loopBack: false },
+    num: '7'
+  }
+];
+
+const track = document.getElementById('loopTrack');
+const stepBtn = document.getElementById('stepBtn');
+const playBtn = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let currentStep = -1;
+let playing = false;
+const renderedEls = []; // parallel array of DOM elements per step
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function buildConnector(step) {
+  if (!step.connector) return null;
+  const el = document.createElement('div');
+  el.className = 'loop-arrow' + (step.connector.loopBack ? ' loop-back' : '');
+  el.setAttribute('aria-hidden', 'true');
+  el.innerHTML = `<div class="arr-line"></div><span>${step.connector.loopBack ? '&#8634; ' : ''}${step.connector.label}</span><div class="arr-line"></div>`;
+  return el;
+}
+
+function buildStepEl(step) {
+  const wrapper = document.createElement('div');
+
+  // connector above (if any)
+  if (step.connector) {
+    const conn = buildConnector(step);
+    wrapper.appendChild(conn);
+    renderedEls[STEPS.indexOf(step)].connEl = conn;
+  }
+
+  if (step.phase === 'answer' && step.answerText) {
+    // answer card
+    const card = document.createElement('div');
+    card.className = 'answer-card';
+    card.setAttribute('role', 'status');
+    card.innerHTML = `<div class="answer-label">Answer</div><div class="answer-text">${step.answerText}</div>`;
+    wrapper.appendChild(card);
+    renderedEls[STEPS.indexOf(step)].card = card;
+  } else {
+    // step card
+    const card = document.createElement('div');
+    card.className = `step-card phase-${step.phase}`;
+    card.innerHTML = `
+      <div class="step-header">
+        <span class="phase-pill ${step.phase}">${step.pillLabel}</span>
+        <span class="step-num">Step ${step.num}</span>
+      </div>
+      <div class="step-body">${step.body}</div>
+    `;
+    wrapper.appendChild(card);
+    renderedEls[STEPS.indexOf(step)].card = card;
+  }
+
+  return wrapper;
+}
+
+function initRendered() {
+  for (let i = 0; i < STEPS.length; i++) {
+    renderedEls[i] = {};
+  }
+}
+
+function renderAll() {
+  track.innerHTML = '';
+  initRendered();
+  STEPS.forEach((step, i) => {
+    const wrapper = buildStepEl(step);
+    track.appendChild(wrapper);
+  });
+}
+
+function showStep(i, animate) {
+  const { card, connEl } = renderedEls[i];
+  if (connEl) {
+    if (animate && !reduceMotion) {
+      setTimeout(() => connEl.classList.add('shown'), 80);
+    } else {
+      connEl.classList.add('shown');
+    }
+  }
+  if (!card) return;
+  if (STEPS[i].phase === 'answer') {
+    if (animate && !reduceMotion) {
+      setTimeout(() => card.classList.add('shown'), connEl ? 260 : 80);
+    } else {
+      card.classList.add('shown');
+    }
+  } else {
+    // deactivate prev
+    if (i > 0 && renderedEls[i - 1].card) {
+      renderedEls[i - 1].card.classList.remove('active');
+      renderedEls[i - 1].card.classList.add('done');
+    }
+    card.classList.add('shown');
+    if (animate && !reduceMotion) {
+      setTimeout(() => card.classList.add('active'), 40);
+    } else {
+      card.classList.add('active');
+    }
+  }
+}
+
+function showAllInstant() {
+  for (let i = 0; i < STEPS.length; i++) {
+    showStep(i, false);
+  }
+  // deactivate all except last step card
+  for (let i = 0; i < STEPS.length - 1; i++) {
+    if (renderedEls[i].card) {
+      renderedEls[i].card.classList.remove('active');
+      renderedEls[i].card.classList.add('done');
+    }
+  }
+  currentStep = STEPS.length - 1;
+}
+
+function resetDemo() {
+  track.innerHTML = '';
+  initRendered();
+  renderAll();
+  currentStep = -1;
+}
+
+// Step button
+stepBtn.addEventListener('click', async () => {
+  if (playing) return;
+  if (currentStep >= STEPS.length - 1) { resetDemo(); return; }
+  currentStep++;
+  showStep(currentStep, !reduceMotion);
+  // scroll last card into view gently
+  setTimeout(() => {
+    if (renderedEls[currentStep].card) {
+      renderedEls[currentStep].card.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+    }
+  }, 200);
+});
+
+// Play button
+playBtn.addEventListener('click', async () => {
+  if (playing) return;
+  if (reduceMotion) { showAllInstant(); return; }
+  playing = true;
+  playBtn.disabled = true;
+  stepBtn.disabled = true;
+  resetDemo();
+  await sleep(300);
+  for (let i = 0; i < STEPS.length; i++) {
+    currentStep = i;
+    showStep(i, true);
+    await sleep(i === STEPS.length - 1 ? 500 : 900);
+    if (renderedEls[i].card) {
+      renderedEls[i].card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    await sleep(200);
+  }
+  playing = false;
+  playBtn.disabled = false;
+  stepBtn.disabled = false;
+});
+
+// Reset button
+resetBtn.addEventListener('click', () => {
+  if (playing) return;
+  resetDemo();
+});
+
+// init
+renderAll();
+if (reduceMotion) showAllInstant();
+</script>
+</body>
+</html>
