@@ -677,7 +677,7 @@
   <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What <em>is</em> it?</h2>
   <div class="idea-card">
-    <p><span style="color:var(--accent-hover)">Chain-of-Thought</span> is just one line you add to your prompt, like <strong style="color:var(--accent-hover)">"Let's think step by step."</strong><br>That one line gets the model to work the problem out before answering, and the working is what gets it right.</p>
+    <p><span style="color:var(--accent-hover)">Chain-of-Thought</span> is just one line you add to your prompt (the words you send the AI), like <strong style="color:var(--accent-hover)">"Let's think step by step."</strong><br>That one line gets the model to work the problem out before answering, and the steps are what get it right.</p>
   </div>
 </section>
 
@@ -1014,7 +1014,7 @@ const codeExplanations = [
   "Add 'Let's think step by step' to the question.",
   "Send it. The reply has the steps, then the answer.",
   "The answer is just the last line.",
-  "Return both, so you can check the working."
+  "Return both, so you can check the steps."
 ];
 
 let tappedLine = null;
