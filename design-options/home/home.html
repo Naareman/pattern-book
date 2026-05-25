@@ -23,6 +23,8 @@
   .strap{color:var(--soft);font-size:15px;margin-top:4px}
 
   .stage{padding:24px 0 34px}
+  .stage-cap{height:24px;text-align:center;font-family:'Fraunces',serif;font-weight:500;font-size:16px;color:var(--accent-hover);opacity:0;transition:opacity .4s ease;margin:2px 0 6px}
+  .stage-cap.show{opacity:1}
   .canvas{width:840px;max-width:100%;margin:0 auto}
 
   .box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:border-color .25s ease,box-shadow .25s ease}
@@ -84,6 +86,8 @@
   .across .spark{position:absolute;left:50%;margin-left:-3px;animation:sparkDown 2.4s linear infinite}
   @keyframes sparkDown{0%{top:24px;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:48px;opacity:0}}
   @media (prefers-reduced-motion:reduce){.spark{display:none}}
+  /* while a demo plays, pause the ambient sparks so they don't compete */
+  body.demoing .flow-x .spark, body.demoing .across .spark{display:none}
 
   .concerns{width:100%;margin-top:2px}
   .concerns.pulse{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--shadow)}
@@ -110,6 +114,7 @@
       <div class="wordmark">The Pattern Book</div>
       <div class="strap">How AI systems are built, layer by layer.</div>
     </header>
+    <div class="stage-cap" id="stageCap"></div>
 
     <div class="stage">
       <div class="canvas">
@@ -188,6 +193,9 @@
   const concernItems = Array.from(document.querySelectorAll('.concerns .item'));
   const concernsBox = document.querySelector('.box.concerns');
   const rail = document.querySelector('.axis .rail');
+  const stageCap = document.getElementById('stageCap');
+  function showCap(t){ stageCap.textContent = t; stageCap.classList.add('show'); }
+  function hideCap(){ stageCap.classList.remove('show'); }
 
   const playBtns = Array.from(document.querySelectorAll('.head-play'));
   playBtns.forEach(b=> b.dataset.cta = b.innerHTML);   // remember each button's label (Build it / Trace it / Weigh it)
@@ -209,7 +217,7 @@
     requestAnimationFrame(()=> requestAnimationFrame(()=> document.body.classList.remove('snapping')));
   }
 
-  function endDemo(clearViz){ clearTimers(); if(clearViz) resetVisual(); if(activeBtn) activeBtn.innerHTML = activeBtn.dataset.cta; demoState='idle'; activeBtn=null; steps=[]; elapsed=0; }
+  function endDemo(clearViz){ clearTimers(); document.body.classList.remove('demoing'); hideCap(); if(clearViz) resetVisual(); if(activeBtn) activeBtn.innerHTML = activeBtn.dataset.cta; demoState='idle'; activeBtn=null; steps=[]; elapsed=0; }
   function pauseDemo(){ elapsed += performance.now()-startedAt; clearTimers(); demoState='paused'; if(activeBtn) activeBtn.innerHTML = '<span class="tri">▶</span> Resume'; }
   function resumeDemo(){ demoState='playing'; if(activeBtn) activeBtn.innerHTML = '<span class="tri">❚❚</span> Pause'; schedule(); }
 
@@ -232,20 +240,27 @@
   function buildSteps(kind){
     const a=[];
     if(kind==='stack'){
-      a.push({at:0, fn:()=>{ layerItems.forEach(el=>el.classList.add('dim')); rail.style.transition='none'; rail.style.transform='scaleY(0)'; }});
-      let revealed=0, t=250;
-      for(let i=layerItems.length-1;i>=0;i--){ const idx=i; a.push({at:t, fn:()=>{ layerItems[idx].classList.remove('dim'); revealed++; rail.style.transition='transform .18s ease'; rail.style.transform='scaleY('+(revealed/layerItems.length)+')'; }}); t+=200; }
+      // intro: name it, then build foundation -> user-facing
+      a.push({at:0, fn:()=>{ showCap('Layers: built from the foundation up to the user'); layerItems.forEach(el=>el.classList.add('dim')); rail.style.transition='none'; rail.style.transform='scaleY(0)'; }});
+      let revealed=0, t=1500;
+      for(let i=layerItems.length-1;i>=0;i--){ const idx=i; a.push({at:t, fn:()=>{ hideCap(); layerItems[idx].classList.remove('dim'); revealed++; rail.style.transition='transform .18s ease'; rail.style.transform='scaleY('+(revealed/layerItems.length)+')'; }}); t+=200; }
       a.push({at:t+150, fn:()=> endDemo(false)});   // layers stay built
     } else if(kind==='concern'){
-      let t=0; concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=> showBars(cc.textContent.trim(), cc)}); t+=1400; }); a.push({at:t, fn:()=> endDemo(true)});
+      // intro: what it is, then drill into each concern's per-layer criticality
+      a.push({at:0, fn:()=>{ showCap('Concerns: what every layer must get right'); concernsBox.classList.add('pulse'); }});
+      let t=1600; concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ hideCap(); showBars(cc.textContent.trim(), cc); }}); t+=1400; }); a.push({at:t, fn:()=> endDemo(true)});
     } else if(kind==='connect'){
-      let t=0; buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1300; }); a.push({at:t, fn:()=> endDemo(true)});
+      // intro: layers -> produces -> builds, then each build's layers
+      a.push({at:0, fn:()=>{ showCap('Builds: assembled from patterns across the layers'); layerItems.forEach(el=>el.classList.add('lit')); }});
+      a.push({at:1000, fn:()=>{ layerItems.forEach(el=>el.classList.remove('lit')); }});
+      let t=1600; buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ hideCap(); layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1300; }); a.push({at:t, fn:()=> endDemo(true)});
     }
     return a;
   }
   function startDemo(btn, kind){
     if(activeBtn && activeBtn!==btn) endDemo(true);   // stop & clear any other demo first
     resetVisual();
+    document.body.classList.add('demoing');
     activeBtn=btn; demoState='playing'; elapsed=0;
     btn.innerHTML='<span class="tri">❚❚</span> Pause';
     steps = buildSteps(kind);
