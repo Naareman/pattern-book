@@ -53,6 +53,8 @@
   /* criticality fill: the layer's own row fills behind the word, proportional to the concern's weight there */
   .layers .item{position:relative;z-index:0}
   .layers .item::before{content:"";position:absolute;left:0;top:0;height:100%;width:var(--fill,0);background:var(--accent-soft);border-radius:9px;z-index:-1;transition:width .55s ease}
+  /* when stopping, snap everything instantly (no slow fade) so Stop = a full stop */
+  body.snapping .item, body.snapping .layers .item::before, body.snapping .axis .rail{transition:none !important}
 
   .top{display:grid;grid-template-columns:minmax(0,1fr) 64px 330px;align-items:start;column-gap:0}
   .layers .body{display:grid;grid-template-columns:1fr 100px}
@@ -72,15 +74,15 @@
   @keyframes sparkX{0%{left:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{left:100%;opacity:0}}
 
   /* across: a bracket that SPANS the Layers box (covers the layers), labelled, pointing down to Concerns, with a neon spark */
-  .across{position:relative;width:calc(100% - 394px);margin:12px 0 0;height:44px}
-  .across .bar{position:absolute;top:16px;left:0;right:0;height:1.5px;background:var(--border-strong);border-radius:2px}
+  .across{position:relative;width:calc(100% - 394px);margin:12px 0 0;height:52px}
+  .across .lbl{position:absolute;top:0;left:50%;transform:translateX(-50%);font-size:11px;color:var(--faint);white-space:nowrap}
+  .across .bar{position:absolute;top:21px;left:0;right:0;height:1.5px;background:var(--border-strong);border-radius:2px}
   .across .bar::before,.across .bar::after{content:"";position:absolute;top:-6px;width:1.5px;height:7px;background:var(--border-strong)}
   .across .bar::before{left:0}.across .bar::after{right:0}
-  .across .lbl{position:absolute;top:9px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--faint);background:var(--bg);padding:0 8px;white-space:nowrap}
-  .across .stem{position:absolute;left:50%;top:17px;transform:translateX(-50%);width:1.5px;height:26px;background:var(--border-strong)}
+  .across .stem{position:absolute;left:50%;top:22px;transform:translateX(-50%);width:1.5px;height:28px;background:var(--border-strong)}
   .across .stem::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);border-left:4px solid transparent;border-right:4px solid transparent;border-top:7px solid var(--border-strong)}
   .across .spark{position:absolute;left:50%;margin-left:-3px;animation:sparkDown 2.4s linear infinite}
-  @keyframes sparkDown{0%{top:17px;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:39px;opacity:0}}
+  @keyframes sparkDown{0%{top:24px;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:48px;opacity:0}}
   @media (prefers-reduced-motion:reduce){.spark{display:none}}
 
   .concerns{width:100%;margin-top:2px}
@@ -204,7 +206,12 @@
     activeConcern = null;
   }
   function resetBtns(){ playBtns.forEach(b=> b.innerHTML = b.dataset.cta); playingBtn = null; }
-  function finish(){ stop(); resetVisual(); resetBtns(); }   // stop everything + clear + revert buttons
+  function finish(){
+    stop();
+    document.body.classList.add('snapping');          // instant clear, not a slow fade -> a real STOP
+    resetVisual(); resetBtns();
+    requestAnimationFrame(()=> requestAnimationFrame(()=> document.body.classList.remove('snapping')));
+  }
 
   // concern criticality per layer (0-3 = how critical that concern is for each layer)
   const importance = {
