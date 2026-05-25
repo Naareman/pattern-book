@@ -56,27 +56,40 @@
     .flow-arrow{transform:rotate(90deg)}
   }
 
-  /* patterns */
+  /* intent guide */
   .section{padding:18px 0 40px}
-  .group{margin-top:26px}
-  .group:first-child{margin-top:6px}
-  .methods-note{font-size:13px;color:var(--faint);margin:0 4px 14px;line-height:1.5}
-  .group-head{font-family:'Inter';font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin:0 4px 10px;display:flex;align-items:center;gap:9px}
-  .group-head::after{content:"";flex:1;height:1px;background:var(--border)}
+  .guide-head{font-family:'Fraunces',serif;font-weight:500;font-size:23px;letter-spacing:-.01em;margin:4px 4px 4px;line-height:1.15}
+  .guide-sub{font-size:13.5px;color:var(--faint);margin:0 4px 18px;line-height:1.5}
 
-  .box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-  .rows{padding:8px}
-  .row{display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:13px 14px;border-radius:11px;border:1px solid transparent;background:none;color:var(--text);transition:background .2s ease,border-color .2s ease}
-  .row + .row{margin-top:2px}
-  .row:hover{background:var(--accent-soft);border-color:var(--accent)}
-  .row .ico{flex:none;width:30px;height:30px;border-radius:9px;background:var(--accent-soft);color:var(--accent-hover);display:flex;align-items:center;justify-content:center}
-  .row .ico svg{width:17px;height:17px;display:block}
-  .row .txt{min-width:0;flex:1}
-  .row .name{font-family:'Fraunces',serif;font-weight:500;font-size:17px;letter-spacing:-.005em;line-height:1.2}
-  .row:hover .name{color:var(--accent-hover)}
-  .row .what{display:block;font-size:13px;color:var(--soft);margin-top:2px;line-height:1.4}
-  .row .arr{flex:none;color:var(--faint);font-size:16px;margin-left:6px;transition:transform .2s ease,color .2s ease}
-  .row:hover .arr{color:var(--accent);transform:translateX(3px)}
+  .guide{display:flex;flex-direction:column;gap:10px}
+  .goal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+
+  .goal-btn{display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:16px 16px;border:0;background:none;color:var(--text);cursor:pointer;font-family:inherit;transition:background .2s ease}
+  .goal-btn:hover{background:var(--accent-soft)}
+  .goal-num{flex:none;width:28px;height:28px;border-radius:9px;background:var(--accent-soft);color:var(--accent-hover);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+  .goal-q{flex:1;min-width:0;font-family:'Fraunces',serif;font-weight:500;font-size:17px;letter-spacing:-.005em;line-height:1.25}
+  .goal-btn:hover .goal-q{color:var(--accent-hover)}
+  .goal-chev{flex:none;color:var(--faint);width:18px;height:18px;transition:transform .25s ease,color .2s ease}
+  .goal-btn:hover .goal-chev{color:var(--accent)}
+  .goal-btn[aria-expanded="true"] .goal-chev{transform:rotate(180deg);color:var(--accent)}
+  .goal-btn[aria-expanded="true"]{background:var(--accent-soft)}
+  .goal-btn[aria-expanded="true"] .goal-q{color:var(--accent-hover)}
+
+  /* revealed answer */
+  .answer{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s ease}
+  .goal.is-open .answer{grid-template-rows:1fr}
+  .answer-in{overflow:hidden;min-height:0}
+  .answer-card{margin:0 12px 12px;padding:14px 15px;background:var(--bg);border:1px solid var(--border);border-radius:12px;display:flex;align-items:flex-start;gap:13px}
+  .answer-ico{flex:none;width:34px;height:34px;border-radius:10px;background:var(--accent-soft);color:var(--accent-hover);display:flex;align-items:center;justify-content:center}
+  .answer-ico svg{width:18px;height:18px;display:block}
+  .answer-txt{min-width:0;flex:1}
+  .answer-lead{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:3px}
+  .answer-name{font-family:'Fraunces',serif;font-weight:500;font-size:18px;letter-spacing:-.005em;line-height:1.2;color:var(--text)}
+  .answer-what{display:block;font-size:13.5px;color:var(--soft);margin-top:4px;line-height:1.5}
+  .answer-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:13px;font-weight:600;color:var(--accent-hover)}
+  .answer-link:hover{text-decoration:underline}
+  .answer-link .arr{transition:transform .2s ease}
+  .answer-link:hover .arr{transform:translateX(3px)}
 
   .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
   .foot strong{color:var(--soft);font-weight:500}
@@ -84,8 +97,10 @@
   @media(max-width:480px){
     .title{font-size:30px}
     .explainer{font-size:15px}
-    .row{padding:12px 11px;gap:11px}
-    .row .name{font-size:16px}
+    .guide-head{font-size:21px}
+    .goal-btn{padding:14px 13px;gap:11px}
+    .goal-q{font-size:16px}
+    .answer-card{flex-direction:column;gap:10px;margin:0 10px 10px}
   }
 </style>
 </head>
@@ -116,73 +131,164 @@
 
     <div class="section" id="main" role="main">
 
-      <p class="methods-note">Different ways to ask the AI and shape its answer, all from one message.</p>
+      <h2 class="guide-head">What do you want to do?</h2>
+      <p class="guide-sub">Pick a goal. We will point you to the method that fits.</p>
 
-      <div class="group">
-        <div class="group-head">How you ask the question</div>
-        <div class="box">
-          <div class="rows">
-            <a class="row" href="#">
-              <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1.5"/><rect x="3" y="12" width="18" height="5" rx="1.5"/><path d="M6 6.5h4M6 14.5h4"/></svg></span>
-              <span class="txt"><span class="name">Few-Shot (show examples)</span><span class="what">Give the AI a few worked examples first, so it copies the pattern you want.</span></span>
-              <span class="arr" aria-hidden="true">&rarr;</span>
-            </a>
-            <a class="row" href="#">
-              <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 11h16M4 16h10"/></svg></span>
-              <span class="txt"><span class="name">Zero-Shot (just ask)</span><span class="what">Simply describe what you want in plain words, with no examples at all.</span></span>
-              <span class="arr" aria-hidden="true">&rarr;</span>
-            </a>
+      <div class="guide">
+
+        <div class="goal">
+          <button class="goal-btn" type="button" aria-expanded="false" aria-controls="ans-1" id="goal-1">
+            <span class="goal-num" aria-hidden="true">1</span>
+            <span class="goal-q">Show it the exact style I want</span>
+            <svg class="goal-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="answer" id="ans-1" role="region" aria-labelledby="goal-1">
+            <div class="answer-in">
+              <div class="answer-card">
+                <span class="answer-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1.5"/><rect x="3" y="12" width="18" height="5" rx="1.5"/><path d="M6 6.5h4M6 14.5h4"/></svg></span>
+                <span class="answer-txt">
+                  <span class="answer-lead">Use</span>
+                  <span class="answer-name">Few-Shot</span>
+                  <span class="answer-what">Give it a few finished examples to copy.</span>
+                  <a class="answer-link" href="#">Learn Few-Shot <span class="arr" aria-hidden="true">&rarr;</span></a>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="group">
-        <div class="group-head">Getting it to think before answering</div>
-        <div class="box">
-          <div class="rows">
-            <a class="row" href="pattern-chain-of-thought.html">
-              <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M6 8.4v3.6a3 3 0 0 0 3 3h6.6"/></svg></span>
-              <span class="txt"><span class="name">Chain-of-Thought (think out loud)</span><span class="what">Ask the AI to work through its reasoning step by step before giving the final answer. This often makes it more accurate.</span></span>
-              <span class="arr" aria-hidden="true">&rarr;</span>
-            </a>
-            <a class="row" href="#">
-              <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 3L8 6M12 3l4 3"/><path d="M5 9l-2 4 2 1M19 9l2 4-2 1M12 9v6"/><path d="M5 14h14M9 20h6"/></svg></span>
-              <span class="txt"><span class="name">Self-Consistency (best of several tries)</span><span class="what">Ask the same question a few times, then go with the answer that comes up most often.</span></span>
-              <span class="arr" aria-hidden="true">&rarr;</span>
-            </a>
+        <div class="goal">
+          <button class="goal-btn" type="button" aria-expanded="false" aria-controls="ans-2" id="goal-2">
+            <span class="goal-num" aria-hidden="true">2</span>
+            <span class="goal-q">Just ask in plain words</span>
+            <svg class="goal-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="answer" id="ans-2" role="region" aria-labelledby="goal-2">
+            <div class="answer-in">
+              <div class="answer-card">
+                <span class="answer-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 11h16M4 16h10"/></svg></span>
+                <span class="answer-txt">
+                  <span class="answer-lead">Use</span>
+                  <span class="answer-name">Zero-Shot</span>
+                  <span class="answer-what">Simply describe what you want, no examples.</span>
+                  <a class="answer-link" href="#">Learn Zero-Shot <span class="arr" aria-hidden="true">&rarr;</span></a>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="group">
-        <div class="group-head">Controlling the shape of the answer</div>
-        <div class="box">
-          <div class="rows">
-            <a class="row" href="#">
-              <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H7a3 3 0 0 0-3 3v2a2 2 0 0 1-2 2 2 2 0 0 1 2 2v2a3 3 0 0 0 3 3h2"/><path d="M15 4h2a3 3 0 0 1 3 3v2a2 2 0 0 0 2 2 2 2 0 0 0-2 2v2a3 3 0 0 1-3 3h-2"/></svg></span>
-              <span class="txt"><span class="name">Structured output (a fixed format)</span><span class="what">Make the answer come back in the exact same tidy format every time (like a filled-in form), so software can read it without guessing.</span></span>
-              <span class="arr" aria-hidden="true">&rarr;</span>
-            </a>
+        <div class="goal">
+          <button class="goal-btn" type="button" aria-expanded="false" aria-controls="ans-3" id="goal-3">
+            <span class="goal-num" aria-hidden="true">3</span>
+            <span class="goal-q">Get a hard, multi-step problem right</span>
+            <svg class="goal-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="answer" id="ans-3" role="region" aria-labelledby="goal-3">
+            <div class="answer-in">
+              <div class="answer-card">
+                <span class="answer-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M6 8.4v3.6a3 3 0 0 0 3 3h6.6"/></svg></span>
+                <span class="answer-txt">
+                  <span class="answer-lead">Use</span>
+                  <span class="answer-name">Chain-of-Thought</span>
+                  <span class="answer-what">Ask it to think step by step before answering.</span>
+                  <a class="answer-link" href="pattern-chain-of-thought.html">Learn Chain-of-Thought <span class="arr" aria-hidden="true">&rarr;</span></a>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="group">
-        <div class="group-head">Getting it to double-check itself</div>
-        <div class="box">
-          <div class="rows">
-            <a class="row" href="#">
-              <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v4h-4"/><path d="M9 12l2 2 4-4"/></svg></span>
-              <span class="txt"><span class="name">Reflection (review and fix)</span><span class="what">The AI looks back at its own answer, spots weak points, and rewrites it to be better.</span></span>
-              <span class="arr" aria-hidden="true">&rarr;</span>
-            </a>
+        <div class="goal">
+          <button class="goal-btn" type="button" aria-expanded="false" aria-controls="ans-4" id="goal-4">
+            <span class="goal-num" aria-hidden="true">4</span>
+            <span class="goal-q">Get a more reliable answer</span>
+            <svg class="goal-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="answer" id="ans-4" role="region" aria-labelledby="goal-4">
+            <div class="answer-in">
+              <div class="answer-card">
+                <span class="answer-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 3L8 6M12 3l4 3"/><path d="M5 9l-2 4 2 1M19 9l2 4-2 1M12 9v6"/><path d="M5 14h14M9 20h6"/></svg></span>
+                <span class="answer-txt">
+                  <span class="answer-lead">Use</span>
+                  <span class="answer-name">Self-Consistency</span>
+                  <span class="answer-what">Ask a few times and take the answer that comes up most.</span>
+                  <a class="answer-link" href="#">Learn Self-Consistency <span class="arr" aria-hidden="true">&rarr;</span></a>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
+
+        <div class="goal">
+          <button class="goal-btn" type="button" aria-expanded="false" aria-controls="ans-5" id="goal-5">
+            <span class="goal-num" aria-hidden="true">5</span>
+            <span class="goal-q">Get the answer in a fixed format</span>
+            <svg class="goal-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="answer" id="ans-5" role="region" aria-labelledby="goal-5">
+            <div class="answer-in">
+              <div class="answer-card">
+                <span class="answer-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H7a3 3 0 0 0-3 3v2a2 2 0 0 1-2 2 2 2 0 0 1 2 2v2a3 3 0 0 0 3 3h2"/><path d="M15 4h2a3 3 0 0 1 3 3v2a2 2 0 0 0 2 2 2 2 0 0 0-2 2v2a3 3 0 0 1-3 3h-2"/></svg></span>
+                <span class="answer-txt">
+                  <span class="answer-lead">Use</span>
+                  <span class="answer-name">Structured output</span>
+                  <span class="answer-what">Tell it the exact shape to return, like a filled-in form.</span>
+                  <a class="answer-link" href="#">Learn Structured output <span class="arr" aria-hidden="true">&rarr;</span></a>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="goal">
+          <button class="goal-btn" type="button" aria-expanded="false" aria-controls="ans-6" id="goal-6">
+            <span class="goal-num" aria-hidden="true">6</span>
+            <span class="goal-q">Catch its own mistakes</span>
+            <svg class="goal-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="answer" id="ans-6" role="region" aria-labelledby="goal-6">
+            <div class="answer-in">
+              <div class="answer-card">
+                <span class="answer-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v4h-4"/><path d="M9 12l2 2 4-4"/></svg></span>
+                <span class="answer-txt">
+                  <span class="answer-lead">Use</span>
+                  <span class="answer-name">Reflection</span>
+                  <span class="answer-what">Ask it to look back at its answer and fix it.</span>
+                  <a class="answer-link" href="#">Learn Reflection <span class="arr" aria-hidden="true">&rarr;</span></a>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
     </div>
 
     <footer class="foot"><strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.</footer>
   </div>
+
+  <script>
+    (function(){
+      var buttons = document.querySelectorAll('.goal-btn');
+      buttons.forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var goal = btn.closest('.goal');
+          var isOpen = btn.getAttribute('aria-expanded') === 'true';
+          // close all (one answer at a time)
+          buttons.forEach(function(other){
+            other.setAttribute('aria-expanded', 'false');
+            other.closest('.goal').classList.remove('is-open');
+          });
+          // open the one tapped, unless it was already open (toggle off)
+          if(!isOpen){
+            btn.setAttribute('aria-expanded', 'true');
+            goal.classList.add('is-open');
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

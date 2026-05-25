@@ -945,8 +945,8 @@
     <div class="trace" id="trace">
       <div class="trace-empty" id="traceEmpty">Step through the flow above. Each idea below lights up on its step.</div>
       <div class="trace-row" data-reveal="0"><span class="lead" aria-hidden="true">1</span>It writes the steps out as <span class="term" tabindex="0" role="button" aria-label="tokens: The small word-sized pieces of text a model reads and writes, one after another. See the chips just below this box." data-def="The small word-sized pieces of text a model reads and writes, one after another. See the chips just below.">tokens</span>, left to right, like talking out loud.</div>
-      <div class="trace-row" data-reveal="1"><span class="lead" aria-hidden="true">2</span>Each step it writes becomes part of what it reads next, so the reasoning feeds itself.</div>
-      <div class="trace-row" data-reveal="2"><span class="lead" aria-hidden="true">3</span>By the final step, the answer is forced by the work, not guessed.</div>
+      <div class="trace-row" data-reveal="1"><span class="lead" aria-hidden="true">2</span>Each step it writes becomes part of what it reads next, so it builds on its own work.</div>
+      <div class="trace-row" data-reveal="2"><span class="lead" aria-hidden="true">3</span>By the last step, the answer follows from the work, instead of being a guess.</div>
     </div>
   </div>
 
@@ -971,29 +971,29 @@
   <div class="section-label"><span class="num">03</span>When it Works . When it Fails</div>
   <h2>Will reasoning out loud <em>help</em>?</h2>
   <div class="test-stage">
-    <div class="test-instruction">Tap each. CoT earns its tokens on some questions and wastes them on others.</div>
+    <div class="test-instruction">Tap each. Showing the steps helps on some questions and is a waste on others.</div>
     <div class="queries" id="queries">
-      <div class="query-card" data-verdict="good" data-reason="Three arithmetic steps, each small and checkable. The model nails the intermediate numbers instead of guessing the total.">
+      <div class="query-card" data-verdict="good" data-reason="Three math steps, each small and easy to check. The model gets the in-between numbers right instead of guessing the total.">
         <div class="q">"A word problem with three arithmetic steps."</div>
         <div class="verdict">Helps it &#10003;<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="good" data-reason="Many constraints at once. Writing them down one at a time keeps them straight instead of collapsing to a hunch.">
+      <div class="query-card" data-verdict="good" data-reason="Lots of rules at once. Writing them one at a time keeps them straight instead of jumping to a hunch.">
         <div class="q">"Which of these 5 meetings fit before 3pm, given the room conflicts?"</div>
         <div class="verdict">Helps it &#10003;<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="good" data-reason="Tracing the loop one iteration at a time IS the work. CoT makes the model actually do it instead of pattern-matching.">
+      <div class="query-card" data-verdict="good" data-reason="Following the loop one round at a time IS the work. Writing the steps makes the model actually do it instead of guessing from things it has seen before.">
         <div class="q">"Find the bug: why does this loop run one time too many?"</div>
         <div class="verdict">Helps it &#10003;<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="bad" data-reason="Pure recall. There are no steps to show. The reasoning is wasted tokens and latency for an answer the model already knows.">
+      <div class="query-card" data-verdict="bad" data-reason="Just remembering a fact. There are no steps to show. The extra text costs time and money for an answer the model already knows.">
         <div class="q">"What's the capital of France?"</div>
         <div class="verdict">Wasted &#10007;<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="bad" data-reason="A one-word call. Forcing reasoning can make the model talk itself out of the obvious answer: sometimes worse, never better.">
+      <div class="query-card" data-verdict="bad" data-reason="A one-word answer. Forcing it to reason can make the model talk itself out of the obvious answer: sometimes worse, never better.">
         <div class="q">"Is this review positive or negative? 'Loved every minute.'"</div>
         <div class="verdict">Can hurt &#10007;<span class="body"></span></div>
       </div>
-      <div class="query-card" data-verdict="bad" data-reason="No multi-step logic to unfold. CoT just adds length and cost without making the summary any better.">
+      <div class="query-card" data-verdict="bad" data-reason="There are no steps to work through. Showing reasoning just adds length and cost without making the summary any better.">
         <div class="q">"Summarize this paragraph in one line."</div>
         <div class="verdict">Wasted &#10007;<span class="body"></span></div>
       </div>
@@ -1016,7 +1016,7 @@
       <div class="icon">1</div>
       <div class="body">
         <div class="head">Pull out the numbers</div>
-        <div class="detail">4 painters, <code>3 rooms</code> each per day, <code>5 days</code>, <code>70 rooms</code> total. Naming the parts before computing is the point of reasoning first.</div>
+        <div class="detail">4 painters, <code>3 rooms</code> each per day, <code>5 days</code>, <code>70 rooms</code> total. Listing the facts before doing any math is what reasoning first means.</div>
       </div>
     </div>
 
@@ -1034,7 +1034,7 @@
       <div class="icon">3</div>
       <div class="body">
         <div class="head">Step two, over five days</div>
-        <div class="detail">Carry the previous result forward, don't restart.
+        <div class="detail">Use the answer from the step before, don't start over.
           <span class="pull-quote">12 rooms/day &times; 5 days = 60 rooms painted</span>
         </div>
       </div>
@@ -1052,7 +1052,7 @@
 
     <div class="dossier-final" data-row="4">
       <div class="label">Answer returned to user</div>
-      <div class="answer">"10 rooms are left unpainted." The answer is just the last step, and every step before it was easy to check. <span class="cite">Asked cold, with no steps, models often jump to a wrong number here.</span></div>
+      <div class="answer">"10 rooms are left unpainted." The answer is just the last step, and every step before it was easy to check. <span class="cite">Without the steps, models often jump to a wrong number here.</span></div>
     </div>
 
     <div class="dossier-replay">
@@ -1096,7 +1096,7 @@
       </div>
     </div>
     <div class="tradeoff-row">
-      <div class="tradeoff-label">Latency</div>
+      <div class="tradeoff-label">Wait time</div>
       <div class="tradeoff-bars">
         <div class="seg on-g"></div>
         <div class="seg on-y"></div>
@@ -1160,7 +1160,7 @@ const traceEmpty = document.getElementById('traceEmpty');
 
 // One label AND one trace point per node, indices 0,1,2 lined up.
 const stepLabels = [
-  { num: 'Step 1 of 3', text: 'The user asks something that takes more than recall.' },
+  { num: 'Step 1 of 3', text: 'The user asks something you have to work out, not just remember.' },
   { num: 'Step 2 of 3', text: 'Instead of answering, the model writes its reasoning first.' },
   { num: 'Step 3 of 3', text: 'The answer comes out of the last step, not a guess.' }
 ];
@@ -1218,7 +1218,7 @@ playFlowBtn.addEventListener('click', async () => {
   arrows.forEach(a => { a.classList.remove('active'); a.classList.add('done'); });
   setTrace(2); // keep all three points visible at the end
   stepNum.textContent = 'Complete';
-  stepText.textContent = '✓ Reasoning shown, answer grounded in it.';
+  stepText.textContent = '✓ Steps shown, answer built from them.';
   playing = false;
   playFlowBtn.disabled = false;
 });
@@ -1285,10 +1285,10 @@ const codeExplainer = document.getElementById('codeExplainer');
 
 const codeExplanations = [
   "The one move that makes it Chain-of-Thought: ask the model to reason before it answers.",
-  "Append the trigger phrase. 'Let's think step by step' is enough to switch on reasoning, no examples needed.",
-  "Send it. The model writes its reasoning, then lands on a final answer.",
-  "Take the last line as the answer. The lines above it are the reasoning that produced it.",
-  "Return both, so you can check the work, not just the result."
+  "Add the phrase to the end. 'Let's think step by step' is enough to get the model reasoning, with no examples needed.",
+  "Send it. The model writes its steps, then ends with a final answer.",
+  "Take the last line as the answer. The lines above it are the steps that led to it.",
+  "Return both, so you can check the steps, not just the answer."
 ];
 
 let tappedLine = null;
