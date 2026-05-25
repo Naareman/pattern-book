@@ -46,10 +46,21 @@
   .title{font-family:'Fraunces',serif;font-weight:500;font-size:38px;letter-spacing:-.015em;margin:16px 0 0;line-height:1.08}
   .explainer{color:var(--soft);font-size:16px;line-height:1.6;max-width:660px;margin-top:14px}
 
+  /* flow diagram */
+  .flow{display:flex;align-items:stretch;gap:10px;margin-top:22px;max-width:560px}
+  .flow-cell{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:14px 12px;text-align:center;font-size:13px;font-weight:500;color:var(--soft);display:flex;align-items:center;justify-content:center}
+  .flow-cell.is-ai{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover);font-family:'Fraunces',serif;font-weight:500;font-size:15px}
+  .flow-arrow{flex:none;align-self:center;color:var(--accent);font-size:17px;line-height:1}
+  @media(max-width:480px){
+    .flow{flex-direction:column;max-width:240px}
+    .flow-arrow{transform:rotate(90deg)}
+  }
+
   /* patterns */
   .section{padding:18px 0 40px}
   .group{margin-top:26px}
   .group:first-child{margin-top:6px}
+  .methods-note{font-size:13px;color:var(--faint);margin:0 4px 14px;line-height:1.5}
   .group-head{font-family:'Inter';font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin:0 4px 10px;display:flex;align-items:center;gap:9px}
   .group-head::after{content:"";flex:1;height:1px;background:var(--border)}
 
@@ -94,9 +105,18 @@
       <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>Layer 6</span>
       <h1 class="title">Single-call control</h1>
       <p class="explainer">Getting the best answer from <em>one</em> message to the AI: no tools, no memory, just one well-asked question.</p>
+      <div class="flow" aria-hidden="true">
+        <div class="flow-cell">Your message</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-cell is-ai">The AI</div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-cell">One answer</div>
+      </div>
     </header>
 
     <div class="section" id="main" role="main">
+
+      <p class="methods-note">Different ways to ask the AI and shape its answer, all from one message.</p>
 
       <div class="group">
         <div class="group-head">How you ask the question</div>
