@@ -50,14 +50,9 @@
 
   .box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:border-color .25s ease,box-shadow .25s ease,transform .25s ease}
   .box-head{display:flex;align-items:center;border-bottom:1px solid var(--border);background:#fff;transition:background .3s ease,border-color .3s ease}
-  /* during the considerations phase, the Layers box header inverts to read as one prominent block */
-  .box.layers.headlit .box-head{background:var(--accent);border-bottom-color:var(--accent)}
-  .box.layers.headlit .head-link .name{color:#fff}
-  .box.layers.headlit .head-link .what{color:rgba(255,255,255,.85)}
-  .box.layers.headlit .head-link .open{color:rgba(255,255,255,.7)}
-  .box.layers.headlit .head-play{background:rgba(255,255,255,.22);color:#fff}
   /* considerations chips and build items get an entrance when the tour reaches them */
   @keyframes pop-in{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+  .concerns.queued .item,.builds.queued .item{opacity:0}
   .concerns.appearing .item,.builds.appearing .item{animation:pop-in .45s ease both}
   .head-link{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:13px 16px;border:none;background:none;cursor:pointer;text-align:left}
   .head-link:hover{background:var(--accent-soft)}
@@ -104,7 +99,7 @@
 
   .produces{align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--faint);font-size:12px;gap:4px}
   .builds{align-self:center}
-  .box.glow{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft),0 12px 34px rgba(124,92,246,.22);transform:translateY(-3px)}
+  .box.glow{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft),0 0 22px 2px rgba(124,92,246,.42),0 12px 34px rgba(124,92,246,.22);transform:translateY(-3px)}
   .produces.glow{color:var(--accent-hover);font-weight:700;transform:scale(1.1)}
   .produces.glow .flow{opacity:1;height:3px;background:var(--accent)}
   body.demoing .produces.glow .spark{display:block;width:8px;height:8px;box-shadow:0 0 12px 4px rgba(124,92,246,.9);animation:sparkX .9s linear infinite}
@@ -282,8 +277,8 @@
     buildItems.forEach(el=> el.classList.remove('demo'));
     concernItems.forEach(c=> c.classList.remove('active'));
     concernsBox.classList.remove('pulse');
-    layersBox.classList.remove('glow','headlit'); buildsBox.classList.remove('glow'); producesEl.classList.remove('glow'); acrossEl.classList.remove('glow');
-    concernsBox.classList.remove('appearing'); buildsBox.classList.remove('appearing');
+    layersBox.classList.remove('glow'); buildsBox.classList.remove('glow'); producesEl.classList.remove('glow'); acrossEl.classList.remove('glow');
+    concernsBox.classList.remove('queued','appearing'); buildsBox.classList.remove('queued','appearing');
     rail.style.transition='none'; rail.style.transform='scaleY(1)';
     hideBoxCaps();
     activeConcern = null;
@@ -321,16 +316,16 @@
       a.push({at:t+300, fn:()=>{ hideBoxCaps(); endDemo(false); }});   // layers stay built
     } else if(kind==='concern'){
       // intro: Layers box glows -> the "applies to every layer" bracket lights -> Concerns box glows -> per-concern criticality
-      a.push({at:0,    fn:()=>{ showBoxCap('concerns', null, 'every layer has to handle all of these: a longer bar means it matters more there'); layersBox.classList.add('glow'); concernsBox.classList.add('appearing'); }});
+      a.push({at:0,    fn:()=>{ showBoxCap('concerns', null, 'every layer has to handle all of these: a longer bar means it matters more there'); layersBox.classList.add('glow'); concernsBox.classList.add('queued'); }});
       a.push({at:1800,  fn:()=>{ layersBox.classList.remove('glow'); acrossEl.classList.add('glow'); }});
-      a.push({at:2600, fn:()=>{ acrossEl.classList.remove('glow'); concernsBox.classList.add('glow'); }});
+      a.push({at:2600, fn:()=>{ acrossEl.classList.remove('glow'); concernsBox.classList.add('glow'); concernsBox.classList.remove('queued'); concernsBox.classList.add('appearing'); }});
       a.push({at:3400, fn:()=>{ concernsBox.classList.remove('glow'); }});
       let t=3600; concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showBoxCap('concerns', null, 'every layer has to handle all of these: a longer bar means it matters more there'); showBars(cc.textContent.trim(), cc); }}); t+=1800; }); a.push({at:t, fn:()=> endDemo(true)});
     } else if(kind==='connect'){
       // intro: whole Layers box glows -> "produces" becomes prominent -> whole Builds box glows -> then each build's layers
-      a.push({at:0,    fn:()=>{ showBoxCap('builds', null, 'each product lights up the layers it uses'); layersBox.classList.add('glow'); buildsBox.classList.add('appearing'); }});
+      a.push({at:0,    fn:()=>{ showBoxCap('builds', null, 'each product lights up the layers it uses'); layersBox.classList.add('glow'); buildsBox.classList.add('queued'); }});
       a.push({at:1800,  fn:()=>{ layersBox.classList.remove('glow'); producesEl.classList.add('glow'); }});
-      a.push({at:2600, fn:()=>{ producesEl.classList.remove('glow'); buildsBox.classList.add('glow'); }});
+      a.push({at:2600, fn:()=>{ producesEl.classList.remove('glow'); buildsBox.classList.add('glow'); buildsBox.classList.remove('queued'); buildsBox.classList.add('appearing'); }});
       a.push({at:3400, fn:()=>{ buildsBox.classList.remove('glow'); }});
       let t=3600; buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ showBoxCap('builds', null, 'each product lights up the layers it uses'); layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1800; }); a.push({at:t, fn:()=> endDemo(true)});
     } else if(kind==='tour'){
@@ -342,18 +337,18 @@
       for(let i=layerItems.length-1;i>=0;i--){ const idx=i; a.push({at:t, fn:()=>{ layerItems[idx].classList.remove('dim'); revealed++; rail.style.transition='transform .3s ease'; rail.style.transform='scaleY('+(revealed/layerItems.length)+')'; }}); t+=560; }
       t+=500;
       // ---- Phase 2: Concerns, what every layer must get right ----
-      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('concerns', '2 / 3', 'every layer has to handle all of these: a longer bar means it matters more there'); setTourPhase(2); layersBox.classList.add('headlit'); concernsBox.classList.add('appearing'); }});
+      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('concerns', '2 / 3', 'every layer has to handle all of these: a longer bar means it matters more there'); setTourPhase(2); concernsBox.classList.add('queued'); }});
       t+=1800;  a.push({at:t, fn:()=>{ layersBox.classList.add('glow'); }});
       t+=1200;  a.push({at:t, fn:()=>{ layersBox.classList.remove('glow'); acrossEl.classList.add('glow'); }});
-      t+=1200;  a.push({at:t, fn:()=>{ acrossEl.classList.remove('glow'); concernsBox.classList.add('glow'); }});
+      t+=1200;  a.push({at:t, fn:()=>{ acrossEl.classList.remove('glow'); concernsBox.classList.add('glow'); concernsBox.classList.remove('queued'); concernsBox.classList.add('appearing'); }});
       t+=1200;  a.push({at:t, fn:()=>{ concernsBox.classList.remove('glow'); }});
       t+=200;  concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showBoxCap('concerns', '2 / 3', 'every layer has to handle all of these: a longer bar means it matters more there'); showBars(cc.textContent.trim(), cc); }}); t+=1800; });
       t+=500;
       // ---- Phase 3: Builds, what layer combinations produce ----
-      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('builds', '3 / 3', 'each product lights up the layers it uses'); setTourPhase(3); buildsBox.classList.add('appearing'); }});
+      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('builds', '3 / 3', 'each product lights up the layers it uses'); setTourPhase(3); buildsBox.classList.add('queued'); }});
       t+=1800;  a.push({at:t, fn:()=>{ layersBox.classList.add('glow'); }});
       t+=1200;  a.push({at:t, fn:()=>{ layersBox.classList.remove('glow'); producesEl.classList.add('glow'); }});
-      t+=1200;  a.push({at:t, fn:()=>{ producesEl.classList.remove('glow'); buildsBox.classList.add('glow'); }});
+      t+=1200;  a.push({at:t, fn:()=>{ producesEl.classList.remove('glow'); buildsBox.classList.add('glow'); buildsBox.classList.remove('queued'); buildsBox.classList.add('appearing'); }});
       t+=1200;  a.push({at:t, fn:()=>{ buildsBox.classList.remove('glow'); }});
       t+=200;  buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ showBoxCap('builds', '3 / 3', 'each product lights up the layers it uses'); layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1800; });
       // ---- End: clean resting state ----
