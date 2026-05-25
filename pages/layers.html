@@ -58,8 +58,7 @@
 
   /* the layer rows */
   .layerlist{display:flex;flex-direction:column;gap:9px}
-  .row{display:flex;align-items:center;gap:13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;text-decoration:none;color:var(--text);opacity:0;transition:opacity .45s ease,border-color .25s ease,box-shadow .25s ease,transform .2s ease,background .2s ease}
-  .row.in{opacity:1}
+  .row{display:flex;align-items:center;gap:13px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;text-decoration:none;color:var(--text);transition:border-color .25s ease,box-shadow .25s ease,transform .2s ease,background .2s ease}
   .row:hover{border-color:var(--accent);background:var(--accent-soft);transform:translateY(-1px)}
   .row .num{flex:none;width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent-hover);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
   .row:hover .num{background:#fff;border:1px solid var(--accent)}
@@ -176,13 +175,5 @@
 
     <footer class="foot"><strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.</footer>
   </div>
-<script>
-(function(){
-  var rows = Array.prototype.slice.call(document.querySelectorAll('.row'));
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { rows.forEach(function(r){ r.classList.add('in'); }); return; }
-  // build from the foundation up: layer 1 (last in the list) appears first, up to layer 9
-  rows.reverse().forEach(function(r, i){ setTimeout(function(){ r.classList.add('in'); }, 120 + i * 85); });
-})();
-</script>
 </body>
 </html>
