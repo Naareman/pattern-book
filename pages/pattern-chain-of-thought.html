@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chain-of-Thought . The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --bg-subtle:#F6F7F9; --surface:#FFFFFF;
+    --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#C2554F; --error-soft:#FBECEB;
+    --radius:16px; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  .serif { font-family: 'Fraunces', serif; }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(252,252,253,0.85);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 13px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex: none;
+  }
+  .brand-mark {
+    width: 29px;
+    height: 29px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(145deg, #7C5CF6, #6D4DE6);
+    box-shadow: 0 4px 14px rgba(124,92,246,.25);
+    flex: none;
+  }
+  .brand-mark svg { width: 16px; height: 16px; display: block; }
+  .wordmark {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 19px;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .topbar .crumbs {
+    margin-left: auto;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    display: flex;
+    gap: 7px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .topbar .crumbs a { color: var(--faint); text-decoration: none; transition: color 0.15s ease; }
+  .topbar .crumbs a:hover { color: var(--accent); }
+  .topbar .crumbs .sep { color: var(--border-strong); }
+  .topbar .crumbs .current { color: var(--soft); font-weight: 600; }
+
+  /* ============ TERM DEFINITIONS ============ */
+  .term {
+    background: var(--accent-soft);
+    cursor: pointer;
+    border-bottom: 1px dotted var(--accent);
+    padding: 0 3px;
+    border-radius: 3px;
+    position: relative;
+    font-weight: 500;
+    color: var(--accent-hover);
+  }
+  .term::after {
+    content: attr(data-def);
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: var(--text);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.45;
+    width: max-content;
+    max-width: 260px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 100;
+    text-align: left;
+    box-shadow: var(--shadow);
+  }
+  .term::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    border: 6px solid transparent;
+    border-top-color: var(--text);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 100;
+  }
+  .term:hover::after, .term:hover::before,
+  .term:focus::after, .term:focus::before,
+  .term.open::after, .term.open::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ============ HEADER ============ */
+  .header {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 32px 24px;
+  }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(40px, 8vw, 72px);
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+  .full-name {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--soft);
+    margin-bottom: 32px;
+  }
+  .meta-strip {
+    display: flex;
+    gap: 36px;
+    flex-wrap: wrap;
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .meta-strip .item { color: var(--soft); }
+  .meta-strip .item strong {
+    display: block;
+    color: var(--faint);
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+  .complexity-dots { display: inline-flex; gap: 5px; align-items: center; }
+  .complexity-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border-strong);
+  }
+  .complexity-dots span.on { background: var(--accent); }
+
+  /* ============ SECTIONS ============ */
+  section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 52px 32px;
+    position: relative;
+  }
+  .section-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    margin-bottom: 10px;
+  }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 6px; }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(26px, 5vw, 38px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 26px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* ============ THE IDEA ============ */
+  .idea-stage {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px;
+  }
+  .tagline-big {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(24px, 4vw, 34px);
+    line-height: 1.3;
+    color: var(--text);
+    letter-spacing: -0.015em;
+  }
+  .tagline-big strong { color: var(--accent); font-weight: 500; }
+  .idea-tip {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+  }
+
+  /* ============ DATA FLOW ============ */
+  .diagram-stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 28px 28px;
+    box-shadow: var(--shadow);
+  }
+  .diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-height: 120px;
+    padding: 8px 0;
+    margin-bottom: 28px;
+  }
+  .node {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    min-width: 92px;
+    text-align: center;
+    will-change: transform;
+  }
+  .node .sub {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--faint);
+    font-weight: 400;
+  }
+  .node.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(124,92,246,.28);
+  }
+  .node.active .sub { color: rgba(255,255,255,0.85); }
+  .node.done {
+    background: var(--success-soft);
+    border-color: var(--success);
+  }
+  .arrow-mark {
+    color: var(--faint);
+    font-size: 20px;
+    transition: color 0.3s ease;
+  }
+  .arrow-mark .down { display: none; }
+  .arrow-mark.active { color: var(--accent); }
+  .arrow-mark.done { color: var(--success); }
+
+  .diagram-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    gap: 16px;
+    flex-wrap: wrap;
+    min-height: 60px;
+  }
+  .step-info {
+    flex: 1;
+    min-width: 200px;
+    min-height: 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .step-info .step-num {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--faint);
+    margin-bottom: 4px;
+  }
+  .step-info .step-text {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: var(--text);
+    line-height: 1.35;
+    min-height: 1.35em;
+  }
+  .diagram-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .diagram-btn {
+    padding: 10px 16px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ REASONING TRACE (Section 02) ============ */
+  .trace {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin-top: 18px;
+    font-size: 14px;
+    color: var(--soft);
+    line-height: 1.6;
+    min-height: 84px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+  }
+  .trace-empty {
+    color: var(--faint);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+  }
+  .trace-empty.hidden { display: none; }
+  .trace-row {
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--text);
+  }
+  .trace-row.shown { opacity: 1; transform: translateX(0); }
+  .trace-row .lead { color: var(--accent); font-weight: 600; margin-right: 8px; }
+
+  /* ============ WHEN IT WORKS / FAILS ============ */
+  .test-stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: var(--shadow);
+  }
+  .test-instruction {
+    font-size: 14px;
+    color: var(--soft);
+    margin-bottom: 18px;
+  }
+  .queries { display: flex; flex-direction: column; gap: 12px; }
+  .query-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+  }
+  .query-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .query-card .q {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 18px;
+    color: var(--text);
+  }
+  .query-card .verdict {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, margin 0.3s ease;
+  }
+  .query-card .verdict span.body {
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--soft);
+    display: block;
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+  .query-card.revealed .verdict { max-height: 220px; margin-top: 14px; }
+  .query-card.good { background: var(--success-soft); border-color: var(--success); }
+  .query-card.bad { background: var(--error-soft); border-color: var(--error); }
+  .query-card.good:hover { border-color: var(--success); }
+  .query-card.bad:hover { border-color: var(--error); }
+  .query-card.good .verdict { color: var(--success); }
+  .query-card.bad .verdict { color: var(--error); }
+  .query-tracker {
+    margin-top: 18px;
+    padding: 12px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+  }
+  .query-tracker.complete {
+    background: var(--accent-soft);
+    color: var(--accent-hover);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ============ WORKED EXAMPLE — DOSSIER ============ */
+  .dossier {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 30px 28px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  .dossier::before {
+    content: 'Case file';
+    position: absolute;
+    top: -12px;
+    right: 24px;
+    background: var(--accent-soft);
+    color: var(--accent-hover);
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 999px;
+    border: 1px solid var(--accent);
+  }
+  .dossier-q {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px 20px;
+    margin-bottom: 24px;
+  }
+  .dossier-q .label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--faint);
+    margin-bottom: 7px;
+  }
+  .dossier-q .text {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 1.35;
+    color: var(--text);
+  }
+  .dossier-step {
+    display: flex;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .dossier-step.shown { opacity: 1; transform: translateX(0); }
+  .dossier-step:last-of-type { border-bottom: none; }
+  .dossier-step .icon {
+    width: 32px;
+    height: 32px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-strong);
+    color: var(--soft);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+  }
+  .dossier-step.done .icon {
+    background: var(--success);
+    color: #fff;
+    border-color: var(--success);
+  }
+  .dossier-step .body { flex: 1; }
+  .dossier-step .head {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--faint);
+    margin-bottom: 5px;
+  }
+  .dossier-step .detail {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .dossier-step .detail code {
+    background: var(--bg-subtle);
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--soft);
+    border: 1px solid var(--border);
+  }
+  .dossier-step .detail .pull-quote {
+    display: block;
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--text);
+  }
+  .dossier-final {
+    background: var(--text);
+    color: #fff;
+    border-radius: var(--radius-sm);
+    padding: 20px 22px;
+    margin-top: 20px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .dossier-final.shown { opacity: 1; transform: translateY(0); }
+  .dossier-final .label {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 8px;
+  }
+  .dossier-final .answer {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .dossier-final .cite {
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-style: italic;
+  }
+  .dossier-replay { margin-top: 20px; text-align: center; }
+  .dossier-replay button {
+    padding: 10px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .dossier-replay button:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+
+  /* ============ CODE ============ */
+  .code-stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: var(--shadow);
+  }
+  .code-hint {
+    font-size: 14px;
+    color: var(--soft);
+    margin-bottom: 16px;
+  }
+  pre.code {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    overflow-x: auto;
+    margin-bottom: 16px;
+  }
+  .code-line {
+    cursor: pointer;
+    padding: 2px 8px;
+    margin: 0 -8px;
+    border-radius: 5px;
+    border-left: 2px solid transparent;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    display: block;
+  }
+  .code-line:hover { background: var(--accent-soft); }
+  .code-line.active { background: var(--accent-soft); border-left: 2px solid var(--accent); }
+  .code-line .comment { color: var(--faint); }
+  .code-line .kw { color: var(--accent); font-weight: 500; }
+  .code-line .str { color: var(--success); }
+  .code-explainer {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--text);
+    min-height: 60px;
+    line-height: 1.5;
+  }
+  .code-explainer .hint {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+  }
+
+  /* ============ TRADEOFFS ============ */
+  .tradeoffs-stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 30px 28px;
+    box-shadow: var(--shadow);
+  }
+  .tradeoff-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 16px;
+  }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--soft);
+    min-width: 100px;
+  }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg {
+    flex: 1;
+    height: 22px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+  }
+  .tradeoff-bars .seg.on { background: var(--error); border-color: var(--error); }
+  .tradeoff-bars .seg.on-y { background: var(--accent-soft); border-color: var(--accent); }
+  .tradeoff-bars .seg.on-g { background: var(--success); border-color: var(--success); }
+  .tradeoff-quote {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 1.45;
+    color: var(--text);
+  }
+  .tradeoff-quote::before { content: '\201C'; color: var(--accent); }
+  .tradeoff-quote::after { content: '\201D'; color: var(--accent); }
+
+  /* ============ BACK LINK ============ */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    color: var(--accent);
+    line-height: 1;
+    transition: transform 0.2s ease;
+  }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    margin-bottom: 3px;
+  }
+  .back-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  /* ============ SOURCES ============ */
+  .sources {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 28px 32px 0;
+  }
+  .sources .sources-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li {
+    font-size: 13px;
+    color: var(--soft);
+    line-height: 1.5;
+  }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* ============ FOOTER ============ */
+  footer {
+    max-width: 900px;
+    margin: 32px auto 60px;
+    padding: 28px 32px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--faint);
+    line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 640px) {
+    .topbar .crumbs { margin-left: 0; width: 100%; }
+  }
+  @media (max-width: 560px) {
+    .diagram { flex-direction: column; gap: 6px; }
+    .node { width: 100%; max-width: 280px; }
+    .arrow-mark { transform: rotate(90deg); font-size: 18px; }
+    .arrow-mark .right { display: none; }
+    .arrow-mark .down { display: inline; }
+  }
+  @media (max-width: 480px) {
+    .header, section, footer, .sources, .topbar-inner { padding-left: 20px; padding-right: 20px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+    .tradeoff-bars { width: 100%; }
+    .diagram-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btns { justify-content: stretch; }
+    .diagram-btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M12 3v18"/></svg></span>
+      <span class="wordmark">The Pattern Book</span>
+    </a>
+    <div class="crumbs">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep">/</span>
+      <a href="layers.html">Layers</a>
+      <span class="sep">/</span>
+      <a href="layer-single-call-control.html">Single-call control</a>
+      <span class="sep">/</span>
+      <span class="current">Chain-of-Thought</span>
+    </div>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header">
+  <h1 class="pattern-title">CoT.</h1>
+  <div class="full-name">Chain-of-Thought</div>
+  <div class="meta-strip">
+    <div class="item">
+      <strong>Layer</strong>Single-call control
+    </div>
+    <div class="item">
+      <strong>Complexity</strong>
+      <div class="complexity-dots">
+        <span class="on"></span><span class="on"></span><span></span><span></span><span></span>
+      </div>
+    </div>
+    <div class="item">
+      <strong>Tags</strong>in-prompt . reasoning . zero-shot
+    </div>
+    <div class="item">
+      <strong>Updated</strong>May 2026
+    </div>
+  </div>
+</header>
+
+<!-- 01 · THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What is <em>Chain-of-Thought</em>?</h2>
+  <div class="idea-stage">
+    <div class="tagline-big">
+      Models blurt the first answer that comes to mind. Chain-of-Thought makes them <strong>show their work first</strong>, and writing the steps is what makes the answer right.
+    </div>
+    <div class="idea-tip">How it works lives in Section 02</div>
+  </div>
+</section>
+
+<!-- 02 · DATA FLOW -->
+<section>
+  <div class="section-label"><span class="num">02</span>Data Flow</div>
+  <h2>How it <em>moves</em>.</h2>
+  <div class="diagram-stage">
+    <div class="diagram" id="diagram">
+      <div class="node" data-step="0">USER<span class="sub">Hard question</span></div>
+      <span class="arrow-mark" data-step="0"><span class="right">&rarr;</span><span class="down">&darr;</span></span>
+      <div class="node" data-step="1">MODEL<span class="sub">Reasons first</span></div>
+      <span class="arrow-mark" data-step="1"><span class="right">&rarr;</span><span class="down">&darr;</span></span>
+      <div class="node" data-step="2">ANSWER<span class="sub">From the steps</span></div>
+    </div>
+    <div class="diagram-controls">
+      <div class="step-info">
+        <div class="step-num" id="stepNum">Step 0 of 3</div>
+        <div class="step-text" id="stepText">Press play to walk through each step.</div>
+      </div>
+      <div class="diagram-btns">
+        <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
+        <button class="diagram-btn primary" id="playFlowBtn">&#9654; Play</button>
+        <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+      </div>
+    </div>
+    <div class="trace" id="trace">
+      <div class="trace-empty" id="traceEmpty">Step to the model. Its reasoning appears here.</div>
+      <div class="trace-row" data-step="1"><span class="lead">1</span>It writes the steps out as <span class="term" tabindex="0" data-def="The pieces of text a model reads and writes, roughly word-sized, produced one after another.">tokens</span>, left to right, like talking out loud.</div>
+      <div class="trace-row" data-step="1"><span class="lead">2</span>Each step it writes becomes part of what it reads next.</div>
+      <div class="trace-row" data-step="1"><span class="lead">3</span>By the final step, the answer is forced by the work, not guessed.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 · THE TEST -->
+<section>
+  <div class="section-label"><span class="num">03</span>When it Works . When it Fails</div>
+  <h2>Will reasoning out loud <em>help</em>?</h2>
+  <div class="test-stage">
+    <div class="test-instruction">Tap each. CoT earns its tokens on some questions and wastes them on others.</div>
+    <div class="queries" id="queries">
+      <div class="query-card" data-verdict="good" data-reason="Three arithmetic steps, each small and checkable. The model nails the intermediate numbers instead of guessing the total.">
+        <div class="q">"A word problem with three arithmetic steps."</div>
+        <div class="verdict">Helps it &#10003;<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="good" data-reason="Many constraints at once. Writing them down one at a time keeps them straight instead of collapsing to a hunch.">
+        <div class="q">"Which of these 5 meetings fit before 3pm, given the room conflicts?"</div>
+        <div class="verdict">Helps it &#10003;<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="good" data-reason="Tracing the loop one iteration at a time IS the work. CoT makes the model actually do it instead of pattern-matching.">
+        <div class="q">"Find the bug: why does this loop run one time too many?"</div>
+        <div class="verdict">Helps it &#10003;<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="bad" data-reason="Pure recall. There are no steps to show. The reasoning is wasted tokens and latency for an answer the model already knows.">
+        <div class="q">"What's the capital of France?"</div>
+        <div class="verdict">Wasted &#10007;<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="bad" data-reason="A one-word call. Forcing reasoning can make the model talk itself out of the obvious answer: sometimes worse, never better.">
+        <div class="q">"Is this review positive or negative? 'Loved every minute.'"</div>
+        <div class="verdict">Can hurt &#10007;<span class="body"></span></div>
+      </div>
+      <div class="query-card" data-verdict="bad" data-reason="No multi-step logic to unfold. CoT just adds length and cost without making the summary any better.">
+        <div class="q">"Summarize this paragraph in one line."</div>
+        <div class="verdict">Wasted &#10007;<span class="body"></span></div>
+      </div>
+    </div>
+    <div class="query-tracker" id="queryTracker">0 / 6 tested</div>
+  </div>
+</section>
+
+<!-- 04 · WORKED EXAMPLE — DOSSIER -->
+<section>
+  <div class="section-label"><span class="num">04</span>Worked Example</div>
+  <h2>One real <em>case</em>.</h2>
+  <div class="dossier">
+    <div class="dossier-q">
+      <div class="label">User asks</div>
+      <div class="text">"A crew of 4 painters each finish 3 rooms a day. They work 5 days. The building has 70 rooms. How many are left unpainted?"</div>
+    </div>
+
+    <div class="dossier-step" data-row="0">
+      <div class="icon">1</div>
+      <div class="body">
+        <div class="head">Pull out the numbers</div>
+        <div class="detail">4 painters, <code>3 rooms</code> each per day, <code>5 days</code>, <code>70 rooms</code> total. Naming the parts before computing is the point of reasoning first.</div>
+      </div>
+    </div>
+
+    <div class="dossier-step" data-row="1">
+      <div class="icon">2</div>
+      <div class="body">
+        <div class="head">Step one, per day</div>
+        <div class="detail">How many rooms get painted in a single day?
+          <span class="pull-quote">4 painters &times; 3 rooms = 12 rooms / day</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dossier-step" data-row="2">
+      <div class="icon">3</div>
+      <div class="body">
+        <div class="head">Step two, over five days</div>
+        <div class="detail">Carry the previous result forward, don't restart.
+          <span class="pull-quote">12 rooms/day &times; 5 days = 60 rooms painted</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dossier-step" data-row="3">
+      <div class="icon">4</div>
+      <div class="body">
+        <div class="head">Step three, what's left</div>
+        <div class="detail">Subtract painted from the total.
+          <span class="pull-quote">70 rooms &minus; 60 painted = 10 left</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dossier-final" data-row="4">
+      <div class="label">Answer returned to user</div>
+      <div class="answer">"10 rooms are left unpainted." The answer is just the last step, and every step before it was easy to check. <span class="cite">Asked cold, with no steps, models often blurt a wrong number here.</span></div>
+    </div>
+
+    <div class="dossier-replay">
+      <button id="dossierReplay">&#9654; Replay case</button>
+    </div>
+  </div>
+</section>
+
+<!-- 05 · CODE -->
+<section>
+  <div class="section-label"><span class="num">05</span>Code Sketch</div>
+  <h2>The <em>shape</em> in code.</h2>
+  <div class="code-stage">
+    <div class="code-hint">Tap a line to see what it does. The whole pattern is one change to the <span class="term" tabindex="0" data-def="The text you send the model. Everything it sees before it starts writing.">prompt</span>.</div>
+    <pre class="code"><code id="codeBlock"><span class="code-line" data-line="0"><span class="comment"># the trick: ask for the reasoning before the answer</span></span>
+<span class="code-line" data-line="1">prompt = question + <span class="str">"\nLet's think step by step."</span></span>
+<span class="code-line" data-line="2"> </span>
+<span class="code-line" data-line="3"><span class="comment"># the model writes its steps, then lands on an answer</span></span>
+<span class="code-line" data-line="4">response = model(prompt)</span>
+<span class="code-line" data-line="5"> </span>
+<span class="code-line" data-line="6"><span class="comment"># reasoning is everything above; the answer is the last line</span></span>
+<span class="code-line" data-line="7">answer = response.splitlines()[<span class="str">-1</span>]</span>
+<span class="code-line" data-line="8"><span class="kw">return</span> answer, response</span></code></pre>
+    <div class="code-explainer" id="codeExplainer">
+      <div class="hint">Tap a line above</div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 · TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">06</span>Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-g"></div>
+        <div class="seg on-y"></div>
+        <div class="seg on-y"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-g"></div>
+        <div class="seg on-y"></div>
+        <div class="seg on-y"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Complexity</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-g"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      One sentence in the prompt buys the model's reasoning. Gold on hard problems, noise on easy ones.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-single-call-control.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Single-call control</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Wei et al. (2022). <em>Chain-of-Thought Prompting Elicits Reasoning in Large Language Models.</em></li>
+    <li>Kojima et al. (2022). <em>Large Language Models are Zero-Shot Reasoners.</em> <span class="note">Origin of the "Let's think step by step" trigger.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ DIAGRAM ============
+const TOTAL = 3;
+const nodes = document.querySelectorAll('.node');
+const arrows = document.querySelectorAll('.arrow-mark');
+const stepNum = document.getElementById('stepNum');
+const stepText = document.getElementById('stepText');
+const stepBtn = document.getElementById('stepBtn');
+const playFlowBtn = document.getElementById('playFlowBtn');
+const resetBtn = document.getElementById('resetBtn');
+const traceRows = document.querySelectorAll('.trace-row');
+const traceEmpty = document.getElementById('traceEmpty');
+
+const stepLabels = [
+  { num: 'Step 1 of 3', text: 'The user asks something that takes more than recall.' },
+  { num: 'Step 2 of 3', text: 'Instead of answering, the model writes its reasoning first.' },
+  { num: 'Step 3 of 3', text: 'The answer comes out of the last step, not a guess.' }
+];
+
+let currentStep = -1;
+
+function setTrace(active) {
+  traceRows.forEach(r => r.classList.toggle('shown', active));
+  if (traceEmpty) traceEmpty.classList.toggle('hidden', active);
+}
+
+function setStep(s) {
+  nodes.forEach(n => n.classList.remove('active', 'done'));
+  arrows.forEach(a => a.classList.remove('active', 'done'));
+  if (s < 0) {
+    stepNum.textContent = 'Step 0 of 3';
+    stepText.textContent = 'Press play to walk through each step.';
+    setTrace(false);
+    return;
+  }
+  for (let i = 0; i < s; i++) {
+    nodes[i].classList.add('done');
+    if (arrows[i]) arrows[i].classList.add('done');
+  }
+  nodes[s].classList.add('active');
+  if (arrows[s]) arrows[s].classList.add('active');
+  stepNum.textContent = stepLabels[s].num;
+  stepText.textContent = stepLabels[s].text;
+  // the reasoning trace belongs to the MODEL step (index 1)
+  setTrace(s === 1);
+}
+
+stepBtn.addEventListener('click', () => {
+  currentStep = (currentStep + 1) % TOTAL;
+  setStep(currentStep);
+});
+
+let playing = false;
+playFlowBtn.addEventListener('click', async () => {
+  if (playing) return;
+  playing = true;
+  playFlowBtn.disabled = true;
+  for (let i = 0; i < TOTAL; i++) {
+    currentStep = i;
+    setStep(i);
+    await sleep(i === 1 ? 1400 : 850);
+  }
+  await sleep(300);
+  nodes.forEach(n => { n.classList.remove('active'); n.classList.add('done'); });
+  arrows.forEach(a => { a.classList.remove('active'); a.classList.add('done'); });
+  setTrace(false);
+  stepNum.textContent = 'Complete';
+  stepText.textContent = '✓ Reasoning shown, answer grounded in it.';
+  playing = false;
+  playFlowBtn.disabled = false;
+});
+
+resetBtn.addEventListener('click', () => {
+  currentStep = -1;
+  setStep(-1);
+});
+
+// ============ QUERIES ============
+const queryCards = document.querySelectorAll('.query-card');
+const queryTracker = document.getElementById('queryTracker');
+const tested = new Set();
+
+queryCards.forEach(card => {
+  card.addEventListener('click', () => {
+    if (card.classList.contains('revealed')) return;
+    card.classList.add('revealed');
+    card.classList.add(card.dataset.verdict);
+    card.querySelector('.verdict .body').textContent = card.dataset.reason;
+    tested.add(card);
+    const n = tested.size;
+    if (n === queryCards.length) {
+      queryTracker.textContent = '✓ All 6 tested, pattern understood';
+      queryTracker.classList.add('complete');
+    } else {
+      queryTracker.textContent = `${n} / 6 tested`;
+    }
+  });
+});
+
+// ============ DOSSIER ============
+const dossierSteps = document.querySelectorAll('.dossier-step');
+const dossierFinal = document.querySelector('.dossier-final');
+const dossierReplay = document.getElementById('dossierReplay');
+
+async function playDossier() {
+  dossierSteps.forEach(s => { s.classList.remove('shown'); s.classList.remove('done'); });
+  dossierFinal.classList.remove('shown');
+  await sleep(200);
+  for (let i = 0; i < dossierSteps.length; i++) {
+    dossierSteps[i].classList.add('shown');
+    await sleep(900);
+    dossierSteps[i].classList.add('done');
+  }
+  await sleep(300);
+  dossierFinal.classList.add('shown');
+}
+
+dossierReplay.addEventListener('click', playDossier);
+const dossierObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      playDossier();
+      dossierObs.disconnect();
+    }
+  });
+}, { threshold: 0.3 });
+dossierObs.observe(document.querySelector('.dossier'));
+
+// ============ CODE ============
+const codeLines = document.querySelectorAll('.code-line');
+const codeExplainer = document.getElementById('codeExplainer');
+
+const codeExplanations = [
+  "The one move that makes it Chain-of-Thought: ask the model to reason before it answers.",
+  "Append the trigger phrase. 'Let's think step by step' is enough to switch on reasoning, no examples needed.",
+  "",
+  "Comment for the model call.",
+  "Send it. The model writes its reasoning, then lands on a final answer.",
+  "",
+  "Comment: where the answer is.",
+  "Take the last line as the answer. The lines above it are the reasoning that produced it.",
+  "Return both, so you can check the work, not just the result."
+];
+
+let tappedLine = null;
+
+function showExplanation(line) {
+  codeLines.forEach(l => l.classList.remove('active'));
+  line.classList.add('active');
+  const idx = parseInt(line.dataset.line);
+  const text = codeExplanations[idx];
+  if (text) {
+    codeExplainer.textContent = text;
+  } else {
+    codeExplainer.innerHTML = '<div class="hint">(blank line)</div>';
+  }
+}
+
+codeLines.forEach(line => {
+  // desktop hover (only when nothing tapped/locked)
+  line.addEventListener('mouseenter', () => {
+    if (tappedLine) return;
+    showExplanation(line);
+  });
+  line.addEventListener('mouseleave', () => {
+    if (tappedLine) return;
+    line.classList.remove('active');
+  });
+  // tap / click locks the explanation until another line is tapped
+  line.addEventListener('click', () => {
+    tappedLine = line;
+    showExplanation(line);
+  });
+});
+
+// ============ TERM TOOLTIPS (tap toggle on touch) ============
+const terms = document.querySelectorAll('.term');
+terms.forEach(term => {
+  term.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const wasOpen = term.classList.contains('open');
+    terms.forEach(t => t.classList.remove('open'));
+    if (!wasOpen) term.classList.add('open');
+  });
+});
+document.addEventListener('click', () => {
+  terms.forEach(t => t.classList.remove('open'));
+});
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+
+</body>
+</html>
