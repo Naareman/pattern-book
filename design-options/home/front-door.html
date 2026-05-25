@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#8A909C;
+    --border:#E8EAEE; --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 2px 4px rgba(16,24,40,.04),0 6px 24px rgba(16,24,40,.07);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px}
+
+  header{padding:40px 0 8px}
+  .wordmark{font-family:'Fraunces',serif;font-weight:500;font-size:24px;letter-spacing:-.01em}
+  .strap{color:var(--soft);font-size:15px;margin-top:4px}
+
+  .stage{padding:32px 0 56px}
+  .diagram{width:100%;height:auto;display:block;max-width:880px;margin:0 auto}
+
+  /* svg interaction */
+  .zone{cursor:pointer}
+  .zone .hit{fill:transparent}
+  .zone-label{font-family:'Fraunces',serif;font-weight:500;font-size:21px;fill:var(--text)}
+  .zone-cap{font-family:'Inter',sans-serif;font-size:13.5px;fill:var(--soft)}
+  .bar{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5;transition:fill .18s ease,transform .18s ease}
+  .buildcard{fill:#fff;stroke:var(--border);stroke-width:1.5;transition:stroke .18s ease,transform .18s ease}
+  .flow{stroke:var(--faint);stroke-width:2;fill:none;transition:stroke .18s ease}
+  .flowhead{fill:var(--faint);transition:fill .18s ease}
+  .concern-band{fill:#fff;stroke:var(--border);stroke-width:1.5}
+  .tick{stroke:var(--accent);stroke-width:1.5;stroke-dasharray:2 4;opacity:.5;transition:opacity .18s ease}
+  .chip{fill:var(--accent-soft)}
+  .chip-tx{font-family:'Inter',sans-serif;font-size:12.5px;fill:var(--accent-hover);font-weight:500}
+  .glyph{stroke:var(--accent);stroke-width:1.6;fill:none}
+
+  /* hovers */
+  .zone:hover .zone-label{fill:var(--accent-hover)}
+  #zLayers:hover .bar{fill:#e7e0fd}
+  #zBuilds:hover .buildcard{stroke:var(--accent)}
+  #zBuilds:hover .flow{stroke:var(--accent)} #zBuilds:hover .flowhead{fill:var(--accent)}
+  #zConcerns:hover .tick{opacity:1}
+  #zConcerns:hover .concern-band{stroke:var(--accent)}
+
+  .hint{font-family:'Inter';font-size:11px;fill:var(--faint);opacity:0;transition:opacity .18s ease}
+  .zone:hover .hint{opacity:1}
+
+  footer{padding:18px 0 48px;color:var(--faint);font-size:12px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="wordmark">The Pattern Book</div>
+      <div class="strap">How AI systems are built.</div>
+    </header>
+
+    <div class="stage">
+      <svg class="diagram" viewBox="0 0 880 470" role="img" aria-label="Layers are stacked into a build, with concerns running under every layer">
+
+        <!-- LAYERS -->
+        <g class="zone" id="zLayers" role="button" tabindex="0" aria-label="Open Layers">
+          <text class="zone-label" x="175" y="86" text-anchor="middle">Layers</text>
+          <rect class="bar" x="100" y="116" width="150" height="32" rx="7"/>
+          <rect class="bar" x="100" y="156" width="150" height="32" rx="7"/>
+          <rect class="bar" x="100" y="196" width="150" height="32" rx="7"/>
+          <rect class="bar" x="100" y="236" width="150" height="32" rx="7"/>
+          <text class="zone-cap" x="175" y="300" text-anchor="middle">the parts an AI is built from</text>
+          <text class="hint" x="175" y="318" text-anchor="middle">click to open ›</text>
+          <rect class="hit" x="80" y="70" width="190" height="240"/>
+        </g>
+
+        <!-- FLOW arrow (layers make builds) -->
+        <g id="zBuilds-flow">
+          <path class="flow" d="M270 192 H 408"/>
+          <path class="flowhead" d="M408 192 l -11 -6 v 12 z"/>
+          <text class="zone-cap" x="339" y="180" text-anchor="middle" style="font-size:12px">make</text>
+        </g>
+
+        <!-- BUILDS -->
+        <g class="zone" id="zBuilds" role="button" tabindex="0" aria-label="Open Builds">
+          <text class="zone-label" x="565" y="86" text-anchor="middle">Builds</text>
+          <rect class="buildcard" x="450" y="138" width="230" height="108" rx="14"/>
+          <!-- simple app/tool glyph -->
+          <rect class="glyph" x="498" y="166" width="134" height="52" rx="8"/>
+          <path class="glyph" d="M498 182 H 632"/>
+          <circle class="glyph" cx="510" cy="174" r="2.4"/>
+          <text class="zone-cap" x="565" y="300" text-anchor="middle">the real tools you make</text>
+          <text class="hint" x="565" y="318" text-anchor="middle">click to open ›</text>
+          <rect class="hit" x="450" y="70" width="230" height="240"/>
+        </g>
+
+        <!-- CONCERNS: a band UNDER everything, ticking up to each layer -->
+        <g class="zone" id="zConcerns" role="button" tabindex="0" aria-label="Open Concerns">
+          <!-- ticks rising from the band to each layer bar -->
+          <line class="tick" x1="120" y1="360" x2="120" y2="270"/>
+          <line class="tick" x1="160" y1="360" x2="160" y2="270"/>
+          <line class="tick" x1="200" y1="360" x2="200" y2="270"/>
+          <line class="tick" x1="240" y1="360" x2="240" y2="270"/>
+
+          <rect class="concern-band" x="100" y="360" width="580" height="62" rx="12"/>
+          <text class="zone-label" x="120" y="352" style="font-size:18px">Concerns</text>
+
+          <!-- chips -->
+          <g>
+            <rect class="chip" x="120" y="378" width="76" height="26" rx="13"/>
+            <text class="chip-tx" x="158" y="395" text-anchor="middle">Safety</text>
+            <rect class="chip" x="206" y="378" width="66" height="26" rx="13"/>
+            <text class="chip-tx" x="239" y="395" text-anchor="middle">Cost</text>
+            <rect class="chip" x="282" y="378" width="82" height="26" rx="13"/>
+            <text class="chip-tx" x="323" y="395" text-anchor="middle">Privacy</text>
+            <rect class="chip" x="374" y="378" width="110" height="26" rx="13"/>
+            <text class="chip-tx" x="429" y="395" text-anchor="middle">Evaluation</text>
+          </g>
+          <text class="zone-cap" x="500" y="395" text-anchor="start" style="fill:var(--faint)">…apply to every layer</text>
+          <text class="hint" x="120" y="440" text-anchor="start">click to open ›</text>
+          <rect class="hit" x="100" y="330" width="580" height="110"/>
+        </g>
+
+      </svg>
+    </div>
+
+    <footer>Click a part to go deeper.</footer>
+  </div>
+
+<script>
+  const go = (name)=>{ /* placeholder until pages are wired */ console.log('open', name); };
+  document.getElementById('zLayers').addEventListener('click', ()=>go('layers'));
+  document.getElementById('zBuilds').addEventListener('click', ()=>go('builds'));
+  document.getElementById('zConcerns').addEventListener('click', ()=>go('concerns'));
+  document.querySelectorAll('.zone').forEach(z=>z.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();z.click();}}));
+</script>
+</body>
+</html>
