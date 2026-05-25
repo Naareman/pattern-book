@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reasoning System with Code Execution (PAL) · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --error:#C2554F; --error-soft:#FBECEB;
+    --warn:#B45309; --warn-soft:#FEF3C7;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.6; color: var(--text); }
+
+  /* layer badges */
+  .layer-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .layer-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .layer-badge:hover { border-color: var(--accent); background: #e4dcfe; }
+  .layer-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* demo lede */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+
+  /* ============ DEMO STAGE ============ */
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* comparison toggle */
+  .compare-toggle {
+    display: flex; gap: 0; border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 18px;
+    width: fit-content;
+  }
+  .toggle-btn {
+    padding: 9px 18px; font-size: 13px; font-weight: 600;
+    background: var(--bg-subtle); border: none; cursor: pointer;
+    color: var(--soft); font-family: 'Inter', sans-serif;
+    transition: background .18s ease, color .18s ease;
+  }
+  .toggle-btn + .toggle-btn { border-left: 1px solid var(--border-strong); }
+  .toggle-btn.active { background: var(--accent); color: #fff; }
+  .toggle-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  /* the query bar */
+  .query-bar {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 18px;
+  }
+  .query-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .query-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--text); line-height: 1.3; }
+
+  /* phases column */
+  .phases { display: flex; flex-direction: column; gap: 14px; }
+
+  /* one phase block */
+  .phase {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    overflow: hidden; opacity: 0; transform: translateY(6px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .phase.visible { opacity: 1; transform: translateY(0); }
+  .phase-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; background: var(--bg-subtle); border-bottom: 1px solid var(--border);
+  }
+  .phase-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .phase.active .phase-head { background: var(--accent-soft); border-bottom-color: var(--accent); }
+  .phase-title { font-weight: 600; font-size: 14px; color: var(--text); }
+  .phase-status {
+    margin-left: auto; font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    color: var(--faint); text-transform: uppercase;
+  }
+  .phase.active .phase-status { color: var(--accent); }
+  .phase.done .phase-status { color: var(--success); }
+  .phase.done .phase-head { background: var(--success-soft); border-bottom-color: #b2e4d5; }
+  .phase.done .phase-num { background: var(--success); }
+  .phase.error-done .phase-head { background: var(--error-soft); border-bottom-color: #e8b4b2; }
+  .phase.error-done .phase-num { background: var(--error); }
+  .phase.error-done .phase-status { color: var(--error); }
+  .phase-body { padding: 12px 14px; min-height: 48px; }
+
+  /* code block inside demo */
+  .phase-code {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    line-height: 1.6; color: var(--text);
+    white-space: pre; overflow-x: auto;
+    opacity: 0; transition: opacity .4s ease;
+  }
+  .phase-code.visible { opacity: 1; }
+  .phase-code .kw { color: var(--accent); font-weight: 500; }
+  .phase-code .fn { color: var(--accent-hover); }
+  .phase-code .num { color: var(--success); }
+  .phase-code .comment { color: var(--faint); }
+  .phase-code .str { color: #0E7490; }
+
+  /* result drop */
+  .result-line {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; border-radius: 8px;
+    background: var(--success-soft); border: 1px solid #b2e4d5;
+    font-size: 14px; color: var(--text);
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .4s ease, transform .4s ease;
+    margin-top: 10px;
+  }
+  .result-line.visible { opacity: 1; transform: translateY(0); }
+  .result-line .result-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--success); flex-shrink: 0; }
+  .result-line .result-val { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 15px; }
+
+  /* inline answer */
+  .answer-block {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+    font-size: 14px; line-height: 1.7; color: var(--text);
+    opacity: 0; transition: opacity .5s ease;
+    min-height: 48px;
+  }
+  .answer-block.visible { opacity: 1; }
+  .answer-block .injected { color: var(--accent-hover); font-weight: 600; background: var(--accent-soft); padding: 0 4px; border-radius: 3px; }
+
+  /* in-head attempt block (error path) */
+  .inhead-block {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+    font-size: 14px; line-height: 1.7; color: var(--text);
+    opacity: 0; transition: opacity .5s ease;
+  }
+  .inhead-block.visible { opacity: 1; }
+  .inhead-block .slip { color: var(--error); font-weight: 600; text-decoration: line-through; }
+  .inhead-error {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 10px; padding: 10px 12px;
+    border-radius: 8px; background: var(--error-soft); border: 1px solid #e8b4b2;
+    font-size: 13px; color: var(--error); font-weight: 600;
+    opacity: 0; transition: opacity .4s ease;
+  }
+  .inhead-error.visible { opacity: 1; }
+
+  /* controls */
+  .demo-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ SECTION 03: REAL EXAMPLE ============ */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .example-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
+  .example-flow { display: flex; flex-direction: column; gap: 0; }
+  .ex-row {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .ex-row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .ex-icon { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; }
+  .ex-icon svg { width: 16px; height: 16px; color: var(--accent-hover); display: block; }
+  .ex-body { flex: 1; min-width: 0; }
+  .ex-step { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
+  .ex-text { font-size: 14px; line-height: 1.6; color: var(--text); }
+  .ex-text strong { color: var(--accent-hover); }
+
+  /* code block for real-world example */
+  .code-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .code-hint { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
+  pre.code {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 18px;
+    font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
+    line-height: 1.6; color: var(--text);
+    overflow-x: auto; margin-bottom: 0;
+  }
+  pre.code .kw { color: var(--accent); font-weight: 500; }
+  pre.code .fn { color: var(--accent-hover); }
+  pre.code .num { color: var(--success); }
+  pre.code .comment { color: var(--faint); font-style: italic; }
+  pre.code .str { color: #0E7490; }
+
+  /* ============ PATTERNS IT USES ============ */
+  .patterns-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .patterns-intro { font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 18px; }
+  .pattern-row {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .pattern-row:last-of-type { border-bottom: 0; padding-bottom: 0; }
+  .pattern-layer-tag {
+    flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px;
+    white-space: nowrap; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .pattern-layer-tag:hover { border-color: var(--accent); background: #e4dcfe; }
+  .pattern-info { flex: 1; min-width: 0; }
+  .pattern-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .pattern-desc { font-size: 13.5px; color: var(--soft); line-height: 1.5; }
+
+  .recipe-note {
+    margin-top: 18px; padding: 14px 16px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px; color: var(--soft); line-height: 1.6;
+  }
+  .recipe-note strong { color: var(--text); }
+
+  /* sequencing list */
+  .sequencing-list {
+    display: flex; flex-direction: column; gap: 0;
+    border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden;
+    margin-top: 10px;
+  }
+  .seq-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 14px; border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .seq-row:last-child { border-bottom: 0; }
+  .seq-arrow { font-size: 13px; color: var(--accent); font-weight: 700; flex-shrink: 0; min-width: 20px; text-align: center; }
+  .seq-text { font-size: 13.5px; color: var(--text); line-height: 1.5; }
+
+  /* ============ TRADEOFFS ============ */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { min-width: 100px; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); min-width: 100px; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+  }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
+    .tradeoff-label { min-width: 0; }
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+    .compare-toggle { width: 100%; }
+    .toggle-btn { flex: 1; }
+    .ex-row { gap: 10px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep">/</span>
+      <a href="builds.html">Builds</a>
+      <span class="sep">/</span>
+      <span class="here">Reasoning System with Code Execution (PAL)</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="18" rx="3"/>
+        <path d="M7 8h10M7 12h6"/>
+      </svg>
+    </span>Build
+  </span>
+  <h1 class="pattern-title">Reasoning System with Code Execution (PAL)</h1>
+  <p class="explainer">Instead of computing in its head, the model writes a short program, runs it, and drops the real result into its answer.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>Language models (LLMs, the AI models you send a prompt to: the text you type and send) are surprisingly bad at arithmetic and multi-step logic when they try to reason inside their own "head." PAL (Program-Aided Language model) sidesteps that weakness entirely. The model is asked to <strong style="color:var(--accent-hover)">write a small program</strong> that encodes the reasoning steps. A sandboxed interpreter then <strong style="color:var(--accent-hover)">runs it</strong>, and the correct, computed result is inserted directly into the final answer. No mental arithmetic. No silent slip on step seven.</p>
+  </div>
+  <div class="layer-badges" aria-label="Layers used by this build">
+    <a class="layer-badge" href="layer-single-call-control.html">
+      <span class="dot" aria-hidden="true"></span>L4: Single-Call Control
+    </a>
+    <a class="layer-badge" href="layer-stateless-retrieval.html">
+      <span class="dot" aria-hidden="true"></span>L3a: Stateless Retrieval
+    </a>
+    <a class="layer-badge" href="layer-orchestration-agents.html">
+      <span class="dot" aria-hidden="true"></span>L5: Orchestration
+    </a>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Watch the <em>code run</em>.</h2>
+
+  <p class="demo-lede">See the difference between a model that tries to do the math in its head versus one that writes and runs code. Toggle the mode, then step through.</p>
+
+  <div class="demo-stage">
+
+    <!-- mode toggle -->
+    <div class="compare-toggle" role="group" aria-label="Demo mode">
+      <button class="toggle-btn active" id="btn-pal" aria-pressed="true">Code Execution (PAL)</button>
+      <button class="toggle-btn" id="btn-inhead" aria-pressed="false">In-Head Reasoning</button>
+    </div>
+
+    <!-- the question -->
+    <div class="query-bar">
+      <div class="query-label">Word Problem</div>
+      <div class="query-text">A bakery sells 127 muffins on Monday, 84 on Tuesday, and 213 on Wednesday. They need to bake 500 more to restock. How many total muffins will they have baked by the end of restocking?</div>
+    </div>
+
+    <!-- PAL MODE -->
+    <div id="demo-pal">
+      <div class="phases" aria-live="polite" aria-atomic="false">
+
+        <!-- Phase 1: Understand -->
+        <div class="phase" id="pal-p1">
+          <div class="phase-head">
+            <span class="phase-num" aria-hidden="true">1</span>
+            <span class="phase-title">Understand: translate to code</span>
+            <span class="phase-status" id="pal-s1">waiting</span>
+          </div>
+          <div class="phase-body">
+            <div class="phase-code" id="pal-code">
+<span class="comment"># The model writes this: no arithmetic yet</span>
+monday    = <span class="num">127</span>
+tuesday   = <span class="num">84</span>
+wednesday = <span class="num">213</span>
+restock   = <span class="num">500</span>
+
+sold_so_far = monday + tuesday + wednesday
+total       = sold_so_far + restock
+<span class="fn">print</span>(total)
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 2: Execute -->
+        <div class="phase" id="pal-p2">
+          <div class="phase-head">
+            <span class="phase-num" aria-hidden="true">2</span>
+            <span class="phase-title">Execute: sandboxed interpreter runs it</span>
+            <span class="phase-status" id="pal-s2">waiting</span>
+          </div>
+          <div class="phase-body">
+            <div class="result-line" id="pal-result">
+              <span class="result-label">Output</span>
+              <span class="result-val">924</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 3: Answer -->
+        <div class="phase" id="pal-p3">
+          <div class="phase-head">
+            <span class="phase-num" aria-hidden="true">3</span>
+            <span class="phase-title">Answer: result drops into the response</span>
+            <span class="phase-status" id="pal-s3">waiting</span>
+          </div>
+          <div class="phase-body">
+            <div class="answer-block" id="pal-answer">
+              The bakery will have baked <span class="injected">924 muffins</span> in total by the end of restocking (127 + 84 + 213 sold, plus 500 more to bake).
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- IN-HEAD MODE -->
+    <div id="demo-inhead" style="display:none">
+      <div class="phases" aria-live="polite" aria-atomic="false">
+
+        <!-- Phase 1: Attempt -->
+        <div class="phase" id="ih-p1">
+          <div class="phase-head">
+            <span class="phase-num" aria-hidden="true">1</span>
+            <span class="phase-title">Attempt: work through it mentally</span>
+            <span class="phase-status" id="ih-s1">waiting</span>
+          </div>
+          <div class="phase-body">
+            <div class="inhead-block" id="ih-working">
+              Monday and Tuesday: 127 + 84 = <span class="slip">201</span> 211. Then 211 + 213 = <span class="slip">414</span> 424. Add restock: 424 + 500 = <span class="slip">914</span> 924.
+            </div>
+            <div class="inhead-error" id="ih-error">
+              <span aria-hidden="true">&#9888;</span>&nbsp; Intermediate slip: carried the wrong digit. Off by 10.
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 2: Output -->
+        <div class="phase" id="ih-p2">
+          <div class="phase-head">
+            <span class="phase-num" aria-hidden="true">2</span>
+            <span class="phase-title">Answer: wrong number, no error signal</span>
+            <span class="phase-status" id="ih-s2">waiting</span>
+          </div>
+          <div class="phase-body">
+            <div class="answer-block" id="ih-answer">
+              The bakery will have baked <span style="color:var(--error);font-weight:600;background:var(--error-soft);padding:0 4px;border-radius:3px">914 muffins</span> in total by the end of restocking.
+              <div style="margin-top:10px;font-size:12.5px;color:var(--faint)">The model sounds confident. There is nothing in the output that flags the error.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="demo-controls">
+      <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>How it <em>runs in practice</em>.</h2>
+  <div class="example-stage">
+    <p class="example-intro">
+      This is what happens when a math tutor app uses PAL to answer a student's homework problem. The user only sees the final answer; all code is internal.
+    </p>
+    <div class="example-flow">
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5l4 4L7 21H3v-4z"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 1: Prompt with a few examples</div>
+          <div class="ex-text">The prompt (the text sent to the model) includes 2 to 3 solved examples, each showing the word problem and the Python code that solves it. This is <strong>few-shot framing</strong>: the model learns the pattern by example, not by instruction.</div>
+        </div>
+      </div>
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l3 3-3 3M13 15h3"/><rect x="2" y="3" width="20" height="18" rx="3"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 2: Model writes code</div>
+          <div class="ex-text">The model generates a short Python snippet. It does <strong>no arithmetic</strong>: it only encodes the structure of the problem as variable assignments and arithmetic operators.</div>
+        </div>
+      </div>
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 3: Sandboxed execution</div>
+          <div class="ex-text">The snippet runs in a <strong>sandboxed interpreter</strong> (a locked environment with no internet access, no file writes, time-limited) so it cannot cause side effects. The numerical result is captured.</div>
+        </div>
+      </div>
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6M9 16h4M6 3h8l4 4v14H6z"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 4: Result injected into the answer</div>
+          <div class="ex-text">The model is called again (or the result is templated in) so the final answer contains the <strong>computed number</strong>, not the model's mental guess. The student sees a friendly explanation, not a code dump.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- The prompt snippet -->
+  <div style="margin-top:20px">
+    <div class="code-stage">
+      <p class="code-hint">A minimal Python-based PAL prompt. Each example shows the problem then the code; the model continues the pattern for a new problem.</p>
+      <pre class="code"><span class="comment"># System: You solve word problems by writing Python.</span>
+<span class="comment"># Always end with print(answer).</span>
+
+<span class="comment">## Example 1</span>
+<span class="comment"># Q: Alice has 45 apples. She gives 12 to Bob. How many remain?</span>
+apples = <span class="num">45</span>
+given  = <span class="num">12</span>
+answer = apples - given
+<span class="fn">print</span>(answer)  <span class="comment"># 33</span>
+
+<span class="comment">## Example 2</span>
+<span class="comment"># Q: A train travels at 80 km/h for 2.5 hours. Distance?</span>
+speed    = <span class="num">80</span>
+hours    = <span class="num">2.5</span>
+answer   = speed * hours
+<span class="fn">print</span>(answer)  <span class="comment"># 200.0</span>
+
+<span class="comment">## Your turn</span>
+<span class="comment"># Q: A bakery sells 127 muffins Monday, 84 Tuesday, 213 Wednesday.</span>
+<span class="comment">#    They bake 500 more to restock. Total muffins baked?</span>
+<span class="comment"># (model continues here...)</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- 04 PATTERNS IT USES -->
+<section>
+  <div class="section-label"><span class="num">04</span>Patterns It Uses</div>
+  <h2>Why this is a <em>Recipe</em>, not one pattern.</h2>
+  <div class="patterns-card">
+    <p class="patterns-intro">
+      A Recipe is a named composition of Part I patterns. PAL spans three layers: it cannot be filed in just one, so it is not a pattern. Here is what it assembles.
+    </p>
+
+    <div class="pattern-row">
+      <a class="pattern-layer-tag" href="layer-single-call-control.html" aria-label="L4 Single-Call Control layer page">L4: Cognitive Strategy</a>
+      <div class="pattern-info">
+        <div class="pattern-name">Chain-of-Thought (externalized)</div>
+        <div class="pattern-desc">Instead of reasoning in free-form prose, the model externalizes every reasoning step as executable code lines. The code is the chain of thought.</div>
+      </div>
+    </div>
+
+    <div class="pattern-row">
+      <a class="pattern-layer-tag" href="layer-single-call-control.html" aria-label="L4 Single-Call Control layer page">L4: Input Shape</a>
+      <div class="pattern-info">
+        <div class="pattern-name">Few-Shot Framing</div>
+        <div class="pattern-desc">Two or three solved examples in the prompt teach the model what code style to generate. No separate fine-tuning needed.</div>
+      </div>
+    </div>
+
+    <div class="pattern-row">
+      <a class="pattern-layer-tag" href="layer-stateless-retrieval.html" aria-label="L3a Stateless Retrieval layer page">L3a: Stateless Retrieval</a>
+      <div class="pattern-info">
+        <div class="pattern-name">Sandboxed Pure-Functional Execution</div>
+        <div class="pattern-desc">Running the generated code is read-only and side-effect-free: no writes to disk, no network calls. That makes it L3a (the layer for read-only external information), not L5 Action (which covers state-changing operations). The taxonomy filing rule: "sandboxed pure-functional code execution is read-only."</div>
+      </div>
+    </div>
+
+    <div class="pattern-row">
+      <a class="pattern-layer-tag" href="layer-orchestration-agents.html" aria-label="L5 Orchestration layer page">L5: Shape</a>
+      <div class="pattern-info">
+        <div class="pattern-name">Sequential Pipeline</div>
+        <div class="pattern-desc">Three steps in strict order: generate code, run it, compose final answer. This is the simplest orchestration shape: a linear pipeline where each step feeds the next.</div>
+      </div>
+    </div>
+
+    <div class="recipe-note">
+      <strong>Why it is a Recipe and not a single pattern:</strong> each of those three layers has a different axis. L4 is about what happens inside one model call. L3a is about how read-only external information enters a call. L5 is about how calls are organized across time. PAL crosses all three. A single-layer pattern cannot span axes. That is the defining test: if the thing cannot be filed in one layer, it is a Recipe.
+    </div>
+
+    <!-- sequencing -->
+    <div style="margin-top:22px">
+      <div style="font-size:13px;font-weight:600;color:var(--soft);margin-bottom:8px;letter-spacing:.03em">Sequencing</div>
+      <div class="sequencing-list">
+        <div class="seq-row"><span class="seq-arrow">1</span><span class="seq-text"><strong>Model call 1:</strong> prompt with few-shot examples + word problem. Model outputs Python code only.</span></div>
+        <div class="seq-row"><span class="seq-arrow">2</span><span class="seq-text"><strong>Sandboxed interpreter:</strong> execute the snippet, capture stdout. On error: surface to user or retry.</span></div>
+        <div class="seq-row"><span class="seq-arrow">3</span><span class="seq-text"><strong>Model call 2 (or template):</strong> combine the original problem + computed result into a natural-language answer.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">05</span>Tradeoffs</div>
+  <h2>What you <em>pay</em>.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Accuracy</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Complexity</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Risk</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      The accuracy gain is large for any problem that involves counting, arithmetic, or multi-step logic: work that a calculator handles perfectly but a model does inconsistently. The cost is two model calls (or one call plus a template pass) plus the overhead of running a sandboxed interpreter.
+      <br><br>
+      <strong style="color:var(--text)">The key tradeoff to know:</strong> the answer is only as correct as the code the model writes. If the model misunderstands the problem structure, it will write code that computes the wrong thing with perfect arithmetic. Code execution cannot fix a misread problem. Sandboxing is also non-negotiable: without it, the model could write code that reads files, makes network calls, or loops infinitely.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Gao et al. (2023). <em>PAL: Program-aided Language Models.</em> ICML. <span class="note">Introduced the PAL framework: LLM writes Python, interpreter runs it.</span></li>
+    <li>Chen et al. (2022). <em>Program of Thoughts Prompting: Disentangling Computation from Reasoning for Numerical Reasoning Tasks.</em> <span class="note">Program-of-Thought variant; separates reasoning from execution.</span></li>
+    <li>Wei et al. (2022). <em>Chain-of-Thought Prompting Elicits Reasoning in Large Language Models.</em> NeurIPS. <span class="note">The precursor that showed step-by-step reasoning improves accuracy.</span></li>
+    <li>Wolfram Research. <em>Wolfram Alpha + ChatGPT plugin.</em> <span class="note">Production example of code/computation execution grounding LLM answers.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ MODE TOGGLE ============
+const btnPAL    = document.getElementById('btn-pal');
+const btnInHead = document.getElementById('btn-inhead');
+const demoPAL   = document.getElementById('demo-pal');
+const demoIH    = document.getElementById('demo-inhead');
+
+let mode = 'pal'; // 'pal' | 'inhead'
+
+function switchMode(m) {
+  if (m === mode) return;
+  resetDemo();
+  mode = m;
+  if (m === 'pal') {
+    demoPAL.style.display = '';
+    demoIH.style.display  = 'none';
+    btnPAL.classList.add('active');    btnPAL.setAttribute('aria-pressed','true');
+    btnInHead.classList.remove('active'); btnInHead.setAttribute('aria-pressed','false');
+  } else {
+    demoIH.style.display  = '';
+    demoPAL.style.display = 'none';
+    btnInHead.classList.add('active');    btnInHead.setAttribute('aria-pressed','true');
+    btnPAL.classList.remove('active'); btnPAL.setAttribute('aria-pressed','false');
+  }
+}
+
+btnPAL.addEventListener('click',    () => switchMode('pal'));
+btnInHead.addEventListener('click', () => switchMode('inhead'));
+
+// ============ ANIMATION HELPERS ============
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function sleep(ms) { return new Promise(r => setTimeout(r, reduceMotion ? 0 : ms)); }
+
+// PAL elements
+const palP1 = document.getElementById('pal-p1');
+const palP2 = document.getElementById('pal-p2');
+const palP3 = document.getElementById('pal-p3');
+const palS1 = document.getElementById('pal-s1');
+const palS2 = document.getElementById('pal-s2');
+const palS3 = document.getElementById('pal-s3');
+const palCode   = document.getElementById('pal-code');
+const palResult = document.getElementById('pal-result');
+const palAnswer = document.getElementById('pal-answer');
+
+// In-head elements
+const ihP1 = document.getElementById('ih-p1');
+const ihP2 = document.getElementById('ih-p2');
+const ihS1 = document.getElementById('ih-s1');
+const ihS2 = document.getElementById('ih-s2');
+const ihWorking = document.getElementById('ih-working');
+const ihError   = document.getElementById('ih-error');
+const ihAnswer  = document.getElementById('ih-answer');
+
+let demoStep = -1;
+let running  = false;
+
+function resetPAL() {
+  [palP1,palP2,palP3].forEach(p => p.classList.remove('visible','active','done'));
+  palS1.textContent = 'waiting'; palS2.textContent = 'waiting'; palS3.textContent = 'waiting';
+  palCode.classList.remove('visible');
+  palResult.classList.remove('visible');
+  palAnswer.classList.remove('visible');
+}
+
+function resetIH() {
+  [ihP1,ihP2].forEach(p => p.classList.remove('visible','active','done','error-done'));
+  ihS1.textContent = 'waiting'; ihS2.textContent = 'waiting';
+  ihWorking.classList.remove('visible');
+  ihError.classList.remove('visible');
+  ihAnswer.classList.remove('visible');
+}
+
+function resetDemo() {
+  demoStep = -1;
+  running  = false;
+  resetPAL();
+  resetIH();
+}
+
+// ---- PAL phases ----
+async function palPhase1(animate) {
+  palP1.classList.add('visible','active');
+  palS1.textContent = 'generating…';
+  await sleep(animate ? 500 : 0);
+  palCode.classList.add('visible');
+  await sleep(animate ? 700 : 0);
+  palP1.classList.remove('active'); palP1.classList.add('done');
+  palS1.textContent = 'done';
+}
+async function palPhase2(animate) {
+  palP2.classList.add('visible','active');
+  palS2.textContent = 'running…';
+  await sleep(animate ? 600 : 0);
+  palResult.classList.add('visible');
+  await sleep(animate ? 300 : 0);
+  palP2.classList.remove('active'); palP2.classList.add('done');
+  palS2.textContent = 'done';
+}
+async function palPhase3(animate) {
+  palP3.classList.add('visible','active');
+  palS3.textContent = 'composing…';
+  await sleep(animate ? 500 : 0);
+  palAnswer.classList.add('visible');
+  await sleep(animate ? 300 : 0);
+  palP3.classList.remove('active'); palP3.classList.add('done');
+  palS3.textContent = 'done';
+}
+
+// ---- In-Head phases ----
+async function ihPhase1(animate) {
+  ihP1.classList.add('visible','active');
+  ihS1.textContent = 'thinking…';
+  await sleep(animate ? 500 : 0);
+  ihWorking.classList.add('visible');
+  await sleep(animate ? 700 : 0);
+  ihError.classList.add('visible');
+  await sleep(animate ? 300 : 0);
+  ihP1.classList.remove('active'); ihP1.classList.add('error-done');
+  ihS1.textContent = 'slip';
+}
+async function ihPhase2(animate) {
+  ihP2.classList.add('visible','active');
+  ihS2.textContent = 'answering…';
+  await sleep(animate ? 500 : 0);
+  ihAnswer.classList.add('visible');
+  await sleep(animate ? 300 : 0);
+  ihP2.classList.remove('active'); ihP2.classList.add('error-done');
+  ihS2.textContent = 'wrong';
+}
+
+// max steps per mode
+function maxSteps() { return mode === 'pal' ? 2 : 1; }
+
+async function runStep(step, animate) {
+  if (mode === 'pal') {
+    if (step === 0) await palPhase1(animate);
+    else if (step === 1) await palPhase2(animate);
+    else if (step === 2) await palPhase3(animate);
+  } else {
+    if (step === 0) await ihPhase1(animate);
+    else if (step === 1) await ihPhase2(animate);
+  }
+}
+
+const stepBtn  = document.getElementById('stepBtn');
+const playBtn  = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+stepBtn.addEventListener('click', async () => {
+  if (running) return;
+  if (demoStep >= maxSteps()) { resetDemo(); return; }
+  running = true;
+  stepBtn.disabled = true; playBtn.disabled = true;
+  demoStep++;
+  await runStep(demoStep, true);
+  running = false;
+  stepBtn.disabled = false; playBtn.disabled = false;
+});
+
+playBtn.addEventListener('click', async () => {
+  if (running) return;
+  resetDemo();
+  running = true;
+  playBtn.disabled = true; stepBtn.disabled = true;
+  await sleep(200);
+  for (let i = 0; i <= maxSteps(); i++) {
+    await runStep(i, true);
+    demoStep = i;
+    await sleep(300);
+  }
+  running = false;
+  playBtn.disabled = false; stepBtn.disabled = false;
+});
+
+resetBtn.addEventListener('click', () => {
+  if (running) return;
+  resetDemo();
+});
+
+// Reduced motion: show all immediately
+if (reduceMotion) {
+  (async () => {
+    for (let i = 0; i <= maxSteps(); i++) {
+      await runStep(i, false);
+      demoStep = i;
+    }
+  })();
+}
+</script>
+</body>
+</html>
