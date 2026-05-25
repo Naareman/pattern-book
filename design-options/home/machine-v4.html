@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#8A909C;
+    --border:#E8EAEE; --border-strong:#D5D9E0; --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 6px 22px rgba(16,24,40,.06);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+  .serif{font-family:'Fraunces',serif;font-weight:500}
+
+  header{padding:40px 0 6px}
+  .wordmark{font-family:'Fraunces',serif;font-weight:500;font-size:24px;letter-spacing:-.01em}
+  .strap{color:var(--soft);font-size:15px;margin-top:4px}
+
+  .stage{padding:30px 0 60px}
+
+  /* region heading (clickable) */
+  .region-title{font-family:'Fraunces',serif;font-weight:500;font-size:19px;display:inline-flex;align-items:center;gap:7px;cursor:pointer;color:var(--text);background:none;border:none;padding:0;margin-bottom:4px}
+  .region-title .arr{color:var(--faint);font-size:14px;transition:transform .15s ease,color .15s ease}
+  .region-title:hover{color:var(--accent)} .region-title:hover .arr{color:var(--accent);transform:translateX(2px)}
+  .region-sub{font-size:13px;color:var(--soft);margin-bottom:12px}
+
+  /* top row: axis | layers | output */
+  .top{display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:stretch}
+
+  /* axis */
+  .axis{display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:34px 0 6px;min-width:96px;text-align:center}
+  .axis .cap{font-size:11.5px;color:var(--soft);line-height:1.3;font-weight:500}
+  .axis .cap b{display:block;color:var(--text);font-size:12.5px}
+  .axis .rail{flex:1;width:2px;background:linear-gradient(var(--accent),#cdbffb);margin:8px 0;position:relative;border-radius:2px}
+  .axis .rail::before{content:"";position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .axis .rail::after{content:"";position:absolute;bottom:-2px;left:50%;transform:translate(-50%,0);border-left:6px solid transparent;border-right:6px solid transparent;border-top:9px solid #cdbffb}
+
+  /* layers box */
+  .layers{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 16px 18px}
+  .layer{display:flex;align-items:center;padding:9px 12px;border-radius:9px;font-size:14px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:background .15s ease,border-color .15s ease}
+  .layer + .layer{margin-top:5px}
+  .layer:hover{background:var(--accent-soft);border-color:var(--accent)}
+  .layer .tag{margin-left:auto;font-size:11px;color:var(--accent-hover);background:var(--accent-soft);border-radius:20px;padding:2px 9px;font-weight:600}
+
+  /* output: arrow + builds box */
+  .output{display:flex;align-items:center;gap:14px}
+  .arrow{display:flex;flex-direction:column;align-items:center;color:var(--faint);font-size:12px;gap:3px}
+  .arrow svg{display:block}
+  .builds{align-self:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;min-width:188px}
+  .build{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:9px;font-size:13.5px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:#fff;transition:all .15s ease}
+  .build + .build{margin-top:8px}
+  .build:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
+
+  /* connector down to concerns */
+  .bridge{display:flex;flex-direction:column;align-items:center;margin:14px 0 0}
+  .bridge .line{width:2px;height:22px;background:var(--border-strong)}
+  .bridge .note{font-size:12px;color:var(--faint);margin-top:6px}
+
+  /* concerns box (grouped, full width under layers) */
+  .concerns{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;margin-top:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:4px}
+  .chip{font-size:13px;font-weight:500;padding:7px 14px;border-radius:22px;background:var(--accent-soft);color:var(--accent-hover);border:1px solid transparent;cursor:pointer;transition:border-color .15s ease}
+  .chip:hover{border-color:var(--accent)}
+
+  footer{padding:6px 0 50px;color:var(--faint);font-size:12px}
+
+  @media(max-width:720px){
+    .top{grid-template-columns:1fr;gap:14px}
+    .axis{flex-direction:row;justify-content:space-between;min-width:0;padding:0 4px}
+    .axis .rail{height:2px;width:auto;flex:1;margin:0 10px;background:linear-gradient(90deg,var(--accent),#cdbffb)}
+    .axis .rail::after{top:50%;right:-2px;bottom:auto;left:auto;transform:translateY(-50%);border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:9px solid #cdbffb;border-right:0}
+    .axis .rail::before{top:50%;left:-5px;transform:translateY(-50%)}
+    .output{flex-direction:column}
+    .arrow svg{transform:rotate(90deg)}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="wordmark">The Pattern Book</div>
+      <div class="strap">How AI systems are built.</div>
+    </header>
+
+    <div class="stage">
+      <div class="top">
+        <!-- direction axis, next to the layers -->
+        <div class="axis" aria-hidden="false">
+          <div class="cap"><b>User-facing</b>what people touch</div>
+          <div class="rail"></div>
+          <div class="cap"><b>Foundation</b>what it rests on</div>
+        </div>
+
+        <!-- LAYERS -->
+        <div>
+          <button class="region-title" data-go="layers">Layers <span class="arr">›</span></button>
+          <div class="region-sub">the parts an AI system is built from</div>
+          <div class="layers">
+            <div class="layer" data-go="layer">User experience</div>
+            <div class="layer" data-go="layer">Application patterns</div>
+            <div class="layer" data-go="layer">Orchestration &amp; agents</div>
+            <div class="layer" data-go="layer">Single-call control <span class="tag">Chain-of-Thought</span></div>
+            <div class="layer" data-go="layer">Memory</div>
+            <div class="layer" data-go="layer">Retrieval <span class="tag">RAG</span></div>
+            <div class="layer" data-go="layer">Composition</div>
+            <div class="layer" data-go="layer">Training &amp; adaptation</div>
+            <div class="layer" data-go="layer">Serving &amp; infrastructure</div>
+            <div class="layer" data-go="layer">Data &amp; artifacts</div>
+          </div>
+        </div>
+
+        <!-- OUTPUT: builds -->
+        <div class="output">
+          <div class="arrow">
+            <svg width="46" height="16" viewBox="0 0 46 16"><path d="M0 8 H38" stroke="#9b94b0" stroke-width="2" fill="none"/><path d="M38 8 l-9 -5 v10 z" fill="#9b94b0"/></svg>
+            <span>produces</span>
+          </div>
+          <div>
+            <button class="region-title" data-go="builds">Builds <span class="arr">›</span></button>
+            <div class="region-sub">what the stack produces</div>
+            <div class="builds">
+              <button class="build" data-go="build">Coding Agent</button>
+              <button class="build" data-go="build">Document Q&amp;A</button>
+              <button class="build" data-go="build">Research Agent</button>
+              <button class="build" data-go="build">Support Agent</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- bridge connecting layers to concerns -->
+      <div class="bridge"><div class="line"></div></div>
+
+      <!-- CONCERNS (grouped box, one line) -->
+      <div class="concerns">
+        <button class="region-title" data-go="concerns">Concerns <span class="arr">›</span></button>
+        <div class="region-sub">what every layer above has to get right</div>
+        <div class="chips">
+          <button class="chip" data-go="concern">Evaluation</button>
+          <button class="chip" data-go="concern">Safety</button>
+          <button class="chip" data-go="concern">Privacy</button>
+          <button class="chip" data-go="concern">Observability</button>
+          <button class="chip" data-go="concern">Cost</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>Click anything to go deeper.</footer>
+  </div>
+
+<script>
+  document.querySelectorAll('[data-go]').forEach(el=>{
+    el.addEventListener('click',()=>{ /* placeholder: each routes to its own page once built */ console.log('open', el.dataset.go, el.textContent.trim()); });
+  });
+</script>
+</body>
+</html>
