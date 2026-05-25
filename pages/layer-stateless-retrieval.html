@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Knowledge &amp; Memory · The Pattern Book</title>
+<title>Stateless Retrieval · The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -103,6 +103,7 @@
   .idea-card p {
     font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.5; color: var(--text);
   }
+  .idea-card p + p { margin-top: 14px; }
 
   /* DEMO STAGE */
   .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
@@ -211,39 +212,44 @@
   }
   .answer-hint { font-size: 13px; color: var(--faint); font-family: 'Inter', sans-serif; font-weight: 500; }
 
-  /* Memory section */
-  .memory-stage {
+  /* INSIDE THIS LAYER */
+  .layer-map {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
   }
-  .memory-turns { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-  .turn {
-    display: flex; gap: 10px; align-items: flex-start;
-    opacity: 0; transform: translateY(6px);
-    transition: opacity .35s ease, transform .35s ease;
+  .layer-axis {
+    font-size: 13px; font-weight: 600; color: var(--soft);
+    padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 20px;
   }
-  .turn.shown { opacity: 1; transform: translateY(0); }
-  .turn-role {
-    flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700;
+  .layer-axis span { color: var(--text); }
+  .category-list { display: flex; flex-direction: column; gap: 12px; }
+  .category-row {
+    display: flex; gap: 14px; align-items: flex-start;
   }
-  .turn-role.user { background: var(--accent-soft); color: var(--accent-hover); }
-  .turn-role.ai { background: var(--bg-subtle); color: var(--soft); border: 1px solid var(--border); }
-  .turn-body {
-    flex: 1; background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 10px 13px;
-    font-size: 14px; line-height: 1.55; color: var(--text);
+  .category-name {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; color: var(--text);
+    min-width: 220px; flex-shrink: 0; line-height: 1.35;
   }
-  .turn-body.memory-highlight {
-    background: var(--accent-soft); border-color: var(--accent);
+  .category-desc {
+    font-size: 14px; color: var(--soft); line-height: 1.55;
   }
-  .turn-body strong { color: var(--accent-hover); font-weight: 600; }
-  .memory-note {
-    font-size: 13px; color: var(--soft); line-height: 1.6;
-    padding-top: 14px; border-top: 1px solid var(--border);
+  .layer-filing {
+    margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
+    font-size: 14px; color: var(--soft); line-height: 1.6;
   }
-  .memory-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; }
+  .layer-filing strong { color: var(--text); }
+  .layer-sidebar {
+    margin-top: 14px;
+    background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 13px 16px; font-size: 13.5px; color: var(--soft); line-height: 1.6;
+  }
+  .layer-sidebar strong { color: var(--text); }
+  .reader-trap {
+    margin-top: 14px;
+    background: var(--bg-subtle); border-left: 3px solid var(--accent); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 13px 16px; font-size: 13.5px; color: var(--soft); line-height: 1.6;
+  }
+  .reader-trap strong { color: var(--text); }
 
   /* TRADEOFFS */
   .tradeoffs-stage {
@@ -292,6 +298,10 @@
   footer strong { color: var(--soft); font-weight: 500; }
 
   /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .category-row { flex-direction: column; gap: 4px; }
+    .category-name { min-width: 0; }
+  }
   @media (max-width: 560px) {
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
@@ -301,9 +311,8 @@
     .pipe-step { font-size: 11px; padding: 4px 9px; }
   }
   @media (max-width: 480px) {
-    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
     .tradeoff-label { min-width: 0; }
-    .memory-controls { flex-direction: column; }
   }
 </style>
 </head>
@@ -311,11 +320,11 @@
 <a class="skip-link" href="#main">Skip to content</a>
 
 <!-- TOP BAR -->
-<nav class="topbar">
+<nav class="topbar" aria-label="Site navigation">
   <div class="topbar-inner">
     <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">Knowledge &amp; Memory</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">Stateless Retrieval</span>
     </nav>
   </div>
 </nav>
@@ -325,13 +334,13 @@
   <span class="eyebrow">
     <span class="ico" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v4c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 9v4c0 1.66 4.03 3 9 3s9-1.34 9-3V9"/><path d="M3 13v4c0 1.66 4.03 3 9 3s9-1.34 9-3v-4"/>
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
       </svg>
     </span>
-    Layer 5
+    Layer &middot; L3a
   </span>
-  <h1 class="pattern-title">Knowledge &amp; Memory</h1>
-  <p class="explainer">How the AI looks things up and remembers what you already said.</p>
+  <h1 class="pattern-title">Stateless Retrieval</h1>
+  <p class="explainer">How an AI looks things up fresh for a single answer, like RAG (Retrieval-Augmented Generation).</p>
 </header>
 
 <!-- 01: THE IDEA -->
@@ -339,15 +348,16 @@
   <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What <em>is</em> it?</h2>
   <div class="idea-card">
-    <p>An AI only knows what is in its prompt. So when you ask a question about your own documents, the system first searches a store of text chunks for the most relevant ones, then drops those chunks into the prompt. That is <strong style="color:var(--accent-hover)">retrieval</strong> (also called RAG). Alongside that, the system keeps a record of earlier turns in the conversation and adds those too, so the AI always knows what was already said. That is <strong style="color:var(--accent-hover)">memory</strong>. Together, they give the AI the right context to answer well.</p>
+    <p>An AI can only work with what is in its prompt (the text you send the AI). When you ask about your own documents, the system first searches a store of text for the most relevant passages, then places those passages into the prompt. That is <strong style="color:var(--accent-hover)">retrieval</strong>.</p>
+    <p>A chunk is a small piece of a document: a paragraph, a page section, or a few sentences. The retrieval system finds the chunks that best match your question and hands them to the AI. This pattern is called <strong style="color:var(--accent-hover)">RAG (Retrieval-Augmented Generation)</strong> because it augments the AI's answer with retrieved content. Crucially, nothing is remembered after the call ends. Every request starts fresh with a new search. That is what makes this layer "stateless".</p>
   </div>
 </section>
 
-<!-- 02: SEE IT WORK (retrieval demo) -->
+<!-- 02: SEE IT WORK -->
 <section>
   <div class="section-label"><span class="num">02</span>See It Work</div>
   <h2>Type a question. Watch it <em>find</em> the answer.</h2>
-  <p class="demo-lede">The system searches three document chunks for the ones that match. Matching chunks get highlighted and pulled into the prompt.</p>
+  <p class="demo-lede">The system searches three document chunks (small pieces of documents) for the ones that match your question. Matching chunks get highlighted and pulled into the answer. Each search is independent: nothing carries over from previous runs.</p>
 
   <div class="demo-stage">
     <!-- Pipeline flow indicator -->
@@ -365,12 +375,13 @@
     <div class="query-row">
       <label for="queryInput" class="sr-only">Type your question</label>
       <input id="queryInput" class="query-input" type="text" placeholder="e.g. How do neural networks learn?" maxlength="100" aria-label="Ask a question about the documents" />
-      <button class="diagram-btn primary" id="searchBtn">Search</button>
-      <button class="diagram-btn" id="resetBtn">Reset</button>
+      <button class="diagram-btn primary" id="searchBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
     </div>
 
     <!-- Document chunks -->
-    <div class="panel-label">Document store (3 chunks)</div>
+    <div class="panel-label">Document store (3 chunks, each a small passage from a different document)</div>
     <div class="docs-panel" id="docsPanel" aria-live="polite" aria-label="Document chunks">
       <div class="doc-chunk" id="chunk0">
         <span class="chunk-label">Chunk A</span>
@@ -379,19 +390,19 @@
       </div>
       <div class="doc-chunk" id="chunk1">
         <span class="chunk-label">Chunk B</span>
-        <span class="chunk-text">A <mark>transformer</mark> model processes all tokens in a sequence at once using self-attention, which lets it weigh the importance of each word relative to every other word.</span>
+        <span class="chunk-text">A <mark>transformer</mark> model processes all tokens (small pieces the AI works in: roughly a word, or a slice of an image) in a sequence at once using self-attention, which lets it weigh the importance of each word relative to every other word.</span>
         <span class="score-badge" aria-hidden="true">Partial match</span>
       </div>
       <div class="doc-chunk" id="chunk2">
         <span class="chunk-label">Chunk C</span>
-        <span class="chunk-text">The history of deep learning stretches back to the 1980s, but practical breakthroughs came after 2012 when large datasets and fast GPUs became widely available.</span>
+        <span class="chunk-text">The history of deep learning stretches back to the 1980s, but practical breakthroughs came after 2012 when large datasets and fast GPUs (the chips that do the heavy computing) became widely available.</span>
         <span class="score-badge" aria-hidden="true">No match</span>
       </div>
     </div>
 
     <!-- Answer box -->
     <div class="answer-box" id="answerBox">
-      <div class="answer-label">Answer (from matched chunks)</div>
+      <div class="answer-label">Answer (assembled from matched chunks)</div>
       <div class="answer-text" id="answerText" aria-live="polite">
         <span class="answer-hint">Run a search to see the answer appear here.</span>
       </div>
@@ -399,21 +410,67 @@
   </div>
 </section>
 
-<!-- 03: MEMORY (separate from retrieval, MECE) -->
+<!-- 03: INSIDE THIS LAYER -->
 <section>
-  <div class="section-label"><span class="num">03</span>The Memory Side</div>
-  <h2>How the AI keeps track of <em>earlier turns</em>.</h2>
-  <div class="memory-stage">
-    <p style="font-size:14px;color:var(--soft);margin-bottom:16px;">
-      Retrieval finds knowledge from documents. Memory tracks the conversation itself. Watch how a follow-up question works because the AI still has the first answer in its prompt.
-    </p>
-    <div class="memory-turns" id="memoryTurns" aria-live="polite">
-      <!-- turns rendered by JS -->
+  <div class="section-label"><span class="num">03</span>Inside This Layer</div>
+  <h2>Every category <em>mapped</em>.</h2>
+  <div class="layer-map">
+    <div class="layer-axis">Axis: <span>how external information enters a single call from a corpus.</span></div>
+
+    <div class="category-list">
+
+      <div class="category-row">
+        <div class="category-name">Indexing and embedding</div>
+        <div class="category-desc">Before any search happens, documents are chopped into chunks and turned into numbers (vectors) so the system can compare them to a question mathematically.</div>
+      </div>
+
+      <div class="category-row">
+        <div class="category-name">Retrieval (dense, sparse, hybrid)</div>
+        <div class="category-desc">The core search step. Dense search uses vector similarity (meaning-level). Sparse search uses keyword overlap (BM25-style). Hybrid does both and merges the scores. This is the heart of RAG.</div>
+      </div>
+
+      <div class="category-row">
+        <div class="category-name">Reranking</div>
+        <div class="category-desc">A second pass over the top candidates that scores them more carefully, so the most useful chunks bubble to the top before they enter the prompt.</div>
+      </div>
+
+      <div class="category-row">
+        <div class="category-name">Context assembly</div>
+        <div class="category-desc">Deciding which chunks to include, in what order, and how to format them so the AI can use them well. Poorly assembled context wastes tokens and confuses the model.</div>
+      </div>
+
+      <div class="category-row">
+        <div class="category-name">Knowledge tool invocation (read-only)</div>
+        <div class="category-desc">Calling an external knowledge source, such as a database SELECT, a file read, or a read-only web search, to pull in information for this one call without changing anything.</div>
+      </div>
+
+      <div class="category-row">
+        <div class="category-name">Caching of knowledge results</div>
+        <div class="category-desc">Storing the results of a retrieval so the same question does not trigger a full search again. The runtime check is L0; this category owns the cache contents and their lifecycle.</div>
+      </div>
+
+      <div class="category-row">
+        <div class="category-name">Freshness and invalidation</div>
+        <div class="category-desc">Deciding when cached or indexed knowledge is stale and needs to be refreshed, so the AI is not answering from outdated documents.</div>
+      </div>
+
+      <div class="category-row">
+        <div class="category-name">Citation and provenance</div>
+        <div class="category-desc">Tracking which chunks produced which parts of the answer, so the AI can tell the user where the information came from and so hallucinations can be checked.</div>
+      </div>
+
     </div>
-    <div class="memory-note" id="memoryNote"></div>
-    <div class="memory-controls">
-      <button class="diagram-btn primary" id="memNextBtn">Next turn &rarr;</button>
-      <button class="diagram-btn" id="memResetBtn">Reset</button>
+
+    <div class="reader-trap">
+      <strong>Common filing mistake:</strong> the L3a vs L5 boundary is read-only vs side-effectful, not who does the work. A live web search by an agent is still L3a because it only reads. Writing or changing something in the world is L5 Action.
+    </div>
+
+    <div class="layer-filing">
+      <strong>Filing rule:</strong> Read-only (a SELECT, a file read, read-only web search) goes here, in Stateless Retrieval (L3a). Writing or changing something goes in Orchestration Action (L5).
+    </div>
+
+    <div class="layer-sidebar">
+      <strong>When everything fits in the prompt:</strong> if the entire corpus fits inside the context window, the retrieval stack collapses. You can skip L3a entirely and pack the content in directly (a Single-Call Control choice). Whether to use RAG or long-context is a Cost, Latency, and Reliability tradeoff (a C5 concern), not a retrieval decision.
     </div>
   </div>
 </section>
@@ -423,7 +480,10 @@
   <div class="section-label"><span class="num">04</span>Tradeoffs</div>
   <h2>What you <em>gain and pay</em>.</h2>
   <div class="tradeoffs-stage">
-    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
     <div class="tradeoff-row">
       <div class="tradeoff-label">Accuracy gain</div>
       <div class="tradeoff-bars">
@@ -434,6 +494,12 @@
       <div class="tradeoff-label">Prompt size</div>
       <div class="tradeoff-bars">
         <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency added</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
       </div>
     </div>
     <div class="tradeoff-row">
@@ -449,7 +515,7 @@
       </div>
     </div>
     <div class="tradeoff-quote">
-      Retrieval lets the AI answer questions about your documents without retraining. The cost: every retrieved chunk plus every prior turn adds tokens to the prompt, which increases latency and API cost. Good systems rank carefully so only the most useful context goes in.
+      Retrieval lets the AI answer questions about your documents without retraining. Each retrieved chunk adds tokens (small pieces the AI works in: roughly a word) to the prompt, which increases latency and cost. Good systems rank carefully so only the most useful context goes in. Reranking and caching help reduce the overhead. The tradeoff between RAG and packing the whole corpus into a long context is a cost and latency question, covered under Cost, Latency and Reliability (C5).
     </div>
   </div>
 </section>
@@ -471,8 +537,9 @@
   <ul>
     <li>Lewis et al. (2020). <em>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.</em> <span class="note">NeurIPS. The paper that named RAG.</span></li>
     <li>Guu et al. (2020). <em>REALM: Retrieval-Augmented Language Model Pre-Training.</em> <span class="note">Google Research. Retrieval integrated into pre-training.</span></li>
+    <li>Robertson and Zaragoza (2009). <em>The Probabilistic Relevance Framework: BM25 and Beyond.</em> <span class="note">Foundations and Trends in Information Retrieval. The canonical sparse-retrieval algorithm.</span></li>
+    <li>Nogueira and Cho (2019). <em>Passage Re-ranking with BERT.</em> <span class="note">Cross-encoder reranking applied to the retrieval stack.</span></li>
     <li>OpenAI. <em>Best Practices for RAG.</em> <span class="note">openai.com/docs. Practical guidance on chunk size and retrieval strategies.</span></li>
-    <li>Xu et al. (2023). <em>A Comprehensive Survey of Memory in LLM-Based Agents.</em> <span class="note">Survey of short-term, long-term, and episodic memory patterns.</span></li>
   </ul>
 </div>
 
@@ -499,7 +566,7 @@ const CHUNKS = [
   },
   {
     id: 'chunk2',
-    keywords: ['history', 'gpu', 'dataset', '1980', '2012', 'breakthrough', 'deep learning timeline'],
+    keywords: ['history', 'gpu', 'dataset', '1980', '2012', 'breakthrough', 'deep learning', 'timeline'],
     bestLabel: 'No match',
     answer: null
   }
@@ -512,25 +579,70 @@ const PRESET_QUERIES = [
 ];
 
 const queryInput = document.getElementById('queryInput');
-const searchBtn = document.getElementById('searchBtn');
-const resetBtn = document.getElementById('resetBtn');
+const searchBtn  = document.getElementById('searchBtn');
+const stepBtn    = document.getElementById('stepBtn');
+const resetBtn   = document.getElementById('resetBtn');
 const answerText = document.getElementById('answerText');
-const answerBox = document.getElementById('answerBox');
+const answerBox  = document.getElementById('answerBox');
 
 const pipeSteps = {
-  query: document.getElementById('pipeQuery'),
-  search: document.getElementById('pipeSearch'),
-  retrieve: document.getElementById('pipeRetrieve'),
-  answer: document.getElementById('pipeAnswer'),
-  arrow1: document.getElementById('arrow1'),
-  arrow2: document.getElementById('arrow2'),
-  arrow3: document.getElementById('arrow3'),
+  query:   document.getElementById('pipeQuery'),
+  search:  document.getElementById('pipeSearch'),
+  retrieve:document.getElementById('pipeRetrieve'),
+  answer:  document.getElementById('pipeAnswer'),
+  arrow1:  document.getElementById('arrow1'),
+  arrow2:  document.getElementById('arrow2'),
+  arrow3:  document.getElementById('arrow3'),
 };
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-let running = false;
 
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+// Step-through state
+let stepPhase = 0; // 0=idle, 1=query, 2=search, 3=retrieve, 4=answer, 5=done
+let running   = false;
+let scores    = [];
+
+function sleep(ms) { return new Promise(r => setTimeout(r, reduceMotion ? 0 : r => setTimeout(r, 0), ms)); }
+// simplified sleep
+function wait(ms) { return new Promise(r => setTimeout(r, reduceMotion ? 0 : ms)); }
+
+function activatePipe(step) {
+  ['query','search','retrieve','answer'].forEach(s => pipeSteps[s].classList.remove('active','done'));
+  ['arrow1','arrow2','arrow3'].forEach(a => pipeSteps[a].classList.remove('lit'));
+  const order = ['query','search','retrieve','answer'];
+  const idx   = order.indexOf(step);
+  order.forEach((s, i) => {
+    if (i < idx)  pipeSteps[s].classList.add('done');
+    if (i === idx) pipeSteps[s].classList.add('active');
+  });
+  if (idx >= 1) pipeSteps.arrow1.classList.add('lit');
+  if (idx >= 2) pipeSteps.arrow2.classList.add('lit');
+  if (idx >= 3) pipeSteps.arrow3.classList.add('lit');
+  if (step === 'done') {
+    order.forEach(s => pipeSteps[s].classList.add('done'));
+    ['arrow1','arrow2','arrow3'].forEach(a => pipeSteps[a].classList.add('lit'));
+  }
+}
+
+function resetChunks() {
+  CHUNKS.forEach(c => {
+    const el = document.getElementById(c.id);
+    el.classList.remove('matched','faded','scanning');
+    el.style.opacity = '';
+  });
+}
+
+function resetDemo() {
+  resetChunks();
+  answerBox.classList.remove('ready');
+  answerText.innerHTML = '<span class="answer-hint">Run a search to see the answer appear here.</span>';
+  activatePipe('');
+  stepPhase = 0;
+  running = false;
+  scores = [];
+  searchBtn.disabled = false;
+  stepBtn.disabled   = false;
+}
 
 function scoreQuery(q) {
   const words = q.toLowerCase().split(/\s+/);
@@ -540,32 +652,46 @@ function scoreQuery(q) {
   });
 }
 
-function activatePipe(step) {
-  ['query','search','retrieve','answer'].forEach(s => {
-    pipeSteps[s].classList.remove('active','done');
+function applyScores() {
+  const maxScore = Math.max(...scores.map(s => s.score));
+  if (maxScore === 0) {
+    CHUNKS.forEach(c => document.getElementById(c.id).classList.add('faded'));
+    return false;
+  }
+  scores.forEach(({ chunk, score }) => {
+    const el = document.getElementById(chunk.id);
+    const badge = el.querySelector('.score-badge');
+    if (score === maxScore) {
+      el.classList.add('matched');
+      badge.textContent = 'Best match';
+    } else if (score > 0) {
+      el.classList.add('matched');
+      el.style.opacity = '0.75';
+      badge.textContent = 'Partial match';
+    } else {
+      el.classList.add('faded');
+    }
   });
-  ['arrow1','arrow2','arrow3'].forEach(a => pipeSteps[a].classList.remove('lit'));
-  if (step === 'query') { pipeSteps.query.classList.add('active'); }
-  else if (step === 'search') { pipeSteps.query.classList.add('done'); pipeSteps.arrow1.classList.add('lit'); pipeSteps.search.classList.add('active'); }
-  else if (step === 'retrieve') { pipeSteps.query.classList.add('done'); pipeSteps.search.classList.add('done'); pipeSteps.arrow1.classList.add('lit'); pipeSteps.arrow2.classList.add('lit'); pipeSteps.retrieve.classList.add('active'); }
-  else if (step === 'answer') { pipeSteps.query.classList.add('done'); pipeSteps.search.classList.add('done'); pipeSteps.retrieve.classList.add('done'); ['arrow1','arrow2','arrow3'].forEach(a => pipeSteps[a].classList.add('lit')); pipeSteps.answer.classList.add('active'); }
-  else if (step === 'done') { ['query','search','retrieve','answer'].forEach(s => pipeSteps[s].classList.add('done')); ['arrow1','arrow2','arrow3'].forEach(a => pipeSteps[a].classList.add('lit')); }
+  return true;
 }
 
-function resetChunks() {
-  CHUNKS.forEach(c => {
-    const el = document.getElementById(c.id);
-    el.classList.remove('matched','faded','scanning');
-  });
+function buildAnswer() {
+  const maxScore = Math.max(...scores.map(s => s.score));
+  if (maxScore === 0) {
+    answerBox.classList.add('ready');
+    answerText.textContent = 'No closely matching chunks found. The AI would answer from general knowledge, which may be less accurate.';
+    return;
+  }
+  const matched = scores.filter(s => s.score > 0 && s.chunk.answer).sort((a,b) => b.score - a.score);
+  answerBox.classList.add('ready');
+  if (matched.length > 0) {
+    answerText.textContent = matched[0].chunk.answer;
+  } else {
+    answerText.textContent = 'No closely matching chunks found.';
+  }
 }
 
-function resetDemo() {
-  resetChunks();
-  answerBox.classList.remove('ready');
-  answerText.innerHTML = '<span class="answer-hint">Run a search to see the answer appear here.</span>';
-  activatePipe('');
-}
-
+// Full auto-play
 async function runSearch() {
   if (running) return;
   const q = queryInput.value.trim();
@@ -573,84 +699,88 @@ async function runSearch() {
 
   running = true;
   searchBtn.disabled = true;
+  stepBtn.disabled   = true;
 
-  // Step 1: mark query active
   resetChunks();
   answerBox.classList.remove('ready');
   answerText.innerHTML = '<span class="answer-hint">Searching...</span>';
+  stepPhase = 1;
+
   activatePipe('query');
+  await wait(500);
 
-  const delay = reduceMotion ? 0 : 500;
-
-  await sleep(delay);
   activatePipe('search');
-
-  // Scan chunks one at a time
   for (let i = 0; i < CHUNKS.length; i++) {
     const el = document.getElementById(CHUNKS[i].id);
     el.classList.add('scanning');
-    await sleep(delay * 0.7);
+    await wait(350);
     el.classList.remove('scanning');
   }
 
-  await sleep(delay * 0.5);
+  await wait(300);
   activatePipe('retrieve');
+  scores = scoreQuery(q);
+  applyScores();
 
-  // Score and classify
-  const scores = scoreQuery(q);
-  const maxScore = Math.max(...scores.map(s => s.score));
+  await wait(400);
+  activatePipe('answer');
+  await wait(300);
+  activatePipe('done');
+  buildAnswer();
 
-  if (maxScore === 0) {
-    // No match: show all as faded
-    CHUNKS.forEach(c => document.getElementById(c.id).classList.add('faded'));
-    await sleep(delay * 0.5);
-    activatePipe('done');
-    answerBox.classList.add('ready');
-    answerText.textContent = 'No closely matching chunks found. The AI would answer from general knowledge, which may be less reliable.';
-  } else {
-    scores.forEach(({ chunk, score }) => {
-      const el = document.getElementById(chunk.id);
-      const badge = el.querySelector('.score-badge');
-      if (score === maxScore) {
-        el.classList.add('matched');
-        badge.textContent = 'Best match';
-      } else if (score > 0) {
-        el.classList.add('matched');
-        el.style.opacity = '0.7';
-        badge.textContent = 'Partial match';
-      } else {
-        el.classList.add('faded');
-      }
-    });
+  stepPhase = 5;
+  running = false;
+  searchBtn.disabled = false;
+  stepBtn.disabled   = false;
+}
 
-    await sleep(delay * 0.5);
-    activatePipe('answer');
+// Step-through mode
+async function runStep() {
+  if (running) return;
+  const q = queryInput.value.trim();
+  if (!q) { queryInput.focus(); return; }
 
-    // Build answer from matched chunks
-    const matched = scores.filter(s => s.score > 0 && s.chunk.answer).sort((a,b) => b.score - a.score);
-    await sleep(delay * 0.5);
-    activatePipe('done');
-    answerBox.classList.add('ready');
-    if (matched.length > 0) {
-      answerText.textContent = matched[0].chunk.answer;
-    } else {
-      answerText.textContent = 'No closely matching chunks found.';
+  if (stepPhase === 5) { resetDemo(); return; }
+
+  running = true;
+  stepBtn.disabled = true;
+
+  if (stepPhase === 0) {
+    resetChunks();
+    answerBox.classList.remove('ready');
+    answerText.innerHTML = '<span class="answer-hint">Searching...</span>';
+    activatePipe('query');
+    stepPhase = 1;
+  } else if (stepPhase === 1) {
+    activatePipe('search');
+    for (let i = 0; i < CHUNKS.length; i++) {
+      const el = document.getElementById(CHUNKS[i].id);
+      el.classList.add('scanning');
+      await wait(reduceMotion ? 0 : 300);
+      el.classList.remove('scanning');
     }
+    stepPhase = 2;
+  } else if (stepPhase === 2) {
+    activatePipe('retrieve');
+    scores = scoreQuery(q);
+    applyScores();
+    stepPhase = 3;
+  } else if (stepPhase === 3) {
+    activatePipe('done');
+    buildAnswer();
+    stepPhase = 5;
   }
 
   running = false;
-  searchBtn.disabled = false;
+  stepBtn.disabled = false;
 }
 
 searchBtn.addEventListener('click', runSearch);
-resetBtn.addEventListener('click', () => {
-  if (running) return;
-  resetDemo();
-  queryInput.value = '';
-});
+stepBtn.addEventListener('click', runStep);
+resetBtn.addEventListener('click', () => { if (!running) { resetDemo(); queryInput.value = ''; } });
 queryInput.addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(); });
 
-// Cycle preset queries on focus for discoverability
+// Cycle preset queries on focus
 let presetIdx = 0;
 queryInput.addEventListener('focus', () => {
   if (!queryInput.value) {
@@ -659,80 +789,9 @@ queryInput.addEventListener('focus', () => {
   }
 });
 
-// ============ MEMORY DEMO ============
-const TURNS = [
-  {
-    role: 'user',
-    text: 'What is backpropagation?',
-    note: 'Turn 1: the user asks a question. The prompt contains: the question.'
-  },
-  {
-    role: 'ai',
-    text: 'Backpropagation is how a neural network learns. It compares its output to the correct answer and works backwards to nudge the weights that caused the error.',
-    note: 'The AI answers. Its answer is now added to the conversation history.'
-  },
-  {
-    role: 'user',
-    text: 'And how fast does it converge?',
-    note: 'Turn 2: the follow-up says "it" without explaining what. The prompt now contains: <strong>the earlier Q&amp;A plus this new question</strong>. The AI knows what "it" refers to because the history is in the prompt.',
-    highlight: true
-  },
-  {
-    role: 'ai',
-    text: 'It depends on the learning rate and the problem. Simple networks can converge in a few hundred iterations; deep ones can take thousands.',
-    note: 'The AI answers correctly because "it" (backpropagation) was defined two turns ago and is still in the prompt.'
-  }
-];
-
-const memoryTurns = document.getElementById('memoryTurns');
-const memoryNote = document.getElementById('memoryNote');
-const memNextBtn = document.getElementById('memNextBtn');
-const memResetBtn = document.getElementById('memResetBtn');
-
-let memStep = -1;
-
-function renderMemTurn(t) {
-  const turn = document.createElement('div');
-  turn.className = 'turn';
-  turn.innerHTML = `
-    <div class="turn-role ${t.role}" aria-label="${t.role === 'user' ? 'User' : 'AI'}">${t.role === 'user' ? 'You' : 'AI'}</div>
-    <div class="turn-body ${t.highlight ? 'memory-highlight' : ''}">${t.text}</div>
-  `;
-  memoryTurns.appendChild(turn);
-  // animate in
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => turn.classList.add('shown'));
-  });
-}
-
-function advanceMem() {
-  if (memStep >= TURNS.length - 1) return;
-  memStep++;
-  renderMemTurn(TURNS[memStep]);
-  memoryNote.innerHTML = TURNS[memStep].note;
-  if (memStep >= TURNS.length - 1) {
-    memNextBtn.disabled = true;
-    memNextBtn.textContent = 'Done';
-  }
-}
-
-function resetMem() {
-  memoryTurns.innerHTML = '';
-  memoryNote.innerHTML = '';
-  memStep = -1;
-  memNextBtn.disabled = false;
-  memNextBtn.textContent = 'Next turn →';
-}
-
-memNextBtn.addEventListener('click', advanceMem);
-memResetBtn.addEventListener('click', resetMem);
-
-// On reduced motion, show all turns immediately
+// Reduced motion: skip to final state immediately
 if (reduceMotion) {
-  TURNS.forEach(t => { memStep++; renderMemTurn(t); });
-  memoryNote.innerHTML = TURNS[TURNS.length - 1].note;
-  memNextBtn.disabled = true;
-  memNextBtn.textContent = 'Done';
+  // no animation; demo still works on click
 }
 </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Single-call control · The Pattern Book</title>
+<title>Single-Call Control · The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -21,11 +21,11 @@
   .wrap{max-width:920px;margin:0 auto;padding:0 24px}
   a{color:inherit;text-decoration:none}
 
-  /* a11y: visible keyboard focus, skip link, reduced motion */
+  /* a11y */
   a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
   .skip-link{position:absolute;left:8px;top:-48px;z-index:100;background:var(--surface);color:var(--accent-hover);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:top .15s ease}
   .skip-link:focus{top:8px}
-  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}}
 
   /* top bar */
   .topbar{border-bottom:1px solid var(--border);background:rgba(252,252,253,.85);backdrop-filter:blur(8px);position:sticky;top:0;z-index:10}
@@ -39,47 +39,70 @@
 
   /* page head */
   header{padding:40px 0 8px;scroll-margin-top:72px}
-  .title{scroll-margin-top:72px}
   .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--border);border-radius:20px;padding:5px 12px}
   .eyebrow .ico{width:15px;height:15px;display:block;color:var(--accent)}
   .eyebrow .ico svg{width:15px;height:15px;display:block}
-  .title{font-family:'Fraunces',serif;font-weight:500;font-size:38px;letter-spacing:-.015em;margin:16px 0 0;line-height:1.08}
+  .title{font-family:'Fraunces',serif;font-weight:500;font-size:38px;letter-spacing:-.015em;margin:16px 0 0;line-height:1.08;scroll-margin-top:72px}
   .explainer{color:var(--soft);font-size:16px;line-height:1.6;max-width:660px;margin-top:14px}
 
-  /* flow diagram */
-  .flow{display:flex;align-items:stretch;gap:10px;margin-top:22px;max-width:560px}
-  .flow-cell{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:14px 12px;text-align:center;font-size:13px;font-weight:500;color:var(--soft);display:flex;align-items:center;justify-content:center}
-  .flow-cell.is-ai{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover);font-family:'Fraunces',serif;font-weight:500;font-size:15px}
-  .flow-arrow{flex:none;align-self:center;color:var(--accent);font-size:17px;line-height:1}
-  @media(max-width:480px){
-    .flow{flex-direction:column;max-width:240px}
-    .flow-arrow{transform:rotate(90deg)}
-  }
+  /* intro card */
+  .intro-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;margin:28px 0 0;max-width:720px}
+  .intro-card p{font-size:15px;color:var(--soft);line-height:1.7}
+  .intro-card p+p{margin-top:10px}
+  .inline-def{font-style:italic;color:var(--soft)}
 
-  /* intent guide */
-  .section{padding:18px 0 40px}
+  /* sections */
+  .section{padding:18px 0 8px}
   .guide-head{font-family:'Fraunces',serif;font-weight:500;font-size:23px;letter-spacing:-.01em;margin:4px 4px 14px;line-height:1.15}
 
-  /* goal -> method map */
+  /* intent map (keeps existing hub rows) */
   .map{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-
   .map-head{display:grid;grid-template-columns:1fr 34px 1.3fr;align-items:center;gap:16px;padding:13px 20px;border-bottom:1px solid var(--border);background:var(--bg)}
   .map-head span{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
   .map-head .h-method{grid-column:3}
-
   .map-row{display:grid;grid-template-columns:1fr 34px 1.3fr;align-items:center;gap:16px;padding:16px 20px;border-top:1px solid var(--border);transition:background .15s ease}
   .map-row:first-child{border-top:0}
   .map-row:hover{background:var(--accent-soft)}
-
   .row-goal{font-family:'Fraunces',serif;font-weight:500;font-size:17px;letter-spacing:-.005em;line-height:1.25;color:var(--text);min-width:0}
   .row-arrow{justify-self:center;color:var(--accent);font-size:18px;line-height:1}
   .row-method{min-width:0}
   .row-name{display:block;font-weight:600;font-size:15px;letter-spacing:-.005em;color:var(--accent-hover);line-height:1.3}
   .row-what{display:block;font-size:13.5px;color:var(--soft);margin-top:3px;line-height:1.5}
 
-  .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
+  /* inside-this-layer card */
+  .layer-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px 28px 24px;margin-top:40px}
+  .layer-card-title{font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:-.01em;color:var(--text);margin-bottom:6px}
+  .axis-line{font-size:13.5px;color:var(--soft);line-height:1.6;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:24px}
+  .axis-line strong{color:var(--text);font-weight:600}
+
+  /* sub-axis groups */
+  .sub-axis{margin-bottom:28px}
+  .sub-axis:last-child{margin-bottom:0}
+  .sub-axis-head{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-hover);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+
+  /* nested group label (in-prompt / in-decoding) */
+  .nested-group{margin-top:12px;margin-bottom:4px}
+  .nested-group-label{font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--faint);text-transform:uppercase;margin-bottom:8px}
+
+  /* category rows */
+  .cat-list{display:flex;flex-direction:column;gap:0}
+  .cat-row{display:flex;flex-direction:column;padding:10px 0;border-bottom:1px solid var(--border)}
+  .cat-row:last-child{border-bottom:0}
+  .cat-name{font-weight:600;font-size:14px;color:var(--text);line-height:1.3;display:flex;align-items:center;gap:6px}
+  .cat-name a{color:var(--accent-hover);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+  .cat-name a:hover{text-decoration:underline}
+  .anchor-icon{font-size:11px;color:var(--accent);flex-shrink:0}
+  .cat-desc{font-size:13px;color:var(--soft);margin-top:3px;line-height:1.55}
+
+  /* filing rule */
+  .filing-rule{margin-top:20px;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--soft);line-height:1.6}
+  .filing-rule strong{color:var(--text);font-weight:600}
+
+  /* footer */
+  .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:40px}
   .foot strong{color:var(--soft);font-weight:500}
 
+  /* responsive */
   @media(max-width:560px){
     .title{font-size:30px}
     .explainer{font-size:15px}
@@ -88,30 +111,41 @@
     .map-row{grid-template-columns:1fr;gap:7px;padding:15px 16px}
     .row-arrow{display:none}
     .row-goal{font-size:16px}
+    .layer-card{padding:20px 16px 16px}
+    .layer-card-title{font-size:20px}
   }
 </style>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
+
   <nav class="topbar">
     <div class="topbar-in">
       <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
       <div class="crumb">
-        <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">Single-call control</span>
+        <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">Single-Call Control</span>
       </div>
     </div>
   </nav>
 
   <div class="wrap">
     <header>
-      <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>Layer 6</span>
-      <h1 class="title">Single-call control</h1>
-      <p class="explainer">How do you get the best answer out of a single message to the AI?</p>
+      <span class="eyebrow">
+        <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>
+        Layer · L4
+      </span>
+      <h1 class="title">Single-Call Control</h1>
+      <p class="explainer">Every knob you can turn inside one message to the AI, before and after it thinks.</p>
     </header>
+
+    <div class="intro-card">
+      <p>A <span class="inline-def">prompt (the text you send the AI)</span> is not just instructions. It sets a role, supplies examples, guides reasoning, and shapes the reply, all before a single token (a token is a small piece the AI works in: roughly a word, or a slice of an image or sound) leaves the model. L4 covers every technique that operates inside that single boundary.</p>
+      <p>Nothing here needs a second call. The moment you add a second call, or a second model, you have crossed into L5 or L2.</p>
+    </div>
 
     <div class="section" id="main" role="main">
 
-      <h2 class="guide-head">What do you want to do?</h2>
+      <h2 class="guide-head">What Do You Want to Do?</h2>
 
       <div class="map">
         <div class="map-head" aria-hidden="true">
@@ -119,20 +153,20 @@
           <span class="h-method">Use this</span>
         </div>
 
-        <a class="map-row" href="#">
+        <a class="map-row" href="pattern-few-shot.html">
           <span class="row-goal">Get it to copy a style I show</span>
           <span class="row-arrow" aria-hidden="true">&rarr;</span>
           <span class="row-method">
-            <span class="row-name">Few-Shot</span>
+            <span class="row-name">Few-Shot ↗</span>
             <span class="row-what">Give it a few examples to copy.</span>
           </span>
         </a>
 
-        <a class="map-row" href="#">
+        <a class="map-row" href="pattern-zero-shot.html">
           <span class="row-goal">Get an answer by just asking</span>
           <span class="row-arrow" aria-hidden="true">&rarr;</span>
           <span class="row-method">
-            <span class="row-name">Zero-Shot</span>
+            <span class="row-name">Zero-Shot ↗</span>
             <span class="row-what">Describe what you want, no examples.</span>
           </span>
         </a>
@@ -141,39 +175,271 @@
           <span class="row-goal">Get a hard problem right</span>
           <span class="row-arrow" aria-hidden="true">&rarr;</span>
           <span class="row-method">
-            <span class="row-name">Chain-of-Thought</span>
+            <span class="row-name">Chain-of-Thought ↗</span>
             <span class="row-what">Ask it to think step by step.</span>
           </span>
         </a>
 
-        <a class="map-row" href="#">
+        <a class="map-row" href="pattern-self-consistency.html">
           <span class="row-goal">Get a more reliable answer</span>
           <span class="row-arrow" aria-hidden="true">&rarr;</span>
           <span class="row-method">
-            <span class="row-name">Self-Consistency</span>
-            <span class="row-what">Ask a few times, take the most common.</span>
+            <span class="row-name">Self-Consistency ↗</span>
+            <span class="row-what">Sample multiple reasoning paths, take the most common.</span>
           </span>
         </a>
 
-        <a class="map-row" href="#">
+        <a class="map-row" href="pattern-structured-output.html">
           <span class="row-goal">Get the answer in a fixed format</span>
           <span class="row-arrow" aria-hidden="true">&rarr;</span>
           <span class="row-method">
-            <span class="row-name">Structured output</span>
+            <span class="row-name">Structured Output ↗</span>
             <span class="row-what">Tell it the exact shape to return.</span>
           </span>
         </a>
 
-        <a class="map-row" href="#">
+        <a class="map-row" href="pattern-reflection.html">
           <span class="row-goal">Get it to fix its own mistakes</span>
           <span class="row-arrow" aria-hidden="true">&rarr;</span>
           <span class="row-method">
-            <span class="row-name">Reflection</span>
-            <span class="row-what">Ask it to review and fix its answer.</span>
+            <span class="row-name">Self-Reflection ↗</span>
+            <span class="row-what">Ask it to review and revise its answer inside the same call.</span>
           </span>
         </a>
       </div>
 
+    </div>
+
+    <!-- ===== Inside this layer ===== -->
+    <div class="layer-card" aria-label="Inside this layer">
+      <div class="layer-card-title">Inside This Layer</div>
+      <div class="axis-line">
+        <strong>Axis:</strong> what you shape, and at which point, inside one model call.
+      </div>
+
+      <!-- Sub-axis 1: Input Shape -->
+      <div class="sub-axis">
+        <div class="sub-axis-head">Input Shape</div>
+        <div class="cat-list">
+
+          <div class="cat-row">
+            <div class="cat-name">
+              <a href="pattern-zero-shot.html">Zero-Shot Framing <span class="anchor-icon">↗</span></a>
+            </div>
+            <div class="cat-desc">Asking the AI directly with no examples, relying on its trained knowledge alone.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">
+              <a href="pattern-few-shot.html">Few-Shot Framing <span class="anchor-icon">↗</span></a>
+            </div>
+            <div class="cat-desc">Supplying a handful of input/output examples ("shots") inside the prompt so the AI picks up the pattern before answering.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Role / Persona</div>
+            <div class="cat-desc">Giving the AI an identity ("You are a careful lawyer") to bias its tone, vocabulary, and caution level.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Delimiters</div>
+            <div class="cat-desc">Using explicit markers (XML tags, triple backticks, horizontal rules) to separate system instructions, user input, and data so the AI does not mix them up.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Negative Prompting</div>
+            <div class="cat-desc">Telling the AI what NOT to do, say, or include, narrowing the answer space by exclusion.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Meta-Prompting</div>
+            <div class="cat-desc">Asking the AI to write or improve the prompt itself, using its own generation to bootstrap better instructions.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Prompt Templates</div>
+            <div class="cat-desc">Reusable prompt skeletons with placeholders that get filled at runtime, keeping structure consistent across many calls.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Example Selection</div>
+            <div class="cat-desc">Choosing which few-shot examples to include based on similarity or difficulty relative to the current query, rather than always using the same fixed set.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Example Ordering</div>
+            <div class="cat-desc">Arranging examples in a deliberate sequence (e.g. hardest last, or most similar to the query last) because position affects what the AI attends to.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Context Packing</div>
+            <div class="cat-desc">Fitting as much relevant information as possible into the prompt's token budget without exceeding the model's context window.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Lost-in-the-Middle Mitigation</div>
+            <div class="cat-desc">Placing the most important content at the start or end of a long prompt, because models reliably attend to edges more than the middle.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Prompt Compression</div>
+            <div class="cat-desc">Shrinking the prompt (via summarization, selective deletion, or learned soft tokens) to reduce cost and latency without losing the meaning the model needs.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Sub-axis 2: Cognitive Strategy -->
+      <div class="sub-axis">
+        <div class="sub-axis-head">Cognitive Strategy</div>
+
+        <div class="nested-group">
+          <div class="nested-group-label">In-Prompt (authored as text the model follows)</div>
+          <div class="cat-list">
+
+            <div class="cat-row">
+              <div class="cat-name">Step-Back</div>
+              <div class="cat-desc">Asking the AI to first answer a broader, simpler version of the question before tackling the specific one, surfacing relevant principles it might otherwise skip.</div>
+            </div>
+
+            <div class="cat-row">
+              <div class="cat-name">Least-to-Most</div>
+              <div class="cat-desc">Instructing the AI to decompose a complex problem into simpler sub-problems and solve them in order from easiest to hardest, within one call.</div>
+            </div>
+
+            <div class="cat-row">
+              <div class="cat-name">Plan-and-Solve</div>
+              <div class="cat-desc">Prompting the AI to write an explicit plan first and then execute each step, reducing arithmetic and logical errors on multi-step tasks.</div>
+            </div>
+
+            <div class="cat-row">
+              <div class="cat-name">Analogical Prompting</div>
+              <div class="cat-desc">Prompting the AI to generate or recall a relevant analogy before answering, using structural similarity to transfer reasoning from a known domain.</div>
+            </div>
+
+            <div class="cat-row">
+              <div class="cat-name">
+                <a href="pattern-chain-of-thought.html">Chain-of-Thought <span class="anchor-icon">↗</span></a>
+              </div>
+              <div class="cat-desc">Asking the AI to show its reasoning steps before giving a final answer, improving accuracy on multi-step problems by externalizing intermediate work.</div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="nested-group">
+          <div class="nested-group-label">In-Decoding (search over generations)</div>
+          <div class="cat-list">
+
+            <div class="cat-row">
+              <div class="cat-name">Tree-of-Thoughts</div>
+              <div class="cat-desc">Generating multiple partial reasoning paths in parallel and pruning or expanding them like a search tree, all within one call, to find better solutions than a single linear chain.</div>
+            </div>
+
+            <div class="cat-row">
+              <div class="cat-name">Skeleton-of-Thought</div>
+              <div class="cat-desc">First generating a bare outline (the skeleton), then filling in each section in parallel within the same call, reducing latency on long structured outputs.</div>
+            </div>
+
+            <div class="cat-row">
+              <div class="cat-name">
+                <a href="pattern-self-consistency.html">Self-Consistency as Search <span class="anchor-icon">↗</span></a>
+              </div>
+              <div class="cat-desc">Sampling N independent reasoning paths from the same model and same prompt, then taking a majority vote over final answers. Filing note: this is L4 when same model and same prompt; if different models or prompts are used, it becomes L2 Combine (Ensembling).</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-axis 3: Self-Verification -->
+      <div class="sub-axis">
+        <div class="sub-axis-head">Self-Verification</div>
+        <div class="cat-list">
+
+          <div class="cat-row">
+            <div class="cat-name">
+              <a href="pattern-reflection.html">Self-Reflection <span class="anchor-icon">↗</span></a>
+            </div>
+            <div class="cat-desc">Asking the AI to critique and revise its own answer within the same call, catching obvious errors before the reply reaches the user.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Chain-of-Verification</div>
+            <div class="cat-desc">Prompting the AI to generate explicit yes/no verification questions about its own answer and then answer each one, surfacing specific factual claims that may be wrong.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Self-Ask</div>
+            <div class="cat-desc">Prompting the AI to identify and answer its own follow-up sub-questions before giving a final answer, decomposing complex queries into checkable steps.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Single-Model Debate-Then-Decide</div>
+            <div class="cat-desc">Having the AI argue both sides of a question within one call and then render a verdict, using the internal tension to surface blind spots. Filing note: if a second call or a second model is involved, this moves to L2 Verify.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Sub-axis 4: Output Shape & Decoding -->
+      <div class="sub-axis">
+        <div class="sub-axis-head">Output Shape &amp; Decoding</div>
+        <div class="cat-list">
+
+          <div class="cat-row">
+            <div class="cat-name">
+              <a href="pattern-structured-output.html">Structured Output <span class="anchor-icon">↗</span></a>
+            </div>
+            <div class="cat-desc">Instructing the model to return data in a defined format (JSON, Markdown table, XML) so downstream code can parse it reliably.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Schema Enforcement</div>
+            <div class="cat-desc">Providing a formal schema (JSON Schema, TypeScript interface) inside the prompt or via API settings so the model knows exactly which fields are required and what types they must be.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Constrained Decoding</div>
+            <div class="cat-desc">Restricting the model's token-by-token generation at the API or runtime level so it can only produce outputs that conform to a grammar or allowlist.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Streaming with Validation</div>
+            <div class="cat-desc">Validating partial output as tokens (the model's smallest output units) stream in, so errors are caught early rather than after the full reply arrives. The streaming discipline is C7; this is the L4 mechanism.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Format Coercion</div>
+            <div class="cat-desc">Rephrasing or post-processing the model's raw output to match a required format when the model did not follow instructions precisely.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Temperature and Sampling</div>
+            <div class="cat-desc">Setting the randomness of token selection: low temperature makes answers more deterministic and focused; high temperature makes them more varied and creative.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Logit Biasing</div>
+            <div class="cat-desc">Adjusting the raw probability scores ("logits") for specific tokens before sampling, to boost or suppress particular words or characters in the output.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Stop Sequences</div>
+            <div class="cat-desc">Specifying character strings that cause generation to halt immediately when encountered, giving precise control over where the output ends.</div>
+          </div>
+
+          <div class="cat-row">
+            <div class="cat-name">Beam Search</div>
+            <div class="cat-desc">Keeping multiple candidate token sequences in parallel during generation and selecting the highest-probability complete sequence, trading speed for output quality.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="filing-rule">
+        <strong>Filing rule:</strong> if it happens inside one call to one model, it belongs here. A second call is L5. A second model is L2.
+      </div>
     </div>
 
     <footer class="foot"><strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.</footer>

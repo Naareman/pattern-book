@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Serving &amp; Infrastructure · The Pattern Book</title>
+<title>Serving Infrastructure · L0 · The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -222,6 +222,32 @@
   .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
   .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
 
+  /* ======== INSIDE THIS LAYER ======== */
+  .inside-layer-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 28px;
+  }
+  .inside-axis {
+    font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 20px;
+    padding-bottom: 16px; border-bottom: 1px solid var(--border);
+  }
+  .inside-categories { display: flex; flex-direction: column; gap: 14px; }
+  .inside-cat {
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .inside-cat-name {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px;
+    color: var(--text); line-height: 1.2;
+  }
+  .inside-cat-desc {
+    font-size: 14px; color: var(--soft); line-height: 1.55;
+  }
+  .inside-filing {
+    margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
+    font-size: 13.5px; color: var(--soft); line-height: 1.6;
+  }
+  .inside-filing strong { color: var(--text); }
+
   /* back link */
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
@@ -275,7 +301,7 @@
       <span class="sep">/</span>
       <a href="layers.html">Layers</a>
       <span class="sep">/</span>
-      <span class="here">Serving &amp; infrastructure</span>
+      <span class="here">Serving Infrastructure</span>
     </nav>
   </div>
 </nav>
@@ -288,10 +314,10 @@
         <circle cx="6" cy="5.5" r="1" fill="currentColor" stroke="none"/><circle cx="6" cy="12.5" r="1" fill="currentColor" stroke="none"/>
       </svg>
     </span>
-    Layer 2
+    Layer &middot; L0
   </span>
-  <h1 class="pattern-title">Serving &amp; infrastructure</h1>
-  <p class="explainer">How the AI runs fast and stays working when everyone asks at once.</p>
+  <h1 class="pattern-title">Serving Infrastructure</h1>
+  <p class="explainer">Everything the runtime does to a model call before the call happens and after the answer comes back, without touching what the model says.</p>
 </header>
 
 <!-- 01 THE IDEA -->
@@ -300,7 +326,7 @@
   <h2>What <em>is</em> it?</h2>
   <div class="idea-card">
     <p>
-      When you ask an AI a question, the words go to a <strong style="color:var(--accent-hover)">server with powerful GPUs</strong> that run the model.
+      When you ask an AI a question, the words go to a <strong style="color:var(--accent-hover)">server with powerful GPUs</strong> (GPU: the chip that does the heavy computing) that run the model.
       To handle thousands of people at once, three tricks work together:
       requests get <strong style="color:var(--accent-hover)">batched</strong> (grouped so the GPU works on many at once),
       popular answers are <strong style="color:var(--accent-hover)">cached</strong> (stored so the GPU skips the work entirely),
@@ -387,12 +413,12 @@
     <div class="flip-card" tabindex="0" role="button" aria-expanded="false">
       <div class="q"><span class="chip" aria-hidden="true">💾</span>Asking the same question twice feels instant the second time</div>
       <div class="tap-hint">Tap to see why</div>
-      <div class="body">Many inference providers cache the output for common or identical prompts. The second request hits the cache and returns in milliseconds — the GPU never runs at all.</div>
+      <div class="body">Many inference providers cache the output for common or identical prompts. The second request hits the cache and returns in milliseconds. The GPU never runs at all.</div>
     </div>
     <div class="flip-card" tabindex="0" role="button" aria-expanded="false">
       <div class="q"><span class="chip" aria-hidden="true">🌍</span>AI apps still work during a datacenter outage</div>
       <div class="tap-hint">Tap to see why</div>
-      <div class="body">Traffic is split across multiple servers and regions. A load balancer watches which machines are healthy and reroutes requests around any that go down — so the service stays up even when hardware fails.</div>
+      <div class="body">Traffic is split across multiple servers and regions. A load balancer watches which machines are healthy and reroutes requests around any that go down, so the service stays up even when hardware fails.</div>
     </div>
   </div>
 </section>
@@ -444,6 +470,64 @@
     </div>
     <div class="tradeoff-quote">
       These three techniques work together. Caching saves the most time for repeated questions. Batching saves money for unique ones. Multiple servers mean users never notice when a machine goes down.
+    </div>
+  </div>
+</section>
+
+<!-- 05 INSIDE THIS LAYER -->
+<section>
+  <div class="section-label"><span class="num">05</span>Inside This Layer</div>
+  <h2>What <em>lives</em> here.</h2>
+
+  <div class="inside-layer-card">
+    <p class="inside-axis"><strong>Axis:</strong> infrastructure function: what the runtime provides between caller and model.</p>
+
+    <div class="inside-categories">
+
+      <div class="inside-cat">
+        <span class="inside-cat-name">Inference Serving</span>
+        <span class="inside-cat-desc">The techniques that make a GPU (the chip that does the heavy computing) process many requests at once: batching (grouping requests), KV-cache (reusing computed memory across tokens), paged attention (managing that memory in pages so big requests don't waste space), and speculative decoding (drafting tokens fast and verifying them).</span>
+      </div>
+
+      <div class="inside-cat">
+        <span class="inside-cat-name">Routing and Load Balancing</span>
+        <span class="inside-cat-desc">Deciding which server handles which request so no single machine gets overwhelmed and every caller gets a response quickly.</span>
+      </div>
+
+      <div class="inside-cat">
+        <span class="inside-cat-name">Fallback Chains</span>
+        <span class="inside-cat-desc">Ordered lists of backup models or providers: if the first choice fails or is too slow, the next one in line takes over automatically.</span>
+      </div>
+
+      <div class="inside-cat">
+        <span class="inside-cat-name">Circuit Breakers and Retry Policies</span>
+        <span class="inside-cat-desc">Rules that stop hammering a failing service (circuit breaker) and decide when it is safe to try again, so temporary failures don't cascade into system-wide outages.</span>
+      </div>
+
+      <div class="inside-cat">
+        <span class="inside-cat-name">Cache Check and Substitution</span>
+        <span class="inside-cat-desc">At request time: check whether an identical or very similar prompt was already answered, and return the stored result if so. This covers both prompt-prefix caching and semantic similarity caching. Note: the runtime check and substitution live here; the cache's contents, population, and eviction lifecycle live in L-1 (Data and Artifact Lifecycle).</span>
+      </div>
+
+      <div class="inside-cat">
+        <span class="inside-cat-name">Cost/Latency-Optimized Model Selection at Runtime</span>
+        <span class="inside-cat-desc">Picking which model variant to route a call to based on live cost or speed constraints, applying the C5 (Cost, Latency, and Reliability) framework at the moment of the call.</span>
+      </div>
+
+      <div class="inside-cat">
+        <span class="inside-cat-name">Observability Hooks</span>
+        <span class="inside-cat-desc">Instrumentation wired into the serving path that emits latency, token counts, and error signals. The traces go to dashboards; the discipline of reading and acting on those traces lives in C4 (Observability and Debuggability).</span>
+      </div>
+
+      <div class="inside-cat">
+        <span class="inside-cat-name">Quantization and Compression at Serving Time</span>
+        <span class="inside-cat-desc">Shrinking the model's internal numbers (weights and activations) so it fits on fewer or cheaper chips, reducing inference cost without retraining.</span>
+      </div>
+
+    </div>
+
+    <div class="inside-filing">
+      <strong>Filing rule:</strong> operates on the model call as a black box, without caring what the model says = here (L0). Operates on what the model says, or which model should speak = L2 (Structural Composition). Manages the lifecycle of an artifact the runtime reads = L-1 (Data and Artifact Lifecycle). A cache's runtime check lives here; the cache's contents and lifecycle live in L-1.
     </div>
   </div>
 </section>
@@ -554,7 +638,7 @@ async function runDemo() {
   if (reduceMotion) {
     bubbles.forEach(b => b.classList.add('done'));
     litNode(nodeGPU, noteGPU, 'done');
-    setStatus('<strong>All 6 requests answered.</strong> User D was served from cache — the GPU never ran for that one.', '');
+    setStatus('<strong>All 6 requests answered.</strong> User D was served from cache. The GPU never ran for that one.', '');
     playing = false;
     playBtn.disabled = false;
     return;
@@ -580,7 +664,7 @@ async function runDemo() {
     bubbles[i].classList.remove('active');
     if (i === CACHE_HIT_IDX) {
       litNode(nodeCache, noteCache, 'hit!');
-      setStatus('<strong>Cache hit!</strong> User D asked the same question before. The answer is already stored — the GPU skips it entirely.', 'cache');
+      setStatus('<strong>Cache hit!</strong> User D asked the same question before. The answer is already stored, so the GPU skips it entirely.', 'cache');
       bubbles[i].classList.add('done');
       await sleep(900);
       litNode(nodeCache, noteCache, 'checking...');
