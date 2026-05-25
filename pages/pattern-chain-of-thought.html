@@ -184,7 +184,7 @@
   section {
     max-width: 920px;
     margin: 0 auto;
-    padding: 22px 24px 34px;
+    padding: 18px 24px 34px;
     position: relative;
     scroll-margin-top: 80px;
   }
@@ -203,7 +203,7 @@
     font-size: 23px;
     line-height: 1.15;
     letter-spacing: -0.01em;
-    margin-bottom: 18px;
+    margin-bottom: 14px;
   }
   h2 em { font-style: italic; color: var(--accent); }
 
@@ -213,20 +213,18 @@
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    padding: 30px 28px;
+    padding: 18px 20px;
   }
   .tagline-big {
-    font-family: 'Fraunces', serif;
-    font-weight: 400;
-    font-size: clamp(22px, 3.4vw, 28px);
-    line-height: 1.35;
-    color: var(--text);
-    letter-spacing: -0.01em;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--soft);
+    max-width: 660px;
   }
-  .tagline-big strong { color: var(--accent); font-weight: 500; }
+  .tagline-big strong { color: var(--accent-hover); font-weight: 600; }
   .idea-tip {
-    margin-top: 22px;
-    padding-top: 18px;
+    margin-top: 16px;
+    padding-top: 14px;
     border-top: 1px solid var(--border);
     font-size: 13px;
     font-weight: 500;
@@ -245,7 +243,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 28px;
+    padding: 20px;
     box-shadow: var(--shadow);
   }
   /* the question being worked on */
@@ -265,9 +263,9 @@
   }
   .demo-qtext {
     font-family: 'Fraunces', serif;
-    font-weight: 400;
-    font-size: 19px;
-    line-height: 1.35;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.4;
     color: var(--text);
   }
   /* the "paper" the model writes its reasoning on */
@@ -370,8 +368,8 @@
   }
   .demo-answer-text {
     font-family: 'Fraunces', serif;
-    font-weight: 400;
-    font-size: 18px;
+    font-weight: 500;
+    font-size: 16px;
     line-height: 1.4;
   }
   /* controls: caption (synced narration) + buttons */
@@ -388,7 +386,7 @@
   .demo-caption {
     flex: 1;
     min-width: 220px;
-    min-height: 52px;
+    min-height: 44px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -401,11 +399,9 @@
     min-height: 1em;
   }
   .demo-caption-text {
-    font-family: 'Fraunces', serif;
-    font-weight: 400;
-    font-size: 18px;
-    color: var(--text);
-    line-height: 1.35;
+    font-size: 14px;
+    color: var(--soft);
+    line-height: 1.5;
   }
   .demo-btns { display: flex; gap: 10px; flex-wrap: wrap; }
   .diagram-btn {
@@ -473,7 +469,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 28px;
+    padding: 20px;
     box-shadow: var(--shadow);
   }
   .test-instruction {
@@ -486,7 +482,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    padding: 18px 20px;
+    padding: 14px 16px;
     cursor: pointer;
     transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
     box-shadow: var(--shadow-sm);
@@ -495,8 +491,9 @@
   .query-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
   .query-card .q {
     font-family: 'Fraunces', serif;
-    font-weight: 400;
-    font-size: 18px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.3;
     color: var(--text);
   }
   .query-card .verdict {
@@ -545,7 +542,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 30px 28px;
+    padding: 20px;
     box-shadow: var(--shadow);
     position: relative;
   }
@@ -566,8 +563,8 @@
     background: var(--bg-subtle);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    padding: 18px 20px;
-    margin-bottom: 24px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
   }
   .dossier-q .label {
     font-size: 12px;
@@ -577,9 +574,9 @@
   }
   .dossier-q .text {
     font-family: 'Fraunces', serif;
-    font-weight: 400;
-    font-size: 20px;
-    line-height: 1.35;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.4;
     color: var(--text);
   }
   .dossier-step {
@@ -651,8 +648,8 @@
     background: var(--text);
     color: #fff;
     border-radius: var(--radius-sm);
-    padding: 20px 22px;
-    margin-top: 20px;
+    padding: 16px 18px;
+    margin-top: 16px;
     opacity: 0;
     transform: translateY(8px);
     transition: opacity 0.5s ease, transform 0.5s ease;
@@ -666,8 +663,8 @@
   }
   .dossier-final .answer {
     font-family: 'Fraunces', serif;
-    font-weight: 400;
-    font-size: 18px;
+    font-weight: 500;
+    font-size: 16px;
     line-height: 1.5;
   }
   .dossier-final .cite {
@@ -697,7 +694,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 28px;
+    padding: 20px;
     box-shadow: var(--shadow);
   }
   .code-hint {
@@ -755,7 +752,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 30px 28px;
+    padding: 20px;
     box-shadow: var(--shadow);
   }
   .tradeoff-row {
@@ -783,25 +780,20 @@
   .tradeoff-bars .seg.on-y { background: var(--accent-soft); border-color: var(--accent); }
   .tradeoff-bars .seg.on-g { background: var(--success); border-color: var(--success); }
   .tradeoff-quote {
-    margin-top: 24px;
-    padding-top: 20px;
+    margin-top: 18px;
+    padding-top: 16px;
     border-top: 1px solid var(--border);
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-weight: 400;
-    font-size: 20px;
-    line-height: 1.45;
-    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--soft);
   }
-  .tradeoff-quote::before { content: '\201C'; color: var(--accent); }
-  .tradeoff-quote::after { content: '\201D'; color: var(--accent); }
 
   /* ============ BACK LINK ============ */
   .back-link {
     display: inline-flex;
     align-items: center;
-    gap: 16px;
-    padding: 18px 22px;
+    gap: 14px;
+    padding: 14px 16px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -814,7 +806,7 @@
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
   .back-arrow {
     font-family: 'Fraunces', serif;
-    font-size: 28px;
+    font-size: 22px;
     color: var(--accent);
     line-height: 1;
     transition: transform 0.2s ease;
@@ -829,7 +821,7 @@
   .back-name {
     font-family: 'Fraunces', serif;
     font-weight: 500;
-    font-size: 20px;
+    font-size: 18px;
     line-height: 1;
     letter-spacing: -0.01em;
   }
