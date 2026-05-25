@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Real-time . The Pattern Book</title>
+<title>Real-time / Streaming . The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -68,9 +68,41 @@
   h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
   h2 em { font-style: italic; color: var(--accent); }
 
+  /* SCOPE BANNER */
+  .scope-banner {
+    background: var(--accent-soft);
+    border: 1.5px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  .scope-banner .scope-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--accent-hover);
+    margin-bottom: 8px;
+  }
+  .scope-banner .scope-line {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  .scope-banner .scope-axis {
+    font-size: 14px;
+    color: var(--soft);
+    line-height: 1.55;
+    font-style: italic;
+  }
+
   /* 01 IDEA CARD */
   .idea-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
   .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
+  .idea-card p + p { margin-top: 14px; }
 
   /* 02 DEMO */
   .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
@@ -148,11 +180,74 @@
   .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
   .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
   .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
-  .tradeoff-bars .seg.on-y { background: #A892F2; border-color: #A892F2; }
   .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
   .tradeoff-scale .spacer { min-width: 130px; }
   .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
-  .tradeoff-note { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* WHAT THIS COVERS MAP */
+  .map-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px 28px;
+  }
+  .map-axis {
+    font-size: 14px;
+    font-style: italic;
+    color: var(--soft);
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.55;
+  }
+  .map-axis strong { color: var(--text); font-style: normal; }
+  .discipline-list { display: flex; flex-direction: column; gap: 0; }
+  .discipline-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .discipline-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .discipline-item:first-child { padding-top: 0; }
+  .di-dot {
+    flex: none;
+    margin-top: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .di-body { flex: 1; }
+  .di-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 15px;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .di-line {
+    font-size: 14px;
+    color: var(--soft);
+    line-height: 1.5;
+  }
+  .di-xref {
+    font-size: 12px;
+    color: var(--faint);
+    margin-top: 3px;
+    font-style: italic;
+  }
+  .map-note {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--faint);
+    line-height: 1.55;
+  }
 
   /* BACK LINK */
   .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; cursor: pointer; }
@@ -185,6 +280,10 @@
     .demo-controls { flex-direction: column; align-items: stretch; }
     .diagram-btn { flex: 1; }
   }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
+    .tradeoff-label { min-width: 0; }
+  }
 </style>
 </head>
 <body>
@@ -195,7 +294,7 @@
   <div class="topbar-inner">
     <a class="back" href="considerations.html"><span aria-hidden="true">&larr;</span> Considerations</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Real-time</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Real-time / Streaming</span>
     </nav>
   </div>
 </nav>
@@ -207,24 +306,34 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/>
       </svg>
-    </span>Consideration
+    </span>C7 &middot; Consideration
   </span>
-  <h1 class="page-title">Real-time</h1>
-  <p class="explainer">Answering fast enough that it feels instant. The gap before the first word matters far more than the total time.</p>
+  <h1 class="page-title">Real-time / Streaming</h1>
+  <p class="explainer">The disciplines for building systems where the gap before the first word matters far more than total generation time.</p>
 </header>
+
+<!-- CONDITIONAL SCOPE -->
+<section style="padding-bottom: 8px;">
+  <div class="scope-banner">
+    <div class="scope-tag">Conditional Scope</div>
+    <div class="scope-line">Applies to: only systems with sub-second, incremental output (streaming chat, voice, live transcription). Batch systems can skip it.</div>
+    <div class="scope-axis">Axis: reasoning where TTFT (time to first word, meaning the delay from sending your message to seeing the AI's first word appear) and continuous output matter more than total throughput.</div>
+  </div>
+</section>
 
 <!-- 01 THE IDEA -->
 <section>
   <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What does <em>real-time</em> mean?</h2>
   <div class="idea-card">
-    <p>When you ask an AI something, it has to generate every word before sending it. The wait from "I sent the question" to "I saw the first word" is called <strong style="color:var(--accent-hover)">time-to-first-token</strong>. It is the number that determines whether an AI feels instant or sluggish. One trick changes everything: <strong style="color:var(--accent-hover)">streaming</strong>, which sends each word as it is generated instead of waiting for the full answer. The total time is the same. The felt wait drops to almost nothing.</p>
+    <p>A token (a token is a small piece the AI works in: roughly a word, or a slice of an image or sound) is the basic unit of generation. When you send a prompt (the text you send the AI), it generates every token before sending a response. The wait from "I sent the message" to "I saw the first word" is called TTFT (time to first word). It is the number that determines whether an AI feels instant or sluggish.</p>
+    <p>One technique changes everything: streaming, which sends each token as it is generated instead of waiting for the full answer. The total time is the same. The felt wait drops to almost nothing. This crosscut is a discipline for reasoning about all the decisions that change once you commit to streaming output.</p>
   </div>
 </section>
 
 <!-- 02 SEE IT WORK -->
 <section>
-  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
   <h2>Wait vs. <em>stream</em>.</h2>
   <p class="demo-lede">The same answer, at the same speed. Toggle the mode and press Play to feel the difference.</p>
 
@@ -237,7 +346,7 @@
 
     <!-- the simulated chat pane -->
     <div class="chat-pane" id="chatPane" aria-live="polite" aria-atomic="false">
-      <div class="chat-label">AI response</div>
+      <div class="chat-label">AI Response</div>
 
       <!-- spinner shown while waiting -->
       <div class="wait-overlay" id="waitOverlay">
@@ -286,9 +395,95 @@
   </div>
 </section>
 
-<!-- 03 WHEN IT MATTERS -->
+<!-- 03 WHAT THIS COVERS -->
 <section>
-  <div class="section-label"><span class="num">03</span>When it Matters</div>
+  <div class="section-label"><span class="num">03</span>What This Covers</div>
+  <h2>Eight <em>disciplines</em> in this crosscut.</h2>
+  <div class="map-card">
+    <div class="map-axis">
+      <strong>This is a discipline crosscut, not a mechanism layer.</strong> The streaming UX mechanism (the actual UI behavior of tokens appearing progressively) lives in L7 User Surface. C7 owns the thinking frameworks that apply once you commit to streaming.
+    </div>
+    <div class="discipline-list">
+
+      <div class="discipline-item">
+        <div class="di-dot" aria-hidden="true"></div>
+        <div class="di-body">
+          <div class="di-name">Streaming Output Discipline</div>
+          <div class="di-line">How to decide when streaming is worth the engineering cost and when batch is fine. Includes the rules for chunking output so each partial response is still useful to a reader.</div>
+          <div class="di-xref">UX mechanism for the user lives in L7 User Surface (Streaming and Progressive Disclosure).</div>
+        </div>
+      </div>
+
+      <div class="discipline-item">
+        <div class="di-dot" aria-hidden="true"></div>
+        <div class="di-body">
+          <div class="di-name">Time-to-First-Token Frameworks</div>
+          <div class="di-line">TTFT (time to first word) is the primary number users feel. This discipline covers how to measure it, how to set targets per product type (voice is tighter than chat), and which infrastructure levers move it (prefill caching, model size, batching policy).</div>
+          <div class="di-xref">Cross-ref C5 Cost, Latency and Reliability for latency budget design.</div>
+        </div>
+      </div>
+
+      <div class="discipline-item">
+        <div class="di-dot" aria-hidden="true"></div>
+        <div class="di-body">
+          <div class="di-name">Streaming Eval</div>
+          <div class="di-line">Standard evals wait for a complete response. Streaming eval frameworks measure quality at intermediate checkpoints: does the partial output stay coherent, does it drift mid-sentence, does the final answer match where it started?</div>
+          <div class="di-xref">Cross-ref C1 Evaluation for general eval methodology.</div>
+        </div>
+      </div>
+
+      <div class="discipline-item">
+        <div class="di-dot" aria-hidden="true"></div>
+        <div class="di-body">
+          <div class="di-name">Streaming Safety</div>
+          <div class="di-line">A filter that reads the complete response before sending it cannot work with streaming. This discipline covers real-time harm detection on partial outputs: sliding-window classifiers, early-exit rules, and how to interrupt a stream mid-generation without creating a confusing user experience.</div>
+          <div class="di-xref">Cross-ref C2 Safety, Alignment and Refusal for harm taxonomy and refusal calibration.</div>
+        </div>
+      </div>
+
+      <div class="discipline-item">
+        <div class="di-dot" aria-hidden="true"></div>
+        <div class="di-body">
+          <div class="di-name">Streaming Validation</div>
+          <div class="di-line">When the output must be structured (JSON, XML, code), partial tokens may be syntactically invalid mid-stream. This discipline covers incremental schema checking, buffering strategies, and how to surface validation errors to users without waiting for the full response.</div>
+          <div class="di-xref">Cross-ref L4 Output Shape for the schema enforcement mechanism itself.</div>
+        </div>
+      </div>
+
+      <div class="discipline-item">
+        <div class="di-dot" aria-hidden="true"></div>
+        <div class="di-body">
+          <div class="di-name">Backpressure and Cancellation</div>
+          <div class="di-line">When a client cannot consume tokens as fast as the model produces them, or when the user navigates away, the system needs a clean way to pause or abort generation. This discipline covers how to propagate cancellation signals upstream, how to avoid wasting compute on abandoned streams, and how to resume gracefully.</div>
+        </div>
+      </div>
+
+      <div class="discipline-item">
+        <div class="di-dot" aria-hidden="true"></div>
+        <div class="di-body">
+          <div class="di-name">Streaming Cost Attribution</div>
+          <div class="di-line">Streaming changes cost accounting: a cancelled stream still consumed prefill compute, and partial responses still count as output tokens. This discipline covers how to attribute cost to users or features when the full response was never delivered.</div>
+          <div class="di-xref">Cross-ref C5 Cost, Latency and Reliability for general cost attribution frameworks.</div>
+        </div>
+      </div>
+
+      <div class="discipline-item">
+        <div class="di-dot" aria-hidden="true"></div>
+        <div class="di-body">
+          <div class="di-name">Continuous Context for Voice</div>
+          <div class="di-line">Voice introduces three challenges batch text does not have: turn-taking (who speaks next?), interruption (the user cuts in mid-sentence), and barge-in (the user speaks while the AI is still talking). This discipline covers the state machine for managing these transitions and how to keep context coherent across interrupted turns.</div>
+          <div class="di-xref">Voice surface mechanism lives in L7 User Surface.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="map-note">All eight are disciplines for reasoning and decision-making. The mechanisms they reference (schema enforcement, output filtering, streaming UI) each have a home in the layer taxonomy.</div>
+  </div>
+</section>
+
+<!-- 04 WHEN IT MATTERS -->
+<section>
+  <div class="section-label"><span class="num">04</span>A Real Example</div>
   <h2>Where <em>every millisecond</em> counts.</h2>
   <div class="examples-stage">
     <div class="example-row">
@@ -296,9 +491,9 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 1 3 3v4a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10a7 7 0 0 1-14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
       </div>
       <div class="ex-body">
-        <div class="ex-title">Voice assistants</div>
-        <div class="ex-desc">People expect a spoken reply to start within about 500ms. A two-second pause breaks the illusion of conversation entirely. Streaming audio lets the AI speak the first sentence while still generating the rest.</div>
-        <span class="ex-tag">time-to-first-token critical</span>
+        <div class="ex-title">Voice Assistants</div>
+        <div class="ex-desc">People expect a spoken reply to start within about 500ms. A two-second pause breaks the illusion of conversation entirely. Streaming audio lets the AI speak the first sentence while still generating the rest. Barge-in handling (the user speaking while the AI is mid-sentence) must interrupt generation cleanly.</div>
+        <span class="ex-tag">TTFT Critical</span>
       </div>
     </div>
     <div class="example-row">
@@ -306,32 +501,32 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8L2 7h20l-6-4z"/></svg>
       </div>
       <div class="ex-body">
-        <div class="ex-title">AI code editors (autocomplete)</div>
-        <div class="ex-desc">Suggestions that arrive in under 100ms feel like the editor is reading your mind. Suggestions that arrive after a second feel like an interruption. Speed here is the product.</div>
-        <span class="ex-tag">sub-100ms target</span>
+        <div class="ex-title">AI Code Editors (Autocomplete)</div>
+        <div class="ex-desc">Suggestions that arrive in under 100ms feel like the editor is reading your mind. Suggestions that arrive after a second feel like an interruption. Speed here is the product. Streaming validation is critical because partial code suggestions must still parse.</div>
+        <span class="ex-tag">Sub-100ms Target</span>
       </div>
     </div>
     <div class="example-row">
       <div class="ex-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h7"/><path d="M15 16l2 2 4-4"/></svg>
       </div>
       <div class="ex-body">
-        <div class="ex-title">Fraud detection</div>
-        <div class="ex-desc">A payment must be approved or blocked while the customer is still at the register. A correct decision that arrives five seconds late is a failed product. Latency here is measured in tens of milliseconds.</div>
-        <span class="ex-tag">hard latency deadline</span>
+        <div class="ex-title">Live Transcription</div>
+        <div class="ex-desc">Captions must appear within one word of the speaker. Latency above 2-3 seconds makes them useless for deaf viewers. Backpressure handling matters here: if the network drops, the system needs to catch up without losing words or doubling them.</div>
+        <span class="ex-tag">Continuous Output</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- 04 TRADEOFFS -->
+<!-- 05 TRADEOFFS -->
 <section>
-  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <div class="section-label"><span class="num">05</span>Tradeoffs</div>
   <h2>What you give up for <em>speed</em>.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale">
       <span class="spacer"></span>
-      <div class="scale-track"><span>low</span><span>high</span></div>
+      <div class="scale-track"><span>Low</span><span>High</span></div>
     </div>
     <div class="tradeoff-row">
       <div class="tradeoff-label">Infrastructure cost</div>
@@ -342,17 +537,23 @@
     <div class="tradeoff-row">
       <div class="tradeoff-label">Complexity added</div>
       <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Safety difficulty</div>
+      <div class="tradeoff-bars">
         <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
       </div>
     </div>
     <div class="tradeoff-row">
-      <div class="tradeoff-label">Model quality impact</div>
+      <div class="tradeoff-label">Answer quality</div>
       <div class="tradeoff-bars">
-        <div class="seg on-y"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+        <div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
       </div>
     </div>
-    <div class="tradeoff-note">
-      Faster hardware and more replicas cost real money. Streaming requires clients to handle partial responses. But the quality of the answer is not affected by streaming: the model generates the same tokens either way. Speed and correctness are separate knobs.
+    <div class="tradeoff-quote">
+      Faster hardware and more replicas cost real money. Streaming requires clients to handle partial responses, cancellation signals, and mid-stream errors. Safety filters that rely on reading the complete response must be redesigned. The one thing streaming does not cost: answer quality. The model generates the same tokens either way. Speed and correctness are separate knobs.
     </div>
   </div>
 </section>

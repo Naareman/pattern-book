@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browsing Agent · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --warn:#B45309; --warn-soft:#FEF3C7; --warn-border:#FCD34D;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.6; color: var(--text); }
+  .idea-card p + p { margin-top: 14px; }
+
+  /* layer badges */
+  .layer-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .layer-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .layer-badge:hover { border-color: var(--accent); background: #e4dcfe; }
+  .layer-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* read vs action callout */
+  .distinction-box {
+    margin-top: 20px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .distinction-row {
+    display: flex; align-items: stretch; gap: 0;
+  }
+  .distinction-col {
+    flex: 1; padding: 16px 18px;
+  }
+  .distinction-col:first-child { border-right: 1px solid var(--border); }
+  .distinction-col.read { background: var(--success-soft); }
+  .distinction-col.action { background: var(--warn-soft); border-color: var(--warn-border); }
+  .distinction-hed {
+    font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .distinction-col.read .distinction-hed { color: var(--success); }
+  .distinction-col.action .distinction-hed { color: var(--warn); }
+  .distinction-body { font-size: 13px; line-height: 1.6; color: var(--text); }
+  .distinction-tag {
+    display: inline-block; margin-top: 8px;
+    font-size: 11px; font-weight: 600; letter-spacing: .04em;
+    padding: 2px 8px; border-radius: 20px;
+  }
+  .distinction-col.read .distinction-tag { background: #b2e4d5; color: #065f46; }
+  .distinction-col.action .distinction-tag { background: var(--warn-border); color: var(--warn); }
+  @media (max-width: 560px) {
+    .distinction-row { flex-direction: column; }
+    .distinction-col:first-child { border-right: 0; border-bottom: 1px solid var(--border); }
+  }
+
+  /* ============ DEMO: browsing loop ============ */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* goal bar */
+  .goal-bar {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 18px;
+  }
+  .goal-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .goal-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--text); line-height: 1.3; }
+
+  /* loop iterations */
+  .loop-iters { display: flex; flex-direction: column; gap: 12px; }
+
+  .iter {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    overflow: hidden; opacity: 0; transform: translateY(6px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .iter.visible { opacity: 1; transform: translateY(0); }
+
+  .iter-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; background: var(--bg-subtle); border-bottom: 1px solid var(--border);
+  }
+  .iter-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .iter.active .iter-head { background: var(--accent-soft); border-bottom-color: var(--accent); }
+  .iter.done .iter-head { background: var(--success-soft); border-bottom-color: #b2e4d5; }
+  .iter.done .iter-num { background: var(--success); }
+
+  .iter-title { font-weight: 600; font-size: 14px; color: var(--text); }
+  .iter-status {
+    margin-left: auto; font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    color: var(--faint); text-transform: uppercase;
+  }
+  .iter.active .iter-status { color: var(--accent); }
+  .iter.done .iter-status { color: var(--success); }
+
+  .iter-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+
+  /* browser chrome sim */
+  .browser-chrome {
+    border: 1px solid var(--border-strong); border-radius: 8px; overflow: hidden;
+    font-size: 12px;
+  }
+  .browser-bar {
+    background: #f0f0f0; padding: 6px 10px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  .browser-dots { display: flex; gap: 5px; }
+  .browser-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border-strong); }
+  .browser-url {
+    flex: 1; background: white; border: 1px solid var(--border-strong);
+    border-radius: 4px; padding: 3px 8px; font-size: 11px; color: var(--soft);
+    font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .browser-body {
+    padding: 10px 12px; background: white; min-height: 52px; color: var(--soft);
+    font-size: 12px; line-height: 1.6;
+  }
+  .browser-highlight { background: #fef9c3; border-radius: 2px; color: var(--text); font-weight: 500; }
+
+  /* action pill */
+  .action-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+    opacity: 0; transition: opacity .3s ease;
+  }
+  .action-pill.visible { opacity: 1; }
+  .action-pill.read-pill { background: var(--success-soft); color: #065f46; border: 1px solid #b2e4d5; }
+  .action-pill.click-pill { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn-border); }
+
+  /* final answer block */
+  .answer-block {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+    font-size: 14px; line-height: 1.7; color: var(--text);
+    opacity: 0; transition: opacity .5s ease;
+  }
+  .answer-block.visible { opacity: 1; }
+
+  /* controls */
+  .demo-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ PATTERNS IT USES ============ */
+  .patterns-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .pattern-group { margin-bottom: 22px; }
+  .pattern-group:last-child { margin-bottom: 0; }
+  .pattern-group-head {
+    font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+  .pattern-rows { display: flex; flex-direction: column; gap: 10px; }
+  .pattern-row {
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .pattern-layer-tag {
+    flex-shrink: 0; display: inline-flex; align-items: center;
+    font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    padding: 3px 9px; border-radius: 20px; margin-top: 1px;
+    background: var(--accent-soft); color: var(--accent-hover); border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .pattern-info { flex: 1; min-width: 0; }
+  .pattern-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .pattern-desc { font-size: 13px; color: var(--soft); line-height: 1.55; }
+
+  /* read vs action note */
+  .rw-note {
+    margin-top: 18px; padding: 14px 16px;
+    background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    font-size: 13px; line-height: 1.65; color: var(--soft);
+  }
+  .rw-note strong { color: var(--text); }
+
+  /* ============ REAL EXAMPLE ============ */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .example-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
+  .example-flow { display: flex; flex-direction: column; gap: 0; }
+  .ex-row {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .ex-row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .ex-icon { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; }
+  .ex-icon svg { width: 16px; height: 16px; color: var(--accent-hover); display: block; }
+  .ex-body { flex: 1; min-width: 0; }
+  .ex-step { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
+  .ex-text { font-size: 14px; line-height: 1.6; color: var(--text); }
+  .ex-text strong { color: var(--accent-hover); }
+
+  /* ============ TRADEOFFS ============ */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { min-width: 100px; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); min-width: 100px; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+  }
+  @media (max-width: 480px) {
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+    .ex-row { gap: 10px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
+    .tradeoff-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a href="builds.html">Builds</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <span class="here" aria-current="page">Browsing Agent</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main" tabindex="-1">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20M12 2a15.3 15.3 0 0 0 0 20"/>
+      </svg>
+    </span>Build
+  </span>
+  <h1 class="pattern-title">Browsing Agent</h1>
+  <p class="explainer">Navigates real websites to find an answer or complete a task, deciding where to go next after each page it reads.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section aria-labelledby="idea-heading">
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2 id="idea-heading">What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>A <span style="color:var(--accent-hover);font-weight:500">Browsing Agent</span> controls a real web browser. It has a goal, it opens a page, reads what it finds, then decides the next step: follow a link, fill a form, press a button, or declare it is done. This loop repeats until the goal is met or the agent gives up.</p>
+    <p>The key distinction is between two kinds of actions. <strong style="color:var(--success)">Reading a page</strong> is passive (the AI model, or LLM, reads text without changing anything). <strong style="color:var(--warn)">Clicking or submitting</strong> changes the state of the world outside the agent. One is safe to retry; the other is not.</p>
+  </div>
+
+  <!-- Read vs side-effectful distinction -->
+  <div class="distinction-box" aria-label="Read-only versus side-effectful actions">
+    <div class="distinction-row">
+      <div class="distinction-col read">
+        <div class="distinction-hed">Read Only</div>
+        <div class="distinction-body">Loading a URL, reading page text, scraping a table. Nothing changes if you do it twice.</div>
+        <span class="distinction-tag">L3a: Stateless Retrieval</span>
+      </div>
+      <div class="distinction-col action">
+        <div class="distinction-hed">Side-Effectful</div>
+        <div class="distinction-body">Clicking a button, submitting a form, adding to a cart. Doing it twice may book twice.</div>
+        <span class="distinction-tag">L5: Orchestration Action</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="layer-badges" aria-label="Layers used by this build">
+    <a class="layer-badge" href="layer-orchestration-agents.html">
+      <span class="dot" aria-hidden="true"></span>L5: Orchestration
+    </a>
+    <a class="layer-badge" href="layer-stateless-retrieval.html">
+      <span class="dot" aria-hidden="true"></span>L3a: Stateless Retrieval
+    </a>
+    <a class="layer-badge" href="layer-single-call-control.html">
+      <span class="dot" aria-hidden="true"></span>L4: Single-Call Control
+    </a>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section aria-labelledby="demo-heading">
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2 id="demo-heading">Watch it <em>loop</em>.</h2>
+
+  <p class="demo-lede">The agent has one goal. Each loop it reads a page, decides the next action, and moves forward. Tap "Step" to advance one iteration at a time, or "Play" to watch it run.</p>
+
+  <div class="demo-stage">
+    <!-- goal -->
+    <div class="goal-bar">
+      <div class="goal-label">Goal</div>
+      <div class="goal-text">Find the cheapest direct flight from Cairo to London on 15 June and book it.</div>
+    </div>
+
+    <div class="loop-iters" aria-live="polite" aria-atomic="false" id="loop-iters">
+
+      <!-- Iteration 1: navigate to search -->
+      <div class="iter" id="iter1">
+        <div class="iter-head">
+          <span class="iter-num" aria-hidden="true">1</span>
+          <span class="iter-title">Navigate to flight search</span>
+          <span class="iter-status" id="status1">waiting</span>
+        </div>
+        <div class="iter-body">
+          <div class="browser-chrome" id="browser1" style="display:none">
+            <div class="browser-bar">
+              <div class="browser-dots" aria-hidden="true">
+                <div class="browser-dot"></div>
+                <div class="browser-dot"></div>
+                <div class="browser-dot"></div>
+              </div>
+              <div class="browser-url">https://www.skyscanner.com</div>
+            </div>
+            <div class="browser-body">Homepage. Search form: From, To, Date, Passengers. [Search button]</div>
+          </div>
+          <span class="action-pill read-pill" id="pill1" aria-label="Action type: read only">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            L3a: read only (no state changed)
+          </span>
+        </div>
+      </div>
+
+      <!-- Iteration 2: fill and submit form -->
+      <div class="iter" id="iter2">
+        <div class="iter-head">
+          <span class="iter-num" aria-hidden="true">2</span>
+          <span class="iter-title">Fill form and search</span>
+          <span class="iter-status" id="status2">waiting</span>
+        </div>
+        <div class="iter-body">
+          <div class="browser-chrome" id="browser2" style="display:none">
+            <div class="browser-bar">
+              <div class="browser-dots" aria-hidden="true">
+                <div class="browser-dot"></div>
+                <div class="browser-dot"></div>
+                <div class="browser-dot"></div>
+              </div>
+              <div class="browser-url">https://www.skyscanner.com/transport/flights/cai/lond/260615/</div>
+            </div>
+            <div class="browser-body">Results loaded. Sorted by price. 12 flights found. <span class="browser-highlight">Cheapest direct: EgyptAir MS779, 06:30, £187</span>. [Select] button visible.</div>
+          </div>
+          <span class="action-pill click-pill" id="pill2" aria-label="Action type: side-effectful">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 9-14 9V3z"/></svg>
+            L5 Action: clicked Submit (state changed)
+          </span>
+        </div>
+      </div>
+
+      <!-- Iteration 3: read results, decide to select -->
+      <div class="iter" id="iter3">
+        <div class="iter-head">
+          <span class="iter-num" aria-hidden="true">3</span>
+          <span class="iter-title">Select cheapest direct flight</span>
+          <span class="iter-status" id="status3">waiting</span>
+        </div>
+        <div class="iter-body">
+          <div class="browser-chrome" id="browser3" style="display:none">
+            <div class="browser-bar">
+              <div class="browser-dots" aria-hidden="true">
+                <div class="browser-dot"></div>
+                <div class="browser-dot"></div>
+                <div class="browser-dot"></div>
+              </div>
+              <div class="browser-url">https://www.skyscanner.com/transport/flights/cai/lond/260615/?sort=price</div>
+            </div>
+            <div class="browser-body">Booking page. Passenger details form. Price confirmed: <span class="browser-highlight">£187 total</span>. [Confirm and Pay] button.</div>
+          </div>
+          <span class="action-pill click-pill" id="pill3" aria-label="Action type: side-effectful">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 9-14 9V3z"/></svg>
+            L5 Action: clicked Select (side-effectful, needs guardrail before Pay)
+          </span>
+        </div>
+      </div>
+
+      <!-- Final: answer -->
+      <div class="iter" id="iter-done">
+        <div class="iter-head">
+          <span class="iter-num" aria-hidden="true" style="background:var(--success)">&#10003;</span>
+          <span class="iter-title">Goal met: ready to confirm</span>
+          <span class="iter-status" id="status-done">waiting</span>
+        </div>
+        <div class="iter-body">
+          <div class="answer-block" id="answer-block">
+            Found cheapest direct flight: EgyptAir MS779, 15 Jun, depart 06:30 CAI, arrive 10:45 LHR. Price: £187. Booking page is open and pre-filled. Waiting for your approval before pressing "Confirm and Pay."
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /loop-iters -->
+
+    <div class="demo-controls">
+      <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 PATTERNS IT USES -->
+<section aria-labelledby="patterns-heading">
+  <div class="section-label"><span class="num">03</span>Patterns It Uses</div>
+  <h2 id="patterns-heading">The <em>layers</em> inside.</h2>
+
+  <div class="patterns-stage">
+
+    <div class="pattern-group">
+      <div class="pattern-group-head">L5: Orchestration</div>
+      <div class="pattern-rows">
+        <div class="pattern-row">
+          <span class="pattern-layer-tag">L5 Shape</span>
+          <div class="pattern-info">
+            <div class="pattern-name">Iterative Loop</div>
+            <div class="pattern-desc">The agent repeats: read a page, decide, act. It loops until it reaches the goal or hits a stop condition. This is the backbone of any browsing agent.</div>
+          </div>
+        </div>
+        <div class="pattern-row">
+          <span class="pattern-layer-tag">L5 Action</span>
+          <div class="pattern-info">
+            <div class="pattern-name">External Action (clicks and submits)</div>
+            <div class="pattern-desc">Every click, form fill, or button press is an External Action: it changes state outside the agent. Unlike reading, clicking cannot safely be undone by retrying.</div>
+          </div>
+        </div>
+        <div class="pattern-row">
+          <span class="pattern-layer-tag">L5 Action</span>
+          <div class="pattern-info">
+            <div class="pattern-name">Approval Gates</div>
+            <div class="pattern-desc">Before a high-stakes action such as "Confirm and Pay," a well-designed browsing agent pauses and asks for human approval. The agent provides the plan; a person authorises the irreversible step.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pattern-group">
+      <div class="pattern-group-head">L3a: Stateless Retrieval</div>
+      <div class="pattern-rows">
+        <div class="pattern-row">
+          <span class="pattern-layer-tag">L3a</span>
+          <div class="pattern-info">
+            <div class="pattern-name">Read-Only Page Reads (Scraping)</div>
+            <div class="pattern-desc">Loading a URL and reading the page text is L3a: the agent is retrieving external information without changing anything. A live web page is just an external knowledge source. Safe to repeat.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pattern-group">
+      <div class="pattern-group-head">L4: Single-Call Control</div>
+      <div class="pattern-rows">
+        <div class="pattern-row">
+          <span class="pattern-layer-tag">L4</span>
+          <div class="pattern-info">
+            <div class="pattern-name">Reasoning Per Step</div>
+            <div class="pattern-desc">Each loop iteration involves a single call to the LLM (the AI model): "here is what I see on this page, what should I do next?" That one call decides the action. The prompt (the text you send the AI) is rebuilt fresh each loop.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rw-note" role="note">
+      <strong>The boundary that matters most:</strong> reading a page is L3a (read-only, safe to retry). Clicking or submitting is L5 Action (side-effectful, may change real-world state). A well-built browsing agent labels every planned action before executing it, so guardrails can block irreversible steps until a human approves.
+    </div>
+  </div>
+</section>
+
+<!-- 04 A REAL EXAMPLE -->
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">04</span>A Real Example</div>
+  <h2 id="example-heading">How a <em>real one</em> runs.</h2>
+  <div class="example-stage">
+    <p class="example-intro">
+      Anthropic's Computer Use (Claude) and OpenAI's Operator are working Browsing Agents. Here is what happens under the hood when one is given a goal.
+    </p>
+    <div class="example-flow">
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20M12 2a15.3 15.3 0 0 0 0 20"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 1: Open a page</div>
+          <div class="ex-text">The agent receives a goal and loads the first URL. It reads the page text (L3a read-only). Nothing has changed in the world yet.</div>
+        </div>
+      </div>
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5l4 4L7 21H3v-4z"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 2: Decide the next action</div>
+          <div class="ex-text">One call to the LLM: "Given this page and my goal, <strong>what is the next action?</strong>" The model chooses from: navigate, click, type, scroll, or finish.</div>
+        </div>
+      </div>
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 3: Execute or gate</div>
+          <div class="ex-text">Read-only actions (navigate, scroll) run immediately. <strong>Side-effectful actions</strong> (click Submit, confirm purchase) check against a guardrail. High-stakes ones pause for human approval.</div>
+        </div>
+      </div>
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 4: Loop back</div>
+          <div class="ex-text">After each action, the agent reads the new page state and loops. The loop continues until the goal is met, the agent is stuck, or a maximum step count is reached.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 05 TRADEOFFS -->
+<section aria-labelledby="tradeoffs-heading">
+  <div class="section-label"><span class="num">05</span>Tradeoffs</div>
+  <h2 id="tradeoffs-heading">What you <em>pay</em>.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Complexity</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Capability</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Browsing agents are slow: each loop involves a real page load plus an LLM call. They can get stuck if a page changes layout or requires a login the agent does not have. They need guardrails (approval gates, step limits) because side-effectful actions cannot be undone. The payoff is capability: they can operate on any website, with no API required.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;" aria-label="Navigation">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Nakano et al. (2022). <em>WebGPT: Browser-assisted question-answering with human feedback.</em> <span class="note">Foundational work on LLM-controlled browsing with human feedback.</span></li>
+    <li>Yao et al. (2023). <em>ReAct: Synergizing Reasoning and Acting in Language Models.</em> <span class="note">The iterative reason-act loop that underlies most browsing agents.</span></li>
+    <li>Anthropic (2024). <em>Computer Use (Claude): model card and documentation.</em> <span class="note">Production browsing agent with approval-gate design.</span></li>
+    <li>Zhou et al. (2024). <em>WebArena: A realistic web environment for building autonomous agents.</em> <span class="note">Benchmark showing how browsing agents handle real multi-step web tasks.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ DEMO ANIMATION ============
+// Four iterations revealed in sequence. Step: one per tap. Play: auto-run. Reset: hide all.
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+const iters   = [1, 2, 3, 'done'].map(id => document.getElementById('iter' + id));
+const statuses = [1, 2, 3, 'done'].map(id => document.getElementById('status' + id));
+const browsers = [1, 2, 3].map(id => document.getElementById('browser' + id));
+const pills    = [1, 2, 3].map(id => document.getElementById('pill' + id));
+const answerBlock = document.getElementById('answer-block');
+
+const stepBtn  = document.getElementById('stepBtn');
+const playBtn  = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+let demoStep = -1;
+let running  = false;
+
+function resetDemo() {
+  demoStep = -1; running = false;
+  iters.forEach(el => el.classList.remove('visible', 'active', 'done'));
+  statuses.forEach(el => { el.textContent = 'waiting'; });
+  browsers.forEach(el => { el.style.display = 'none'; });
+  pills.forEach(el => el.classList.remove('visible'));
+  answerBlock.classList.remove('visible');
+}
+
+async function runIter(idx, animate) {
+  const iter   = iters[idx];
+  const status = statuses[idx];
+  iter.classList.add('visible', 'active');
+  status.textContent = idx < 3 ? 'navigating...' : 'done';
+  if (animate) await sleep(reduceMotion ? 0 : 400);
+
+  if (idx < 3) {
+    browsers[idx].style.display = 'block';
+    if (animate) await sleep(reduceMotion ? 0 : 500);
+    pills[idx].classList.add('visible');
+    if (animate) await sleep(reduceMotion ? 0 : 400);
+    iter.classList.remove('active');
+    iter.classList.add('done');
+    status.textContent = 'done';
+  } else {
+    // final answer
+    if (animate) await sleep(reduceMotion ? 0 : 400);
+    answerBlock.classList.add('visible');
+    if (animate) await sleep(reduceMotion ? 0 : 300);
+    iter.classList.remove('active');
+    iter.classList.add('done');
+    status.textContent = 'done';
+  }
+}
+
+stepBtn.addEventListener('click', async () => {
+  if (running) return;
+  if (demoStep >= 3) { resetDemo(); return; }
+  running = true;
+  stepBtn.disabled = true; playBtn.disabled = true;
+  demoStep++;
+  await runIter(demoStep, true);
+  running = false;
+  stepBtn.disabled = false; playBtn.disabled = false;
+});
+
+playBtn.addEventListener('click', async () => {
+  if (running) return;
+  resetDemo();
+  running = true;
+  playBtn.disabled = true; stepBtn.disabled = true;
+  await sleep(reduceMotion ? 0 : 200);
+  for (let i = 0; i <= 3; i++) {
+    await runIter(i, !reduceMotion);
+    if (i < 3 && !reduceMotion) await sleep(300);
+  }
+  demoStep = 3;
+  running = false;
+  playBtn.disabled = false; stepBtn.disabled = false;
+});
+
+resetBtn.addEventListener('click', () => {
+  if (running) return;
+  resetDemo();
+});
+
+// Reduced motion: reveal everything immediately
+if (reduceMotion) {
+  (async () => {
+    for (let i = 0; i <= 3; i++) await runIter(i, false);
+    demoStep = 3;
+  })();
+}
+</script>
+</body>
+</html>

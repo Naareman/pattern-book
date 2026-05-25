@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summarization Service · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.6; color: var(--text); }
+
+  /* layer badges */
+  .layer-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .layer-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .layer-badge:hover { border-color: var(--accent); background: #e4dcfe; }
+  .layer-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ============ DEMO ============ */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* document display bar */
+  .doc-bar {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 18px;
+  }
+  .doc-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .doc-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; color: var(--text); line-height: 1.3; }
+  .doc-meta { font-size: 12px; color: var(--faint); margin-top: 4px; }
+
+  /* phases */
+  .phases { display: flex; flex-direction: column; gap: 14px; }
+  .phase {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    overflow: hidden; opacity: 0; transform: translateY(6px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .phase.visible { opacity: 1; transform: translateY(0); }
+  .phase-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; background: var(--bg-subtle); border-bottom: 1px solid var(--border);
+  }
+  .phase-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .phase.active .phase-head { background: var(--accent-soft); border-bottom-color: var(--accent); }
+  .phase-title { font-weight: 600; font-size: 14px; color: var(--text); }
+  .phase-status {
+    margin-left: auto; font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    color: var(--faint); text-transform: uppercase;
+  }
+  .phase.active .phase-status { color: var(--accent); }
+  .phase.done .phase-status { color: var(--success); }
+  .phase.done .phase-head { background: var(--success-soft); border-bottom-color: #b2e4d5; }
+  .phase.done .phase-num { background: var(--success); }
+  .phase-body { padding: 12px 14px; min-height: 48px; }
+
+  /* chunk grid (map phase) */
+  .chunk-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  }
+  .chunk-card {
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); padding: 10px 12px;
+    opacity: 0; transform: translateY(4px);
+    transition: opacity .3s ease, transform .3s ease, border-color .3s ease, background .3s ease;
+  }
+  .chunk-card.in { opacity: 1; transform: translateY(0); }
+  .chunk-card.summarized { border-color: var(--accent); background: var(--accent-soft); }
+  .chunk-num { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 5px; }
+  .chunk-card.summarized .chunk-num { color: var(--accent-hover); }
+  .chunk-text { font-size: 12px; line-height: 1.5; color: var(--soft); }
+  .chunk-sum { font-size: 11px; line-height: 1.5; color: var(--accent-hover); margin-top: 6px; font-style: italic; display: none; border-top: 1px solid var(--accent); padding-top: 5px; }
+  .chunk-card.summarized .chunk-sum { display: block; }
+
+  /* reduce phase */
+  .reduce-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .reduce-row:last-child { border-bottom: 0; }
+  .reduce-icon { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; }
+  .reduce-icon svg { width: 13px; height: 13px; color: var(--accent-hover); }
+  .reduce-body { flex: 1; min-width: 0; }
+  .reduce-step { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 3px; }
+  .reduce-text { font-size: 13px; line-height: 1.6; color: var(--text); }
+  .reduce-text strong { color: var(--accent-hover); }
+
+  /* final summary */
+  .final-block {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+    font-size: 14px; line-height: 1.7; color: var(--text);
+    opacity: 0; transition: opacity .5s ease;
+    min-height: 60px;
+  }
+  .final-block.visible { opacity: 1; }
+  .final-tag {
+    display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft);
+    border-radius: 4px; padding: 2px 7px; margin-bottom: 8px;
+  }
+
+  /* controls */
+  .demo-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ REAL EXAMPLE ============ */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .example-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
+  .example-flow { display: flex; flex-direction: column; gap: 0; }
+  .ex-row {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .ex-row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .ex-icon { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; }
+  .ex-icon svg { width: 16px; height: 16px; color: var(--accent-hover); display: block; }
+  .ex-body { flex: 1; min-width: 0; }
+  .ex-step { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
+  .ex-text { font-size: 14px; line-height: 1.6; color: var(--text); }
+  .ex-text strong { color: var(--accent-hover); }
+
+  /* ============ PATTERNS IT USES ============ */
+  .patterns-grid {
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .pattern-row {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+  }
+  .pattern-tag {
+    flex-shrink: 0; font-size: 11px; font-weight: 700; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 3px 8px; white-space: nowrap; margin-top: 1px;
+  }
+  .pattern-info { flex: 1; min-width: 0; }
+  .pattern-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .pattern-desc { font-size: 13px; color: var(--soft); line-height: 1.5; }
+
+  /* ============ TRADEOFFS ============ */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { min-width: 100px; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); min-width: 100px; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 600px) {
+    .chunk-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+  }
+  @media (max-width: 480px) {
+    .chunk-grid { grid-template-columns: 1fr; }
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
+    .tradeoff-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep">/</span>
+      <a href="builds.html">Builds</a>
+      <span class="sep">/</span>
+      <span class="here">Summarization Service</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="18" rx="3"/>
+        <path d="M7 8h10M7 12h6"/>
+      </svg>
+    </span>Build
+  </span>
+  <h1 class="pattern-title">Summarization Service</h1>
+  <p class="explainer">Turns long documents into short, faithful summaries at scale.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>The AI works in <strong style="color:var(--accent-hover)">tokens</strong> (a token is a small piece it processes: roughly a word, or a short slice of text). Every AI model has a limit on how many tokens it can read at once. A long report, transcript, or legal document usually exceeds that limit. The solution: split the document into <strong style="color:var(--accent-hover)">chunks</strong> (fixed-size text segments, each small enough to fit one call), summarize each chunk independently in parallel, then combine those mini-summaries into one final summary. This is called <strong style="color:var(--accent-hover)">map-reduce</strong>: map a task over every chunk, then reduce the results into one answer.</p>
+  </div>
+  <div class="layer-badges" aria-label="Layers used by this build">
+    <a class="layer-badge" href="layer-application-patterns.html">
+      <span class="dot" aria-hidden="true"></span>L6: Application Patterns (Transformation)
+    </a>
+    <a class="layer-badge" href="layer-single-call-control.html">
+      <span class="dot" aria-hidden="true"></span>L4: Single-Call Control
+    </a>
+    <a class="layer-badge" href="layer-composition.html">
+      <span class="dot" aria-hidden="true"></span>L2: Structural Composition
+    </a>
+    <a class="layer-badge" href="consideration-cost.html">
+      <span class="dot" aria-hidden="true"></span>C5: Cost and Latency
+    </a>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Watch the <em>map-reduce</em>.</h2>
+
+  <p class="demo-lede">A long document is split into chunks. Each chunk is summarized in parallel (the "map" step). Then all chunk summaries are combined into one final summary (the "reduce" step).</p>
+
+  <div class="demo-stage">
+    <!-- document display -->
+    <div class="doc-bar">
+      <div class="doc-label">Input Document</div>
+      <div class="doc-title">Annual Climate Report 2024 (42 pages)</div>
+      <div class="doc-meta">~28,000 tokens total. Model context limit: 8,000 tokens per call. Split into 6 chunks.</div>
+    </div>
+
+    <div class="phases" aria-live="polite" aria-atomic="false">
+
+      <!-- Phase 1: Split -->
+      <div class="phase" id="phase-split">
+        <div class="phase-head">
+          <span class="phase-num" aria-hidden="true">1</span>
+          <span class="phase-title">Split: divide into chunks</span>
+          <span class="phase-status" id="status-split">waiting</span>
+        </div>
+        <div class="phase-body">
+          <div id="split-body" style="display:none">
+            <div class="chunk-grid" id="chunk-grid">
+              <div class="chunk-card" id="chunk-0">
+                <div class="chunk-num">Chunk 1</div>
+                <div class="chunk-text">Pages 1-7: Executive summary and global temperature trends.</div>
+                <div class="chunk-sum">Temperatures rose 1.4C above pre-industrial baseline.</div>
+              </div>
+              <div class="chunk-card" id="chunk-1">
+                <div class="chunk-num">Chunk 2</div>
+                <div class="chunk-text">Pages 8-14: Ocean data, sea-level rise, and Arctic ice extent.</div>
+                <div class="chunk-sum">Sea levels up 4.5 mm; Arctic summer ice at record low.</div>
+              </div>
+              <div class="chunk-card" id="chunk-2">
+                <div class="chunk-num">Chunk 3</div>
+                <div class="chunk-text">Pages 15-21: Extreme weather events and attribution studies.</div>
+                <div class="chunk-sum">Heatwaves 5x more likely; flood severity increased in 60% of basins.</div>
+              </div>
+              <div class="chunk-card" id="chunk-3">
+                <div class="chunk-num">Chunk 4</div>
+                <div class="chunk-text">Pages 22-28: Emissions by sector and country-level commitments.</div>
+                <div class="chunk-sum">Energy sector still 34% of emissions; 80 countries updated NDCs.</div>
+              </div>
+              <div class="chunk-card" id="chunk-4">
+                <div class="chunk-num">Chunk 5</div>
+                <div class="chunk-text">Pages 29-35: Adaptation strategies and investment gaps.</div>
+                <div class="chunk-sum">$340bn adaptation gap; coastal infrastructure most underfunded.</div>
+              </div>
+              <div class="chunk-card" id="chunk-5">
+                <div class="chunk-num">Chunk 6</div>
+                <div class="chunk-text">Pages 36-42: Policy recommendations and 2030 targets.</div>
+                <div class="chunk-sum">Recommends 45% emissions cut by 2030 to stay under 1.5C.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 2: Map (parallel summarization) -->
+      <div class="phase" id="phase-map">
+        <div class="phase-head">
+          <span class="phase-num" aria-hidden="true">2</span>
+          <span class="phase-title">Map: summarize each chunk in parallel</span>
+          <span class="phase-status" id="status-map">waiting</span>
+        </div>
+        <div class="phase-body">
+          <div id="map-body" style="display:none;font-size:13px;color:var(--soft);line-height:1.7">
+            6 calls fire at once, one per chunk. Each call gets a prompt (the text you send the AI): "Summarize this section faithfully in 2 sentences." The AI returns a mini-summary for each chunk.
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 3: Reduce (combine summaries) -->
+      <div class="phase" id="phase-reduce">
+        <div class="phase-head">
+          <span class="phase-num" aria-hidden="true">3</span>
+          <span class="phase-title">Reduce: combine into one final summary</span>
+          <span class="phase-status" id="status-reduce">waiting</span>
+        </div>
+        <div class="phase-body">
+          <div id="reduce-body" style="display:none">
+            <div class="final-block" id="final-block">
+              <div class="final-tag">Final Summary</div>
+              <div>The 2024 Climate Report documents a 1.4C rise above pre-industrial levels, record-low Arctic ice, and a 4.5 mm sea-level increase. Extreme weather has intensified sharply. Despite 80 countries updating their climate commitments, a $340bn adaptation funding gap remains. The report calls for a 45% emissions reduction by 2030 to hold warming under 1.5C.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /phases -->
+
+    <div class="demo-controls">
+      <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>How a <em>real one</em> runs.</h2>
+  <div class="example-stage">
+    <p class="example-intro">
+      A legal team uses a summarization service to process hundreds of contracts per week. Here is the pipeline, step by step.
+    </p>
+    <div class="example-flow">
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6M9 16h4M6 3h8l4 4v14H6z"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 1: Ingest</div>
+          <div class="ex-text">A 60-page contract arrives as a PDF. The system extracts text and counts tokens. At ~900 tokens per page, that is roughly <strong>54,000 tokens</strong>, far above any single-call limit.</div>
+        </div>
+      </div>
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h7"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 2: Chunk</div>
+          <div class="ex-text">The text is split at paragraph breaks into chunks of <strong>3,000 tokens each</strong>, leaving headroom in the 8,000-token context window for the prompt and the summary output.</div>
+        </div>
+      </div>
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 11.5l10-5.5M7 12.5l10 5.5"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 3: Map (parallel calls)</div>
+          <div class="ex-text">18 chunks, 18 calls fire in parallel. Each prompt instructs the LLM (large language model, the AI model doing the work) to extract <strong>key obligations, dates, and risk clauses</strong> only.</div>
+        </div>
+      </div>
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 4: Reduce (combine)</div>
+          <div class="ex-text">The 18 mini-summaries (now a few thousand tokens total) are assembled into one final prompt. A single call produces the <strong>one-page executive summary</strong> that the lawyer reads.</div>
+        </div>
+      </div>
+
+      <div class="ex-row">
+        <div class="ex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <div class="ex-body">
+          <div class="ex-step">Step 5: Deliver</div>
+          <div class="ex-text">The summary is returned with <strong>section references</strong> so the lawyer can jump to the source clause. Total wall-clock time: under 30 seconds for a 60-page contract.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 04 PATTERNS IT USES -->
+<section>
+  <div class="section-label"><span class="num">04</span>Patterns It Uses</div>
+  <h2>The <em>building blocks</em>.</h2>
+  <div class="patterns-grid">
+    <div class="pattern-row">
+      <div class="pattern-tag">L6</div>
+      <div class="pattern-info">
+        <div class="pattern-name">Transformation (Application Patterns)</div>
+        <div class="pattern-desc">The output preserves the meaning of the input in a shorter form. That makes summarization a Transformation, not a generation of new content or a retrieval of existing facts.</div>
+      </div>
+    </div>
+    <div class="pattern-row">
+      <div class="pattern-tag">L4</div>
+      <div class="pattern-info">
+        <div class="pattern-name">Single-Call Control: Prompt and Output Shape</div>
+        <div class="pattern-desc">Each chunk call is shaped by a careful prompt (the text you send the AI): system role, explicit constraints ("2 sentences, no new claims"), and a structured output format. All of this happens inside one call, one chunk at a time.</div>
+      </div>
+    </div>
+    <div class="pattern-row">
+      <div class="pattern-tag">L2</div>
+      <div class="pattern-info">
+        <div class="pattern-name">Decomposition and Recomposition (Structural Composition)</div>
+        <div class="pattern-desc">The document is broken into parts (decomposition), each part is processed independently, and the outputs are fused into one answer (recomposition). This is the core L2 Combine mechanism for long documents.</div>
+      </div>
+    </div>
+    <div class="pattern-row">
+      <div class="pattern-tag">C5</div>
+      <div class="pattern-info">
+        <div class="pattern-name">Cost and Latency: Cost Grows with Length</div>
+        <div class="pattern-desc">Every chunk costs tokens. A 100-page document generates many more calls than a 10-page one. The parallel fan-out keeps latency low, but total token spend scales linearly with document length. Chunk size and summary length are the main cost levers.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">05</span>Tradeoffs</div>
+  <h2>What you <em>give up</em>.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Wait time</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Faithfulness</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Brevity</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      The central tension is faithfulness vs brevity. Prompting for shorter summaries saves tokens at each step, but risks dropping a clause that matters. Prompting for fuller coverage produces trustworthy chunk summaries, but the reduce step receives more text and produces a longer final output. There is no single right answer: tune to what the downstream reader actually needs. Cost grows with every additional page, so budget-conscious services often cap chunk summaries to 3 sentences regardless of chunk length.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Chang et al. (2023). <em>A Survey on Evaluation of Large Language Models.</em> <span class="note">Covers faithfulness and summarization evaluation metrics.</span></li>
+    <li>Guo et al. (2022). <em>LongT5: Efficient Text-to-Text Transformer for Long Sequences.</em> <span class="note">Motivates chunking strategies for long documents.</span></li>
+    <li>Wu et al. (2021). <em>Recursively Summarizing Books with Human Feedback.</em> <span class="note">OpenAI paper on hierarchical (map-reduce) summarization at book length.</span></li>
+    <li>LangChain documentation. <em>Map-Reduce Chain for Document Summarization.</em> <span class="note">Reference implementation of the map-reduce pattern for production use.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ DEMO ANIMATION ============
+// Three phases: Split, Map, Reduce. Revealed one at a time.
+// Step: one phase per tap. Play: auto-run all. Reset: hides all.
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+const phaseSplit  = document.getElementById('phase-split');
+const phaseMap    = document.getElementById('phase-map');
+const phaseReduce = document.getElementById('phase-reduce');
+
+const statusSplit  = document.getElementById('status-split');
+const statusMap    = document.getElementById('status-map');
+const statusReduce = document.getElementById('status-reduce');
+
+const splitBody = document.getElementById('split-body');
+const mapBody   = document.getElementById('map-body');
+const reduceBody = document.getElementById('reduce-body');
+const finalBlock = document.getElementById('final-block');
+
+const chunkCards = [
+  document.getElementById('chunk-0'),
+  document.getElementById('chunk-1'),
+  document.getElementById('chunk-2'),
+  document.getElementById('chunk-3'),
+  document.getElementById('chunk-4'),
+  document.getElementById('chunk-5'),
+];
+
+const stepBtn  = document.getElementById('stepBtn');
+const playBtn  = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+let demoStep = -1;
+let running  = false;
+
+function resetDemo() {
+  demoStep = -1;
+  running  = false;
+  [phaseSplit, phaseMap, phaseReduce].forEach(p => {
+    p.classList.remove('visible', 'active', 'done');
+  });
+  statusSplit.textContent  = 'waiting';
+  statusMap.textContent    = 'waiting';
+  statusReduce.textContent = 'waiting';
+  splitBody.style.display  = 'none';
+  mapBody.style.display    = 'none';
+  reduceBody.style.display = 'none';
+  chunkCards.forEach(c => c.classList.remove('in', 'summarized'));
+  finalBlock.classList.remove('visible');
+}
+
+// Phase 1: Split — reveal chunk grid cards one by one
+async function doPhase1(animate) {
+  phaseSplit.classList.add('visible', 'active');
+  statusSplit.textContent = 'splitting…';
+  splitBody.style.display = 'block';
+  for (let i = 0; i < chunkCards.length; i++) {
+    chunkCards[i].classList.add('in');
+    if (animate) await sleep(reduceMotion ? 0 : 160);
+  }
+  if (animate) await sleep(reduceMotion ? 0 : 200);
+  phaseSplit.classList.remove('active');
+  phaseSplit.classList.add('done');
+  statusSplit.textContent = 'done';
+}
+
+// Phase 2: Map — light up each chunk to show it is being summarized, then mark summarized
+async function doPhase2(animate) {
+  phaseMap.classList.add('visible', 'active');
+  statusMap.textContent = 'summarizing…';
+  mapBody.style.display = 'block';
+  // mark all summarized in parallel-ish (staggered slightly for feel)
+  for (let i = 0; i < chunkCards.length; i++) {
+    chunkCards[i].classList.add('summarized');
+    if (animate) await sleep(reduceMotion ? 0 : 130);
+  }
+  if (animate) await sleep(reduceMotion ? 0 : 300);
+  phaseMap.classList.remove('active');
+  phaseMap.classList.add('done');
+  statusMap.textContent = 'done';
+}
+
+// Phase 3: Reduce — show final summary
+async function doPhase3(animate) {
+  phaseReduce.classList.add('visible', 'active');
+  statusReduce.textContent = 'combining…';
+  reduceBody.style.display = 'block';
+  if (animate) await sleep(reduceMotion ? 0 : 500);
+  finalBlock.classList.add('visible');
+  if (animate) await sleep(reduceMotion ? 0 : 200);
+  phaseReduce.classList.remove('active');
+  phaseReduce.classList.add('done');
+  statusReduce.textContent = 'done';
+}
+
+stepBtn.addEventListener('click', async () => {
+  if (running) return;
+  if (demoStep >= 2) { resetDemo(); return; }
+  running = true;
+  stepBtn.disabled = true; playBtn.disabled = true;
+  demoStep++;
+  if (demoStep === 0) await doPhase1(true);
+  else if (demoStep === 1) await doPhase2(true);
+  else if (demoStep === 2) await doPhase3(true);
+  running = false;
+  stepBtn.disabled = false; playBtn.disabled = false;
+});
+
+playBtn.addEventListener('click', async () => {
+  if (running) return;
+  resetDemo();
+  running = true;
+  playBtn.disabled = true; stepBtn.disabled = true;
+  await sleep(reduceMotion ? 0 : 200);
+  await doPhase1(!reduceMotion);
+  await sleep(reduceMotion ? 0 : 300);
+  await doPhase2(!reduceMotion);
+  await sleep(reduceMotion ? 0 : 300);
+  await doPhase3(!reduceMotion);
+  demoStep = 2;
+  running = false;
+  playBtn.disabled = false; stepBtn.disabled = false;
+});
+
+resetBtn.addEventListener('click', () => {
+  if (running) return;
+  resetDemo();
+});
+
+// Reduced-motion: show fully revealed state immediately
+if (reduceMotion) {
+  (async () => {
+    await doPhase1(false);
+    await doPhase2(false);
+    await doPhase3(false);
+    demoStep = 2;
+  })();
+}
+</script>
+</body>
+</html>
