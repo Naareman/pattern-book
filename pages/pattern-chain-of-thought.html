@@ -326,6 +326,8 @@
   /* tokens render as plain readable text; each briefly highlights as it is written, left to right */
   .tok { border-radius: 3px; transition: background 0.4s ease; }
   .tok.writing-tok { background: var(--accent-soft); }
+  /* short label beside each step, so the explanation sits where the eye is */
+  .board-note { flex: none; align-self: center; margin-left: 10px; font-size: 11.5px; font-weight: 600; letter-spacing: .02em; color: var(--accent-hover); white-space: nowrap; }
   /* the answer, falling out of the last line */
   .board-answer {
     display: flex;
@@ -707,14 +709,17 @@
         <div class="board-line" data-reveal="0">
           <span class="board-bullet" aria-hidden="true">1</span>
           <span class="board-tokens"></span>
+          <span class="board-note">tokens, left to right</span>
         </div>
         <div class="board-line" data-reveal="1">
           <span class="board-bullet" aria-hidden="true">2</span>
           <span class="board-tokens"></span>
+          <span class="board-note">a first result</span>
         </div>
         <div class="board-line" data-reveal="2">
           <span class="board-bullet" aria-hidden="true">3</span>
           <span class="board-tokens"></span>
+          <span class="board-note">carries it forward</span>
         </div>
 
         <div class="board-answer" id="boardAnswer">
@@ -933,15 +938,17 @@ const BOARD_TOTAL = 4;   // 3 lines + 1 answer
 let boardStep = -1;      // last revealed index
 let boardPlaying = false;
 
-// Step: one tap reveals the next line (filled instantly) or the answer
-boardStepBtn.addEventListener('click', () => {
+// Step: one tap writes the next line (same token animation as Play) or drops the answer
+boardStepBtn.addEventListener('click', async () => {
   if (boardPlaying) return;
   if (boardStep >= BOARD_TOTAL - 1) { boardReset(); return; }
   boardStep += 1;
   if (boardStep < 3) {
-    boardLines.forEach(l => l.classList.remove('writing'));
-    fillLine(boardStep);
-    boardCaption.textContent = boardCaptions[boardStep];
+    boardPlaying = true;
+    boardStepBtn.disabled = true; boardPlayBtn.disabled = true;
+    await writeLine(boardStep, !reduceMotion);
+    boardStepBtn.disabled = false; boardPlayBtn.disabled = false;
+    boardPlaying = false;
   } else {
     boardLines.forEach(l => l.classList.remove('writing'));
     boardAnswer.classList.add('shown');
