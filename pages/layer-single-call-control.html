@@ -110,6 +110,15 @@
 
   .considers-note{font-size:12.5px;color:var(--faint);margin:12px 4px 0;line-height:1.5}
 
+  /* quiet back card at the bottom, same shape as the pattern pages */
+  .back-link{display:inline-flex;align-items:center;gap:14px;margin-top:36px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);text-decoration:none;color:var(--text);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+  .back-link:hover{transform:translateY(-2px);border-color:var(--accent)}
+  .back-arrow{font-family:'Fraunces',serif;font-size:22px;color:var(--accent);line-height:1;transition:transform .2s ease}
+  .back-link:hover .back-arrow{transform:translateX(-3px)}
+  .back-text{display:flex;flex-direction:column}
+  .back-hint{font-size:13px;font-weight:500;color:var(--faint);margin-bottom:3px}
+  .back-name{font-family:'Fraunces',serif;font-weight:500;font-size:18px;line-height:1;letter-spacing:-.01em}
+
   @media(max-width:560px){
     .considers-head{font-size:21px}
     .considers-headrow{display:none}
@@ -215,6 +224,14 @@
         <div class="consider lv-low"><span class="c-name">Real-time</span><span class="c-bar" role="img" aria-label="matters a little"><i class="on"></i><i></i><i></i></span></div>
       </div>
       <p class="considers-note">A rough guide, not exact scores.</p>
+
+      <a href="layers.html" class="back-link">
+        <span class="back-arrow" aria-hidden="true">&larr;</span>
+        <span class="back-text">
+          <span class="back-hint">Back to</span>
+          <span class="back-name">Layers</span>
+        </span>
+      </a>
 
     </div>
 
