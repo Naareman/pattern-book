@@ -27,7 +27,7 @@
   .stage-cap.show{opacity:1}
   .canvas{width:840px;max-width:100%;margin:0 auto}
 
-  .box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:border-color .25s ease,box-shadow .25s ease}
+  .box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:border-color .25s ease,box-shadow .25s ease,transform .25s ease}
   .box-head{display:flex;align-items:center;border-bottom:1px solid var(--border);background:#fff}
   .head-link{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:13px 16px;border:none;background:none;cursor:pointer;text-align:left}
   .head-link:hover{background:var(--accent-soft)}
@@ -68,9 +68,13 @@
 
   .produces{align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--faint);font-size:12px;gap:4px}
   .builds{align-self:center}
-  .box.glow{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft),var(--shadow)}
-  .produces.glow{color:var(--accent-hover);font-weight:600}
-  .produces.glow .flow{opacity:1;height:3px}
+  .box.glow{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft),0 12px 34px rgba(124,92,246,.22);transform:translateY(-3px)}
+  .produces.glow{color:var(--accent-hover);font-weight:700;transform:scale(1.1)}
+  .produces.glow .flow{opacity:1;height:3px;background:var(--accent)}
+  body.demoing .produces.glow .spark{display:block;width:8px;height:8px;box-shadow:0 0 12px 4px rgba(124,92,246,.9);animation:sparkX .9s linear infinite}
+  .across.glow .bar, .across.glow .bar::before, .across.glow .bar::after, .across.glow .stem{background:var(--accent)}
+  .across.glow .stem::after{border-top-color:var(--accent)}
+  .across.glow .lbl{color:var(--accent-hover);font-weight:600}
   .flow{position:relative;background:var(--accent);opacity:.4;border-radius:2px}
   .flow-x{width:40px;height:2px}
   .flow-x::after{content:"";position:absolute;right:-1px;top:50%;transform:translateY(-50%);border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:7px solid var(--accent)}
@@ -202,6 +206,7 @@
   const layersBox = document.querySelector('.box.layers');
   const buildsBox = document.querySelector('.box.builds');
   const producesEl = document.querySelector('.produces');
+  const acrossEl = document.querySelector('.across');
 
   const playBtns = Array.from(document.querySelectorAll('.head-play'));
   playBtns.forEach(b=> b.dataset.cta = b.innerHTML);   // remember each button's label (Build it / Trace it / Weigh it)
@@ -218,7 +223,7 @@
     buildItems.forEach(el=> el.classList.remove('demo'));
     concernItems.forEach(c=> c.classList.remove('active'));
     concernsBox.classList.remove('pulse');
-    layersBox.classList.remove('glow'); buildsBox.classList.remove('glow'); producesEl.classList.remove('glow');
+    layersBox.classList.remove('glow'); buildsBox.classList.remove('glow'); producesEl.classList.remove('glow'); acrossEl.classList.remove('glow');
     rail.style.transition='none'; rail.style.transform='scaleY(1)';
     activeConcern = null;
     requestAnimationFrame(()=> requestAnimationFrame(()=> document.body.classList.remove('snapping')));
@@ -253,9 +258,12 @@
       for(let i=layerItems.length-1;i>=0;i--){ const idx=i; a.push({at:t, fn:()=>{ hideCap(); layerItems[idx].classList.remove('dim'); revealed++; rail.style.transition='transform .18s ease'; rail.style.transform='scaleY('+(revealed/layerItems.length)+')'; }}); t+=200; }
       a.push({at:t+150, fn:()=> endDemo(false)});   // layers stay built
     } else if(kind==='concern'){
-      // intro: what it is, then drill into each concern's per-layer criticality
-      a.push({at:0, fn:()=>{ showCap('Concerns: what every layer must get right'); concernsBox.classList.add('pulse'); }});
-      let t=1600; concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ hideCap(); showBars(cc.textContent.trim(), cc); }}); t+=1400; }); a.push({at:t, fn:()=> endDemo(true)});
+      // intro: Layers box glows -> the "applies to every layer" bracket lights -> Concerns box glows -> per-concern criticality
+      a.push({at:0,    fn:()=>{ layersBox.classList.add('glow'); }});
+      a.push({at:850,  fn:()=>{ layersBox.classList.remove('glow'); acrossEl.classList.add('glow'); }});
+      a.push({at:1700, fn:()=>{ acrossEl.classList.remove('glow'); concernsBox.classList.add('glow'); }});
+      a.push({at:2600, fn:()=>{ concernsBox.classList.remove('glow'); }});
+      let t=2800; concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=> showBars(cc.textContent.trim(), cc)}); t+=1400; }); a.push({at:t, fn:()=> endDemo(true)});
     } else if(kind==='connect'){
       // intro: whole Layers box glows -> "produces" becomes prominent -> whole Builds box glows -> then each build's layers
       a.push({at:0,    fn:()=>{ layersBox.classList.add('glow'); }});
