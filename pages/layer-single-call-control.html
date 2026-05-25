@@ -93,23 +93,23 @@
     <header>
       <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>Layer 6</span>
       <h1 class="title">Single-call control</h1>
-      <p class="explainer">Everything you can shape inside a single call to the model: how you write the prompt, how you make it reason, and how you constrain the output. No extra calls, no tools, no memory: just getting the most out of one request.</p>
+      <p class="explainer">Getting the best answer from <em>one</em> message to the AI: no tools, no memory, just one well-asked question.</p>
     </header>
 
     <div class="section" id="main" role="main">
 
       <div class="group">
-        <div class="group-head">Shaping the input</div>
+        <div class="group-head">How you ask the question</div>
         <div class="box">
           <div class="rows">
             <a class="row" href="#">
               <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1.5"/><rect x="3" y="12" width="18" height="5" rx="1.5"/><path d="M6 6.5h4M6 14.5h4"/></svg></span>
-              <span class="txt"><span class="name">Few-Shot</span><span class="what">Teach the format by showing a few examples.</span></span>
+              <span class="txt"><span class="name">Few-Shot (show examples)</span><span class="what">Give the AI a few worked examples first, so it copies the pattern you want.</span></span>
               <span class="arr" aria-hidden="true">&rarr;</span>
             </a>
             <a class="row" href="#">
               <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 11h16M4 16h10"/></svg></span>
-              <span class="txt"><span class="name">Zero-shot &amp; instructions</span><span class="what">Just describe the task, no examples.</span></span>
+              <span class="txt"><span class="name">Zero-Shot (just ask)</span><span class="what">Simply describe what you want in plain words, with no examples at all.</span></span>
               <span class="arr" aria-hidden="true">&rarr;</span>
             </a>
           </div>
@@ -117,17 +117,17 @@
       </div>
 
       <div class="group">
-        <div class="group-head">Making it reason</div>
+        <div class="group-head">Getting it to think before answering</div>
         <div class="box">
           <div class="rows">
             <a class="row" href="pattern-chain-of-thought.html">
               <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M6 8.4v3.6a3 3 0 0 0 3 3h6.6"/></svg></span>
-              <span class="txt"><span class="name">Chain-of-Thought</span><span class="what">Make the model show its steps before answering.</span></span>
+              <span class="txt"><span class="name">Chain-of-Thought (think out loud)</span><span class="what">Ask the AI to work through its reasoning step by step before giving the final answer. This often makes it more accurate.</span></span>
               <span class="arr" aria-hidden="true">&rarr;</span>
             </a>
             <a class="row" href="#">
               <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 3L8 6M12 3l4 3"/><path d="M5 9l-2 4 2 1M19 9l2 4-2 1M12 9v6"/><path d="M5 14h14M9 20h6"/></svg></span>
-              <span class="txt"><span class="name">Self-Consistency</span><span class="what">Sample several reasoning paths, take the majority.</span></span>
+              <span class="txt"><span class="name">Self-Consistency (best of several tries)</span><span class="what">Ask the same question a few times, then go with the answer that comes up most often.</span></span>
               <span class="arr" aria-hidden="true">&rarr;</span>
             </a>
           </div>
@@ -135,12 +135,12 @@
       </div>
 
       <div class="group">
-        <div class="group-head">Shaping the output</div>
+        <div class="group-head">Controlling the shape of the answer</div>
         <div class="box">
           <div class="rows">
             <a class="row" href="#">
               <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H7a3 3 0 0 0-3 3v2a2 2 0 0 1-2 2 2 2 0 0 1 2 2v2a3 3 0 0 0 3 3h2"/><path d="M15 4h2a3 3 0 0 1 3 3v2a2 2 0 0 0 2 2 2 2 0 0 0-2 2v2a3 3 0 0 1-3 3h-2"/></svg></span>
-              <span class="txt"><span class="name">Structured output</span><span class="what">Force valid, parseable output (e.g. JSON to a schema).</span></span>
+              <span class="txt"><span class="name">Structured output (a fixed format)</span><span class="what">Make the answer come back in the exact same tidy format every time (like a filled-in form), so software can read it without guessing.</span></span>
               <span class="arr" aria-hidden="true">&rarr;</span>
             </a>
           </div>
@@ -148,12 +148,12 @@
       </div>
 
       <div class="group">
-        <div class="group-head">Checking itself</div>
+        <div class="group-head">Getting it to double-check itself</div>
         <div class="box">
           <div class="rows">
             <a class="row" href="#">
               <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v4h-4"/><path d="M9 12l2 2 4-4"/></svg></span>
-              <span class="txt"><span class="name">Reflection</span><span class="what">The model critiques and revises its own answer.</span></span>
+              <span class="txt"><span class="name">Reflection (review and fix)</span><span class="what">The AI looks back at its own answer, spots weak points, and rewrites it to be better.</span></span>
               <span class="arr" aria-hidden="true">&rarr;</span>
             </a>
           </div>
