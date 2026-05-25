@@ -22,7 +22,7 @@
   .wordmark{font-family:'Fraunces',serif;font-weight:500;font-size:25px;letter-spacing:-.01em}
   .strap{color:var(--soft);font-size:15px;margin-top:4px}
 
-  .stage{padding:20px 0 22px}
+  .stage{padding:24px 0 34px}
   .canvas{width:840px;max-width:100%;margin:0 auto}
 
   .box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:border-color .25s ease,box-shadow .25s ease}
@@ -54,7 +54,7 @@
   .layers .item{position:relative;z-index:0}
   .layers .item::before{content:"";position:absolute;left:0;top:0;height:100%;width:var(--fill,0);background:var(--accent-soft);border-radius:9px;z-index:-1;transition:width .55s ease}
 
-  .top{display:grid;grid-template-columns:minmax(0,1fr) 80px 280px;align-items:start;column-gap:0}
+  .top{display:grid;grid-template-columns:minmax(0,1fr) 64px 330px;align-items:start;column-gap:0}
   .layers .body{display:grid;grid-template-columns:1fr 100px}
   .axis{display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:16px 8px;text-align:center;border-left:1px solid var(--border)}
   .axis .cap{font-size:10.5px;color:var(--soft);line-height:1.25}
@@ -72,7 +72,7 @@
   @keyframes sparkX{0%{left:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{left:100%;opacity:0}}
 
   /* across: a bracket that SPANS the Layers box (covers the layers), labelled, pointing down to Concerns, with a neon spark */
-  .across{position:relative;width:calc(100% - 360px);margin:12px 0 0;height:44px}
+  .across{position:relative;width:calc(100% - 394px);margin:12px 0 0;height:44px}
   .across .bar{position:absolute;top:16px;left:0;right:0;height:1.5px;background:var(--border-strong);border-radius:2px}
   .across .bar::before,.across .bar::after{content:"";position:absolute;top:-6px;width:1.5px;height:7px;background:var(--border-strong)}
   .across .bar::before{left:0}.across .bar::after{right:0}
@@ -90,7 +90,7 @@
   .concerns .item:hover{border-color:var(--accent)}
   .concerns .item.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
 
-  .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:18px}
+  .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
   .foot strong{color:var(--soft);font-weight:500}
 
   @media(max-width:720px){
@@ -115,7 +115,7 @@
           <div class="box layers">
             <div class="box-head">
               <button class="head-link" data-go="layers"><span class="name">Layers</span><span class="what">what it's built from</span><span class="open">›</span></button>
-              <button class="head-play" data-play="stack" type="button" aria-label="Watch the stack build, foundation to user-facing"><span class="tri">▶</span> Watch</button>
+              <button class="head-play" data-play="stack" type="button" aria-label="Watch the stack build, foundation to user-facing"><span class="tri">▶</span> Build it</button>
             </div>
             <div class="body">
               <div class="items">
@@ -145,7 +145,7 @@
           <div class="box builds">
             <div class="box-head">
               <button class="head-link" data-go="builds"><span class="name">Builds</span><span class="what">what it produces</span><span class="open">›</span></button>
-              <button class="head-play" data-play="connect" type="button" aria-label="Watch how each build connects to layers"><span class="tri">▶</span> Watch</button>
+              <button class="head-play" data-play="connect" type="button" aria-label="Watch how each build connects to layers"><span class="tri">▶</span> Trace it</button>
             </div>
             <div class="items">
               <button class="item" data-go="build"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12"/></svg></span>Coding Agent</button>
@@ -163,7 +163,7 @@
         <div class="box concerns">
           <div class="box-head">
             <button class="head-link" data-go="concerns"><span class="name">Concerns</span><span class="what">what every layer must get right</span><span class="open">›</span></button>
-            <button class="head-play" data-play="concern" type="button" aria-label="Watch how each concern weighs on the layers"><span class="tri">▶</span> Watch</button>
+            <button class="head-play" data-play="concern" type="button" aria-label="Watch how each concern weighs on the layers"><span class="tri">▶</span> Weigh it</button>
           </div>
           <div class="items">
             <button class="item" data-go="concern"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13a9 9 0 0 1 18 0"/><path d="M12 13l4-3"/><circle cx="12" cy="13" r="1.3" fill="currentColor" stroke="none"/></svg></span>Evaluation</button>
@@ -187,28 +187,24 @@
   const concernsBox = document.querySelector('.box.concerns');
   const rail = document.querySelector('.axis .rail');
 
+  const playBtns = Array.from(document.querySelectorAll('.head-play'));
+  playBtns.forEach(b=> b.dataset.cta = b.innerHTML);   // remember each button's label (Build it / Trace it / Weigh it)
+
   let timers = [];
   const wait = (ms, fn)=> timers.push(setTimeout(fn, ms));
   const stop = ()=>{ timers.forEach(clearTimeout); timers = []; };
-  let activeConcern = null;
+  let activeConcern = null, playingBtn = null;
 
-  function resetTransient(){
+  function resetVisual(){
     layerItems.forEach(el=>{ el.classList.remove('lit','dim'); el.style.setProperty('--fill','0'); });
     buildItems.forEach(el=> el.classList.remove('demo'));
     concernItems.forEach(c=> c.classList.remove('active'));
     concernsBox.classList.remove('pulse');
+    rail.style.transition='transform .3s ease'; rail.style.transform='scaleY(1)';
+    activeConcern = null;
   }
-  function clearAll(){ stop(); resetTransient(); rail.style.transition='transform .3s ease'; rail.style.transform='scaleY(1)'; activeConcern=null; }
-
-  // PLAY 1 (Layers): build the stack foundation->user, drawing the arrow as it goes
-  function buildStack(){
-    clearAll();
-    layerItems.forEach(el=> el.classList.add('dim'));
-    rail.style.transition='none'; rail.style.transform='scaleY(0)'; rail.getBoundingClientRect();
-    const total = 200 + layerItems.length*180;
-    rail.style.transition='transform '+(total/1000)+'s ease'; rail.style.transform='scaleY(1)';
-    let t=200; for(let i=layerItems.length-1;i>=0;i--){ wait(t,()=>layerItems[i].classList.remove('dim')); t+=180; }
-  }
+  function resetBtns(){ playBtns.forEach(b=> b.innerHTML = b.dataset.cta); playingBtn = null; }
+  function finish(){ stop(); resetVisual(); resetBtns(); }   // stop everything + clear + revert buttons
 
   // concern criticality per layer (0-3 = how critical that concern is for each layer)
   const importance = {
@@ -216,42 +212,47 @@
     'Observability':[1,1,3,1,1,2,1,3,2],'Cost':[1,1,2,2,2,2,3,3,1],'Multimodal':[2,2,1,2,2,1,2,1,1],'Real-time':[2,1,2,1,1,1,1,3,1]
   };
   function showBars(name, chip){
-    resetTransient();
+    resetVisual();
     const v = importance[name]; if(!v) return;
     if(chip) chip.classList.add('active');
     concernsBox.classList.add('pulse');
     layerItems.forEach((el,i)=> el.style.setProperty('--fill', ((v[i]||0)/3*100)+'%'));
     activeConcern = name;
   }
-  // PLAY 2 (Concerns): step through each concern in sequence, showing its per-layer criticality
-  function concernDemo(){
-    clearAll(); let t=0;
-    concernItems.forEach((c)=>{ wait(t, ()=> showBars(c.textContent.trim(), c)); t += 1300; });
-    wait(t, clearAll);
-  }
 
-  // PLAY 3 (Builds): step through each build in sequence, lighting the layers it uses
+  // PLAY 1 (Layers): build the stack foundation->user, drawing the arrow; button reverts when done (layers stay)
+  function buildStack(){
+    layerItems.forEach(el=> el.classList.add('dim'));
+    rail.style.transition='none'; rail.style.transform='scaleY(0)'; rail.getBoundingClientRect();
+    const total = 200 + layerItems.length*180;
+    rail.style.transition='transform '+(total/1000)+'s ease'; rail.style.transform='scaleY(1)';
+    let t=200; for(let i=layerItems.length-1;i>=0;i--){ wait(t,()=>layerItems[i].classList.remove('dim')); t+=180; }
+    wait(t, resetBtns);
+  }
+  // PLAY 2 (Concerns): step through each concern, showing its per-layer criticality
+  function concernDemo(){ let t=0; concernItems.forEach((c)=>{ wait(t,()=> showBars(c.textContent.trim(), c)); t+=1300; }); wait(t, finish); }
+  // PLAY 3 (Builds): step through each build, lighting the layers it uses
   const buildLayers = [[0,2,3,4],[0,4,8],[2,3,4],[0,1,4],[0,3,7]];
   function connect(){
-    clearAll(); let t=0;
-    buildItems.forEach((b,k)=>{
-      wait(t, ()=>{
-        layerItems.forEach(el=> el.classList.remove('lit'));
-        buildItems.forEach(x=> x.classList.remove('demo'));
-        b.classList.add('demo'); (buildLayers[k]||[]).forEach(i=> layerItems[i].classList.add('lit'));
-      });
-      t += 1200;
-    });
-    wait(t, clearAll);
+    let t=0;
+    buildItems.forEach((b,k)=>{ wait(t,()=>{ layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); b.classList.add('demo'); (buildLayers[k]||[]).forEach(i=>layerItems[i].classList.add('lit')); }); t+=1200; });
+    wait(t, finish);
   }
 
-  document.querySelectorAll('.head-play').forEach(b=>{
-    b.addEventListener('click',()=>{ const p=b.dataset.play; if(p==='stack')buildStack(); else if(p==='connect')connect(); else if(p==='concern')concernDemo(); });
+  // play/stop toggle on the same button
+  playBtns.forEach(b=>{
+    b.addEventListener('click',()=>{
+      if(playingBtn===b){ finish(); return; }   // clicking the one that's playing stops it
+      finish();                                  // stop any other first
+      playingBtn = b; b.innerHTML = '<span class="tri">■</span> Stop';
+      const p=b.dataset.play;
+      if(p==='stack')buildStack(); else if(p==='connect')connect(); else if(p==='concern')concernDemo();
+    });
   });
-  // click a concern chip -> its per-layer criticality (toggle)
+  // click a concern chip -> its criticality (toggle); stops any running demo first
   concernItems.forEach(c=>{
     const name = c.textContent.trim();
-    c.addEventListener('click',()=>{ if(activeConcern===name){ clearAll(); } else { stop(); showBars(name, c); } });
+    c.addEventListener('click',()=>{ const was=activeConcern; finish(); if(was!==name){ showBars(name, c); } });
   });
   // click a title / layer / build -> navigate to its page (placeholder)
   document.querySelectorAll('.head-link[data-go], .layers .item[data-go], .builds .item[data-go]').forEach(el=>{
