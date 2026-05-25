@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document Q&amp;A · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 11px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    padding: 5px 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb {
+    font-size: 12.5px;
+    color: var(--faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 8px;
+    scroll-margin-top: 80px;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--accent-hover);
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    scroll-margin-top: 80px;
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 38px;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    margin: 16px 0 0;
+  }
+  .explainer {
+    color: var(--soft);
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 660px;
+    margin-top: 14px;
+  }
+
+  /* layer pills under header */
+  .layer-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+  }
+  .layer-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--soft);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 11px;
+    text-decoration: none;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+  }
+  .layer-pill:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .layer-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* sections */
+  section {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 18px 24px 34px;
+    position: relative;
+    scroll-margin-top: 80px;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 9px;
+  }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 23px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--text);
+  }
+
+  /* ===== DEMO: THE RAG MACHINE ===== */
+  .demo-stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  /* question input bar */
+  .demo-question-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-subtle);
+  }
+  .demo-q-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--faint);
+    flex-shrink: 0;
+  }
+  .demo-q-text {
+    flex: 1;
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--text);
+    min-width: 0;
+  }
+  .demo-ask-btn {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s ease, transform .18s ease;
+  }
+  .demo-ask-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .demo-ask-btn:disabled { opacity: .5; cursor: default; transform: none; }
+
+  /* three-column layout: doc chunks | arrow | result */
+  .demo-body {
+    display: grid;
+    grid-template-columns: 1fr 32px 1fr;
+    align-items: start;
+    gap: 0;
+  }
+
+  /* chunks panel */
+  .chunks-panel {
+    padding: 16px 16px 20px;
+    border-right: 1px solid var(--border);
+  }
+  .chunks-panel-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 12px;
+  }
+  .chunks-list { display: flex; flex-direction: column; gap: 8px; }
+  .chunk {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--soft);
+    background: var(--bg-subtle);
+    transition: background .35s ease, border-color .35s ease, color .35s ease, box-shadow .35s ease;
+    position: relative;
+  }
+  .chunk .chunk-id {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 5px;
+  }
+  .chunk .chunk-text { display: block; }
+  /* relevance score badge */
+  .chunk .chunk-score {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent-hover);
+    background: var(--accent-soft);
+    border-radius: 20px;
+    padding: 2px 8px;
+    margin-top: 7px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  /* lit up = relevant */
+  .chunk.lit {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--text);
+    box-shadow: 0 0 0 3px rgba(124,92,246,.08);
+  }
+  .chunk.lit .chunk-id { color: var(--accent-hover); }
+  .chunk.lit .chunk-score { opacity: 1; transform: scale(1); }
+  /* dim = not relevant */
+  .chunk.dim { opacity: .35; }
+
+  /* center arrow column */
+  .demo-arrow-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 56px;
+    color: var(--accent);
+    font-size: 20px;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity .4s ease;
+  }
+  .demo-arrow-col.shown { opacity: 1; }
+
+  /* result panel */
+  .result-panel {
+    padding: 16px 16px 20px;
+  }
+  .result-panel-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 12px;
+  }
+
+  /* the answer building token by token */
+  .answer-box {
+    min-height: 120px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 14px;
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text);
+    position: relative;
+  }
+  .answer-placeholder {
+    color: var(--faint);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  /* tokens */
+  .tok { border-radius: 3px; transition: background .4s ease; }
+  .tok.writing-tok { background: var(--accent-soft); }
+  /* citation chips inline in the answer */
+  .cite {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent-hover);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 20px;
+    padding: 1px 7px;
+    margin: 0 2px;
+    vertical-align: middle;
+    opacity: 0;
+    transform: scale(0.7);
+    transition: opacity .3s ease, transform .3s ease;
+    white-space: nowrap;
+  }
+  .cite.shown { opacity: 1; transform: scale(1); }
+
+  /* step status line */
+  .step-status {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    margin-top: 10px;
+    min-height: 20px;
+    transition: color .3s ease;
+  }
+  .step-status.active { color: var(--accent-hover); }
+
+  /* controls */
+  .demo-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-subtle);
+  }
+  .diagram-btn {
+    padding: 10px 16px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: .5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ===== REAL EXAMPLE section ===== */
+  .example-stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .example-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 15px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .example-row:last-child { border-bottom: 0; }
+  .example-step-num {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .example-step-body { flex: 1; min-width: 0; }
+  .example-step-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .example-step-detail {
+    font-size: 13.5px;
+    color: var(--soft);
+    line-height: 1.55;
+  }
+  .example-step-detail strong { color: var(--text); font-weight: 600; }
+
+  /* ===== TRADEOFFS ===== */
+  .tradeoffs-stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  .tradeoff-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 16px;
+  }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); min-width: 130px; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { min-width: 130px; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--soft);
+  }
+
+  /* back link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 28px 24px 0;
+  }
+  .sources .sources-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* footer */
+  footer {
+    max-width: 920px;
+    margin: 30px auto 48px;
+    padding: 16px 24px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--faint);
+    line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 640px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .demo-body {
+      grid-template-columns: 1fr;
+    }
+    .chunks-panel { border-right: none; border-bottom: 1px solid var(--border); }
+    .demo-arrow-col { display: none; }
+    .result-panel { padding-top: 14px; }
+  }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+    .demo-question-bar { flex-wrap: wrap; }
+    .demo-q-text { width: 100%; flex-basis: 100%; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="builds.html">Builds</a><span class="sep">/</span><span class="here">Document Q&amp;A</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h4"/></svg>
+    </span>Build
+  </span>
+  <h1 class="pattern-title">Document Q&amp;A</h1>
+  <p class="explainer">Ask questions about your own files. The AI finds the relevant parts and answers using them, with citations.</p>
+  <div class="layer-pills" aria-label="Layers used">
+    <span style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);align-self:center;">Layers used:</span>
+    <a class="layer-pill" href="layer-knowledge-memory.html"><span class="dot" aria-hidden="true"></span>Knowledge &amp; memory</a>
+    <a class="layer-pill" href="layer-data-artifacts.html"><span class="dot" aria-hidden="true"></span>Data &amp; artifacts</a>
+  </div>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>Your documents are chopped into small chunks and turned into numbers (called <strong style="color:var(--accent-hover)">embeddings</strong>) that capture meaning. When you ask a question, your question becomes the same kind of number, and the nearest chunks light up. The AI reads only those chunks and writes an answer from them, citing where each fact came from. This is called <strong style="color:var(--accent-hover)">RAG</strong>: Retrieval-Augmented Generation.</p>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <h2>Watch the <em>relevant passages</em> light up.</h2>
+
+  <p style="font-size:15px;color:var(--soft);line-height:1.6;max-width:640px;margin-bottom:18px;">Press Play to ask a question. The chunks that match your question glow, then the answer is built from them with citations.</p>
+
+  <div class="demo-stage">
+    <!-- question bar -->
+    <div class="demo-question-bar">
+      <span class="demo-q-label">Question</span>
+      <span class="demo-q-text" id="demoQuestion">"What is the refund policy for annual plans?"</span>
+      <button class="demo-ask-btn" id="playBtn">&#9654; Play</button>
+    </div>
+
+    <!-- body: chunks on left, arrow in middle, answer on right -->
+    <div class="demo-body">
+      <!-- CHUNKS -->
+      <div class="chunks-panel">
+        <div class="chunks-panel-label">Document chunks</div>
+        <div class="chunks-list" id="chunksList" aria-live="polite" aria-label="Document chunks with relevance highlighted">
+
+          <div class="chunk" id="chunk-0">
+            <span class="chunk-id">Chunk A &middot; Pricing.pdf p.2</span>
+            <span class="chunk-text">Monthly plans can be cancelled at any time. Unused days are not refunded.</span>
+            <span class="chunk-score" aria-hidden="true">&#10003; 92% match</span>
+          </div>
+
+          <div class="chunk" id="chunk-1">
+            <span class="chunk-id">Chunk B &middot; Pricing.pdf p.3</span>
+            <span class="chunk-text">Annual plans are eligible for a full refund within 30 days of purchase. After 30 days, a prorated credit is issued.</span>
+            <span class="chunk-score" aria-hidden="true">&#10003; 97% match</span>
+          </div>
+
+          <div class="chunk" id="chunk-2">
+            <span class="chunk-id">Chunk C &middot; FAQ.pdf p.1</span>
+            <span class="chunk-text">To request a refund, email billing@company.com with your order number. Response within 2 business days.</span>
+            <span class="chunk-score" aria-hidden="true">&#10003; 88% match</span>
+          </div>
+
+          <div class="chunk" id="chunk-3">
+            <span class="chunk-id">Chunk D &middot; TOS.pdf p.7</span>
+            <span class="chunk-text">Users must agree to the terms of service before purchasing any subscription plan offered by the company.</span>
+            <span class="chunk-score" aria-hidden="true">62% match</span>
+          </div>
+
+          <div class="chunk" id="chunk-4">
+            <span class="chunk-id">Chunk E &middot; Setup.pdf p.1</span>
+            <span class="chunk-text">Download the app and sign in to get started. Your account syncs across all devices automatically.</span>
+            <span class="chunk-score" aria-hidden="true">14% match</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ARROW -->
+      <div class="demo-arrow-col" id="demoArrow" aria-hidden="true">&rarr;</div>
+
+      <!-- ANSWER -->
+      <div class="result-panel">
+        <div class="result-panel-label">AI answer</div>
+        <div class="answer-box" id="answerBox" aria-live="polite" aria-label="Generated answer">
+          <span class="answer-placeholder" id="answerPlaceholder">Answer will appear here.</span>
+        </div>
+        <div class="step-status" id="stepStatus"></div>
+      </div>
+    </div>
+
+    <!-- controls -->
+    <div class="demo-controls">
+      <button class="diagram-btn primary" id="demoPlayBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="demoResetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>What <em>actually</em> happens to your file.</h2>
+
+  <div class="example-stage">
+    <div class="example-row">
+      <div class="example-step-num">1</div>
+      <div class="example-step-body">
+        <div class="example-step-name">Your file is split into chunks</div>
+        <div class="example-step-detail">A 40-page PDF becomes ~200 chunks of roughly 300 words each. Smaller chunks match more precisely; too small and context is lost.</div>
+      </div>
+    </div>
+    <div class="example-row">
+      <div class="example-step-num">2</div>
+      <div class="example-step-body">
+        <div class="example-step-name">Each chunk becomes an embedding</div>
+        <div class="example-step-detail">An embedding model (like <strong>text-embedding-3-small</strong>) turns each chunk into a list of numbers that captures its meaning. Similar chunks end up near each other in this number space.</div>
+      </div>
+    </div>
+    <div class="example-row">
+      <div class="example-step-num">3</div>
+      <div class="example-step-body">
+        <div class="example-step-name">Your question is embedded too</div>
+        <div class="example-step-detail">When you type a question, it is converted to the same kind of number. The system finds the top 3 to 5 chunks whose numbers are closest to your question's number.</div>
+      </div>
+    </div>
+    <div class="example-row">
+      <div class="example-step-num">4</div>
+      <div class="example-step-body">
+        <div class="example-step-name">The AI answers from those chunks only</div>
+        <div class="example-step-detail">The retrieved chunks are pasted into the prompt alongside your question. The AI is told: <strong>answer using only this context, and cite the source.</strong> It never sees the parts of your file it does not need.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>What you <em>give up</em>.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Setup effort</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div>
+        <div class="seg on"></div>
+        <div class="seg on"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Answer quality</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div>
+        <div class="seg on"></div>
+        <div class="seg on"></div>
+        <div class="seg on"></div>
+        <div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Hallucination risk</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+        <div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      The AI can only answer what is in your documents. If the relevant chunk is missing or poorly written, the answer will be wrong or empty. Chunk quality matters more than model size.
+    </div>
+  </div>
+</section>
+
+<!-- BACK LINK -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Lewis et al. (2020). <em>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.</em> <span class="note">The paper that named RAG.</span></li>
+    <li>Gao et al. (2023). <em>Retrieval-Augmented Generation for Large Language Models: A Survey.</em></li>
+    <li>OpenAI. <em>Embeddings guide.</em> <span class="note">platform.openai.com/docs/guides/embeddings</span></li>
+    <li>Anthropic. <em>Contextual retrieval.</em> <span class="note">anthropic.com/news/contextual-retrieval</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ===== DEMO LOGIC =====
+// Steps:
+//   0: idle
+//   1: embedding question (status text)
+//   2: chunks scan + lit/dim animation
+//   3: arrow appears
+//   4: answer builds token by token with inline citations
+//   5: done
+
+const CHUNKS_RELEVANT = [1, 2, 0]; // order they light up (by index, highest match first)
+const CHUNKS_DIM = [3, 4];
+
+// Answer to build. We encode citations as {cite:X} tokens, rest are plain text words.
+const ANSWER_PARTS = [
+  {t:'Annual'},
+  {t:'plans'},
+  {t:'get'},
+  {t:'a'},
+  {t:'full'},
+  {t:'refund'},
+  {t:'within'},
+  {t:'30'},
+  {t:'days'},
+  {t:'of'},
+  {t:'purchase.'},
+  {cite:'B'},
+  {t:'After'},
+  {t:'30'},
+  {t:'days,'},
+  {t:'a'},
+  {t:'prorated'},
+  {t:'credit'},
+  {t:'is'},
+  {t:'issued.'},
+  {cite:'B'},
+  {t:'To'},
+  {t:'request'},
+  {t:'a'},
+  {t:'refund,'},
+  {t:'email'},
+  {t:'billing@company.com.'},
+  {cite:'C'},
+];
+
+const STATUS_MESSAGES = [
+  'Turning your question into an embedding...',
+  'Scanning all chunks for closest matches...',
+  'Top 3 chunks retrieved. Generating answer...',
+  '',
+];
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let playing = false;
+let currentStep = 0; // 0 = idle
+
+const demoPlayBtn = document.getElementById('demoPlayBtn');
+const demoResetBtn = document.getElementById('demoResetBtn');
+const playBtnHeader = document.getElementById('playBtn');
+const stepStatus = document.getElementById('stepStatus');
+const answerBox = document.getElementById('answerBox');
+const answerPlaceholder = document.getElementById('answerPlaceholder');
+const demoArrow = document.getElementById('demoArrow');
+const chunks = document.querySelectorAll('.chunk');
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function setStatus(msg, active) {
+  stepStatus.textContent = msg;
+  stepStatus.className = 'step-status' + (active ? ' active' : '');
+}
+
+function resetDemo() {
+  playing = false;
+  currentStep = 0;
+  chunks.forEach(c => { c.classList.remove('lit', 'dim'); });
+  demoArrow.classList.remove('shown');
+  answerBox.innerHTML = '<span class="answer-placeholder" id="answerPlaceholder">Answer will appear here.</span>';
+  setStatus('', false);
+  demoPlayBtn.disabled = false;
+  demoPlayBtn.textContent = '▶ Play';
+  playBtnHeader.disabled = false;
+}
+
+function addToken(word, spaceBefore) {
+  if (spaceBefore) answerBox.appendChild(document.createTextNode(' '));
+  const s = document.createElement('span');
+  s.className = 'tok';
+  s.textContent = word;
+  answerBox.appendChild(s);
+  if (!reduceMotion) {
+    s.classList.add('writing-tok');
+    setTimeout(() => s.classList.remove('writing-tok'), 380);
+  }
+  return s;
+}
+
+function addCite(label) {
+  answerBox.appendChild(document.createTextNode(' '));
+  const c = document.createElement('span');
+  c.className = 'cite';
+  c.textContent = label;
+  c.setAttribute('aria-label', 'Citation ' + label);
+  answerBox.appendChild(c);
+  // pop in
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => { c.classList.add('shown'); });
+  });
+}
+
+async function runDemo() {
+  if (playing) return;
+  playing = true;
+  demoPlayBtn.disabled = true;
+  playBtnHeader.disabled = true;
+
+  // clear placeholder
+  answerBox.innerHTML = '';
+
+  // step 1: embedding status
+  setStatus(STATUS_MESSAGES[0], true);
+  if (!reduceMotion) await sleep(900);
+
+  // step 2: scan chunks
+  setStatus(STATUS_MESSAGES[1], true);
+  if (reduceMotion) {
+    // instant: light up relevant, dim irrelevant
+    CHUNKS_RELEVANT.forEach(i => chunks[i].classList.add('lit'));
+    CHUNKS_DIM.forEach(i => chunks[i].classList.add('dim'));
+  } else {
+    // sequential: each chunk briefly activates, then settles lit or stays dim
+    for (let i = 0; i < chunks.length; i++) {
+      chunks[i].classList.add('lit');
+      await sleep(140);
+      if (!CHUNKS_RELEVANT.includes(i)) {
+        chunks[i].classList.remove('lit');
+        chunks[i].classList.add('dim');
+      }
+      await sleep(60);
+    }
+  }
+  if (!reduceMotion) await sleep(400);
+
+  // step 3: arrow + status
+  demoArrow.classList.add('shown');
+  setStatus(STATUS_MESSAGES[2], true);
+  if (!reduceMotion) await sleep(600);
+
+  // step 4: build answer token by token
+  setStatus('', false);
+  let first = true;
+  for (let i = 0; i < ANSWER_PARTS.length; i++) {
+    const part = ANSWER_PARTS[i];
+    if (part.cite !== undefined) {
+      addCite(part.cite);
+      if (!reduceMotion) await sleep(180);
+    } else {
+      addToken(part.t, !first);
+      first = false;
+      if (!reduceMotion) await sleep(55);
+    }
+  }
+
+  setStatus('Done. Each fact is cited to the chunk it came from.', false);
+  playing = false;
+  demoPlayBtn.disabled = false;
+  demoPlayBtn.textContent = '↺ Reset';
+  playBtnHeader.disabled = false;
+  currentStep = 5;
+}
+
+demoPlayBtn.addEventListener('click', () => {
+  if (currentStep === 5) { resetDemo(); return; }
+  runDemo();
+});
+
+demoResetBtn.addEventListener('click', () => {
+  resetDemo();
+});
+
+playBtnHeader.addEventListener('click', () => {
+  if (currentStep === 5) { resetDemo(); return; }
+  runDemo();
+  playBtnHeader.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+
+// prefers-reduced-motion: run immediately, fully
+if (reduceMotion) {
+  runDemo();
+}
+</script>
+</body>
+</html>

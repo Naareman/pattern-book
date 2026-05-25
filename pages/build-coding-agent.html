@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coding Agent · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --error:#C2554F; --error-soft:#FBECEB;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* topbar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
+
+  /* layers used chips */
+  .layers-used { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .layer-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--soft);
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; text-decoration: none;
+    transition: border-color .18s ease, color .18s ease, background .18s ease;
+  }
+  .layer-chip:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .layer-chip .chip-label { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); margin-right: 2px; }
+
+  /* ========== DEMO STAGE ========== */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+
+  /* task bar at top */
+  .task-bar {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    background: var(--bg-subtle);
+  }
+  .task-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); flex-shrink: 0; }
+  .task-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; color: var(--text); }
+
+  /* loop track */
+  .loop-track {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* each step in the loop */
+  .loop-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    position: relative;
+  }
+  /* vertical connector line between steps */
+  .loop-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 40px;
+    width: 2px;
+    height: 28px;
+    background: var(--border-strong);
+    border-radius: 2px;
+    transition: background 0.4s ease;
+  }
+  .loop-step.step-active:not(:last-child)::after,
+  .loop-step.step-done:not(:last-child)::after {
+    background: var(--accent);
+  }
+
+  .step-icon-wrap {
+    flex-shrink: 0;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--bg-subtle);
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.3s ease, border-color 0.3s ease;
+    position: relative; z-index: 1;
+  }
+  .loop-step.step-active .step-icon-wrap { background: var(--accent-soft); border-color: var(--accent); }
+  .loop-step.step-done .step-icon-wrap { background: var(--success-soft); border-color: var(--success); }
+
+  .step-icon-wrap svg { width: 18px; height: 18px; color: var(--faint); transition: color 0.3s ease; }
+  .loop-step.step-active .step-icon-wrap svg { color: var(--accent); }
+  .loop-step.step-done .step-icon-wrap svg { color: var(--success); }
+
+  .step-body {
+    flex: 1; min-width: 0;
+    padding: 8px 0 28px;
+  }
+  .loop-step:last-child .step-body { padding-bottom: 8px; }
+
+  .step-name {
+    font-size: 13px; font-weight: 600; color: var(--soft);
+    letter-spacing: .01em; margin-bottom: 4px;
+    transition: color 0.3s ease;
+  }
+  .loop-step.step-active .step-name { color: var(--accent-hover); }
+  .loop-step.step-done .step-name { color: var(--success); }
+
+  .step-detail {
+    font-size: 14px; color: var(--text); line-height: 1.5;
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.4s ease;
+    opacity: 0;
+  }
+  .loop-step.step-active .step-detail,
+  .loop-step.step-done .step-detail { max-height: 120px; opacity: 1; }
+
+  /* code diff block inside edit step */
+  .diff-block {
+    margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px; line-height: 1.5;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px;
+  }
+  .diff-add { color: var(--success); }
+  .diff-rem { color: var(--error); }
+  .diff-ctx { color: var(--faint); }
+
+  /* test result row */
+  .test-result {
+    margin-top: 8px;
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .test-pill {
+    font-size: 12px; font-weight: 600;
+    padding: 4px 10px; border-radius: 20px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    color: var(--faint);
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+  .test-pill.fail { background: var(--error-soft); border-color: var(--error); color: var(--error); }
+  .test-pill.pass { background: var(--success-soft); border-color: var(--success); color: var(--success); }
+
+  /* loop counter / iteration badge */
+  .iter-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600; color: var(--faint);
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 10px;
+    margin-bottom: 16px;
+    transition: color .3s ease, border-color .3s ease, background .3s ease;
+  }
+  .iter-badge.looping { color: var(--accent-hover); border-color: var(--accent); background: var(--accent-soft); }
+
+  /* controls */
+  .demo-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding: 16px 20px; border-top: 1px solid var(--border);
+    background: var(--bg-subtle);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ========== REAL EXAMPLE ========== */
+  .example-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+  }
+  .example-row { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 16px; }
+  .example-row:last-child { margin-bottom: 0; }
+  .example-num {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent-soft); border: 1px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--accent-hover);
+  }
+  .example-text { font-size: 15px; line-height: 1.55; color: var(--soft); padding-top: 2px; }
+  .example-text strong { color: var(--text); font-weight: 600; }
+
+  /* ========== TRADEOFFS ========== */
+  .tradeoffs-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); min-width: 120px; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { min-width: 120px; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .task-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+  }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="builds.html">Builds</a><span class="sep">/</span><span class="here">Coding Agent</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+      </svg>
+    </span>
+    Build
+  </span>
+  <h1 class="pattern-title">Coding Agent</h1>
+  <p class="explainer">A helper that reads, writes, and fixes code for you. It loops until the tests go green.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>A <span style="color:var(--accent-hover);font-weight:500">Coding Agent</span> is an AI that can read your files, edit code, and run tests, all on its own. You give it a task. It makes a plan, edits the right file, runs the code to see what happens, checks what broke, and fixes it. It keeps looping until everything passes. You watch. It works.</p>
+  </div>
+  <div class="layers-used" aria-label="Layers this build uses">
+    <span style="font-size:13px;font-weight:500;color:var(--faint);align-self:center;">Built from:</span>
+    <a class="layer-chip" href="layer-orchestration-agents.html">
+      <span class="chip-label">Layer</span> Orchestration &amp; Agents
+    </a>
+    <a class="layer-chip" href="layer-single-call-control.html">
+      <span class="chip-label">Layer</span> Single-call Control
+    </a>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <h2>Watch the <em>loop</em>.</h2>
+  <p class="demo-lede">You give the agent a task. It plans, edits, runs, sees what fails, and fixes. Press Play to watch one full loop.</p>
+
+  <div class="demo-stage" role="region" aria-label="Coding agent loop demo">
+
+    <!-- task banner -->
+    <div class="task-bar">
+      <span class="task-label">Task</span>
+      <span class="task-text">"Add a function that sums a list of numbers, and make its test pass."</span>
+    </div>
+
+    <!-- loop body -->
+    <div class="loop-track" id="loopTrack" aria-live="polite">
+
+      <div class="iter-badge" id="iterBadge">Iteration 1</div>
+
+      <!-- PLAN -->
+      <div class="loop-step" id="step-plan" data-step="plan">
+        <div class="step-icon-wrap" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/>
+          </svg>
+        </div>
+        <div class="step-body">
+          <div class="step-name">Plan</div>
+          <div class="step-detail">Read <code>math_utils.py</code> and <code>test_math_utils.py</code> to understand what is missing. The test calls <code>sum_list()</code>, but that function does not exist yet.</div>
+        </div>
+      </div>
+
+      <!-- EDIT -->
+      <div class="loop-step" id="step-edit" data-step="edit">
+        <div class="step-icon-wrap" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5l3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </div>
+        <div class="step-body">
+          <div class="step-name">Edit</div>
+          <div class="step-detail" id="editDetail">
+            Write the missing function into <code>math_utils.py</code>:
+            <div class="diff-block" aria-label="Code change">
+              <div class="diff-ctx">  # math_utils.py</div>
+              <div class="diff-add">+ def sum_list(numbers):</div>
+              <div class="diff-add">+     return sum(numbers)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RUN -->
+      <div class="loop-step" id="step-run" data-step="run">
+        <div class="step-icon-wrap" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </div>
+        <div class="step-body">
+          <div class="step-name">Run</div>
+          <div class="step-detail" id="runDetail">
+            <span id="runSentence">Run the test suite and read the output.</span>
+            <div class="test-result" id="testResult" style="margin-top:10px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHECK / FIX (shown conditionally) -->
+      <div class="loop-step" id="step-check" data-step="check" style="display:none">
+        <div class="step-icon-wrap" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </div>
+        <div class="step-body">
+          <div class="step-name">Check &amp; fix</div>
+          <div class="step-detail" id="checkDetail"></div>
+        </div>
+      </div>
+
+      <!-- DONE (hidden until tests pass) -->
+      <div class="loop-step" id="step-done" data-step="done" style="display:none">
+        <div class="step-icon-wrap" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <div class="step-body">
+          <div class="step-name">Done</div>
+          <div class="step-detail" id="doneDetail"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="demo-controls">
+      <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>What it looks like <em>in practice</em>.</h2>
+  <div class="example-card">
+    <div class="example-row">
+      <div class="example-num" aria-hidden="true">1</div>
+      <div class="example-text">You tell GitHub Copilot Workspace: <strong>"Refactor the login handler to use the new auth library."</strong> No more instructions needed.</div>
+    </div>
+    <div class="example-row">
+      <div class="example-num" aria-hidden="true">2</div>
+      <div class="example-text">The agent reads the current login code, finds every place that calls the old auth API, and writes a plan listing each file it will touch.</div>
+    </div>
+    <div class="example-row">
+      <div class="example-num" aria-hidden="true">3</div>
+      <div class="example-text">It edits each file, then runs the existing tests. Two fail. It reads the error messages, patches the two calls it missed, and runs again.</div>
+    </div>
+    <div class="example-row">
+      <div class="example-num" aria-hidden="true">4</div>
+      <div class="example-text">All tests pass. It opens a pull request with a description of every change it made. You review and merge.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>The <em>cost</em> of autonomy.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost per task</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Speed</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Autonomy</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Risk of mistakes</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      The more autonomy you give it, the more LLM calls it makes per task. Good tests are essential: the agent uses them as its signal for "done." Without tests, it can loop forever or stop too soon.
+    </div>
+  </div>
+</section>
+
+<!-- BACK LINK -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Yao et al. (2023). <em>ReAct: Synergizing Reasoning and Acting in Language Models.</em> <span class="note">Foundation for agent loops that interleave thinking and tool use.</span></li>
+    <li>Jimenez et al. (2024). <em>SWE-bench: Can Language Models Resolve Real-World GitHub Issues?</em> <span class="note">The standard benchmark for coding agents on real bugs.</span></li>
+    <li>GitHub. <em>GitHub Copilot Workspace.</em> <span class="note">A production coding agent that plans, edits, and runs tests in a cloud workspace.</span></li>
+    <li>Anthropic. <em>Claude computer use and tool use docs.</em> <span class="note">How AI agents are given tools to read files, run commands, and iterate.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ CODING AGENT DEMO ============
+// Two-iteration narrative:
+//   Iter 1: plan -> edit (missing function) -> run (1 test fails) -> check (typo found) -> fix
+//   Iter 2: plan -> edit (fix typo) -> run (all pass) -> done
+//
+// Each "step" in the sequence activates one step card, then pauses.
+// Play runs the whole sequence with timed delays.
+// Step runs one card at a time.
+// Reset clears everything back to start.
+
+const stepIds   = ['plan','edit','run','check','run2','edit2','run3','done'];
+
+// ---------- step definitions ----------
+// Each entry: id, what card/sub-element to show/update, how
+const STEPS = [
+  // ---- Iteration 1 ----
+  { phase: 'plan',  iter: 1,  card: 'step-plan',  focus: true,
+    setup() { showCard('step-plan'); setActive('step-plan'); } },
+
+  { phase: 'edit',  iter: 1,  card: 'step-edit',  focus: true,
+    setup() {
+      setDone('step-plan');
+      // show edit with first diff
+      document.getElementById('editDetail').innerHTML =
+        `Write the missing function into <code>math_utils.py</code>:
+        <div class="diff-block" aria-label="Code change">
+          <div class="diff-ctx">  # math_utils.py</div>
+          <div class="diff-add">+ def sum_list(nubers):  <span style="color:var(--faint);font-size:11px">← typo!</span></div>
+          <div class="diff-add">+     return sum(nubers)</div>
+        </div>`;
+      showCard('step-edit'); setActive('step-edit');
+    }
+  },
+
+  { phase: 'run',   iter: 1,  card: 'step-run',   focus: true,
+    setup() {
+      setDone('step-edit');
+      document.getElementById('runSentence').textContent = 'Run the test suite and read the output.';
+      buildTestPills([
+        { label:'test_empty_list', state:'fail' },
+        { label:'test_basic_sum', state:'fail' },
+        { label:'test_negatives', state:'fail' },
+      ]);
+      showCard('step-run'); setActive('step-run');
+    }
+  },
+
+  { phase: 'check', iter: 1,  card: 'step-check', focus: true,
+    setup() {
+      setDone('step-run');
+      document.getElementById('checkDetail').innerHTML =
+        `<strong>3 tests failed.</strong> Reading the error: <code>NameError: name 'nubers' is not defined</code>. Found it: the parameter name has a typo (<code>nubers</code> instead of <code>numbers</code>). Will fix and re-run.`;
+      showCard('step-check'); setActive('step-check');
+    }
+  },
+
+  // ---- Iteration 2 ----
+  { phase: 'plan2', iter: 2,  card: null,
+    setup() {
+      setDone('step-check');
+      updateIterBadge(2);
+      // Reset plan for iter 2
+      setActive('step-plan');
+      const planDetail = document.querySelector('#step-plan .step-detail');
+      planDetail.textContent = 'Fix the typo in the parameter name: rename nubers to numbers.';
+      showCard('step-plan');
+    }
+  },
+
+  { phase: 'edit2', iter: 2,  card: 'step-edit',
+    setup() {
+      setDone('step-plan');
+      document.getElementById('editDetail').innerHTML =
+        `Correct the parameter name in <code>math_utils.py</code>:
+        <div class="diff-block" aria-label="Code change iteration 2">
+          <div class="diff-rem">- def sum_list(nubers):</div>
+          <div class="diff-rem">-     return sum(nubers)</div>
+          <div class="diff-add">+ def sum_list(numbers):</div>
+          <div class="diff-add">+     return sum(numbers)</div>
+        </div>`;
+      setActive('step-edit');
+    }
+  },
+
+  { phase: 'run2',  iter: 2,  card: 'step-run',
+    setup() {
+      setDone('step-edit');
+      document.getElementById('runSentence').textContent = 'Run the test suite again.';
+      buildTestPills([
+        { label:'test_empty_list', state:'pass' },
+        { label:'test_basic_sum', state:'pass' },
+        { label:'test_negatives', state:'pass' },
+      ]);
+      setActive('step-run');
+    }
+  },
+
+  { phase: 'done',  iter: 2,  card: 'step-done',
+    setup() {
+      setDone('step-run');
+      document.getElementById('doneDetail').innerHTML =
+        `All 3 tests pass. Task complete in 2 loops. The agent stops and reports back.`;
+      showCard('step-done'); setActive('step-done');
+    }
+  },
+];
+
+// ---------- helpers ----------
+function showCard(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'flex';
+}
+function setActive(id) {
+  // remove active/done from all steps, set one active
+  document.querySelectorAll('.loop-step').forEach(s => {
+    s.classList.remove('step-active');
+  });
+  const el = document.getElementById(id);
+  if (el) el.classList.add('step-active');
+}
+function setDone(id) {
+  const el = document.getElementById(id);
+  if (el) { el.classList.remove('step-active'); el.classList.add('step-done'); }
+}
+function updateIterBadge(n) {
+  const b = document.getElementById('iterBadge');
+  b.textContent = `Iteration ${n}`;
+  b.classList.add('looping');
+}
+function buildTestPills(tests) {
+  const tr = document.getElementById('testResult');
+  tr.innerHTML = '';
+  tests.forEach(t => {
+    const p = document.createElement('span');
+    p.className = 'test-pill ' + t.state;
+    p.textContent = t.state === 'pass' ? '✓ ' + t.label : '✗ ' + t.label;
+    tr.appendChild(p);
+  });
+}
+
+function demoReset() {
+  // hide check and done cards, reset all states
+  const cards = ['step-plan','step-edit','step-run','step-check','step-done'];
+  cards.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('step-active','step-done');
+    if (id === 'step-check' || id === 'step-done') el.style.display = 'none';
+  });
+  // reset plan detail text
+  document.querySelector('#step-plan .step-detail').textContent =
+    'Read math_utils.py and test_math_utils.py to understand what is missing. The test calls sum_list(), but that function does not exist yet.';
+  // reset edit detail
+  document.getElementById('editDetail').innerHTML =
+    `Write the missing function into <code>math_utils.py</code>:
+    <div class="diff-block" aria-label="Code change">
+      <div class="diff-ctx">  # math_utils.py</div>
+      <div class="diff-add">+ def sum_list(nubers):  <span style="color:var(--faint);font-size:11px">← typo!</span></div>
+      <div class="diff-add">+     return sum(nubers)</div>
+    </div>`;
+  // reset run
+  document.getElementById('runSentence').textContent = 'Run the test suite and read the output.';
+  document.getElementById('testResult').innerHTML = '';
+  // reset check
+  document.getElementById('checkDetail').innerHTML = '';
+  // reset done
+  document.getElementById('doneDetail').innerHTML = '';
+  // reset badge
+  const b = document.getElementById('iterBadge');
+  b.textContent = 'Iteration 1';
+  b.classList.remove('looping');
+  // reset cursor
+  cursor = -1;
+}
+
+let cursor = -1;
+let playing = false;
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function runStep(i) {
+  const s = STEPS[i];
+  s.setup();
+}
+
+function stepForward() {
+  if (playing) return;
+  if (cursor >= STEPS.length - 1) { demoReset(); return; }
+  cursor++;
+  runStep(cursor);
+}
+
+async function playAll() {
+  if (playing) return;
+  playing = true;
+  document.getElementById('playBtn').disabled = true;
+  document.getElementById('stepBtn').disabled = true;
+  demoReset();
+  const delay = reduceMotion ? 0 : 900;
+  for (let i = 0; i < STEPS.length; i++) {
+    cursor = i;
+    runStep(i);
+    if (i < STEPS.length - 1) await sleep(delay);
+  }
+  playing = false;
+  document.getElementById('playBtn').disabled = false;
+  document.getElementById('stepBtn').disabled = false;
+}
+
+document.getElementById('stepBtn').addEventListener('click', stepForward);
+document.getElementById('playBtn').addEventListener('click', playAll);
+document.getElementById('resetBtn').addEventListener('click', () => { if (!playing) demoReset(); });
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// start clean
+demoReset();
+</script>
+</body>
+</html>

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice Assistant · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header {
+    max-width: 920px; margin: 0 auto; padding: 40px 24px 8px;
+    scroll-margin-top: 80px;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section {
+    max-width: 920px; margin: 0 auto; padding: 18px 24px 34px;
+    position: relative; scroll-margin-top: 80px;
+  }
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 9px;
+  }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
+    line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px;
+    line-height: 1.55; color: var(--text);
+  }
+
+  /* ============ PIPELINE DEMO ============ */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .pipeline-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* the pipeline itself */
+  .pipeline {
+    display: flex; flex-direction: column; gap: 0;
+    position: relative;
+  }
+
+  .pipe-step {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .pipe-step:last-child { border-bottom: none; }
+
+  /* left: icon circle */
+  .pipe-icon {
+    flex: none; width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    transition: background 0.4s ease, border-color 0.4s ease;
+    position: relative; z-index: 1;
+  }
+  .pipe-icon svg { width: 20px; height: 20px; display: block; color: var(--faint); transition: color 0.4s ease; }
+
+  /* vertical connector between steps */
+  .pipe-step:not(:last-child) .pipe-icon::after {
+    content: '';
+    position: absolute;
+    top: 100%; left: 50%;
+    transform: translateX(-50%);
+    width: 2px; height: 16px;
+    background: var(--border);
+    transition: background 0.4s ease;
+  }
+
+  /* right: text */
+  .pipe-body { flex: 1; min-width: 0; }
+  .pipe-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 4px; transition: color 0.3s ease;
+  }
+  .pipe-name {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px;
+    line-height: 1.25; color: var(--text); transition: color 0.3s ease;
+  }
+  .pipe-detail {
+    font-size: 13.5px; color: var(--soft); margin-top: 6px; line-height: 1.5;
+    max-height: 0; overflow: hidden; opacity: 0;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin-top 0.3s ease;
+  }
+  /* the data traveling: a little pill that shows what's passing between steps */
+  .pipe-data {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 6px; padding: 5px 10px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 20px; font-size: 12px; font-weight: 500; color: var(--faint);
+    max-height: 0; overflow: hidden; opacity: 0;
+    transition: max-height 0.35s ease 0.1s, opacity 0.3s ease 0.15s;
+  }
+  .pipe-data .data-arrow { color: var(--accent); font-size: 11px; }
+
+  /* active step */
+  .pipe-step.active .pipe-icon {
+    background: var(--accent-soft); border-color: var(--accent);
+  }
+  .pipe-step.active .pipe-icon svg { color: var(--accent-hover); }
+  .pipe-step.active .pipe-icon::after { background: var(--accent); }
+  .pipe-step.active .pipe-label { color: var(--accent-hover); }
+  .pipe-step.active .pipe-name { color: var(--accent-hover); }
+  .pipe-step.active .pipe-detail { max-height: 80px; opacity: 1; margin-top: 6px; }
+  .pipe-step.active .pipe-data { max-height: 40px; opacity: 1; }
+
+  /* done step */
+  .pipe-step.done .pipe-icon { background: var(--success-soft); border-color: var(--success); }
+  .pipe-step.done .pipe-icon svg { color: var(--success); }
+  .pipe-step.done .pipe-icon::after { background: var(--success); }
+  .pipe-step.done .pipe-detail { max-height: 80px; opacity: 1; }
+  .pipe-step.done .pipe-data { max-height: 40px; opacity: 1; }
+
+  /* latency bar at bottom */
+  .latency-row {
+    margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .latency-label { font-size: 12px; font-weight: 500; color: var(--faint); white-space: nowrap; }
+  .latency-track {
+    flex: 1; height: 8px; background: var(--bg-subtle);
+    border: 1px solid var(--border); border-radius: 99px; overflow: hidden;
+  }
+  .latency-fill {
+    height: 100%; width: 0; border-radius: 99px;
+    background: linear-gradient(90deg, var(--success) 0%, var(--accent) 100%);
+    transition: width 0.5s ease;
+  }
+  .latency-num {
+    font-size: 12px; font-weight: 600; color: var(--soft);
+    white-space: nowrap; min-width: 80px; text-align: right;
+    transition: color 0.3s ease;
+  }
+  .latency-num.fast { color: var(--success); }
+  .latency-num.slow { color: #C2554F; }
+
+  /* controls */
+  .pipeline-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 0;
+    border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ WHEN IT MATTERS ============ */
+  .example-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 24px;
+  }
+  .example-scenario {
+    font-family: 'Fraunces', serif; font-size: 17px; font-weight: 500;
+    line-height: 1.4; color: var(--text); margin-bottom: 14px;
+  }
+  .latency-compare { display: flex; flex-direction: column; gap: 10px; }
+  .lc-row { display: flex; align-items: center; gap: 12px; }
+  .lc-name { font-size: 13px; font-weight: 500; color: var(--soft); min-width: 110px; }
+  .lc-bar-wrap { flex: 1; }
+  .lc-bar-track { height: 24px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .lc-bar-fill { height: 100%; border-radius: 8px; display: flex; align-items: center; padding-left: 8px; font-size: 12px; font-weight: 600; color: #fff; }
+  .lc-bar-fill.ok { background: var(--success); width: 20%; }
+  .lc-bar-fill.edge { background: #F59E0B; width: 55%; }
+  .lc-bar-fill.bad { background: #C2554F; width: 100%; }
+  .lc-caption { font-size: 13px; font-weight: 500; min-width: 60px; text-align: right; }
+  .lc-caption.ok { color: var(--success); }
+  .lc-caption.edge { color: #B45309; }
+  .lc-caption.bad { color: #C2554F; }
+  .example-note { margin-top: 16px; font-size: 13.5px; color: var(--soft); line-height: 1.55; }
+
+  /* ============ TRADEOFFS ============ */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); min-width: 120px; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg {
+    flex: 1; height: 22px; background: var(--bg-subtle);
+    border: 1px solid var(--border); border-radius: 5px;
+  }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-bars .seg.on-y { background: #F59E0B; border-color: #F59E0B; }
+  .tradeoff-bars .seg.on-g { background: var(--success); border-color: var(--success); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { min-width: 120px; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote {
+    margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border);
+    font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+
+  /* layer tags */
+  .layers-used {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;
+  }
+  .layer-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border: 1px solid var(--border);
+    border-radius: 20px; font-size: 13px; font-weight: 500;
+    color: var(--accent-hover); background: var(--accent-soft);
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .layer-tag:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .layer-tag svg { width: 13px; height: 13px; }
+
+  /* back card */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow {
+    font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent);
+    line-height: 1; transition: transform 0.2s ease;
+  }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources + footer */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+    .pipe-step { gap: 12px; }
+    .pipe-icon { width: 38px; height: 38px; }
+    .lc-name { min-width: 80px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="builds.html">Builds</a><span class="sep">/</span><span class="here">Voice Assistant</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l8 8 8-8"/></svg></span>
+    Build
+  </span>
+  <h1 class="pattern-title">Voice Assistant</h1>
+  <p class="explainer">You talk out loud. It talks back. Speed is what makes it feel real.</p>
+</header>
+
+<!-- 01: THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>A voice assistant is a pipeline with three stages: your speech is converted to text, the <span style="color:var(--accent-hover);font-weight:500">AI works out a reply</span>, and that reply is converted back into spoken audio. None of it is clever individually; what makes it feel alive is how fast all three stages finish. Under about 800ms total, it feels like a real conversation. Above two seconds, it feels like waiting on hold.</p>
+  </div>
+
+  <div class="layers-used" aria-label="Layers used in this build">
+    <a class="layer-tag" href="layer-single-call-control.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg>
+      Single-call control
+    </a>
+    <a class="layer-tag" href="layer-serving-infrastructure.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="6" rx="2"/><rect x="2" y="13" width="20" height="6" rx="2"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="16" r="1"/></svg>
+      Serving &amp; infrastructure (real-time)
+    </a>
+  </div>
+</section>
+
+<!-- 02: SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <h2>The pipeline, <em>live</em>.</h2>
+
+  <p class="demo-lede">Tap Play to run a request through all three stages. Watch what passes between them, and see how total latency builds up.</p>
+
+  <div class="pipeline-stage">
+    <div class="pipeline" id="pipeline" aria-live="polite">
+
+      <!-- Step 1: Speech to Text -->
+      <div class="pipe-step" data-step="0" data-delay="600" data-label="Speech-to-Text (STT)" data-detail="Your microphone captures audio. A fast model transcribes it to plain text in real time." data-from="voice audio" data-to="&quot;What&apos;s the weather in Cairo?&quot;" data-ms="220">
+        <div class="pipe-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+        </div>
+        <div class="pipe-body">
+          <div class="pipe-label">Step 1</div>
+          <div class="pipe-name">Speech to Text</div>
+          <div class="pipe-detail">Your microphone captures audio. A fast model transcribes it to plain text in real time.</div>
+          <div class="pipe-data">
+            <span class="data-arrow" aria-hidden="true">&rarr;</span>
+            <span class="data-text">"What's the weather in Cairo?"</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: AI (LLM) -->
+      <div class="pipe-step" data-step="1" data-delay="900" data-label="AI reply" data-detail="The transcribed text goes to the language model. It generates a short spoken reply, streamed out token by token." data-from="text question" data-to="&quot;It&apos;s 32°C and sunny in Cairo today.&quot;" data-ms="410">
+        <div class="pipe-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
+        </div>
+        <div class="pipe-body">
+          <div class="pipe-label">Step 2</div>
+          <div class="pipe-name">AI Reply</div>
+          <div class="pipe-detail">The text question goes to the language model. It generates a short spoken reply, streamed out token by token.</div>
+          <div class="pipe-data">
+            <span class="data-arrow" aria-hidden="true">&rarr;</span>
+            <span class="data-text">"It's 32°C and sunny in Cairo today."</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Text to Speech -->
+      <div class="pipe-step" data-step="2" data-delay="500" data-label="Text-to-Speech (TTS)" data-detail="The reply text is synthesized into audio and streamed to your speaker, often starting before the full sentence is ready." data-from="reply text" data-to="spoken audio out" data-ms="170">
+        <div class="pipe-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+        </div>
+        <div class="pipe-body">
+          <div class="pipe-label">Step 3</div>
+          <div class="pipe-name">Text to Speech</div>
+          <div class="pipe-detail">The reply text is synthesized into audio and streamed to your speaker, often starting before the full sentence is ready.</div>
+          <div class="pipe-data">
+            <span class="data-arrow" aria-hidden="true">&rarr;</span>
+            <span class="data-text">spoken audio out</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- latency bar -->
+    <div class="latency-row">
+      <div class="latency-label">Total latency</div>
+      <div class="latency-track"><div class="latency-fill" id="latencyFill"></div></div>
+      <div class="latency-num" id="latencyNum">0 ms</div>
+    </div>
+
+    <div class="pipeline-controls">
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03: WHEN IT MATTERS -->
+<section>
+  <div class="section-label"><span class="num">03</span>When it Matters</div>
+  <h2>Latency is the <em>product</em>.</h2>
+
+  <div class="example-card">
+    <p class="example-scenario">Same assistant, same answer. Only the total latency changes. Here is what each feels like to a real user:</p>
+
+    <div class="latency-compare" role="list" aria-label="Latency comparisons">
+      <div class="lc-row" role="listitem">
+        <div class="lc-name">Under 800 ms</div>
+        <div class="lc-bar-wrap">
+          <div class="lc-bar-track">
+            <div class="lc-bar-fill ok">natural</div>
+          </div>
+        </div>
+        <div class="lc-caption ok">Feels live</div>
+      </div>
+      <div class="lc-row" role="listitem">
+        <div class="lc-name">800 ms to 2 s</div>
+        <div class="lc-bar-wrap">
+          <div class="lc-bar-track">
+            <div class="lc-bar-fill edge">noticeable</div>
+          </div>
+        </div>
+        <div class="lc-caption edge">Feels slow</div>
+      </div>
+      <div class="lc-row" role="listitem">
+        <div class="lc-name">Over 2 s</div>
+        <div class="lc-bar-wrap">
+          <div class="lc-bar-track">
+            <div class="lc-bar-fill bad">waiting&hellip;</div>
+          </div>
+        </div>
+        <div class="lc-caption bad">Feels broken</div>
+      </div>
+    </div>
+
+    <p class="example-note">This is why voice assistant infrastructure runs on dedicated, low-latency servers and why the AI model must stream its reply immediately, not wait for the full answer before handing it to the TTS stage. Every millisecond is felt.</p>
+  </div>
+</section>
+
+<!-- 04: TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency pressure</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Infrastructure cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Error surface</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-y"></div><div class="seg on-y"></div><div class="seg on-y"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Reply quality</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-y"></div><div class="seg on-y"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Latency pressure is the hardest constraint. Each of the three stages can fail independently (bad audio, hallucinated reply, robotic speech), so the error surface is wider than a text-only product. Reply quality is intentionally lower: spoken answers must be short or they take too long to say.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Latency guidelines from <em>Google Duplex: A Phone Calling AI.</em> <span class="note">Google AI Blog, 2018. Introduced sub-1s turn-taking as the design target for natural voice.</span></li>
+    <li>Radford et al. (2022). <em>Robust Speech Recognition via Large-Scale Weak Supervision (Whisper).</em> OpenAI. <span class="note">The STT model used in many real-time voice products.</span></li>
+    <li>Betker et al. (2023). <em>Better Speech Synthesis through Scaling (TortoiseTTS).</em> <span class="note">TTS quality/speed tradeoffs in neural speech synthesis.</span></li>
+    <li>OpenAI Realtime API documentation (2024). <span class="note">Reference implementation for streaming STT + LLM + TTS pipelines.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+const steps = Array.from(document.querySelectorAll('.pipe-step'));
+const latencyFill = document.getElementById('latencyFill');
+const latencyNum = document.getElementById('latencyNum');
+const playBtn = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+const stepMs = [220, 410, 170]; // ms each stage takes (summing to 800ms — "feels live")
+const TOTAL_MS = stepMs.reduce((a, b) => a + b, 0);
+const PLAY_DELAY = [0, 900, 1700]; // real animation delay between stage activations (ms)
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let playing = false;
+let elapsed = 0;
+let latencyTimer = null;
+
+function setStep(i, state) {
+  // state: 'idle' | 'active' | 'done'
+  const el = steps[i];
+  el.classList.remove('active', 'done');
+  if (state === 'active') el.classList.add('active');
+  if (state === 'done') el.classList.add('done');
+}
+
+function setLatency(ms, total) {
+  const pct = Math.min(100, (ms / total) * 100);
+  latencyFill.style.width = pct + '%';
+  latencyNum.textContent = ms + ' ms';
+  latencyNum.classList.remove('fast', 'slow');
+  if (ms >= total) latencyNum.classList.add('fast');
+}
+
+function resetAll() {
+  if (latencyTimer) { clearInterval(latencyTimer); latencyTimer = null; }
+  playing = false;
+  elapsed = 0;
+  steps.forEach(s => { s.classList.remove('active', 'done'); });
+  latencyFill.style.width = '0';
+  latencyNum.textContent = '0 ms';
+  latencyNum.classList.remove('fast', 'slow');
+  playBtn.disabled = false;
+  resetBtn.disabled = false;
+}
+
+function showAllInstant() {
+  steps.forEach((_, i) => setStep(i, 'done'));
+  setLatency(TOTAL_MS, TOTAL_MS);
+}
+
+async function runPipeline() {
+  if (playing) return;
+  playing = true;
+  playBtn.disabled = true;
+
+  if (reduceMotion) { showAllInstant(); playing = false; playBtn.disabled = false; return; }
+
+  // reset silently
+  steps.forEach(s => s.classList.remove('active', 'done'));
+  latencyFill.style.width = '0';
+  latencyNum.textContent = '0 ms';
+  latencyNum.classList.remove('fast', 'slow');
+  elapsed = 0;
+
+  // stage 0
+  setStep(0, 'active');
+  await sleep(PLAY_DELAY[1] - PLAY_DELAY[0]); // 900ms
+
+  // tick latency for step 0 (220ms spread across the 900ms wait)
+  let tickStart0 = Date.now();
+  let tickTarget0 = stepMs[0];
+  await tickLatency(tickStart0, tickTarget0, 900);
+  elapsed = stepMs[0];
+
+  setStep(0, 'done');
+  setStep(1, 'active');
+
+  // stage 1
+  let tickStart1 = Date.now();
+  let tickTarget1 = stepMs[0] + stepMs[1];
+  await tickLatency(Date.now(), stepMs[1], 800);
+  elapsed = stepMs[0] + stepMs[1];
+
+  setStep(1, 'done');
+  setStep(2, 'active');
+
+  // stage 2
+  await tickLatency(Date.now(), stepMs[2], 500);
+  elapsed = TOTAL_MS;
+
+  setStep(2, 'done');
+  setLatency(TOTAL_MS, TOTAL_MS);
+  latencyNum.classList.add('fast');
+
+  playing = false;
+  playBtn.disabled = false;
+}
+
+// animates the latency number from current to current+delta, over durationMs
+function tickLatency(startTime, delta, durationMs) {
+  return new Promise(resolve => {
+    const base = elapsed;
+    function frame() {
+      const now = Date.now();
+      const progress = Math.min(1, (now - startTime) / durationMs);
+      const current = Math.round(base + delta * progress);
+      latencyFill.style.width = Math.min(100, (current / TOTAL_MS) * 100) + '%';
+      latencyNum.textContent = current + ' ms';
+      if (progress < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        resolve();
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+playBtn.addEventListener('click', runPipeline);
+resetBtn.addEventListener('click', resetAll);
+</script>
+
+</body>
+</html>
