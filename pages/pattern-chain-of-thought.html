@@ -692,7 +692,7 @@
   <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What <em>is</em> it?</h2>
   <div class="idea-card">
-    <p>Chain-of-Thought is just one line you add to your prompt, like "Let's think step by step." That one line gets the model to work the problem out before answering, and the working is what gets it right.</p>
+    <p><span style="color:var(--accent-hover)">Chain-of-Thought</span> is just one line you add to your prompt, like <strong style="color:var(--accent-hover)">"Let's think step by step."</strong> That one line gets the model to work the problem out before answering, and the working is what gets it right.</p>
   </div>
 </section>
 
@@ -784,7 +784,7 @@
   <h2>The <em>shape</em> in code.</h2>
   <div class="code-stage">
     <div class="code-hint">Tap a line to see what it does. The whole pattern is one change to the <span class="term" tabindex="0" role="button" aria-label="prompt: The text you send the model. Everything it sees before it starts writing." data-def="The text you send the model. Everything it sees before it starts writing.">prompt</span>.</div>
-    <pre class="code"><code id="codeBlock"><span class="code-line" data-line="0"><span class="comment"># the trick: ask for the reasoning before the answer</span></span><span class="code-line" data-line="1">prompt = question + <span class="str">"\nLet's think step by step."</span></span><span class="code-line" data-line="2"><span class="comment"># the model writes its steps, then lands on an answer</span></span><span class="code-line" data-line="3">response = model(prompt)</span><span class="code-line" data-line="4"><span class="comment"># reasoning is everything above; the answer is the last line</span></span><span class="code-line" data-line="5">answer = response.splitlines()[<span class="str">-1</span>]</span><span class="code-line" data-line="6"><span class="kw">return</span> answer, response</span></code></pre>
+    <pre class="code"><code id="codeBlock"><span class="code-line" data-line="0">prompt = question + <span class="str">"\nLet's think step by step."</span></span><span class="code-line" data-line="1">response = model(prompt)</span><span class="code-line" data-line="2">answer = response.splitlines()[<span class="str">-1</span>]</span><span class="code-line" data-line="3"><span class="kw">return</span> answer, response</span></code></pre>
     <div class="code-explainer" id="codeExplainer" aria-live="polite">
       <div class="hint">Tap a line above</div>
     </div>
@@ -873,7 +873,7 @@ const boardResetBtn = document.getElementById('boardResetBtn');
 const boardWork = [
   ['3', 'baskets', ',', 'each', 'with', '6', 'apples', '.'],
   ['3', '×', '6', '=', '18', 'apples', 'in', 'all', '.'],
-  ['18', '−', '4', '=', '14', 'left', '.']
+  ['I', 'ate', '4', 'of', 'those', ',', 'so', '18', '−', '4', '=', '14', 'left', '.']
 ];
 // the caption narrates exactly what is happening, line by line
 const boardCaptions = [
@@ -900,7 +900,7 @@ async function writeLine(r, animate) {
     chip.className = 'token';
     chip.textContent = tokens[i];
     slot.appendChild(chip);
-    if (animate) await sleep(170);
+    if (animate) await sleep(260);
   }
   line.classList.remove('writing');
 }
@@ -969,7 +969,7 @@ boardPlayBtn.addEventListener('click', async () => {
   await sleep(250);
   for (let r = 0; r < 3; r++) {
     await writeLine(r, true);
-    await sleep(350);
+    await sleep(600);
   }
   await sleep(250);
   boardAnswer.classList.add('shown');
@@ -1019,13 +1019,10 @@ const codeLines = document.querySelectorAll('.code-line');
 const codeExplainer = document.getElementById('codeExplainer');
 
 const codeExplanations = [
-  "The whole trick: ask for the reasoning before the answer.",
-  "Add one line to the prompt. 'Let's think step by step' is enough to get the model reasoning, no examples needed.",
-  "What happens next: the model writes its steps, then ends with a final answer.",
-  "Send the prompt. The reply comes back with the steps, then the answer.",
-  "How to read the reply: the steps are everything above, the answer is the last line.",
-  "Take that last line as the answer.",
-  "Return both, so you can check the steps, not just the answer."
+  "Add 'Let's think step by step' to the question.",
+  "Send it. The reply has the steps, then the answer.",
+  "The answer is just the last line.",
+  "Return both, so you can check the working."
 ];
 
 let tappedLine = null;
