@@ -44,6 +44,11 @@
   .item .ico svg{width:18px;height:18px;display:block}
   .item.more{color:var(--faint);font-weight:500}
   .item.more:hover{background:none;border-color:transparent;color:var(--accent)}
+  /* interaction: a concern lights every layer; a build lights the layers it is made from */
+  .layers .item.lit{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover);box-shadow:inset 0 0 0 1px var(--accent)}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .layers .item{animation:rise .45s ease both}
+  @media (prefers-reduced-motion:reduce){.layers .item{animation:none}}
 
   /* TOP: layers (with axis on the RIGHT) + builds output centered vertically */
   .top{display:grid;grid-template-columns:1fr 96px 210px;align-items:start;column-gap:0}
@@ -163,8 +168,26 @@
   </div>
 
 <script>
+  const layerItems = Array.from(document.querySelectorAll('.layers .item'));
+  layerItems.forEach((el,i)=>{ el.style.animationDelay = (i*45) + 'ms'; });
+
+  let selected = null; // 'all' (a concern) | array of layer numbers (a build) | null
+  function paint(set){ layerItems.forEach((el,i)=> el.classList.toggle('lit', set!=null && (set==='all' || set.indexOf(i+1)>-1))); }
+  function apply(){ paint(selected); }
+
+  // works on both mouse (hover previews) and touch (tap toggles, stays lit)
+  function wire(el, set){
+    el.addEventListener('mouseenter', ()=> paint(set));
+    el.addEventListener('mouseleave', apply);
+    el.addEventListener('click', ()=>{ selected = (selected === set) ? null : set; apply(); });
+  }
+  document.querySelectorAll('.concerns .item').forEach(c=> wire(c, 'all'));
+  const buildLayers = [[3,4,5],[2,4,5],[3,4,5],[1,3,5,6],[1,4,8]];
+  Array.from(document.querySelectorAll('.builds .item')).filter(b=> !b.classList.contains('more')).forEach((b,i)=> wire(b, buildLayers[i] || []));
+
+  // placeholder navigation (each routes to its own page once built)
   document.querySelectorAll('[data-go]').forEach(el=>{
-    el.addEventListener('click',()=>{ console.log('open', el.dataset.go, el.textContent.trim()); });
+    el.addEventListener('click',()=> console.log('open', el.dataset.go, el.textContent.trim()));
   });
 </script>
 </body>
