@@ -305,11 +305,11 @@
       a.push({at:t+300, fn:()=>{ hideBoxCaps(); endDemo(false); }});   // layers stay built
     } else if(kind==='concern'){
       // intro: Layers box glows -> the "applies to every layer" bracket lights -> Concerns box glows -> per-concern criticality
-      a.push({at:0,    fn:()=>{ showBoxCap('concerns', null, 'see how each one weighs on every layer: a longer bar means it matters more there'); layersBox.classList.add('glow'); }});
+      a.push({at:0,    fn:()=>{ showBoxCap('concerns', null, 'every layer has to handle all of these: a longer bar means it matters more there'); layersBox.classList.add('glow'); }});
       a.push({at:1800,  fn:()=>{ layersBox.classList.remove('glow'); acrossEl.classList.add('glow'); }});
       a.push({at:2600, fn:()=>{ acrossEl.classList.remove('glow'); concernsBox.classList.add('glow'); }});
       a.push({at:3400, fn:()=>{ concernsBox.classList.remove('glow'); }});
-      let t=3600; concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showBoxCap('concerns', null, 'see how each one weighs on every layer: a longer bar means it matters more there'); showBars(cc.textContent.trim(), cc); }}); t+=1800; }); a.push({at:t, fn:()=> endDemo(true)});
+      let t=3600; concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showBoxCap('concerns', null, 'every layer has to handle all of these: a longer bar means it matters more there'); showBars(cc.textContent.trim(), cc); }}); t+=1800; }); a.push({at:t, fn:()=> endDemo(true)});
     } else if(kind==='connect'){
       // intro: whole Layers box glows -> "produces" becomes prominent -> whole Builds box glows -> then each build's layers
       a.push({at:0,    fn:()=>{ showBoxCap('builds', null, 'each one lights up the layers it uses'); layersBox.classList.add('glow'); }});
@@ -326,12 +326,12 @@
       for(let i=layerItems.length-1;i>=0;i--){ const idx=i; a.push({at:t, fn:()=>{ layerItems[idx].classList.remove('dim'); revealed++; rail.style.transition='transform .3s ease'; rail.style.transform='scaleY('+(revealed/layerItems.length)+')'; }}); t+=560; }
       t+=500;
       // ---- Phase 2: Concerns, what every layer must get right ----
-      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('concerns', '2 / 3', 'see how each one weighs on every layer: a longer bar means it matters more there'); }});
+      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('concerns', '2 / 3', 'every layer has to handle all of these: a longer bar means it matters more there'); }});
       t+=1800;  a.push({at:t, fn:()=>{ layersBox.classList.add('glow'); }});
       t+=1200;  a.push({at:t, fn:()=>{ layersBox.classList.remove('glow'); acrossEl.classList.add('glow'); }});
       t+=1200;  a.push({at:t, fn:()=>{ acrossEl.classList.remove('glow'); concernsBox.classList.add('glow'); }});
       t+=1200;  a.push({at:t, fn:()=>{ concernsBox.classList.remove('glow'); }});
-      t+=200;  concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showBoxCap('concerns', '2 / 3', 'see how each one weighs on every layer: a longer bar means it matters more there'); showBars(cc.textContent.trim(), cc); }}); t+=1800; });
+      t+=200;  concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showBoxCap('concerns', '2 / 3', 'every layer has to handle all of these: a longer bar means it matters more there'); showBars(cc.textContent.trim(), cc); }}); t+=1800; });
       t+=500;
       // ---- Phase 3: Builds, what layer combinations produce ----
       a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('builds', '3 / 3', 'each one lights up the layers it uses'); }});
