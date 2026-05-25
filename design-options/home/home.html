@@ -26,17 +26,17 @@
   .canvas{width:840px;max-width:100%;margin:0 auto}
 
   .box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:border-color .25s ease,box-shadow .25s ease}
-  /* header: a clickable title link + a play button on the same line */
   .box-head{display:flex;align-items:center;border-bottom:1px solid var(--border);background:#fff}
   .head-link{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:13px 16px;border:none;background:none;cursor:pointer;text-align:left}
   .head-link:hover{background:var(--accent-soft)}
   .head-link .name{font-family:'Fraunces',serif;font-weight:500;font-size:18px}
-  .head-link .what{font-size:12.5px;color:var(--soft)}
-  .head-link .open{margin-left:auto;color:var(--faint);font-size:14px}
+  .head-link .what{font-size:12.5px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .head-link .open{margin-left:auto;color:var(--faint);font-size:14px;padding-left:6px}
   .head-link:hover .name{color:var(--accent-hover)} .head-link:hover .open{color:var(--accent)}
-  .head-play{flex:none;margin:0 12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--border-strong);background:#fff;color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background .14s ease,border-color .14s ease}
-  .head-play:hover{background:var(--accent-soft);border-color:var(--accent)}
-  .head-play svg{width:11px;height:11px;display:block;margin-left:1px}
+  /* play button = clear call-to-action */
+  .head-play{flex:none;margin:0 12px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#fff;background:var(--accent);border:none;border-radius:20px;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:background .14s ease}
+  .head-play:hover{background:var(--accent-hover)}
+  .head-play .tri{font-size:8px}
 
   .items{padding:8px}
   .item{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:9px 11px;border-radius:9px;border:1px solid transparent;background:none;font-family:'Inter';font-size:14px;font-weight:500;color:var(--text);cursor:pointer;transition:background .25s ease,border-color .25s ease,opacity .5s ease,transform .5s ease}
@@ -50,39 +50,37 @@
   .layers .item.lit{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover);box-shadow:inset 0 0 0 1px var(--accent)}
   .layers .item.dim{opacity:0;transform:translateY(10px)}
   .builds .item.demo{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
-  /* per-layer importance meter for a selected concern (hidden until a concern is active) */
-  .item .meter{margin-left:auto;flex:none;width:48px;height:5px;border-radius:3px;background:var(--border);overflow:hidden;opacity:0;transition:opacity .3s ease}
-  .item .meter > i{display:block;height:100%;width:0;background:var(--accent);transition:width .5s ease}
-  .box.layers.show-meters .item .meter{opacity:1}
-  .concerns .item.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
+  /* criticality fill: the layer's own row fills behind the word, proportional to the concern's weight there */
+  .layers .item{position:relative;z-index:0}
+  .layers .item::before{content:"";position:absolute;left:0;top:0;height:100%;width:var(--fill,0);background:var(--accent-soft);border-radius:9px;z-index:-1;transition:width .55s ease}
 
-  .top{display:grid;grid-template-columns:1fr 96px 210px;align-items:start;column-gap:0}
+  .top{display:grid;grid-template-columns:minmax(0,1fr) 80px 280px;align-items:start;column-gap:0}
   .layers .body{display:grid;grid-template-columns:1fr 100px}
-  /* direction arrow: points UP (foundation -> user-facing); grows when you build the stack */
   .axis{display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:16px 8px;text-align:center;border-left:1px solid var(--border)}
   .axis .cap{font-size:10.5px;color:var(--soft);line-height:1.25}
   .axis .cap b{display:block;color:var(--text);font-size:11.5px;font-weight:600;margin-bottom:1px}
   .axis .rail{flex:1;min-height:70px;width:4px;background:var(--accent);opacity:.75;margin:10px 0;position:relative;border-radius:3px;transform-origin:bottom center}
   .axis .rail::after{content:"";position:absolute;top:-3px;left:50%;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:11px solid var(--accent)}
 
-  /* produces -> builds (an output, so a directional flow + spark is right) */
   .produces{align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--faint);font-size:12px;gap:4px}
   .builds{align-self:center}
   .flow{position:relative;background:var(--accent);opacity:.4;border-radius:2px}
-  .flow-x{width:46px;height:2px}
+  .flow-x{width:40px;height:2px}
   .flow-x::after{content:"";position:absolute;right:-1px;top:50%;transform:translateY(-50%);border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:7px solid var(--accent)}
   .spark{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px 2px rgba(124,92,246,.75)}
   .flow-x .spark{top:50%;transform:translateY(-50%);animation:sparkX 2.6s linear infinite}
   @keyframes sparkX{0%{left:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{left:100%;opacity:0}}
 
-  /* across: a bracket spanning the whole Layers box, pointing down to Concerns, with a neon spark */
-  .across{position:relative;width:64%;margin:14px auto 0;height:36px}
-  .across .bar{position:absolute;top:0;left:0;right:0;height:1.5px;background:var(--border-strong);border-radius:2px}
+  /* across: a bracket that SPANS the Layers box (covers the layers), labelled, pointing down to Concerns, with a neon spark */
+  .across{position:relative;width:calc(100% - 360px);margin:12px 0 0;height:44px}
+  .across .bar{position:absolute;top:16px;left:0;right:0;height:1.5px;background:var(--border-strong);border-radius:2px}
   .across .bar::before,.across .bar::after{content:"";position:absolute;top:0;width:1.5px;height:7px;background:var(--border-strong)}
   .across .bar::before{left:0}.across .bar::after{right:0}
-  .across .stem{position:absolute;left:50%;top:0;transform:translateX(-50%);width:1.5px;height:36px;background:var(--border-strong)}
+  .across .lbl{position:absolute;top:9px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--faint);background:var(--bg);padding:0 8px;white-space:nowrap}
+  .across .stem{position:absolute;left:50%;top:17px;transform:translateX(-50%);width:1.5px;height:26px;background:var(--border-strong)}
+  .across .stem::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);border-left:4px solid transparent;border-right:4px solid transparent;border-top:7px solid var(--border-strong)}
   .across .spark{position:absolute;left:50%;margin-left:-3px;animation:sparkDown 2.4s linear infinite}
-  @keyframes sparkDown{0%{top:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:36px;opacity:0}}
+  @keyframes sparkDown{0%{top:17px;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:39px;opacity:0}}
   @media (prefers-reduced-motion:reduce){.spark{display:none}}
 
   .concerns{width:100%;margin-top:2px}
@@ -90,7 +88,7 @@
   .concerns .items{display:flex;flex-wrap:wrap;gap:9px;padding:16px;justify-content:center}
   .concerns .item{width:auto;border:1px solid var(--border-strong);border-radius:22px;padding:8px 16px}
   .concerns .item:hover{border-color:var(--accent)}
-  .concerns .item .meter{display:none}
+  .concerns .item.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
 
   .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:18px}
   .foot strong{color:var(--soft);font-weight:500}
@@ -100,7 +98,7 @@
     .top{grid-template-columns:1fr}
     .produces{flex-direction:row;padding:10px 0}
     .builds{width:100%}
-    .across{width:80%}
+    .across{width:100%}
   }
 </style>
 </head>
@@ -114,11 +112,10 @@
     <div class="stage">
       <div class="canvas">
         <div class="top">
-          <!-- LAYERS: numbered BOTTOM-UP, arrow points up (foundation -> user-facing), play in the header -->
           <div class="box layers">
             <div class="box-head">
               <button class="head-link" data-go="layers"><span class="name">Layers</span><span class="what">what it's built from</span><span class="open">›</span></button>
-              <button class="head-play" data-play="stack" type="button" aria-label="Watch the stack build, foundation to user-facing"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+              <button class="head-play" data-play="stack" type="button" aria-label="Watch the stack build, foundation to user-facing"><span class="tri">▶</span> Watch</button>
             </div>
             <div class="body">
               <div class="items">
@@ -148,7 +145,7 @@
           <div class="box builds">
             <div class="box-head">
               <button class="head-link" data-go="builds"><span class="name">Builds</span><span class="what">what it produces</span><span class="open">›</span></button>
-              <button class="head-play" data-play="connect" type="button" aria-label="Watch how a build connects to layers"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+              <button class="head-play" data-play="connect" type="button" aria-label="Watch how each build connects to layers"><span class="tri">▶</span> Watch</button>
             </div>
             <div class="items">
               <button class="item" data-go="build"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12"/></svg></span>Coding Agent</button>
@@ -161,13 +158,12 @@
           </div>
         </div>
 
-        <!-- bracket spanning the Layers box, pointing down to Concerns (neon spark) -->
-        <div class="across"><div class="bar"></div><div class="stem"></div><span class="spark"></span></div>
+        <div class="across"><div class="bar"></div><div class="lbl">applies to every layer</div><div class="stem"></div><span class="spark"></span></div>
 
         <div class="box concerns">
           <div class="box-head">
             <button class="head-link" data-go="concerns"><span class="name">Concerns</span><span class="what">what every layer must get right</span><span class="open">›</span></button>
-            <button class="head-play" data-play="concern" type="button" aria-label="Watch how a concern weighs on each layer"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+            <button class="head-play" data-play="concern" type="button" aria-label="Watch how each concern weighs on the layers"><span class="tri">▶</span> Watch</button>
           </div>
           <div class="items">
             <button class="item" data-go="concern"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13a9 9 0 0 1 18 0"/><path d="M12 13l4-3"/><circle cx="12" cy="13" r="1.3" fill="currentColor" stroke="none"/></svg></span>Evaluation</button>
@@ -189,76 +185,73 @@
   const buildItems = Array.from(document.querySelectorAll('.builds .item')).filter(b=> !b.classList.contains('more'));
   const concernItems = Array.from(document.querySelectorAll('.concerns .item'));
   const concernsBox = document.querySelector('.box.concerns');
-  const layersBox = document.querySelector('.box.layers');
   const rail = document.querySelector('.axis .rail');
-
-  // inject a small importance meter into each layer row (hidden until a concern is active)
-  layerItems.forEach(el=>{ const m=document.createElement('span'); m.className='meter'; m.innerHTML='<i></i>'; el.appendChild(m); });
-  const meters = layerItems.map(el=> el.querySelector('.meter > i'));
 
   let timers = [];
   const wait = (ms, fn)=> timers.push(setTimeout(fn, ms));
   const stop = ()=>{ timers.forEach(clearTimeout); timers = []; };
   let activeConcern = null;
-  function clearAll(){
-    layerItems.forEach(el=> el.classList.remove('lit','dim'));
+
+  function resetTransient(){
+    layerItems.forEach(el=>{ el.classList.remove('lit','dim'); el.style.setProperty('--fill','0'); });
     buildItems.forEach(el=> el.classList.remove('demo'));
     concernItems.forEach(c=> c.classList.remove('active'));
     concernsBox.classList.remove('pulse');
-    layersBox.classList.remove('show-meters');
-    meters.forEach(m=> m.style.width='0');
-    rail.style.transition='transform .3s ease'; rail.style.transform='scaleY(1)';
-    activeConcern = null;
   }
+  function clearAll(){ stop(); resetTransient(); rail.style.transition='transform .3s ease'; rail.style.transform='scaleY(1)'; activeConcern=null; }
 
-  // PLAY 1: build the stack, foundation up, and draw the foundation->user arrow as it goes
+  // PLAY 1 (Layers): build the stack foundation->user, drawing the arrow as it goes
   function buildStack(){
-    stop(); clearAll();
+    clearAll();
     layerItems.forEach(el=> el.classList.add('dim'));
     rail.style.transition='none'; rail.style.transform='scaleY(0)'; rail.getBoundingClientRect();
     const total = 200 + layerItems.length*180;
     rail.style.transition='transform '+(total/1000)+'s ease'; rail.style.transform='scaleY(1)';
-    let t = 200;
-    for(let i = layerItems.length - 1; i >= 0; i--){ wait(t, ()=> layerItems[i].classList.remove('dim')); t += 180; }
+    let t=200; for(let i=layerItems.length-1;i>=0;i--){ wait(t,()=>layerItems[i].classList.remove('dim')); t+=180; }
   }
 
-  // PLAY 2: a concern, overall (applies to every layer) then drilled into per-layer importance
+  // concern criticality per layer (0-3 = how critical that concern is for each layer)
   const importance = {
-    'Evaluation':[1,2,2,3,2,3,3,1,2], 'Safety':[3,3,2,3,2,1,2,1,2], 'Privacy':[2,2,1,1,3,1,2,2,3],
-    'Observability':[1,1,3,1,1,2,1,3,2], 'Cost':[1,1,2,2,2,2,3,3,1], 'Multimodal':[2,2,1,2,2,1,2,1,1], 'Real-time':[2,1,2,1,1,1,1,3,1]
+    'Evaluation':[1,2,2,3,2,3,3,1,2],'Safety':[3,3,2,3,2,1,2,1,2],'Privacy':[2,2,1,1,3,1,2,2,3],
+    'Observability':[1,1,3,1,1,2,1,3,2],'Cost':[1,1,2,2,2,2,3,3,1],'Multimodal':[2,2,1,2,2,1,2,1,1],'Real-time':[2,1,2,1,1,1,1,3,1]
   };
-  function showConcern(name, chip){
-    stop(); clearAll();
+  function showBars(name, chip){
+    resetTransient();
     const v = importance[name]; if(!v) return;
-    activeConcern = name; if(chip) chip.classList.add('active'); concernsBox.classList.add('pulse');
-    // overall: it touches EVERY layer
-    layerItems.forEach(el=> el.classList.add('lit'));
-    // then drill into how much it weighs per layer
-    wait(1200, ()=>{
-      layerItems.forEach(el=> el.classList.remove('lit'));
-      layersBox.classList.add('show-meters');
-      meters.forEach((m,i)=> m.style.width = ((v[i]||0)/3*100)+'%');
-    });
+    if(chip) chip.classList.add('active');
+    concernsBox.classList.add('pulse');
+    layerItems.forEach((el,i)=> el.style.setProperty('--fill', ((v[i]||0)/3*100)+'%'));
+    activeConcern = name;
   }
-  function concernDemo(){ const c = concernItems.find(x=> x.textContent.trim()==='Cost'); showConcern('Cost', c); }
+  // PLAY 2 (Concerns): step through each concern in sequence, showing its per-layer criticality
+  function concernDemo(){
+    clearAll(); let t=0;
+    concernItems.forEach((c)=>{ wait(t, ()=> showBars(c.textContent.trim(), c)); t += 1300; });
+    wait(t, clearAll);
+  }
 
-  // PLAY 3: how a build connects — first two builds only, a bit faster
+  // PLAY 3 (Builds): step through each build in sequence, lighting the layers it uses
+  const buildLayers = [[0,2,3,4],[0,4,8],[2,3,4],[0,1,4],[0,3,7]];
   function connect(){
-    stop(); clearAll();
-    const A=[2,3,4], B=[0,4,8];
-    buildItems[0].classList.add('demo'); A.forEach(i=> layerItems[i].classList.add('lit'));
-    wait(1400, ()=>{ buildItems[0].classList.remove('demo'); A.forEach(i=> layerItems[i].classList.remove('lit')); });
-    wait(1700, ()=>{ buildItems[1].classList.add('demo'); B.forEach(i=> layerItems[i].classList.add('lit')); });
-    wait(3100, ()=>{ buildItems[1].classList.remove('demo'); B.forEach(i=> layerItems[i].classList.remove('lit')); });
+    clearAll(); let t=0;
+    buildItems.forEach((b,k)=>{
+      wait(t, ()=>{
+        layerItems.forEach(el=> el.classList.remove('lit'));
+        buildItems.forEach(x=> x.classList.remove('demo'));
+        b.classList.add('demo'); (buildLayers[k]||[]).forEach(i=> layerItems[i].classList.add('lit'));
+      });
+      t += 1200;
+    });
+    wait(t, clearAll);
   }
 
   document.querySelectorAll('.head-play').forEach(b=>{
     b.addEventListener('click',()=>{ const p=b.dataset.play; if(p==='stack')buildStack(); else if(p==='connect')connect(); else if(p==='concern')concernDemo(); });
   });
-  // click a concern chip -> its per-layer importance (toggle)
+  // click a concern chip -> its per-layer criticality (toggle)
   concernItems.forEach(c=>{
     const name = c.textContent.trim();
-    c.addEventListener('click',()=>{ if(activeConcern===name){ clearAll(); } else { showConcern(name, c); } });
+    c.addEventListener('click',()=>{ if(activeConcern===name){ clearAll(); } else { stop(); showBars(name, c); } });
   });
   // click a title / layer / build -> navigate to its page (placeholder)
   document.querySelectorAll('.head-link[data-go], .layers .item[data-go], .builds .item[data-go]').forEach(el=>{
