@@ -31,6 +31,13 @@
   body { min-height: 100vh; }
   .serif { font-family: 'Fraunces', serif; }
 
+  /* a11y: visible keyboard focus, skip link, reduced motion */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
   /* ============ TOP BAR ============ */
   .topbar {
     position: sticky;
@@ -817,6 +824,7 @@
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <!-- TOP BAR -->
 <nav class="topbar">
@@ -838,8 +846,8 @@
 </nav>
 
 <!-- HEADER -->
-<header class="header">
-  <h1 class="pattern-title">CoT.</h1>
+<header class="header" id="main">
+  <h1 class="pattern-title"><span aria-hidden="true">CoT.</span><span class="sr-only">Chain-of-Thought</span></h1>
   <div class="full-name">Chain-of-Thought</div>
   <div class="meta-strip">
     <div class="item">
@@ -879,13 +887,13 @@
   <div class="diagram-stage">
     <div class="diagram" id="diagram">
       <div class="node" data-step="0">USER<span class="sub">Hard question</span></div>
-      <span class="arrow-mark" data-step="0"><span class="right">&rarr;</span><span class="down">&darr;</span></span>
+      <span class="arrow-mark" data-step="0" aria-hidden="true"><span class="right">&rarr;</span><span class="down">&darr;</span></span>
       <div class="node" data-step="1">MODEL<span class="sub">Reasons first</span></div>
-      <span class="arrow-mark" data-step="1"><span class="right">&rarr;</span><span class="down">&darr;</span></span>
+      <span class="arrow-mark" data-step="1" aria-hidden="true"><span class="right">&rarr;</span><span class="down">&darr;</span></span>
       <div class="node" data-step="2">ANSWER<span class="sub">From the steps</span></div>
     </div>
     <div class="diagram-controls">
-      <div class="step-info">
+      <div class="step-info" aria-live="polite">
         <div class="step-num" id="stepNum">Step 0 of 3</div>
         <div class="step-text" id="stepText">Press play to walk through each step.</div>
       </div>
@@ -897,7 +905,7 @@
     </div>
     <div class="trace" id="trace">
       <div class="trace-empty" id="traceEmpty">Step to the model. Its reasoning appears here.</div>
-      <div class="trace-row" data-step="1"><span class="lead">1</span>It writes the steps out as <span class="term" tabindex="0" data-def="The pieces of text a model reads and writes, roughly word-sized, produced one after another.">tokens</span>, left to right, like talking out loud.</div>
+      <div class="trace-row" data-step="1"><span class="lead">1</span>It writes the steps out as <span class="term" tabindex="0" role="button" aria-label="tokens: The pieces of text a model reads and writes, roughly word-sized, produced one after another." data-def="The pieces of text a model reads and writes, roughly word-sized, produced one after another.">tokens</span>, left to right, like talking out loud.</div>
       <div class="trace-row" data-step="1"><span class="lead">2</span>Each step it writes becomes part of what it reads next.</div>
       <div class="trace-row" data-step="1"><span class="lead">3</span>By the final step, the answer is forced by the work, not guessed.</div>
     </div>
@@ -936,7 +944,7 @@
         <div class="verdict">Wasted &#10007;<span class="body"></span></div>
       </div>
     </div>
-    <div class="query-tracker" id="queryTracker">0 / 6 tested</div>
+    <div class="query-tracker" id="queryTracker" aria-live="polite">0 / 6 tested</div>
   </div>
 </section>
 
@@ -1004,7 +1012,7 @@
   <div class="section-label"><span class="num">05</span>Code Sketch</div>
   <h2>The <em>shape</em> in code.</h2>
   <div class="code-stage">
-    <div class="code-hint">Tap a line to see what it does. The whole pattern is one change to the <span class="term" tabindex="0" data-def="The text you send the model. Everything it sees before it starts writing.">prompt</span>.</div>
+    <div class="code-hint">Tap a line to see what it does. The whole pattern is one change to the <span class="term" tabindex="0" role="button" aria-label="prompt: The text you send the model. Everything it sees before it starts writing." data-def="The text you send the model. Everything it sees before it starts writing.">prompt</span>.</div>
     <pre class="code"><code id="codeBlock"><span class="code-line" data-line="0"><span class="comment"># the trick: ask for the reasoning before the answer</span></span>
 <span class="code-line" data-line="1">prompt = question + <span class="str">"\nLet's think step by step."</span></span>
 <span class="code-line" data-line="2"> </span>
@@ -1014,7 +1022,7 @@
 <span class="code-line" data-line="6"><span class="comment"># reasoning is everything above; the answer is the last line</span></span>
 <span class="code-line" data-line="7">answer = response.splitlines()[<span class="str">-1</span>]</span>
 <span class="code-line" data-line="8"><span class="kw">return</span> answer, response</span></code></pre>
-    <div class="code-explainer" id="codeExplainer">
+    <div class="code-explainer" id="codeExplainer" aria-live="polite">
       <div class="hint">Tap a line above</div>
     </div>
   </div>

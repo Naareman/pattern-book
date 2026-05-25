@@ -19,6 +19,12 @@
   html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   .wrap{max-width:920px;margin:0 auto;padding:0 24px}
 
+  /* a11y: visible keyboard focus, skip link, reduced motion */
+  a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+  .skip-link{position:absolute;left:8px;top:-48px;z-index:100;background:var(--surface);color:var(--accent-hover);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:top .15s ease}
+  .skip-link:focus{top:8px}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}}
+
   /* slim top bar */
   .topbar{position:sticky;top:0;z-index:10;background:rgba(252,252,253,.86);backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--border)}
   .topbar-in{max-width:920px;margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
@@ -67,6 +73,7 @@
 </style>
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
   <div class="topbar">
     <div class="topbar-in">
       <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
@@ -80,7 +87,7 @@
       <div class="strap">Real products made by combining the parts.</div>
     </header>
 
-    <div class="stage">
+    <div class="stage" id="main" role="main">
       <div class="canvas">
         <div class="pagehead">
           <h1>Builds</h1>
@@ -89,23 +96,23 @@
 
         <div class="layerlist">
           <div class="row">
-            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12"/></svg></span>
+            <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12"/></svg></span>
             <span class="meta"><span class="name">Coding Agent</span><span class="what">A helper that reads, writes, and fixes computer code for you.</span><span class="uses">Leans on: Orchestration &amp; agents + Single-call control</span></span>
           </div>
           <div class="row">
-            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h4"/></svg></span>
+            <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h4"/></svg></span>
             <span class="meta"><span class="name">Document Q&amp;A</span><span class="what">Ask questions about your own files and get answers from them.</span><span class="uses">Leans on: Knowledge &amp; memory (retrieval) + Data &amp; artifacts</span></span>
           </div>
           <div class="row">
-            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg></span>
+            <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg></span>
             <span class="meta"><span class="name">Research Agent</span><span class="what">Looks things up across many sources and writes up what it found.</span><span class="uses">Leans on: Orchestration &amp; agents + Knowledge &amp; memory</span></span>
           </div>
           <div class="row">
-            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 0-3.2 6.9L21 20z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/></svg></span>
+            <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 0-3.2 6.9L21 20z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/></svg></span>
             <span class="meta"><span class="name">Customer Support Agent</span><span class="what">Answers customer questions using the company's own help guides.</span><span class="uses">Leans on: Knowledge &amp; memory + Application patterns</span></span>
           </div>
           <div class="row">
-            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>
+            <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>
             <span class="meta"><span class="name">Voice Assistant</span><span class="what">You talk to it out loud and it talks back, like a smart speaker.</span><span class="uses">Leans on: Single-call control + Serving &amp; infrastructure (real-time)</span></span>
           </div>
           <div class="row more">

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluation . The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FCFCFD; --surface:#FFFFFF; --bg-subtle:#F6F7F9; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0; --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-padding-top:72px}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{overflow-x:hidden}
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px}
+  a{color:inherit;text-decoration:none}
+
+  a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+  .skip-link{position:absolute;left:8px;top:-48px;z-index:100;background:var(--surface);color:var(--accent-hover);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:top .15s ease}
+  .skip-link:focus{top:8px}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}}
+
+  .topbar{position:sticky;top:0;z-index:10;background:rgba(252,252,253,.86);backdrop-filter:saturate(180%) blur(10px);-webkit-backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--border)}
+  .topbar-in{max-width:920px;margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;padding:5px 11px;border:1px solid var(--border-strong);border-radius:20px;background:#fff;transition:border-color .2s ease,color .2s ease,background .2s ease;white-space:nowrap}
+  .back:hover{border-color:var(--accent);color:var(--accent-hover);background:var(--accent-soft)}
+  .crumb{font-size:12.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .crumb a{color:var(--faint);text-decoration:none}
+  .crumb a:hover{color:var(--accent)}
+  .crumb .sep{margin:0 7px;color:var(--border-strong)}
+  .crumb .here{color:var(--soft)}
+
+  header{padding:36px 0 6px;scroll-margin-top:72px}
+  .wordmark{font-family:'Fraunces',serif;font-weight:500;font-size:25px;letter-spacing:-.01em}
+  .strap{color:var(--soft);font-size:15px;margin-top:4px}
+
+  .stage{padding:22px 0 34px}
+  .canvas{max-width:680px;margin:0 auto}
+
+  .pagehead{margin-bottom:8px}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--border);border-radius:20px;padding:5px 12px;margin-bottom:14px}
+  .eyebrow .ico{width:15px;height:15px;display:block;color:var(--accent)}
+  .eyebrow .ico svg{width:15px;height:15px;display:block}
+  .pagehead h1{font-family:'Fraunces',serif;font-weight:500;font-size:38px;letter-spacing:-.015em;line-height:1.05;scroll-margin-top:72px}
+  .pagehead .intro{color:var(--soft);font-size:16px;line-height:1.6;margin-top:12px;max-width:580px}
+
+  .block{margin-top:26px}
+  .block h2{font-family:'Fraunces',serif;font-weight:500;font-size:21px;letter-spacing:-.01em;line-height:1.2;margin-bottom:10px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px}
+  .card p{font-size:15px;line-height:1.65;color:var(--soft)}
+  .card p + p{margin-top:10px}
+  .card p strong{color:var(--text);font-weight:600}
+
+  /* "why it matters" tinted note */
+  .note{background:var(--bg-subtle);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius-sm)}
+  .note .tag{display:block;font-size:12px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+
+  /* where it shows up: bars */
+  .bars{display:flex;flex-direction:column;gap:10px}
+  .bar-row{display:flex;align-items:center;gap:14px}
+  .bar-label{flex:none;width:180px;font-size:13.5px;color:var(--soft);text-align:right}
+  .bar-track{flex:1;height:18px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+  .bar-fill{height:100%;background:var(--accent);border-radius:5px 0 0 5px}
+  .bar-fill.mid{background:#A892F2}
+  .bar-fill.low{background:#CFC3F6}
+  .bars-note{font-size:12.5px;color:var(--faint);margin-top:14px;line-height:1.5}
+  @media(max-width:560px){
+    .bar-label{width:118px;font-size:12px}
+  }
+
+  /* examples */
+  .ex-list{display:flex;flex-direction:column;gap:12px}
+  .ex{display:flex;gap:13px;align-items:flex-start}
+  .ex .dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:7px}
+  .ex .ex-text{font-size:15px;line-height:1.55;color:var(--soft)}
+  .ex .ex-text strong{color:var(--text);font-weight:600}
+
+  /* learn more */
+  .links{list-style:none;display:flex;flex-direction:column;gap:9px}
+  .links li{font-size:14px;line-height:1.5}
+  .links a{color:var(--accent-hover);font-weight:500;border-bottom:1px solid var(--accent-soft)}
+  .links a:hover{border-bottom-color:var(--accent)}
+  .links .src{color:var(--soft)}
+
+  .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
+  .foot strong{color:var(--soft);font-weight:500}
+
+  @media(max-width:560px){
+    .pagehead h1{font-size:30px}
+    .card{padding:17px 16px}
+  }
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="topbar">
+    <div class="topbar-in">
+      <a class="back" href="considerations.html"><span aria-hidden="true">&larr;</span> Considerations</a>
+      <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Evaluation</span></nav>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <header>
+      <div class="wordmark">The Pattern Book</div>
+      <div class="strap">What every part of an AI must get right.</div>
+    </header>
+
+    <div class="stage" id="main" role="main">
+      <div class="canvas">
+        <div class="pagehead">
+          <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13a9 9 0 0 1 18 0"/><path d="M12 13l4-3"/><circle cx="12" cy="13" r="1.3" fill="currentColor" stroke="none"/></svg></span>Consideration</span>
+          <h1>Evaluation</h1>
+          <p class="intro">Checking that the AI is actually right, not just sounding sure of itself.</p>
+        </div>
+
+        <div class="block">
+          <h2>In plain words</h2>
+          <div class="card">
+            <p>An AI can give a wrong answer in a very confident voice. Evaluation means testing it on lots of questions where we already know the right answer, then counting how often it gets them right. If you do not test it, you are just hoping.</p>
+          </div>
+        </div>
+
+        <div class="block">
+          <h2>Why it matters</h2>
+          <div class="card note">
+            <span class="tag">What goes wrong if you ignore it</span>
+            <p>A team ships a chatbot that looks great in a quick demo, so they skip real testing. In the wild it confidently invents fake refund rules and made-up product specs. Nobody notices for weeks because there were no checks in place, and by then thousands of customers got wrong answers.</p>
+          </div>
+        </div>
+
+        <div class="block">
+          <h2>Where it shows up most</h2>
+          <div class="card">
+            <div class="bars">
+              <div class="bar-row"><span class="bar-label">Composition</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></div>
+              <div class="bar-row"><span class="bar-label">Training &amp; adaptation</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></div>
+              <div class="bar-row"><span class="bar-label">Single-call control</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></div>
+              <div class="bar-row"><span class="bar-label">Knowledge &amp; memory</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
+              <div class="bar-row"><span class="bar-label">Application patterns</span><div class="bar-track"><div class="bar-fill mid" style="width:66%"></div></div></div>
+            </div>
+            <p class="bars-note">Rough editorial estimate of where this matters most, not a measured score. Evaluation matters everywhere, but it bites hardest where outputs are combined, where models are trained or tuned, and where you shape a single answer.</p>
+          </div>
+        </div>
+
+        <div class="block">
+          <h2>Examples</h2>
+          <div class="card">
+            <div class="ex-list">
+              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>Spam filters</strong> are measured on precision and recall: how much real spam they catch versus how often they block a good email by mistake.</span></div>
+              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>Coding assistants</strong> are tested on benchmark sets of programming problems to see what share they solve correctly.</span></div>
+              <div class="ex"><span class="dot" aria-hidden="true"></span><span class="ex-text"><strong>Translation tools</strong> are scored against human reference translations to track quality over time.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="block">
+          <h2>Learn more</h2>
+          <div class="card">
+            <ul class="links">
+              <li><a href="https://en.wikipedia.org/wiki/Precision_and_recall" target="_blank" rel="noopener">Precision and recall</a> <span class="src">. Wikipedia, the core idea behind measuring right vs. wrong answers.</span></li>
+              <li><a href="https://en.wikipedia.org/wiki/Evaluation_of_machine_translation" target="_blank" rel="noopener">Evaluation of machine translation</a> <span class="src">. Wikipedia, a real example of scoring AI output.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="foot"><strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.</footer>
+  </div>
+</body>
+</html>
