@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Training &amp; adaptation · The Pattern Book</title>
+<title>Model Training &amp; Adaptation · The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -114,20 +114,38 @@
   .ex-tag{flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1}
   .ex-tag.pretrain{background:#EDE9FE}
   .ex-tag.finetune{background:#DBEAFE}
-  .ex-tag.rlhf{background:#D1FAE5}
+  .ex-tag.feedback{background:#D1FAE5}
   .ex-body{}
   .ex-name{font-size:13px;font-weight:600;color:var(--soft);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
   .ex-text{font-family:'Fraunces',serif;font-weight:400;font-size:16px;color:var(--text);line-height:1.5}
   .ex-detail{font-size:13px;color:var(--soft);line-height:1.5;margin-top:5px}
 
-  /* ======== SECTION 04: tradeoffs ======== */
-  .tradeoffs-grid{display:flex;flex-direction:column;gap:12px}
-  .tradeoff-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;display:flex;gap:14px;align-items:flex-start;box-shadow:var(--shadow-sm)}
-  .tradeoff-dot{flex:none;width:10px;height:10px;border-radius:50%;margin-top:5px}
-  .tradeoff-dot.pro{background:var(--success)}
-  .tradeoff-dot.con{background:#C2554F}
-  .tradeoff-text{font-size:14px;line-height:1.6;color:var(--soft)}
-  .tradeoff-text strong{color:var(--text);font-weight:600}
+  /* ======== SECTION 04: tradeoffs (canonical meter) ======== */
+  .tradeoffs-stage{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
+  .tradeoff-scale{display:flex;justify-content:space-between;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .tradeoff-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+  .tradeoff-label{font-size:13px;font-weight:600;color:var(--text);min-width:100px;flex:none}
+  .tradeoff-bars{display:flex;gap:4px;flex:1}
+  .seg{height:8px;border-radius:4px;flex:1;background:var(--border)}
+  .seg.on{background:var(--accent)}
+  .tradeoff-quote{font-size:13px;color:var(--soft);line-height:1.6;font-style:italic;padding-top:14px;border-top:1px solid var(--border);margin-top:6px}
+
+  @media(max-width:480px){
+    .tradeoff-row{flex-direction:column;align-items:stretch}
+    .tradeoff-label{min-width:0}
+  }
+
+  /* ======== INSIDE THIS LAYER ======== */
+  .layer-map{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 28px}
+  .layer-axis{font-size:13px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border-radius:20px;display:inline-block;padding:4px 14px;margin-bottom:20px}
+  .category-list{display:flex;flex-direction:column;gap:14px}
+  .cat-row{display:flex;gap:14px;align-items:flex-start}
+  .cat-dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:6px}
+  .cat-body{}
+  .cat-name{font-family:'Fraunces',serif;font-weight:500;font-size:16px;color:var(--text);line-height:1.2;margin-bottom:3px}
+  .cat-line{font-size:14px;color:var(--soft);line-height:1.5}
+  .layer-filing{margin-top:22px;padding-top:16px;border-top:1px solid var(--border);font-size:13px;color:var(--soft);line-height:1.6}
+  .layer-filing strong{color:var(--text);font-weight:600}
 
   /* ======== BACK LINK ======== */
   .back-link{display:inline-flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);text-decoration:none;color:var(--text);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;cursor:pointer}
@@ -172,7 +190,7 @@
   <div class="topbar-inner">
     <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">Training &amp; adaptation</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">Model Training &amp; Adaptation</span>
     </nav>
   </div>
 </nav>
@@ -185,10 +203,10 @@
         <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
       </svg>
     </span>
-    Layer 3
+    Layer &middot; L1
   </span>
-  <h1 class="page-title">Training &amp; adaptation</h1>
-  <p class="explainer">How the AI is taught and shaped before you ever talk to it.</p>
+  <h1 class="page-title">Model Training &amp; Adaptation</h1>
+  <p class="explainer">How the AI is taught and shaped, step by step, before you ever talk to it.</p>
 </header>
 
 <!-- 01 THE IDEA -->
@@ -196,13 +214,13 @@
   <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What <em>is</em> it?</h2>
   <div class="idea-card">
-    <p>Before you send a single message, the AI goes through three rounds of school. First it reads an enormous pile of text from the internet to learn language (<strong style="color:var(--accent-hover)">pretraining</strong>). Then it studies worked examples for a specific job (<strong style="color:var(--accent-hover)">fine-tuning</strong>). Finally, humans rate its answers and it adjusts to match their preferences (<strong style="color:var(--accent-hover)">RLHF</strong>). Each round builds on the last, making the answer a little better.</p>
+    <p>Before you send a single message, the AI goes through several rounds of school. First it reads an enormous pile of text from the internet to learn language (<strong style="color:var(--accent-hover)">pretraining</strong>). Then it studies worked examples for a specific job (<strong style="color:var(--accent-hover)">fine-tuning</strong>). Finally, humans rate its answers and it adjusts to match their preferences (<strong style="color:var(--accent-hover)">Reinforcement Learning from Human Feedback (RLHF)</strong>). Each round builds on the last, making the answer a little better. Larger models may also receive specialised training to improve their raw reasoning ability before any of this happens.</p>
   </div>
 </section>
 
 <!-- 02 SEE IT WORK -->
 <section>
-  <div class="section-label"><span class="num">02</span>See it work</div>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
   <h2>Watch the answer <em>improve</em>.</h2>
 
   <p class="demo-lede">Tap a stage (or press Play) to see how the same question gets a better answer at each step of training.</p>
@@ -219,13 +237,13 @@
       <div class="p-node" id="node-1" tabindex="0" role="button" aria-pressed="false" aria-label="Stage: Fine-tuning">
         <div class="node-icon" aria-hidden="true">🎯</div>
         <div class="node-label">Stage 2</div>
-        <div class="node-name">Fine-tuning</div>
+        <div class="node-name">Fine-Tuning</div>
       </div>
       <div class="p-arrow" id="arrow-1" aria-hidden="true">&rarr;</div>
-      <div class="p-node" id="node-2" tabindex="0" role="button" aria-pressed="false" aria-label="Stage: RLHF">
+      <div class="p-node" id="node-2" tabindex="0" role="button" aria-pressed="false" aria-label="Stage: Human Feedback">
         <div class="node-icon" aria-hidden="true">👍</div>
         <div class="node-label">Stage 3</div>
-        <div class="node-name">RLHF</div>
+        <div class="node-name">Human Feedback</div>
       </div>
     </div>
 
@@ -254,36 +272,37 @@
     <!-- controls -->
     <div class="pipeline-controls">
       <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
       <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
     </div>
   </div>
 </section>
 
-<!-- 03 REAL EXAMPLE -->
+<!-- 03 A REAL EXAMPLE -->
 <section>
-  <div class="section-label"><span class="num">03</span>A real example</div>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
   <h2>GPT-4, <em>stage by stage</em>.</h2>
   <div class="example-cards">
     <div class="ex-card">
       <div class="ex-tag pretrain" aria-hidden="true">📚</div>
       <div class="ex-body">
         <div class="ex-name">Pretraining</div>
-        <div class="ex-text">GPT-4 trained on roughly a trillion words: books, Wikipedia, code, websites.</div>
+        <div class="ex-text">GPT-4 is estimated to be trained on trillions of words: books, Wikipedia, code, websites.</div>
         <div class="ex-detail">This gave it general knowledge and the ability to produce fluent text in many languages and styles.</div>
       </div>
     </div>
     <div class="ex-card">
       <div class="ex-tag finetune" aria-hidden="true">🎯</div>
       <div class="ex-body">
-        <div class="ex-name">Fine-tuning</div>
+        <div class="ex-name">Supervised Fine-Tuning (SFT)</div>
         <div class="ex-text">OpenAI staff wrote thousands of ideal question-and-answer pairs and trained GPT-4 to copy that style.</div>
         <div class="ex-detail">This is what turned a next-word predictor into a conversational assistant that follows instructions.</div>
       </div>
     </div>
     <div class="ex-card">
-      <div class="ex-tag rlhf" aria-hidden="true">👍</div>
+      <div class="ex-tag feedback" aria-hidden="true">👍</div>
       <div class="ex-body">
-        <div class="ex-name">RLHF</div>
+        <div class="ex-name">Human Feedback (RLHF)</div>
         <div class="ex-text">Human raters compared pairs of answers and chose the better one. The model learned to predict those ratings, then optimised for them.</div>
         <div class="ex-detail">This is what made it helpful, honest, and less likely to say harmful things.</div>
       </div>
@@ -295,23 +314,119 @@
 <section>
   <div class="section-label"><span class="num">04</span>Tradeoffs</div>
   <h2>What training <em>can't</em> fix.</h2>
-  <div class="tradeoffs-grid">
-    <div class="tradeoff-item">
-      <div class="tradeoff-dot pro" aria-label="advantage"></div>
-      <div class="tradeoff-text"><strong>Knowledge cutoff.</strong> Pretraining ends at a date. Anything after that date the model simply does not know, no matter how you prompt it.</div>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span>Low</span><span>High</span></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost</div>
+      <div class="tradeoff-bars" aria-label="Cost: 5 out of 5">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
     </div>
-    <div class="tradeoff-item">
-      <div class="tradeoff-dot pro" aria-label="advantage"></div>
-      <div class="tradeoff-text"><strong>Fine-tuning costs money.</strong> Retraining on new examples is expensive. Most teams only fine-tune once, then rely on prompting for the rest.</div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Time</div>
+      <div class="tradeoff-bars" aria-label="Time: 5 out of 5">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
     </div>
-    <div class="tradeoff-item">
-      <div class="tradeoff-dot con" aria-label="caution"></div>
-      <div class="tradeoff-text"><strong>RLHF can over-optimise.</strong> If raters prefer confident-sounding answers, the model learns to sound confident even when it is wrong. The human signal is not perfect.</div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Capability lift</div>
+      <div class="tradeoff-bars" aria-label="Capability lift: 4 out of 5">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
     </div>
-    <div class="tradeoff-item">
-      <div class="tradeoff-dot con" aria-label="caution"></div>
-      <div class="tradeoff-text"><strong>Training is not the last word.</strong> How you prompt the trained model matters just as much. A well-trained model still gives poor answers to poorly written questions.</div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Reversibility</div>
+      <div class="tradeoff-bars" aria-label="Reversibility: 1 out of 5">
+        <div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
     </div>
+    <div class="tradeoff-quote">Training is the most powerful lever but the slowest and most expensive one. Knowledge has a cutoff date; fine-tuning is costly to repeat; human feedback can teach overconfidence if rater signals are noisy. How you prompt the trained model still matters just as much as how it was trained.</div>
+  </div>
+</section>
+
+<!-- 05 INSIDE THIS LAYER -->
+<section>
+  <div class="section-label"><span class="num">05</span>Inside This Layer</div>
+  <h2>Every category <em>mapped</em>.</h2>
+  <div class="layer-map">
+    <div class="layer-axis">Axis: training lifecycle stage</div>
+    <div class="category-list">
+
+      <div class="cat-row">
+        <div class="cat-dot" aria-hidden="true"></div>
+        <div class="cat-body">
+          <div class="cat-name">Pretraining Objectives &amp; Data</div>
+          <div class="cat-line">The foundation step: a model reads an enormous corpus and learns to predict the next word (or token, a small piece of text the AI works in: roughly a word, or a slice of an image or sound). This is where general language ability comes from.</div>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-dot" aria-hidden="true"></div>
+        <div class="cat-body">
+          <div class="cat-name">Continued Pretraining</div>
+          <div class="cat-line">Running the pretraining objective further, usually on a domain-specific corpus (legal documents, medical literature, code) after the main pretraining run ends. Keeps the full language capability while shifting the model's knowledge toward a new area.</div>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-dot" aria-hidden="true"></div>
+        <div class="cat-body">
+          <div class="cat-name">Supervised Fine-Tuning (SFT)</div>
+          <div class="cat-line">Training on labelled examples: a prompt (the text you send the AI) paired with the ideal response. This is what turns a raw language model into something that follows instructions and converses helpfully.</div>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-dot" aria-hidden="true"></div>
+        <div class="cat-body">
+          <div class="cat-name">Preference Optimization (Reinforcement Learning from Human Feedback, DPO, Constitutional AI / RLAIF)</div>
+          <div class="cat-line">After SFT, preference signals shape behaviour. Reinforcement Learning from Human Feedback (RLHF) uses human raters to score answers; Direct Preference Optimization (DPO) achieves a similar goal without a separate reward model; Constitutional AI (RLAIF) substitutes AI-generated preferences for human labels to scale the process.</div>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-dot" aria-hidden="true"></div>
+        <div class="cat-body">
+          <div class="cat-name">Reasoning-Capability Training</div>
+          <div class="cat-line">Dedicated training to improve the model's ability to reason step by step, using reinforcement learning on reasoning traces, distillation from reasoning examples, or process-reward models that score each step, not just the final answer.</div>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-dot" aria-hidden="true"></div>
+        <div class="cat-body">
+          <div class="cat-name">Parameter-Efficient Fine-Tuning (LoRA, QLoRA, Adapters, Prefix Tuning)</div>
+          <div class="cat-line">Techniques that update only a small fraction of a model's weights (or add a tiny extra module) instead of retraining the whole thing. Makes fine-tuning feasible on a single consumer GPU (the chip that does the heavy computing) rather than a large cluster.</div>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-dot" aria-hidden="true"></div>
+        <div class="cat-body">
+          <div class="cat-name">Distillation</div>
+          <div class="cat-line">Training a smaller model (the student) to mimic the outputs of a larger model (the teacher). The student inherits capability at a fraction of the size and cost, making deployment practical.</div>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-dot" aria-hidden="true"></div>
+        <div class="cat-body">
+          <div class="cat-name">Model Merging</div>
+          <div class="cat-line">Combining the weights of separately trained models (often by averaging) to blend their capabilities without additional training. Can combine a coding specialist and a language specialist into one model with both strengths.</div>
+        </div>
+      </div>
+
+      <div class="cat-row">
+        <div class="cat-dot" aria-hidden="true"></div>
+        <div class="cat-body">
+          <div class="cat-name">Evaluation During Training</div>
+          <div class="cat-line">Tracking quality on a held-out dev set throughout the training run: deciding which checkpoint to keep, catching overfitting early, and maintaining hygiene so the eval set does not leak into the training data.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="layer-filing"><strong>Filing rule:</strong> What stage of the training lifecycle is this? If the purpose is to build native reasoning capability into the weights, it is Reasoning-Capability Training regardless of mechanism shape. If it operates on the model at serving time as a black box, it belongs to L0 (Serving Infrastructure), not here.</div>
   </div>
 </section>
 
@@ -332,8 +447,10 @@
   <ul>
     <li>Ouyang et al. (2022). <em>Training language models to follow instructions with human feedback.</em> <span class="note">The InstructGPT paper that introduced RLHF for language models.</span></li>
     <li>Brown et al. (2020). <em>Language Models are Few-Shot Learners (GPT-3).</em> <span class="note">Foundational large-scale pretraining result.</span></li>
-    <li>OpenAI (2023). <em>GPT-4 Technical Report.</em> <span class="note">Describes the full pretraining + RLHF pipeline for GPT-4.</span></li>
+    <li>OpenAI (2023). <em>GPT-4 Technical Report.</em> <span class="note">Describes the full pretraining and RLHF pipeline for GPT-4.</span></li>
     <li>Ziegler et al. (2019). <em>Fine-Tuning Language Models from Human Preferences.</em> <span class="note">Early work showing human preference signals improve generation.</span></li>
+    <li>Hu et al. (2022). <em>LoRA: Low-Rank Adaptation of Large Language Models.</em> <span class="note">Foundational parameter-efficient fine-tuning technique.</span></li>
+    <li>Bai et al. (2022). <em>Constitutional AI: Harmlessness from AI Feedback.</em> <span class="note">Introduces RLAIF as a scalable alternative to human preference labelling.</span></li>
   </ul>
 </div>
 
@@ -343,21 +460,18 @@
 
 <script>
 // ======== PIPELINE DEMO ========
-// Three stages. Tapping a node or pressing Play reveals that stage's
-// version of the answer, with the improvement highlighted, and updates
-// the caption below. Play steps through all three automatically.
-
 const nodes    = [0,1,2].map(i => document.getElementById('node-' + i));
 const arrows   = [0,1].map(i => document.getElementById('arrow-' + i));
 const layers   = ['idle',0,1,2].map(k => document.getElementById('layer-' + k));
 const caption  = document.getElementById('stage-caption');
 const playBtn  = document.getElementById('playBtn');
+const stepBtn  = document.getElementById('stepBtn');
 const resetBtn = document.getElementById('resetBtn');
 
 const captions = [
   '<strong>Pretraining:</strong> The model has read huge amounts of text, so it can produce a relevant answer. But it is vague and generic — it has not been told what a good answer looks like.',
-  '<strong>Fine-tuning:</strong> The model has studied worked examples of good answers. Now it gives concrete steps instead of vague advice. It knows the shape of a helpful reply.',
-  '<strong>RLHF:</strong> Human raters preferred answers that were warm and referenced real research. The model learned from that signal, adding a greeting and naming the Pomodoro technique.'
+  '<strong>Supervised Fine-Tuning (SFT):</strong> The model has studied worked examples of good answers. Now it gives concrete steps instead of vague advice. It knows the shape of a helpful reply.',
+  '<strong>Human Feedback (RLHF):</strong> Human raters preferred answers that were warm and referenced real research. The model learned from that signal, adding a greeting and naming the Pomodoro technique.'
 ];
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -367,19 +481,15 @@ let playing = false;
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
 function showLayer(idx) {
-  // idx: 0..2 for stages; -1 for idle
-  layers.forEach(l => {
-    l.classList.remove('shown');
-  });
+  layers.forEach(l => { l.classList.remove('shown'); });
   if(idx === -1){
-    layers[0].classList.add('shown'); // idle prompt
+    layers[0].classList.add('shown');
   } else {
-    layers[idx + 1].classList.add('shown'); // layer-0, layer-1, layer-2
+    layers[idx + 1].classList.add('shown');
   }
 }
 
 function activateNode(idx) {
-  // idx: 0..2
   nodes.forEach((n, i) => {
     n.classList.remove('active','done');
     n.setAttribute('aria-pressed','false');
@@ -400,6 +510,7 @@ function goToStage(idx){
   activateNode(idx);
   showLayer(idx);
   setCaption(captions[idx]);
+  stepBtn.disabled = currentStage >= 2;
 }
 
 function reset(){
@@ -408,6 +519,7 @@ function reset(){
   arrows.forEach(a => a.classList.remove('lit'));
   showLayer(-1);
   setCaption('Tap a stage or press Play to see how training improves the answer.');
+  stepBtn.disabled = false;
 }
 
 // tap a node
@@ -425,15 +537,22 @@ nodes.forEach((node, i) => {
   });
 });
 
-// play button: steps through stages automatically
+// step button
+stepBtn.addEventListener('click', () => {
+  if(playing) return;
+  const next = currentStage + 1;
+  if(next <= 2) goToStage(next);
+});
+
+// play button
 playBtn.addEventListener('click', async () => {
   if(playing) return;
   playing = true;
   playBtn.disabled = true;
+  stepBtn.disabled = true;
   resetBtn.disabled = true;
   reset();
   if(reduceMotion){
-    // show final stage immediately
     goToStage(2);
   } else {
     await sleep(400);
@@ -444,6 +563,7 @@ playBtn.addEventListener('click', async () => {
   }
   playing = false;
   playBtn.disabled = false;
+  stepBtn.disabled = currentStage >= 2;
   resetBtn.disabled = false;
 });
 

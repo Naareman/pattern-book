@@ -217,6 +217,46 @@
   .method-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
   .method-desc { font-size: 14px; color: var(--soft); line-height: 1.5; }
 
+  /* 04 WHAT THIS COVERS */
+  .covers-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .covers-scope {
+    font-size: 13px; font-weight: 600; color: var(--faint);
+    text-transform: uppercase; letter-spacing: .05em;
+    margin-bottom: 6px;
+  }
+  .covers-scope span { color: var(--text); font-weight: 500; text-transform: none; letter-spacing: 0; }
+  .covers-axis {
+    font-size: 14px; color: var(--soft); line-height: 1.55;
+    padding: 10px 14px; background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 22px;
+  }
+  .covers-axis strong { color: var(--text); font-weight: 600; }
+  .discipline-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
+  .discipline-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 13px 0; border-bottom: 1px solid var(--border);
+  }
+  .discipline-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .discipline-name {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
+    color: var(--text); min-width: 220px; flex-shrink: 0; padding-top: 1px;
+  }
+  .discipline-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .covers-note {
+    margin-top: 20px; padding: 12px 14px;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 8px; font-size: 13px; color: var(--soft); line-height: 1.55;
+  }
+  .covers-note strong { color: var(--text); font-weight: 600; }
+
+  @media (max-width: 560px) {
+    .discipline-item { flex-direction: column; gap: 4px; }
+    .discipline-name { min-width: 0; }
+  }
+
   /* BACK LINK */
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
@@ -277,7 +317,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
       </svg>
-    </span>Consideration
+    </span>C1 &middot; Consideration
   </span>
   <h1 class="pattern-title">Evaluation</h1>
   <p class="explainer">Checking that the AI is actually right, not just sounding certain.</p>
@@ -393,7 +433,7 @@
     <div class="eval-status" id="evalStatus" aria-live="polite">0 / 4 checked</div>
 
     <div class="board-controls">
-      <button class="diagram-btn primary" id="runAllBtn">&#9654; Run all</button>
+      <button class="diagram-btn primary" id="runAllBtn">&#9654; Play</button>
       <button class="diagram-btn" id="resetEvalBtn">&#8635; Reset</button>
     </div>
   </div>
@@ -430,11 +470,63 @@
       <li class="method-item">
         <div class="method-dot">D</div>
         <div class="method-body">
-          <div class="method-name">LLM-as-judge</div>
+          <div class="method-name">LLM (large language model) as judge</div>
           <div class="method-desc">A second AI reads the answer and rates it against the known-correct answer. Scales better than human review and catches more nuance than code. It can still be fooled by confident-sounding errors, so it works best alongside a test set.</div>
         </div>
       </li>
     </ul>
+  </div>
+</section>
+
+<!-- 04 WHAT THIS COVERS -->
+<section>
+  <div class="section-label"><span class="num">04</span>What This Covers</div>
+  <h2>The <em>disciplines</em> inside Evaluation.</h2>
+
+  <div class="covers-card">
+
+    <div class="covers-scope">Applies to: <span>every AI system</span></div>
+    <div class="covers-axis"><strong>Axis:</strong> how to judge whether the system produces the right output or the right trajectory.</div>
+
+    <ul class="discipline-list">
+      <li class="discipline-item">
+        <div class="discipline-name">Eval Methodology</div>
+        <div class="discipline-desc">The overall framework: benchmarks, golden test sets, human eval, and rubrics. Decides what "right" means before measuring anything.</div>
+      </li>
+      <li class="discipline-item">
+        <div class="discipline-name">Agent Trajectory Evaluation</div>
+        <div class="discipline-desc">Judges not just the final answer but every step the agent took to get there. A correct result via a broken path is still a problem.</div>
+      </li>
+      <li class="discipline-item">
+        <div class="discipline-name">Regression Testing</div>
+        <div class="discipline-desc">Running the same eval suite after every change to confirm nothing that worked before has broken. The safety net for iterative development.</div>
+      </li>
+      <li class="discipline-item">
+        <div class="discipline-name">Eval-Driven Development</div>
+        <div class="discipline-desc">Writing the eval before writing the system, so you know exactly what "done" looks like before you start building.</div>
+      </li>
+      <li class="discipline-item">
+        <div class="discipline-name">Statistical Rigor</div>
+        <div class="discipline-desc">Making sure eval results are real, not noise. Covers sample sizes, confidence intervals, and avoiding lucky-run bias.</div>
+      </li>
+      <li class="discipline-item">
+        <div class="discipline-name">Prompt Lifecycle Thinking</div>
+        <div class="discipline-desc">Treating prompts as versioned artifacts with their own eval coverage, so a prompt change triggers a re-run, not just a re-read.</div>
+      </li>
+      <li class="discipline-item">
+        <div class="discipline-name">Faithfulness and Groundedness Evaluation</div>
+        <div class="discipline-desc">Checking that the AI's answer actually follows from the documents or facts it was given, not from something it invented.</div>
+      </li>
+      <li class="discipline-item">
+        <div class="discipline-name">Hallucination Detection Methodology</div>
+        <div class="discipline-desc">The overall discipline for finding made-up claims. The actual pieces live across layers: claim extraction in Single-Call Control (L4), verifier scoring in Structural Composition (L2), and citation grounding in Stateless Retrieval (L3a).</div>
+      </li>
+    </ul>
+
+    <div class="covers-note">
+      <strong>Considerations are disciplines, not mechanisms.</strong> A consideration is a way of reasoning about a concern. The actual building blocks live in the layers. Hallucination detection is a good example: the methodology lives here in C1, but its pieces are spread across L4, L2, and L3a. When you want to build something, follow the cross-references into the layers.
+    </div>
+
   </div>
 </section>
 
@@ -505,7 +597,7 @@ function updateScore() {
   if (checked === total) {
     const failCount = total - passed;
     if (failCount === 0) {
-      evalStatus.textContent = 'All 4 correct. Perfect score — but a real eval set has hundreds of questions.';
+      evalStatus.textContent = 'All 4 correct. Perfect score. A real eval set has hundreds of questions.';
     } else {
       evalStatus.textContent = failCount + ' of 4 caught wrong. That’s why you test before you ship.';
     }

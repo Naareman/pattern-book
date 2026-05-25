@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Orchestration &amp; Agents · The Pattern Book</title>
+<title>Orchestration · L5 · The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -218,17 +218,17 @@
     display: flex; gap: 10px; flex-wrap: wrap;
     padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
   }
-  .demo-btn {
+  .diagram-btn {
     padding: 10px 16px; border: 1px solid var(--border-strong);
     background: var(--surface); border-radius: var(--radius-sm);
     cursor: pointer; font-family: 'Inter', sans-serif;
     font-size: 14px; font-weight: 600; color: var(--text);
     transition: transform 0.18s, box-shadow 0.18s, background 0.18s, border-color 0.18s;
   }
-  .demo-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
-  .demo-btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
-  .demo-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .demo-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 
   /* ============ WHEN IT MATTERS ============ */
   .example-card {
@@ -251,21 +251,68 @@
   }
   .example-val strong { color: var(--accent-hover); font-weight: 600; }
 
-  /* ============ TRADEOFFS ============ */
-  .tradeoffs-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-  }
-  .tradeoff-cell {
+  /* ============ TRADEOFFS (canonical monochrome meter) ============ */
+  .tradeoffs-stage {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 18px 20px;
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
   }
-  .tradeoff-cell .tc-label {
-    font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-    margin-bottom: 8px;
+  .tradeoff-scale {
+    display: flex; justify-content: space-between;
+    font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 14px;
   }
-  .tradeoff-cell.tc-good .tc-label { color: var(--success); }
-  .tradeoff-cell.tc-cost .tc-label { color: #92400E; }
-  .tradeoff-cell .tc-body { font-size: 14px; line-height: 1.55; color: var(--soft); }
+  .tradeoff-row {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 10px;
+  }
+  .tradeoff-label {
+    min-width: 100px; font-size: 13px; font-weight: 600; color: var(--soft); flex-shrink: 0;
+  }
+  .tradeoff-bars { display: flex; gap: 5px; flex: 1; }
+  .tradeoff-bars .seg {
+    flex: 1; height: 8px; border-radius: 4px;
+    background: var(--border); transition: background .2s;
+  }
+  .tradeoff-bars .seg.on { background: var(--accent); }
+  .tradeoff-quote {
+    font-size: 13px; color: var(--faint); line-height: 1.55;
+    border-top: 1px solid var(--border); margin-top: 16px; padding-top: 14px;
+  }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
+    .tradeoff-label { min-width: 0; }
+  }
+
+  /* ============ INSIDE THIS LAYER ============ */
+  .layer-map {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .layer-axis {
+    font-size: 13px; font-style: italic; color: var(--soft);
+    border-left: 3px solid var(--accent); padding-left: 14px;
+    margin-bottom: 26px; line-height: 1.55;
+  }
+  .subaxis-block { margin-bottom: 26px; }
+  .subaxis-block:last-child { margin-bottom: 0; }
+  .subaxis-head {
+    font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent-hover); margin-bottom: 12px;
+    padding-bottom: 6px; border-bottom: 1px solid var(--border);
+  }
+  .cat-row { display: flex; flex-direction: column; gap: 10px; }
+  .cat-item { display: flex; flex-direction: column; gap: 3px; }
+  .cat-name {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
+    color: var(--text); line-height: 1.2;
+  }
+  .cat-desc {
+    font-size: 13.5px; color: var(--soft); line-height: 1.5;
+  }
+  .layer-filing-rule {
+    margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--faint); line-height: 1.6;
+  }
+  .layer-filing-rule strong { color: var(--soft); font-weight: 600; }
 
   /* back link */
   .back-link {
@@ -306,13 +353,13 @@
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .tradeoffs-grid { grid-template-columns: 1fr; }
+    .layer-map { padding: 18px 16px; }
     .example-row { grid-template-columns: 1fr; }
     .example-key { border-right: none; border-bottom: 1px solid var(--border); }
   }
   @media (max-width: 480px) {
     .demo-controls { flex-direction: column; align-items: stretch; }
-    .demo-btn { flex: 1; }
+    .diagram-btn { flex: 1; }
   }
 </style>
 </head>
@@ -324,7 +371,7 @@
   <div class="topbar-inner">
     <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">Orchestration &amp; agents</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">L5 · Orchestration</span>
     </nav>
   </div>
 </nav>
@@ -337,16 +384,16 @@
         <circle cx="12" cy="12" r="3"/>
         <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/>
       </svg>
-    </span>Layer 7
+    </span>Layer · L5
   </span>
-  <h1 class="pattern-title">Orchestration &amp; agents</h1>
-  <p class="explainer">The AI plans its own steps, picks the right tool for each one, checks what came back, and keeps going until the task is done.</p>
+  <h1 class="pattern-title">Orchestration</h1>
+  <p class="explainer">How the system organizes its calls across time, takes action in the world, and talks to other AI actors.</p>
 </header>
 
 <!-- 01 · THE IDEA -->
 <section>
   <div class="section-label"><span class="num">01</span>The Idea</div>
-  <h2>What <em>is</em> it?</h2>
+  <h2>What <em>Is</em> It?</h2>
   <div class="idea-card">
     <p>
       An <strong style="color:var(--accent-hover)">agent</strong> does not just answer a question. It runs a loop:
@@ -359,8 +406,8 @@
 
 <!-- 02 · SEE IT WORK -->
 <section>
-  <div class="section-label"><span class="num">02</span>See it work</div>
-  <h2>Watch the <em>loop</em>.</h2>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Watch the <em>Loop</em>.</h2>
 
   <p class="demo-lede">An agent is solving a small task. Tap Step to go one step at a time, or Play to run the whole loop.</p>
 
@@ -384,17 +431,17 @@
     </div>
 
     <div class="demo-controls">
-      <button class="demo-btn" id="stepBtn">&rarr; Step</button>
-      <button class="demo-btn primary" id="playBtn">&#9654; Play</button>
-      <button class="demo-btn" id="resetBtn">&#8635; Reset</button>
+      <button class="diagram-btn" id="stepBtn">&#8594; Step</button>
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8634; Reset</button>
     </div>
   </div>
 </section>
 
 <!-- 03 · REAL EXAMPLE -->
 <section>
-  <div class="section-label"><span class="num">03</span>A real example</div>
-  <h2>Where it <em>matters</em>.</h2>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>Where It <em>Matters</em>.</h2>
 
   <div class="example-card">
     <div class="example-row">
@@ -419,23 +466,144 @@
 <!-- 04 · TRADEOFFS -->
 <section>
   <div class="section-label"><span class="num">04</span>Tradeoffs</div>
-  <h2>The <em>price</em> you pay.</h2>
-  <div class="tradeoffs-grid">
-    <div class="tradeoff-cell tc-good">
-      <div class="tc-label">What you gain</div>
-      <div class="tc-body">Tasks that need many steps, decisions, or real-world data can now run on their own. The AI does the work you would have had to do manually, step by step.</div>
+  <h2>The <em>Price</em> You Pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span>Low</span><span>High</span></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Autonomy</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
     </div>
-    <div class="tradeoff-cell tc-cost">
-      <div class="tc-label">What you give up</div>
-      <div class="tc-body">More steps cost more time and money. The agent can get stuck in a loop or take a wrong turn. Each tool call is a point where something can go wrong.</div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
     </div>
-    <div class="tradeoff-cell tc-good">
-      <div class="tc-label">Best fit</div>
-      <div class="tc-body">Multi-step tasks, tasks that need live data, or tasks where the right path is not known in advance.</div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost per task</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
     </div>
-    <div class="tradeoff-cell tc-cost">
-      <div class="tc-label">Not worth it</div>
-      <div class="tc-body">Simple questions. If one call gives the answer, adding a loop just wastes time and money.</div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Observability</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Failure modes</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Best fit: multi-step tasks that need live data or branching decisions. Not worth it: simple one-shot questions where a single model call gives the full answer.
+    </div>
+  </div>
+</section>
+
+<!-- 05 · INSIDE THIS LAYER -->
+<section>
+  <div class="section-label"><span class="num">05</span>Inside This Layer</div>
+  <h2>Everything that <em>lives</em> here.</h2>
+
+  <div class="layer-map">
+    <div class="layer-axis">Axis: how a system's calls and actions are organized across time, the world, and other actors.</div>
+
+    <!-- SUB-AXIS: SHAPE -->
+    <div class="subaxis-block">
+      <div class="subaxis-head">Shape: Structure of Execution Across Calls</div>
+      <div class="cat-row">
+        <div class="cat-item">
+          <div class="cat-name">Single-Call Patterns</div>
+          <div class="cat-desc">The entire task is answered in one round trip to the model. Nothing loops or fans out.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Sequential Pipelines</div>
+          <div class="cat-desc">Steps run one after another in a fixed order. The output of each step feeds the next.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Parallel / Fan-Out / Fan-In</div>
+          <div class="cat-desc">Multiple sub-tasks run at the same time and their results are gathered back into one answer.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Iterative Loops (ReAct, Reflection)</div>
+          <div class="cat-desc">The model repeats a Think-Act-Observe cycle until it has enough to stop. The ReAct loop demonstrated above is this pattern.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Router / Dispatcher</div>
+          <div class="cat-desc">An entry point inspects the request and sends it to whichever specialist or sub-pipeline is the right fit.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Hierarchical Planning (Planner-Executor)</div>
+          <div class="cat-desc">A planner model breaks the goal into a high-level plan. Separate executor agents carry out each step of that plan.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Conditional Branching</div>
+          <div class="cat-desc">The path through the system changes based on what the model or a check discovers at runtime.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUB-AXIS: ACTION -->
+    <div class="subaxis-block">
+      <div class="subaxis-head">Action: State-Changing Operations on the Outside World</div>
+      <div class="cat-row">
+        <div class="cat-item">
+          <div class="cat-name">External Action (State-Changing Tool Invocation)</div>
+          <div class="cat-desc">The agent calls a tool that writes, books, sends, or otherwise changes something outside the model. A read-only search belongs in L3a, not here.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Idempotency and Action Verification</div>
+          <div class="cat-desc">Ensuring the same action run twice leaves the world in the same state, and confirming the action actually succeeded.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Compensating Actions and Rollback</div>
+          <div class="cat-desc">When a step fails mid-sequence, the system runs an undo operation to restore a safe state.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Approval Gates</div>
+          <div class="cat-desc">The agent pauses and waits for a human to approve before a high-stakes action executes. The user-facing display of that pause lives in L7.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Side-Effect Sandboxing</div>
+          <div class="cat-desc">Running potentially dangerous code or actions in an isolated environment so failures cannot escape to production.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Multi-Step Action Transactions</div>
+          <div class="cat-desc">Treating a sequence of actions as one atomic unit: all succeed together or all roll back together.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUB-AXIS: COORDINATION -->
+    <div class="subaxis-block">
+      <div class="subaxis-head">Coordination: Communication Between Multiple Actors</div>
+      <div class="cat-row">
+        <div class="cat-item">
+          <div class="cat-name">Agent-to-Agent Protocols (MCP, A2A)</div>
+          <div class="cat-desc">Standard message formats that let one AI agent call or delegate to another. MCP (Model Context Protocol) and A2A (Agent-to-Agent) are the current leading protocols.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Shared Workspace / Blackboard</div>
+          <div class="cat-desc">Multiple agents read and write to a common space so they can build on each other's partial results without a direct hand-off.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Agent Identity and Auth</div>
+          <div class="cat-desc">How an agent proves who it is, holds credentials securely, and operates with only the permissions it needs.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Capability Negotiation and Tool Discovery</div>
+          <div class="cat-desc">Agents advertise what they can do, and callers discover which tools or sub-agents are available at runtime.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="layer-filing-rule">
+      <strong>Filing rule:</strong> Shape = in what order or structure do calls execute? Action = what does the system do to outside state? Coordination = how do multiple actors communicate? When you see a ReAct loop, the loop itself is Shape. Each tool call inside the loop is Action.
     </div>
   </div>
 </section>
@@ -458,7 +626,7 @@
     <li>Yao et al. (2022). <em>ReAct: Synergizing Reasoning and Acting in Language Models.</em> <span class="note">The paper that named the Think-Act-Observe loop.</span></li>
     <li>Shinn et al. (2023). <em>Reflexion: Language Agents with Verbal Reinforcement Learning.</em> <span class="note">Agents that improve by observing their own mistakes.</span></li>
     <li>Anthropic (2024). <em>Claude's Tool Use documentation.</em> <span class="note">How tool-calling is implemented in practice.</span></li>
-    <li>OpenAI (2023). <em>Function Calling and Agents — developer documentation.</em></li>
+    <li>OpenAI (2023). <em>Function Calling and Agents: developer documentation.</em></li>
   </ul>
 </div>
 

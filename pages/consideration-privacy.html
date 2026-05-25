@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Privacy . The Pattern Book</title>
+<title>Privacy, Security &amp; Governance . The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -254,6 +254,44 @@
   .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
   .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
 
+  /* WHAT THIS COVERS CARD */
+  .covers-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 26px;
+  }
+  .covers-scope, .covers-axis {
+    font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 6px;
+  }
+  .covers-scope-label, .covers-axis-label {
+    font-weight: 600; color: var(--text);
+  }
+  .covers-note {
+    font-size: 13px; color: var(--faint); line-height: 1.6;
+    margin-top: 10px; padding: 10px 14px;
+    background: var(--bg-subtle); border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+  .covers-list {
+    margin-top: 18px; display: flex; flex-direction: column; gap: 0;
+  }
+  .covers-item {
+    padding: 13px 0; border-bottom: 1px solid var(--border);
+    display: flex; gap: 14px; align-items: baseline;
+  }
+  .covers-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .covers-item-name {
+    font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 15px; color: var(--text);
+    min-width: 230px; flex-shrink: 0; line-height: 1.4;
+  }
+  .covers-item-line {
+    font-size: 14px; color: var(--soft); line-height: 1.55; flex: 1;
+  }
+  @media (max-width: 560px) {
+    .covers-item { flex-direction: column; gap: 4px; }
+    .covers-item-name { min-width: 0; }
+  }
+
   /* BACK LINK */
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
@@ -296,7 +334,11 @@
     h2 { font-size: 21px; }
     .board-controls { flex-direction: column; align-items: stretch; }
     .diagram-btn { flex: 1; }
-    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
+    .tradeoff-label { min-width: 0; }
+  }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
     .tradeoff-label { min-width: 0; }
   }
 </style>
@@ -313,7 +355,7 @@
       <span class="sep">/</span>
       <a href="considerations.html">Considerations</a>
       <span class="sep">/</span>
-      <span class="here">Privacy</span>
+      <span class="here">Privacy, Security &amp; Governance</span>
     </nav>
   </div>
 </nav>
@@ -327,10 +369,10 @@
         <path d="M8 11V8a4 4 0 0 1 8 0v3"/>
       </svg>
     </span>
-    Consideration
+    C3 &nbsp;&middot;&nbsp; Consideration
   </span>
-  <h1 class="pattern-title">Privacy</h1>
-  <p class="explainer">Personal details belong to people, not to models. Detect them, hide them, and never let one person's data reach another.</p>
+  <h1 class="pattern-title">Privacy, Security &amp; Governance</h1>
+  <p class="explainer">Personal details belong to people, not to models. This crosscut covers how to protect data, users, and tenants across every part of a system that handles user, customer, or tenant data.</p>
 </header>
 
 <!-- 01 · THE IDEA -->
@@ -338,13 +380,13 @@
   <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What <em>is</em> it?</h2>
   <div class="idea-card">
-    <p>When someone talks to an AI, they often share private things: their name, email, phone number, ID. <span style="color:var(--accent-hover);font-weight:500">Privacy</span> means the system detects those personal details and hides them before storing the message or sending it to the model. One person's data never leaks to another person's session.</p>
+    <p>When someone talks to an AI, they often share private things: their name, email, phone number, ID. Protecting that personal information (PII) means the system detects those personal details and hides them before storing the message or sending it to the model. One person's data never leaks to another person's session.</p>
   </div>
 </section>
 
 <!-- 02 · DEMO -->
 <section>
-  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
   <h2>Watch a message get <em>scanned</em>.</h2>
 
   <p class="demo-lede">A customer support message arrives. The system scans it and redacts every piece of personal information before it reaches the AI or the database. Tap Play to watch.</p>
@@ -367,9 +409,54 @@
   </div>
 </section>
 
-<!-- 03 · REAL EXAMPLE -->
+<!-- 03 · WHAT THIS COVERS -->
 <section>
-  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <div class="section-label"><span class="num">03</span>What This Covers</div>
+  <h2>Every discipline in <em>this crosscut</em>.</h2>
+  <div class="covers-card">
+    <div class="covers-scope">
+      <span class="covers-scope-label">Applies to:</span> every system that handles user, customer, or tenant data.
+    </div>
+    <div class="covers-axis">
+      <span class="covers-axis-label">Axis:</span> protecting data, users, and tenants.
+    </div>
+    <p class="covers-note">C3 is a discipline crosscut. The mechanisms (scoped retrieval, per-tenant context limits) live in Serving Infrastructure (L0) and Stateless Retrieval (L3a). What lives here is the reasoning framework: which controls to apply, why, and how they compose.</p>
+    <div class="covers-list">
+      <div class="covers-item">
+        <div class="covers-item-name">Access Control</div>
+        <div class="covers-item-line">Who is allowed to see what. Defines the permission model for users, roles, and API keys across the system.</div>
+      </div>
+      <div class="covers-item">
+        <div class="covers-item-name">Tenant Isolation Discipline</div>
+        <div class="covers-item-line">Keeping one customer's data strictly separate from another's. A discipline: the actual runtime mechanisms (scoped queries, per-tenant limits) live in L0 and L3a.</div>
+      </div>
+      <div class="covers-item">
+        <div class="covers-item-name">Audit-Logging</div>
+        <div class="covers-item-line">Recording what happened, who triggered it, and when. An immutable trail that lets you answer "what did the system do with this user's data?"</div>
+      </div>
+      <div class="covers-item">
+        <div class="covers-item-name">Compliance Mapping (GDPR, HIPAA, SOC2)</div>
+        <div class="covers-item-line">Translating legal and regulatory obligations into concrete system requirements. Each regime names different controls; this discipline maps them to the patterns you build.</div>
+      </div>
+      <div class="covers-item">
+        <div class="covers-item-name">Data Residency</div>
+        <div class="covers-item-line">Ensuring data is stored and processed only in allowed geographic regions. Critical when regulations restrict cross-border data flows.</div>
+      </div>
+      <div class="covers-item">
+        <div class="covers-item-name">Runtime PII-Handling</div>
+        <div class="covers-item-line">Detecting, redacting, or tokenizing personal information (PII) as it flows through the system at inference time, before data reaches the model or logs.</div>
+      </div>
+      <div class="covers-item">
+        <div class="covers-item-name">Provenance &amp; Watermarking</div>
+        <div class="covers-item-line">Tracking where output came from and marking generated content so it can be identified as AI-produced. Supports attribution and misuse detection.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 · REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">04</span>A Real Example</div>
   <h2>How a <em>support tool</em> applies this.</h2>
   <div class="example-stage">
     <div class="flow">
@@ -383,8 +470,8 @@
       <div class="flow-step">
         <div class="flow-num" aria-hidden="true">2</div>
         <div class="flow-body">
-          <div class="flow-title">PII scanner runs before anything else</div>
-          <div class="flow-desc">A regex or ML classifier finds names, emails, phone numbers, and government IDs. Each is replaced with a neutral tag like <code style="font-size:12px;background:var(--bg-subtle);padding:1px 5px;border-radius:3px;border:1px solid var(--border)">[EMAIL]</code> before the text moves forward.</div>
+          <div class="flow-title">Personal Info (PII) Scanner Runs Before Anything Else</div>
+          <div class="flow-desc">A pattern-matcher finds names, emails, phone numbers, and government IDs. Each is replaced with a neutral tag like <code style="font-size:12px;background:var(--bg-subtle);padding:1px 5px;border-radius:3px;border:1px solid var(--border)">[EMAIL]</code> before the text moves forward.</div>
         </div>
       </div>
       <div class="flow-step">
@@ -405,9 +492,9 @@
   </div>
 </section>
 
-<!-- 04 · TRADEOFFS -->
+<!-- 05 · TRADEOFFS -->
 <section>
-  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <div class="section-label"><span class="num">05</span>Tradeoffs</div>
   <h2>What privacy <em>costs</em>.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale">

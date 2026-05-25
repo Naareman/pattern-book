@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User experience · The Pattern Book</title>
+<title>User Surface &amp; Agency · The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -211,17 +211,17 @@
     border-top: 1px solid var(--border); padding: 14px 18px;
     display: flex; gap: 8px; flex-wrap: wrap;
   }
-  .demo-btn {
+  .diagram-btn {
     padding: 9px 16px; border: 1px solid var(--border-strong);
     background: var(--surface); border-radius: var(--radius-sm);
     cursor: pointer; font-family: 'Inter', sans-serif;
     font-size: 14px; font-weight: 600; color: var(--text);
     transition: transform .18s, box-shadow .18s, background .18s, border-color .18s;
   }
-  .demo-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
-  .demo-btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
-  .demo-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .demo-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 
   /* 03 REAL EXAMPLE */
   .example-stage {
@@ -245,16 +245,73 @@
   }
   .example-content strong { color: var(--text); font-weight: 600; }
 
-  /* 04 TRADEOFFS */
+  /* 04 TRADEOFFS -- canonical monochrome meter */
   .tradeoffs-stage {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
   }
-  .tradeoff-item { margin-bottom: 20px; }
-  .tradeoff-item:last-child { margin-bottom: 0; }
-  .tradeoff-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
-  .tradeoff-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
-  .tradeoff-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+  .tradeoff-scale {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 14px;
+  }
+  .tradeoff-row {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 12px;
+  }
+  .tradeoff-label {
+    min-width: 100px; font-size: 13px; font-weight: 600; color: var(--text); flex-shrink: 0;
+  }
+  .tradeoff-bars { display: flex; gap: 4px; flex: 1; }
+  .seg {
+    height: 8px; flex: 1; border-radius: 3px;
+    background: var(--border-strong);
+  }
+  .seg.on { background: var(--accent); }
+  .tradeoff-quote {
+    font-size: 13px; color: var(--soft); line-height: 1.5; margin-top: 16px;
+    border-top: 1px solid var(--border); padding-top: 14px;
+  }
+  @media(max-width:480px){
+    .tradeoff-row{flex-direction:column;align-items:stretch}
+    .tradeoff-label{min-width:0}
+  }
+
+  /* 05 INSIDE THIS LAYER */
+  .layer-map {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .layer-map-axis {
+    background: var(--bg-subtle); border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    font-size: 13px; color: var(--soft); line-height: 1.5;
+  }
+  .layer-map-axis strong { color: var(--text); font-weight: 600; }
+  .layer-map-category {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .layer-map-category:last-of-type { border-bottom: none; }
+  .layer-map-name {
+    flex: 0 0 230px; padding: 14px 18px;
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
+    color: var(--text); background: var(--bg-subtle);
+    border-right: 1px solid var(--border); display: flex; align-items: flex-start;
+  }
+  .layer-map-desc {
+    flex: 1; padding: 14px 18px;
+    font-size: 14px; color: var(--soft); line-height: 1.55;
+  }
+  .layer-map-rule {
+    background: var(--accent-soft); border-top: 1px solid var(--border);
+    padding: 13px 20px;
+    font-size: 13px; color: var(--accent-hover); line-height: 1.5;
+    font-weight: 500;
+  }
+  @media(max-width:540px){
+    .layer-map-category{flex-direction:column}
+    .layer-map-name{flex:none;border-right:none;border-bottom:1px solid var(--border)}
+  }
 
   /* BACK LINK */
   .back-link {
@@ -309,7 +366,7 @@
   <div class="topbar-inner">
     <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">User experience</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">User Surface &amp; Agency</span>
     </nav>
   </div>
 </nav>
@@ -323,10 +380,10 @@
         <path d="M8 10h8M8 14h5"/>
       </svg>
     </span>
-    Layer 9
+    Layer &middot; L7
   </span>
-  <h1 class="pattern-title">User experience</h1>
-  <p class="explainer">What people actually see and click when they use an AI: the chat window, answers streaming in word by word, citations, copy and retry buttons, and thumbs up/down feedback.</p>
+  <h1 class="pattern-title">User Surface &amp; Agency</h1>
+  <p class="explainer">Everything the user actually sees, taps, and controls: how answers arrive, how much the AI does on its own, and how people push back or give direction.</p>
 </header>
 
 <!-- 01 THE IDEA -->
@@ -334,15 +391,15 @@
   <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What <em>is</em> it?</h2>
   <div class="idea-card">
-    <p>The <span style="color:var(--accent-hover);font-weight:500">user experience layer</span> is everything between the AI's raw output and the person reading it. The answer doesn't just appear all at once: it <strong>streams in word by word</strong>, so it feels alive and fast. Alongside the answer, the interface shows <strong>where the information came from</strong> (citations), lets you <strong>copy or retry</strong> with one tap, and gives you a way to say whether it helped (thumbs up or down). Each of those pieces is a deliberate design choice, not an accident.</p>
+    <p>The <span style="color:var(--accent-hover);font-weight:500">user surface and agency layer</span> is everything between the AI's raw output and the person reading it. The answer does not just appear all at once: it <strong>streams in token by token</strong> (a token is a small piece the AI works in: roughly a word, or a slice of an image or sound), so it feels alive and fast. Alongside the answer, the interface shows <strong>where the information came from</strong> (citations), lets you <strong>copy or retry</strong> with one tap, and gives you a way to say whether it helped. Each of those pieces is a deliberate design choice, not an accident.</p>
   </div>
 </section>
 
 <!-- 02 SEE IT WORK -->
 <section>
-  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
   <h2>A <em>mini chat</em> in your hands.</h2>
-  <p class="demo-lede">Press Play to watch the answer stream in word by word. Then tap a citation to see its source, or give feedback.</p>
+  <p class="demo-lede">Press Play to watch the answer stream in word by word. Then tap a citation to see its source, or give feedback with thumbs up or down.</p>
 
   <div class="chat-stage">
     <!-- Chat header -->
@@ -400,13 +457,13 @@
 
     <!-- Controls -->
     <div class="chat-controls">
-      <button class="demo-btn primary" id="playBtn">&#9654; Play</button>
-      <button class="demo-btn" id="resetBtn">&#8635; Reset</button>
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
     </div>
   </div>
 </section>
 
-<!-- 03 REAL EXAMPLE -->
+<!-- 03 A REAL EXAMPLE -->
 <section>
   <div class="section-label"><span class="num">03</span>A Real Example</div>
   <h2>What each piece <em>actually does</em>.</h2>
@@ -424,8 +481,8 @@
       <div class="example-content"><strong>Copy</strong> puts the answer on the clipboard in one tap. <strong>Retry</strong> sends the same question again to get a different attempt, useful when the first answer missed the point.</div>
     </div>
     <div class="example-row" role="listitem">
-      <div class="example-label">Thumbs up/down</div>
-      <div class="example-content">Every AI product collects this signal. Teams use it to find answers that users disliked and retrain the model, or tune the system prompt. One tap creates a training label that shapes future answers.</div>
+      <div class="example-label">Thumbs Up / Down</div>
+      <div class="example-content">Every AI product collects this signal. Teams use it to find answers that users disliked and retrain the AI model (using a technique called RLHF: Reinforcement Learning from Human Feedback). One tap creates a training label that shapes future answers.</div>
     </div>
   </div>
 </section>
@@ -435,19 +492,96 @@
   <div class="section-label"><span class="num">04</span>Tradeoffs</div>
   <h2>Design choices, each with a <em>cost</em>.</h2>
   <div class="tradeoffs-stage">
-    <div class="tradeoff-item">
-      <div class="tradeoff-name">Streaming adds complexity</div>
-      <div class="tradeoff-desc">To stream, your server has to hold the connection open and push chunks. That's harder to build than a simple request/response, and can break if the user's connection is slow.</div>
+    <div class="tradeoff-scale">
+      <span>Low</span>
+      <span>High</span>
     </div>
-    <hr class="tradeoff-divider">
-    <div class="tradeoff-item">
-      <div class="tradeoff-name">Citations require a retrieval step</div>
-      <div class="tradeoff-desc">The AI doesn't automatically know which page it pulled a fact from. You need a retrieval system (like RAG) that tracks sources, then maps them back to sentences in the answer. That's extra infrastructure.</div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">User control</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
     </div>
-    <hr class="tradeoff-divider">
-    <div class="tradeoff-item">
-      <div class="tradeoff-name">Feedback is sparse and noisy</div>
-      <div class="tradeoff-desc">Most users never press thumbs up or down. Of those who do, a thumbs-down could mean "wrong answer," "wrong tone," or just "I'm frustrated." Interpreting the signal correctly takes careful analysis.</div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Build complexity</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Feedback signal</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Perceived speed</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Streaming (progressive disclosure) dramatically raises perceived speed but requires a persistent connection. Feedback thumbs collect sparse, noisy signal: most users never press them, and a thumbs-down could mean "wrong answer," "wrong tone," or just "I am frustrated." Citations need a retrieval system (like RAG: Retrieval-Augmented Generation) that tracks sources, adding infrastructure cost.
+    </div>
+  </div>
+</section>
+
+<!-- 05 INSIDE THIS LAYER -->
+<section>
+  <div class="section-label"><span class="num">05</span>Inside This Layer</div>
+  <h2>Every category <em>in L7</em>.</h2>
+  <div class="layer-map">
+    <div class="layer-map-axis">
+      <strong>Axis: UX function</strong> &mdash; how the user experiences and controls the AI.
+    </div>
+
+    <div class="layer-map-category">
+      <div class="layer-map-name">Conversational Surfaces</div>
+      <div class="layer-map-desc">Chat windows, voice turns, and any interface where the user and AI take alternating turns: the most familiar form of AI interaction.</div>
+    </div>
+
+    <div class="layer-map-category">
+      <div class="layer-map-name">Inline / Embedded Surfaces</div>
+      <div class="layer-map-desc">AI that lives inside another tool: a writing assistant inside a doc editor, autocomplete inside a code editor, or suggestions inside a form. The user never leaves their workflow.</div>
+    </div>
+
+    <div class="layer-map-category">
+      <div class="layer-map-name">Background / Agentic Surfaces</div>
+      <div class="layer-map-desc">AI that runs tasks on its own, out of sight, and surfaces a result when done. The user delegates rather than directs, checking back rather than watching every step.</div>
+    </div>
+
+    <div class="layer-map-category">
+      <div class="layer-map-name">Streaming and Progressive Disclosure</div>
+      <div class="layer-map-desc">Showing output as it is generated, word by word or chunk by chunk, so the user sees progress immediately. This is the UX mechanism; the real-time streaming discipline lives in C7 (Real-time / Streaming).</div>
+    </div>
+
+    <div class="layer-map-category">
+      <div class="layer-map-name">Handoff and Escalation</div>
+      <div class="layer-map-desc">The moment when the AI passes a conversation or task to a human agent, or when the user asks to escalate. Good handoff design preserves context so the human does not start from zero.</div>
+    </div>
+
+    <div class="layer-map-category">
+      <div class="layer-map-name">Approval Gates</div>
+      <div class="layer-map-desc">Checkpoints where the system pauses and asks the user to confirm before taking a consequential action. The UX of that confirmation lives here; the runtime mechanism that enforces the pause lives in L5 (Orchestration) Action.</div>
+    </div>
+
+    <div class="layer-map-category">
+      <div class="layer-map-name">Autonomy Levels and Guardrails</div>
+      <div class="layer-map-desc">Controls that let users (or operators) dial how much the AI can do without asking: read-only, suggest-only, act-with-approval, or fully autonomous. Guardrails set the ceiling; autonomy levels set where the slider is today.</div>
+    </div>
+
+    <div class="layer-map-category">
+      <div class="layer-map-name">Feedback Capture Surfaces</div>
+      <div class="layer-map-desc">Thumbs up / down buttons, star ratings, correction flows, and any surface that collects the user's signal about quality. This raw signal feeds back into model improvement via RLHF (Reinforcement Learning from Human Feedback).</div>
+    </div>
+
+    <div class="layer-map-category">
+      <div class="layer-map-name">Clarification and Disambiguation Surfaces</div>
+      <div class="layer-map-desc">When the AI is uncertain what the user wants, it asks a follow-up question. The UX of presenting and answering that question is here. The control-flow shape of the clarification loop (how the system decides when to ask) lives in L5 Shape Conditional Branching.</div>
+    </div>
+
+    <div class="layer-map-rule">
+      Filing rule: if the user interacts with it directly, it is here. If the system uses it without the user seeing, it is not.
     </div>
   </div>
 </section>
@@ -530,8 +664,6 @@ function resetDemo() {
   citePreview.textContent = '';
   activeCite = null;
   copyBtn.classList.remove('done');
-  copyBtn.textContent = '';
-  // restore copy btn content
   copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
   thumbUp.classList.remove('pressed');
   thumbDown.classList.remove('pressed');

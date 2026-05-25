@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Composition · The Pattern Book</title>
+<title>Structural Composition · The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -219,22 +219,31 @@
   }
   .eg-card.open .eg-detail { max-height: 200px; margin-top: 10px; }
 
-  /* ---- section 04: tradeoffs ---- */
-  .tradeoffs-grid { display: flex; flex-direction: column; gap: 10px; }
-  .tr-row {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 15px 18px;
-    display: grid; grid-template-columns: 140px 1fr; gap: 14px; align-items: center;
-  }
-  .tr-name { font-size: 14px; font-weight: 600; color: var(--text); }
-  .tr-bar-wrap { display: flex; flex-direction: column; gap: 5px; }
-  .tr-bars { display: flex; gap: 4px; }
-  .tr-seg {
-    flex: 1; height: 18px; background: var(--bg-subtle);
-    border: 1px solid var(--border); border-radius: 4px;
-  }
-  .tr-seg.on { background: var(--accent); border-color: var(--accent); }
-  .tr-note { font-size: 12px; color: var(--faint); line-height: 1.4; }
+  /* ---- section 04: tradeoffs (canonical monochrome meter) ---- */
+  .tradeoffs-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .tradeoff-scale { display: flex; justify-content: space-between; font-size: 11px; font-weight: 500; color: var(--faint); letter-spacing: .03em; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+  .tradeoff-row { display: flex; align-items: center; gap: 14px; }
+  .tradeoff-label { min-width: 100px; font-size: 13px; font-weight: 600; color: var(--text); flex: none; }
+  .tradeoff-bars { display: flex; gap: 4px; flex: 1; }
+  .seg { flex: 1; height: 16px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 3px; }
+  .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-quote { font-size: 12px; color: var(--faint); line-height: 1.45; margin-top: 2px; padding-top: 10px; border-top: 1px solid var(--border); font-style: italic; }
+  @media(max-width:480px){.tradeoff-row{flex-direction:column;align-items:stretch}.tradeoff-label{min-width:0}}
+
+  /* ---- inside this layer map ---- */
+  .layer-map { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 26px; }
+  .layer-axis { font-size: 13px; color: var(--soft); line-height: 1.5; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .layer-axis strong { color: var(--text); font-weight: 600; }
+  .subaxis-group { margin-bottom: 20px; }
+  .subaxis-group:last-of-type { margin-bottom: 0; }
+  .subaxis-head { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--accent-hover); margin-bottom: 10px; padding: 5px 10px; background: var(--accent-soft); border-radius: 6px; display: inline-block; }
+  .cat-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .cat-item { display: flex; flex-direction: column; gap: 2px; }
+  .cat-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; color: var(--text); }
+  .cat-line { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .filing-rule { margin-top: 20px; padding: 14px 16px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--soft); line-height: 1.6; }
+  .filing-rule strong { color: var(--text); font-weight: 600; }
+  .filing-note { margin-top: 10px; font-size: 12.5px; color: var(--faint); line-height: 1.5; }
 
   /* ---- back link ---- */
   .back-link {
@@ -267,7 +276,6 @@
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .tr-row { grid-template-columns: 1fr; gap: 8px; }
     .board-controls { flex-direction: column; align-items: stretch; }
   }
 </style>
@@ -284,7 +292,7 @@
       <span class="sep">/</span>
       <a href="layers.html">Layers</a>
       <span class="sep">/</span>
-      <span class="here">Composition</span>
+      <span class="here">Structural Composition</span>
     </nav>
   </div>
 </nav>
@@ -297,10 +305,10 @@
         <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/>
         <path d="M12 3v18M4 7.5l8 4.5 8-4.5"/>
       </svg>
-    </span>Layer 4
+    </span>Layer · L2
   </span>
-  <h1 class="pattern-title">Composition</h1>
-  <p class="explainer">How several AI answers are joined into one good result.</p>
+  <h1 class="pattern-title">Structural Composition</h1>
+  <p class="explainer">How multiple model calls are organized into a single good answer: combine, choose, or check.</p>
 </header>
 
 <!-- 01 THE IDEA -->
@@ -308,13 +316,13 @@
   <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What <em>is</em> it?</h2>
   <div class="idea-card">
-    <p>One answer from one AI call can be wrong. <span style="color:var(--accent-hover);font-weight:500">Composition</span> fixes that by combining multiple answers into something better. The three main moves: chain one answer into the next question, ask the same question several times and take the answer that comes up most (voting), or send the question to the model best suited for it (routing).</p>
+    <p>One answer from one LLM (large language model, the AI that reads and writes text) can be wrong. <span style="color:var(--accent-hover);font-weight:500">Structural Composition</span> fixes that by deciding how multiple model calls are organized into one reliable answer. The three moves: fuse several outputs together (Combine), pick the best one from a set of candidates (Select), or gate the answer through a separate judgment step (Verify).</p>
   </div>
 </section>
 
 <!-- 02 SEE IT WORK -->
 <section>
-  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
   <h2>Ask three times, <em>vote</em>.</h2>
 
   <p class="demo-lede">The same question goes to the model three times. Each run gives a slightly different answer. Then a vote picks the most common one.</p>
@@ -375,15 +383,15 @@
     </div>
 
     <div class="board-controls">
-      <button class="diagram-btn primary" id="playBtn">&#9654; Run the vote</button>
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
       <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
     </div>
   </div>
 </section>
 
-<!-- 03 WHEN IT MATTERS -->
+<!-- 03 A REAL EXAMPLE -->
 <section>
-  <div class="section-label"><span class="num">03</span>When it Matters</div>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
   <h2>Real <em>examples</em>.</h2>
 
   <div class="examples-grid" id="examples">
@@ -421,33 +429,123 @@
   <div class="section-label"><span class="num">04</span>Tradeoffs</div>
   <h2>What each move <em>costs</em>.</h2>
 
-  <div class="tradeoffs-grid">
-    <div class="tr-row">
-      <div class="tr-name">Chaining</div>
-      <div class="tr-bar-wrap">
-        <div class="tr-bars" aria-label="Cost: low (1 of 5)">
-          <div class="tr-seg on"></div><div class="tr-seg"></div><div class="tr-seg"></div><div class="tr-seg"></div><div class="tr-seg"></div>
-        </div>
-        <div class="tr-note">1 call per step. Errors in early steps carry forward.</div>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span>Low</span><span>High</span></div>
+
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Combining (cost)</div>
+      <div class="tradeoff-bars" aria-label="Cost: high (4 of 5)">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
       </div>
     </div>
-    <div class="tr-row">
-      <div class="tr-name">Voting</div>
-      <div class="tr-bar-wrap">
-        <div class="tr-bars" aria-label="Cost: high (3 of 5)">
-          <div class="tr-seg on"></div><div class="tr-seg on"></div><div class="tr-seg on"></div><div class="tr-seg"></div><div class="tr-seg"></div>
-        </div>
-        <div class="tr-note">3x (or more) the calls, 3x the cost and wait time. Accuracy gain is worth it on high-stakes questions.</div>
+
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Combining (accuracy)</div>
+      <div class="tradeoff-bars" aria-label="Accuracy: high (4 of 5)">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
       </div>
     </div>
-    <div class="tr-row">
-      <div class="tr-name">Routing</div>
-      <div class="tr-bar-wrap">
-        <div class="tr-bars" aria-label="Cost: low-medium (2 of 5)">
-          <div class="tr-seg on"></div><div class="tr-seg on"></div><div class="tr-seg"></div><div class="tr-seg"></div><div class="tr-seg"></div>
-        </div>
-        <div class="tr-note">Needs a classifier. When it works, it cuts cost by sending easy questions to cheap models.</div>
+
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Selecting (cost)</div>
+      <div class="tradeoff-bars" aria-label="Cost: low-medium (2 of 5)">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
       </div>
+    </div>
+
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Selecting (accuracy)</div>
+      <div class="tradeoff-bars" aria-label="Accuracy: medium (3 of 5)">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Verifying (cost)</div>
+      <div class="tradeoff-bars" aria-label="Cost: medium (3 of 5)">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Verifying (accuracy)</div>
+      <div class="tradeoff-bars" aria-label="Accuracy: high (4 of 5)">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+
+    <div class="tradeoff-quote">Combine runs the most calls and costs the most, but gives the highest accuracy gain. Select is cheap but depends on a good routing classifier. Verify adds one extra judgment call and catches errors without multiplying cost as aggressively as full voting.</div>
+  </div>
+</section>
+
+<!-- 05 INSIDE THIS LAYER -->
+<section>
+  <div class="section-label"><span class="num">05</span>Inside This Layer</div>
+  <h2>Every category <em>in L2</em>.</h2>
+
+  <div class="layer-map">
+    <div class="layer-axis"><strong>Axis:</strong> how multiple potential model calls are organized into a single answering act.</div>
+
+    <!-- COMBINE -->
+    <div class="subaxis-group">
+      <div class="subaxis-head">Combine</div>
+      <p style="font-size:13px;color:var(--soft);line-height:1.5;margin-bottom:10px;">Multiple outputs are fused together to produce one result.</p>
+      <div class="cat-list">
+        <div class="cat-item">
+          <div class="cat-name">Ensembling (vote, average, blend)</div>
+          <div class="cat-line">Run the same or similar question through several models or prompts (the instructions you send the AI), then combine the outputs by majority vote, numerical average, or weighted blend.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Decomposition and Recomposition</div>
+          <div class="cat-line">Break a complex task into independent sub-tasks, solve each with its own model call, then reassemble the pieces into a final answer.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SELECT -->
+    <div class="subaxis-group">
+      <div class="subaxis-head">Select</div>
+      <p style="font-size:13px;color:var(--soft);line-height:1.5;margin-bottom:10px;">One output is chosen from a set of candidates.</p>
+      <div class="cat-list">
+        <div class="cat-item">
+          <div class="cat-name">Cascading (Cheap to Expensive)</div>
+          <div class="cat-line">Try the smallest, cheapest model first. If its confidence is high enough, stop. Otherwise escalate to a larger, more capable model.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Confidence-Based Routing</div>
+          <div class="cat-line">Inspect the model's confidence score on its own output. Route low-confidence outputs to a stronger model or a fallback path.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Specialist-of-Experts Routing</div>
+          <div class="cat-line">A classifier reads the incoming question and sends it to whichever specialist model is best matched to that topic or task type.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VERIFY -->
+    <div class="subaxis-group">
+      <div class="subaxis-head">Verify</div>
+      <p style="font-size:13px;color:var(--soft);line-height:1.5;margin-bottom:10px;">One output is gated, scored, or revised by a separate judgment step.</p>
+      <div class="cat-list">
+        <div class="cat-item">
+          <div class="cat-name">Verification Composition (LLM-as-Judge)</div>
+          <div class="cat-line">A second LLM call is used specifically to judge whether the first answer is correct, faithful, or high-quality. The judge's verdict determines whether the output passes.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Generator-Critic Pairs</div>
+          <div class="cat-line">One model generates a draft. A separate critic model reviews that draft and flags problems. The generator may then revise based on the critic's notes.</div>
+        </div>
+        <div class="cat-item">
+          <div class="cat-name">Output Filtering by Classifier</div>
+          <div class="cat-line">A fast classifier (not necessarily an LLM) scans the model's output for policy violations, format errors, or low quality, and blocks or flags outputs that fail.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILING RULE -->
+    <div class="filing-rule">
+      <strong>Filing rule:</strong> fused from multiple outputs = Combine. Chosen from candidates = Select. Gated or scored by a separate judgment = Verify. Self-checking inside one call is L4 Single-Call Control, not L2.
+      <div class="filing-note">Note on Self-Consistency: when N samples come from the same model with the same prompt (in-decoding search), that is L4. When the samples use different models or different prompts, it is L2 Combine (Ensembling). The boundary is implementation, not intent.</div>
     </div>
   </div>
 </section>
