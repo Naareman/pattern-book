@@ -42,6 +42,10 @@
 
   .stage{padding:24px 0 34px}
   .tour-bar{text-align:center;margin:0 0 16px}
+  .tour-dots{display:none;justify-content:center;gap:7px;margin-top:9px}
+  body.touring .tour-dots{display:flex}
+  .tour-dots i{width:7px;height:7px;border-radius:50%;background:var(--border-strong);transition:background .35s ease,transform .35s ease}
+  .tour-dots i.on{background:var(--accent);transform:scale(1.25)}
   .canvas{width:840px;max-width:100%;margin:0 auto}
 
   .box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:border-color .25s ease,box-shadow .25s ease,transform .25s ease}
@@ -106,7 +110,7 @@
   @keyframes sparkX{0%{left:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{left:100%;opacity:0}}
 
   /* across: a bracket that SPANS the Layers box (covers the layers), labelled, pointing down to Concerns, with a neon spark */
-  .across{position:relative;width:calc(100% - 394px);margin:12px 0 0;height:52px}
+  .across{position:relative;width:100%;margin:12px 0 0;height:52px}
   .across .lbl{position:absolute;top:0;left:50%;transform:translateX(-50%);font-size:11px;color:var(--faint);white-space:nowrap}
   .across .bar{position:absolute;top:21px;left:0;right:0;height:1.5px;background:var(--border-strong);border-radius:2px}
   .across .bar::before,.across .bar::after{content:"";position:absolute;top:-6px;width:1.5px;height:7px;background:var(--border-strong)}
@@ -154,7 +158,7 @@
     </header>
 
     <div class="stage" id="main" role="main">
-      <div class="tour-bar"><button class="tour-link" id="tourBtn" type="button"><span class="tri" aria-hidden="true">▶</span> Take the 60-second tour</button></div>
+      <div class="tour-bar"><button class="tour-link" id="tourBtn" type="button"><span class="tri" aria-hidden="true">▶</span> Take the 60-second tour</button><div class="tour-dots" id="tourDots" aria-hidden="true"><i></i><i></i><i></i></div></div>
       <div class="canvas">
         <div class="top">
           <div class="box layers">
@@ -244,6 +248,8 @@
     el.classList.add('show');
   }
   function hideBoxCaps(){ Object.values(boxCaps).forEach(el=> el.classList.remove('show')); }
+  const tourDots = document.getElementById('tourDots');
+  function setTourPhase(n){ if(!tourDots) return; Array.from(tourDots.children).forEach((d,i)=> d.classList.toggle('on', i < n)); }
   const layersBox = document.querySelector('.box.layers');
   const buildsBox = document.querySelector('.box.builds');
   const producesEl = document.querySelector('.produces');
@@ -275,7 +281,7 @@
   }
 
   function isTour(b){ return b && b.dataset.play === 'tour'; }
-  function endDemo(clearViz){ clearTimers(); document.body.classList.remove('demoing'); hideBoxCaps(); if(clearViz) resetVisual(); if(activeBtn) activeBtn.innerHTML = activeBtn.dataset.cta; demoState='idle'; activeBtn=null; steps=[]; elapsed=0; }
+  function endDemo(clearViz){ clearTimers(); document.body.classList.remove('demoing','touring'); hideBoxCaps(); setTourPhase(0); if(clearViz) resetVisual(); if(activeBtn) activeBtn.innerHTML = activeBtn.dataset.cta; demoState='idle'; activeBtn=null; steps=[]; elapsed=0; }
   function pauseDemo(){ elapsed += performance.now()-startedAt; clearTimers(); demoState='paused'; if(activeBtn) activeBtn.innerHTML = isTour(activeBtn) ? '<span class="tri" aria-hidden="true">▶</span>Resume tour' : '<span class="tri" aria-hidden="true">▶</span> Resume'; }
   function resumeDemo(){ demoState='playing'; if(activeBtn) activeBtn.innerHTML = isTour(activeBtn) ? '<span class="tri" aria-hidden="true">❚❚</span>Pause tour' : '<span class="tri" aria-hidden="true">❚❚</span> Pause'; schedule(); }
 
@@ -321,12 +327,12 @@
       // one guided walk through all three layers groupings, reusing the stack/concern/connect visuals
       let t=0;
       // ---- Phase 1: the Stack, foundation up ----
-      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('stack', '1 / 3', 'this is how an AI is built, from raw data at the bottom up to the screen people use'); layerItems.forEach(el=>el.classList.add('dim')); rail.style.transition='none'; rail.style.transform='scaleY(0)'; }});
+      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('stack', '1 / 3', 'this is how an AI is built, from raw data at the bottom up to the screen people use'); setTourPhase(1); layerItems.forEach(el=>el.classList.add('dim')); rail.style.transition='none'; rail.style.transform='scaleY(0)'; }});
       t+=1800; let revealed=0;
       for(let i=layerItems.length-1;i>=0;i--){ const idx=i; a.push({at:t, fn:()=>{ layerItems[idx].classList.remove('dim'); revealed++; rail.style.transition='transform .3s ease'; rail.style.transform='scaleY('+(revealed/layerItems.length)+')'; }}); t+=560; }
       t+=500;
       // ---- Phase 2: Concerns, what every layer must get right ----
-      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('concerns', '2 / 3', 'every layer has to handle all of these: a longer bar means it matters more there'); }});
+      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('concerns', '2 / 3', 'every layer has to handle all of these: a longer bar means it matters more there'); setTourPhase(2); }});
       t+=1800;  a.push({at:t, fn:()=>{ layersBox.classList.add('glow'); }});
       t+=1200;  a.push({at:t, fn:()=>{ layersBox.classList.remove('glow'); acrossEl.classList.add('glow'); }});
       t+=1200;  a.push({at:t, fn:()=>{ acrossEl.classList.remove('glow'); concernsBox.classList.add('glow'); }});
@@ -334,7 +340,7 @@
       t+=200;  concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showBoxCap('concerns', '2 / 3', 'every layer has to handle all of these: a longer bar means it matters more there'); showBars(cc.textContent.trim(), cc); }}); t+=1800; });
       t+=500;
       // ---- Phase 3: Builds, what layer combinations produce ----
-      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('builds', '3 / 3', 'each product lights up the layers it uses'); }});
+      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('builds', '3 / 3', 'each product lights up the layers it uses'); setTourPhase(3); }});
       t+=1800;  a.push({at:t, fn:()=>{ layersBox.classList.add('glow'); }});
       t+=1200;  a.push({at:t, fn:()=>{ layersBox.classList.remove('glow'); producesEl.classList.add('glow'); }});
       t+=1200;  a.push({at:t, fn:()=>{ producesEl.classList.remove('glow'); buildsBox.classList.add('glow'); }});
@@ -350,6 +356,7 @@
     resetVisual();
     document.body.classList.add('demoing');
     activeBtn=btn; demoState='playing'; elapsed=0;
+    if(isTour(btn)){ document.body.classList.add('touring'); } else { document.body.classList.remove('touring'); setTourPhase(0); }
     btn.innerHTML = isTour(btn) ? '<span class="tri" aria-hidden="true">❚❚</span>Pause tour' : '<span class="tri" aria-hidden="true">❚❚</span> Pause';
     steps = buildSteps(kind);
     schedule();
