@@ -63,19 +63,19 @@
   .group{margin-top:26px}
   .group:first-of-type{margin-top:6px}
 
-  .group-head{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text);padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:6px}
+  .group-head{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-hover);padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:6px}
 
-  /* a "want" is the prominent left; technique name is a small tag on the right */
-  .want-row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:9px 10px;border-radius:8px;min-width:0}
+  /* methodology-first: technique NAME leads on the left, plain description follows */
+  .want-row{display:flex;align-items:baseline;justify-content:flex-start;gap:14px;padding:9px 10px;border-radius:8px;min-width:0}
   .want-row.is-link{transition:background .15s ease}
   .want-row.is-link:hover{background:var(--accent-soft)}
 
-  .want-do{font-weight:600;font-size:15px;letter-spacing:-.005em;color:var(--text);line-height:1.35;min-width:0}
-  .want-row.is-link .want-do{color:var(--text)}
-
-  .want-tag{flex:none;font-family:'Fraunces',serif;font-size:16px;font-weight:500;color:var(--soft);white-space:nowrap;align-self:baseline}
+  .want-tag{flex:none;width:220px;font-family:'Fraunces',serif;font-size:16px;font-weight:500;color:var(--text);line-height:1.35}
   .want-row.is-link .want-tag{color:var(--accent-hover)}
   .want-tag .arr{font-size:12px;margin-left:4px;vertical-align:1px}
+
+  .want-do{font-weight:400;font-size:14px;color:var(--soft);line-height:1.45;min-width:0}
+  .want-row.is-link .want-do{color:var(--soft)}
 
   .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
   .foot strong{color:var(--soft);font-weight:500}
@@ -85,7 +85,8 @@
   @media(max-width:560px){
     .title{font-size:30px}
     .explainer{font-size:15px}
-    .want-row{padding:10px 8px}
+    .want-row{padding:10px 8px;flex-direction:column;gap:2px}
+    .want-tag{width:auto}
   }
 </style>
 </head>
@@ -112,148 +113,148 @@
       <section class="group" aria-labelledby="g-ask">
         <h2 class="group-head" id="g-ask">Ask it well</h2>
         <a class="want-row is-link" href="pattern-few-shot.html">
-          <span class="want-do">Copy a style you show it</span>
           <span class="want-tag">Few-Shot<span class="arr" aria-hidden="true">&#8599;</span></span>
+          <span class="want-do">give it a few examples to copy</span>
         </a>
         <a class="want-row is-link" href="pattern-zero-shot.html">
-          <span class="want-do">Just ask, no examples</span>
           <span class="want-tag">Zero-Shot<span class="arr" aria-hidden="true">&#8599;</span></span>
+          <span class="want-do">just ask, no examples</span>
         </a>
         <div class="want-row">
-          <span class="want-do">Give it a role or voice</span>
           <span class="want-tag">Role / Persona</span>
+          <span class="want-do">tell it who to be</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Tell it what to avoid</span>
           <span class="want-tag">Negative Prompting</span>
+          <span class="want-do">say what to avoid</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Reuse a fill-in-the-blank prompt</span>
           <span class="want-tag">Prompt Templates</span>
+          <span class="want-do">reusable fill-in-the-blank prompts</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Keep the parts from blurring together</span>
           <span class="want-tag">Delimiters</span>
+          <span class="want-do">mark where each part starts</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Have it write the prompt for you</span>
           <span class="want-tag">Meta-Prompting</span>
+          <span class="want-do">let it write the prompt</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Choose which examples to show</span>
           <span class="want-tag">Example Selection</span>
+          <span class="want-do">pick the best examples</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Order the examples on purpose</span>
           <span class="want-tag">Example Ordering</span>
+          <span class="want-do">order examples on purpose</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Fit a lot of info into the prompt</span>
           <span class="want-tag">Context Packing</span>
+          <span class="want-do">fit the key info in</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Stop it ignoring the middle</span>
           <span class="want-tag">Lost-in-the-Middle Mitigation</span>
+          <span class="want-do">put key facts at the edges</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Shrink the prompt to save cost</span>
           <span class="want-tag">Prompt Compression</span>
+          <span class="want-do">shrink the prompt to save cost</span>
         </div>
       </section>
 
       <section class="group" aria-labelledby="g-think">
         <h2 class="group-head" id="g-think">Guide its thinking</h2>
         <a class="want-row is-link" href="pattern-chain-of-thought.html">
-          <span class="want-do">Get a hard problem right</span>
           <span class="want-tag">Chain-of-Thought<span class="arr" aria-hidden="true">&#8599;</span></span>
+          <span class="want-do">think step by step</span>
         </a>
         <div class="want-row">
-          <span class="want-do">Make it plan before answering</span>
           <span class="want-tag">Plan-and-Solve</span>
+          <span class="want-do">plan, then do each step</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Start from the big picture</span>
           <span class="want-tag">Step-Back</span>
+          <span class="want-do">answer a simpler version first</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Break it into small steps</span>
           <span class="want-tag">Least-to-Most</span>
+          <span class="want-do">solve the easy parts first</span>
         </div>
         <a class="want-row is-link" href="pattern-self-consistency.html">
-          <span class="want-do">Get a more reliable answer</span>
           <span class="want-tag">Self-Consistency<span class="arr" aria-hidden="true">&#8599;</span></span>
+          <span class="want-do">answer a few times, vote</span>
         </a>
         <div class="want-row">
-          <span class="want-do">Have it reason from a similar case</span>
           <span class="want-tag">Analogical Prompting</span>
+          <span class="want-do">reason from a similar case</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Explore several paths, pick the best</span>
           <span class="want-tag">Tree-of-Thoughts</span>
+          <span class="want-do">explore several paths, pick best</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Outline first, then fill in</span>
           <span class="want-tag">Skeleton-of-Thought</span>
+          <span class="want-do">outline first, fill in parallel</span>
         </div>
       </section>
 
       <section class="group" aria-labelledby="g-shape">
         <h2 class="group-head" id="g-shape">Shape the output</h2>
         <a class="want-row is-link" href="pattern-structured-output.html">
-          <span class="want-do">Get the answer in a fixed format</span>
           <span class="want-tag">Structured Output<span class="arr" aria-hidden="true">&#8599;</span></span>
+          <span class="want-do">return a fixed shape</span>
         </a>
         <div class="want-row">
-          <span class="want-do">Make it stop at the right point</span>
           <span class="want-tag">Stop Sequences</span>
+          <span class="want-do">tell it where to stop</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Make it more or less creative</span>
           <span class="want-tag">Temperature &amp; Sampling</span>
+          <span class="want-do">dial randomness up or down</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Force the exact fields</span>
           <span class="want-tag">Schema Enforcement</span>
+          <span class="want-do">force valid fields</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Only allow valid output</span>
           <span class="want-tag">Constrained Decoding</span>
+          <span class="want-do">only allow valid output</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Check it while it streams</span>
           <span class="want-tag">Streaming with Validation</span>
+          <span class="want-do">check it as it streams</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Repair the format afterward</span>
           <span class="want-tag">Format Coercion</span>
+          <span class="want-do">repair the format after</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Nudge it toward or away from words</span>
           <span class="want-tag">Logit Biasing</span>
+          <span class="want-do">nudge specific words</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Keep the best few options</span>
           <span class="want-tag">Beam Search</span>
+          <span class="want-do">keep the best few options</span>
         </div>
       </section>
 
       <section class="group" aria-labelledby="g-check">
         <h2 class="group-head" id="g-check">Make it check itself</h2>
         <a class="want-row is-link" href="pattern-reflection.html">
-          <span class="want-do">Have it review and fix its answer</span>
           <span class="want-tag">Self-Reflection<span class="arr" aria-hidden="true">&#8599;</span></span>
+          <span class="want-do">review and fix its answer</span>
         </a>
         <div class="want-row">
-          <span class="want-do">Have it double-check its facts</span>
           <span class="want-tag">Chain-of-Verification</span>
+          <span class="want-do">draft check questions, answer them</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Have it ask itself sub-questions</span>
           <span class="want-tag">Self-Ask</span>
+          <span class="want-do">ask itself sub-questions first</span>
         </div>
         <div class="want-row">
-          <span class="want-do">Have it argue both sides first</span>
           <span class="want-tag">Debate-Then-Decide</span>
+          <span class="want-do">argue both sides, then choose</span>
         </div>
       </section>
 
