@@ -77,14 +77,6 @@
   .want-row.is-link .want-tag{color:var(--accent-hover)}
   .want-tag .arr{font-size:12px;margin-left:4px;vertical-align:1px}
 
-  /* advanced controls: quieter, compact, two columns, name + short gloss */
-  .advanced{margin-top:34px;padding-top:8px}
-  .advanced-head{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding-bottom:7px;border-bottom:1px solid var(--border);margin-bottom:8px}
-  .advanced-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 28px}
-  .adv-item{font-size:12.5px;line-height:1.45;color:var(--faint);min-width:0}
-  .adv-item b{font-weight:600;color:var(--soft)}
-  .adv-item b::after{content:" \00B7";color:var(--border-strong);font-weight:600}
-
   .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
   .foot strong{color:var(--soft);font-weight:500}
 
@@ -93,7 +85,6 @@
   @media(max-width:560px){
     .title{font-size:30px}
     .explainer{font-size:15px}
-    .advanced-grid{grid-template-columns:1fr;gap:2px}
     .want-row{padding:10px 8px}
   }
 </style>
@@ -140,6 +131,34 @@
           <span class="want-do">Reuse a fill-in-the-blank prompt</span>
           <span class="want-tag">Prompt Templates</span>
         </div>
+        <div class="want-row">
+          <span class="want-do">Keep the parts from blurring together</span>
+          <span class="want-tag">Delimiters</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Have it write the prompt for you</span>
+          <span class="want-tag">Meta-Prompting</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Choose which examples to show</span>
+          <span class="want-tag">Example Selection</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Order the examples on purpose</span>
+          <span class="want-tag">Example Ordering</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Fit a lot of info into the prompt</span>
+          <span class="want-tag">Context Packing</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Stop it ignoring the middle</span>
+          <span class="want-tag">Lost-in-the-Middle Mitigation</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Shrink the prompt to save cost</span>
+          <span class="want-tag">Prompt Compression</span>
+        </div>
       </section>
 
       <section class="group" aria-labelledby="g-think">
@@ -164,6 +183,18 @@
           <span class="want-do">Get a more reliable answer</span>
           <span class="want-tag">Self-Consistency<span class="arr" aria-hidden="true">&#8599;</span></span>
         </a>
+        <div class="want-row">
+          <span class="want-do">Have it reason from a similar case</span>
+          <span class="want-tag">Analogical Prompting</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Explore several paths, pick the best</span>
+          <span class="want-tag">Tree-of-Thoughts</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Outline first, then fill in</span>
+          <span class="want-tag">Skeleton-of-Thought</span>
+        </div>
       </section>
 
       <section class="group" aria-labelledby="g-shape">
@@ -179,6 +210,30 @@
         <div class="want-row">
           <span class="want-do">Make it more or less creative</span>
           <span class="want-tag">Temperature &amp; Sampling</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Force the exact fields</span>
+          <span class="want-tag">Schema Enforcement</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Only allow valid output</span>
+          <span class="want-tag">Constrained Decoding</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Check it while it streams</span>
+          <span class="want-tag">Streaming with Validation</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Repair the format afterward</span>
+          <span class="want-tag">Format Coercion</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Nudge it toward or away from words</span>
+          <span class="want-tag">Logit Biasing</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Keep the best few options</span>
+          <span class="want-tag">Beam Search</span>
         </div>
       </section>
 
@@ -201,30 +256,6 @@
           <span class="want-tag">Debate-Then-Decide</span>
         </div>
       </section>
-
-      <section class="advanced" aria-labelledby="g-adv">
-        <h2 class="advanced-head" id="g-adv">Advanced controls</h2>
-        <div class="advanced-grid">
-          <p class="adv-item"><b>Delimiters</b> mark where each part starts</p>
-          <p class="adv-item"><b>Meta-Prompting</b> let it write the prompt</p>
-          <p class="adv-item"><b>Example Selection</b> pick the best examples</p>
-          <p class="adv-item"><b>Example Ordering</b> order examples on purpose</p>
-          <p class="adv-item"><b>Context Packing</b> fit the key info in</p>
-          <p class="adv-item"><b>Lost-in-the-Middle Mitigation</b> put key facts at the edges</p>
-          <p class="adv-item"><b>Prompt Compression</b> shrink the prompt to save cost</p>
-          <p class="adv-item"><b>Analogical Prompting</b> reason from a similar case</p>
-          <p class="adv-item"><b>Tree-of-Thoughts</b> explore several paths, pick best</p>
-          <p class="adv-item"><b>Skeleton-of-Thought</b> outline first, fill in parallel</p>
-          <p class="adv-item"><b>Schema Enforcement</b> force valid fields</p>
-          <p class="adv-item"><b>Constrained Decoding</b> only allow valid tokens</p>
-          <p class="adv-item"><b>Streaming with Validation</b> check it as it streams</p>
-          <p class="adv-item"><b>Format Coercion</b> repair the format after</p>
-          <p class="adv-item"><b>Logit Biasing</b> nudge specific words</p>
-          <p class="adv-item"><b>Beam Search</b> keep the best few continuations</p>
-        </div>
-      </section>
-
-      <p class="closing">All of these happen inside one message to the AI.</p>
 
     </div>
 
