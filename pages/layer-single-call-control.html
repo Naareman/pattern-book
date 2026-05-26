@@ -57,47 +57,45 @@
   }
 
   /* intent guide */
-  .section{padding:18px 0 40px}
-  .guide-head{font-family:'Fraunces',serif;font-weight:500;font-size:23px;letter-spacing:-.01em;margin:4px 4px 14px;line-height:1.15}
+  .section{padding:14px 0 32px}
 
-  /* inside-this-layer: grouped rows */
-  .map{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  /* problem-first groups */
+  .group{margin-top:26px}
+  .group:first-of-type{margin-top:6px}
 
-  /* collapsible group header (real button) */
-  .group-toggle{width:100%;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:14px;text-align:left;background:var(--bg);border:0;border-top:1px solid var(--border);padding:15px 20px;cursor:pointer;font-family:inherit;transition:background .15s ease}
-  .group:first-of-type .group-toggle{border-top:0}
-  .group-toggle:hover{background:var(--accent-soft)}
-  .group-toggle .gt-text{min-width:0}
-  .group-toggle .gt-name{display:block;font-size:15px;font-weight:600;letter-spacing:-.005em;color:var(--text);line-height:1.25}
-  .group-toggle .gt-gloss{display:block;font-size:13px;color:var(--soft);line-height:1.4;margin-top:2px}
-  .group-toggle .gt-count{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--faint);white-space:nowrap}
-  .group-toggle .gt-chev{flex:none;color:var(--accent);transition:transform .2s ease;display:block}
-  .group-toggle .gt-chev svg{width:18px;height:18px;display:block}
-  .group-toggle[aria-expanded="true"] .gt-chev{transform:rotate(180deg)}
-  .group-panel[hidden]{display:none}
+  .group-head{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text);padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:6px}
 
-  .map-row{display:grid;grid-template-columns:minmax(0,200px) 1fr;align-items:baseline;gap:18px;padding:11px 20px;border-top:1px solid var(--border)}
-  .map-row.is-link{transition:background .15s ease}
-  .map-row.is-link:hover{background:var(--accent-soft)}
+  /* a "want" is the prominent left; technique name is a small tag on the right */
+  .want-row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:9px 10px;border-radius:8px;min-width:0}
+  .want-row.is-link{transition:background .15s ease}
+  .want-row.is-link:hover{background:var(--accent-soft)}
 
-  .row-name{font-weight:600;font-size:15px;letter-spacing:-.005em;color:var(--text);line-height:1.3;min-width:0}
-  .map-row.is-link .row-name{color:var(--accent-hover)}
-  .row-name .arr{font-size:12px;color:var(--accent);margin-left:5px;vertical-align:1px}
-  .row-what{font-size:13.5px;color:var(--soft);line-height:1.5;min-width:0}
+  .want-do{font-weight:600;font-size:15px;letter-spacing:-.005em;color:var(--text);line-height:1.35;min-width:0}
+  .want-row.is-link .want-do{color:var(--accent-hover)}
+
+  .want-tag{flex:none;font-size:12px;font-weight:500;color:var(--faint);white-space:nowrap;align-self:center}
+  .want-row.is-link .want-tag{color:var(--accent)}
+  .want-tag .arr{font-size:10px;margin-left:3px;vertical-align:1px}
+
+  /* advanced controls: quieter, compact, two columns, name + short gloss */
+  .advanced{margin-top:34px;padding-top:8px}
+  .advanced-head{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding-bottom:7px;border-bottom:1px solid var(--border);margin-bottom:8px}
+  .advanced-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 28px}
+  .adv-item{font-size:12.5px;line-height:1.45;color:var(--faint);min-width:0}
+  .adv-item b{font-weight:600;color:var(--soft)}
+  .adv-item b::after{content:" \00B7";color:var(--border-strong);font-weight:600}
 
   .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
   .foot strong{color:var(--soft);font-weight:500}
 
-  .closing{margin:18px 4px 0;color:var(--soft);font-size:14px;line-height:1.6}
+  .closing{margin:26px 4px 0;color:var(--soft);font-size:14px;line-height:1.6}
 
   @media(max-width:560px){
     .title{font-size:30px}
     .explainer{font-size:15px}
-    .guide-head{font-size:21px}
-    .map-row{grid-template-columns:1fr;gap:3px;padding:12px 16px}
-    .group-toggle{padding:14px 16px;gap:10px}
+    .advanced-grid{grid-template-columns:1fr;gap:2px}
+    .want-row{padding:10px 8px}
   }
-  @media (prefers-reduced-motion:reduce){.group-toggle .gt-chev{transition:none}}
 </style>
 </head>
 <body>
@@ -120,223 +118,118 @@
 
     <div class="section" id="main" role="main">
 
-      <h2 class="guide-head">Inside this layer</h2>
+      <section class="group" aria-labelledby="g-ask">
+        <h2 class="group-head" id="g-ask">Ask it well</h2>
+        <a class="want-row is-link" href="pattern-few-shot.html">
+          <span class="want-do">Copy a style you show it</span>
+          <span class="want-tag">Few-Shot<span class="arr" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <a class="want-row is-link" href="pattern-zero-shot.html">
+          <span class="want-do">Just ask, no examples</span>
+          <span class="want-tag">Zero-Shot<span class="arr" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <div class="want-row">
+          <span class="want-do">Give it a role or voice</span>
+          <span class="want-tag">Role / Persona</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Tell it what to avoid</span>
+          <span class="want-tag">Negative Prompting</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Reuse a fill-in-the-blank prompt</span>
+          <span class="want-tag">Prompt Templates</span>
+        </div>
+      </section>
 
-      <div class="map">
+      <section class="group" aria-labelledby="g-think">
+        <h2 class="group-head" id="g-think">Guide its thinking</h2>
+        <a class="want-row is-link" href="pattern-chain-of-thought.html">
+          <span class="want-do">Get a hard problem right</span>
+          <span class="want-tag">Chain-of-Thought<span class="arr" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <div class="want-row">
+          <span class="want-do">Make it plan before answering</span>
+          <span class="want-tag">Plan-and-Solve</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Start from the big picture</span>
+          <span class="want-tag">Step-Back</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Break it into small steps</span>
+          <span class="want-tag">Least-to-Most</span>
+        </div>
+        <a class="want-row is-link" href="pattern-self-consistency.html">
+          <span class="want-do">Get a more reliable answer</span>
+          <span class="want-tag">Self-Consistency<span class="arr" aria-hidden="true">&#8599;</span></span>
+        </a>
+      </section>
 
-        <section class="group">
-          <h3 style="margin:0">
-            <button type="button" class="group-toggle" aria-expanded="false" aria-controls="grp-shape" id="grp-shape-btn">
-              <span class="gt-text">
-                <span class="gt-name">Shape what you send in</span>
-                <span class="gt-gloss">how you frame the prompt</span>
-              </span>
-              <span class="gt-count">12 techniques</span>
-              <span class="gt-chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
-            </button>
-          </h3>
-          <div class="group-panel" id="grp-shape" role="region" aria-labelledby="grp-shape-btn" hidden>
-          <a class="map-row is-link" href="pattern-few-shot.html">
-            <span class="row-name">Few-Shot<span class="arr" aria-hidden="true">&#8599;</span></span>
-            <span class="row-what">give it examples to copy</span>
-          </a>
-          <a class="map-row is-link" href="pattern-zero-shot.html">
-            <span class="row-name">Zero-Shot<span class="arr" aria-hidden="true">&#8599;</span></span>
-            <span class="row-what">just ask, no examples</span>
-          </a>
-          <div class="map-row">
-            <span class="row-name">Role / Persona</span>
-            <span class="row-what">tell it who to be</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Delimiters</span>
-            <span class="row-what">mark where each part starts</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Negative Prompting</span>
-            <span class="row-what">say what to avoid</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Meta-Prompting</span>
-            <span class="row-what">let it write the prompt</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Prompt Templates</span>
-            <span class="row-what">reusable fill-in-the-blank prompts</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Example Selection</span>
-            <span class="row-what">pick the most relevant examples</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Example Ordering</span>
-            <span class="row-what">order examples on purpose</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Context Packing</span>
-            <span class="row-what">fit the key info in</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Lost-in-the-Middle Mitigation</span>
-            <span class="row-what">put key facts at the edges</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Prompt Compression</span>
-            <span class="row-what">shrink the prompt to save cost</span>
-          </div>
-          </div>
-        </section>
+      <section class="group" aria-labelledby="g-shape">
+        <h2 class="group-head" id="g-shape">Shape the output</h2>
+        <a class="want-row is-link" href="pattern-structured-output.html">
+          <span class="want-do">Get the answer in a fixed format</span>
+          <span class="want-tag">Structured Output<span class="arr" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <div class="want-row">
+          <span class="want-do">Make it stop at the right point</span>
+          <span class="want-tag">Stop Sequences</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Make it more or less creative</span>
+          <span class="want-tag">Temperature &amp; Sampling</span>
+        </div>
+      </section>
 
-        <section class="group">
-          <h3 style="margin:0">
-            <button type="button" class="group-toggle" aria-expanded="false" aria-controls="grp-think" id="grp-think-btn">
-              <span class="gt-text">
-                <span class="gt-name">Guide how it thinks</span>
-                <span class="gt-gloss">reasoning strategies</span>
-              </span>
-              <span class="gt-count">8 techniques</span>
-              <span class="gt-chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
-            </button>
-          </h3>
-          <div class="group-panel" id="grp-think" role="region" aria-labelledby="grp-think-btn" hidden>
-          <div class="map-row">
-            <span class="row-name">Step-Back</span>
-            <span class="row-what">answer a simpler version first</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Least-to-Most</span>
-            <span class="row-what">solve the easy parts first</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Plan-and-Solve</span>
-            <span class="row-what">plan, then do each step</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Analogical Prompting</span>
-            <span class="row-what">reason from a similar case</span>
-          </div>
-          <a class="map-row is-link" href="pattern-chain-of-thought.html">
-            <span class="row-name">Chain-of-Thought<span class="arr" aria-hidden="true">&#8599;</span></span>
-            <span class="row-what">think step by step</span>
-          </a>
-          <div class="map-row">
-            <span class="row-name">Tree-of-Thoughts</span>
-            <span class="row-what">explore several paths, pick best</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Skeleton-of-Thought</span>
-            <span class="row-what">outline first, fill in parallel</span>
-          </div>
-          <a class="map-row is-link" href="pattern-self-consistency.html">
-            <span class="row-name">Self-Consistency<span class="arr" aria-hidden="true">&#8599;</span></span>
-            <span class="row-what">answer a few times, vote</span>
-          </a>
-          </div>
-        </section>
+      <section class="group" aria-labelledby="g-check">
+        <h2 class="group-head" id="g-check">Make it check itself</h2>
+        <a class="want-row is-link" href="pattern-reflection.html">
+          <span class="want-do">Have it review and fix its answer</span>
+          <span class="want-tag">Self-Reflection<span class="arr" aria-hidden="true">&#8599;</span></span>
+        </a>
+        <div class="want-row">
+          <span class="want-do">Have it double-check its facts</span>
+          <span class="want-tag">Chain-of-Verification</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Have it ask itself sub-questions</span>
+          <span class="want-tag">Self-Ask</span>
+        </div>
+        <div class="want-row">
+          <span class="want-do">Have it argue both sides first</span>
+          <span class="want-tag">Debate-Then-Decide</span>
+        </div>
+      </section>
 
-        <section class="group">
-          <h3 style="margin:0">
-            <button type="button" class="group-toggle" aria-expanded="false" aria-controls="grp-check" id="grp-check-btn">
-              <span class="gt-text">
-                <span class="gt-name">Make it check itself</span>
-                <span class="gt-gloss">self-review tricks</span>
-              </span>
-              <span class="gt-count">4 techniques</span>
-              <span class="gt-chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
-            </button>
-          </h3>
-          <div class="group-panel" id="grp-check" role="region" aria-labelledby="grp-check-btn" hidden>
-          <a class="map-row is-link" href="pattern-reflection.html">
-            <span class="row-name">Self-Reflection<span class="arr" aria-hidden="true">&#8599;</span></span>
-            <span class="row-what">review and fix its answer</span>
-          </a>
-          <div class="map-row">
-            <span class="row-name">Chain-of-Verification</span>
-            <span class="row-what">draft check questions, answer them</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Self-Ask</span>
-            <span class="row-what">ask itself sub-questions first</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Debate-Then-Decide</span>
-            <span class="row-what">argue both sides, then choose</span>
-          </div>
-          </div>
-        </section>
+      <section class="advanced" aria-labelledby="g-adv">
+        <h2 class="advanced-head" id="g-adv">Advanced controls</h2>
+        <div class="advanced-grid">
+          <p class="adv-item"><b>Delimiters</b> mark where each part starts</p>
+          <p class="adv-item"><b>Meta-Prompting</b> let it write the prompt</p>
+          <p class="adv-item"><b>Example Selection</b> pick the best examples</p>
+          <p class="adv-item"><b>Example Ordering</b> order examples on purpose</p>
+          <p class="adv-item"><b>Context Packing</b> fit the key info in</p>
+          <p class="adv-item"><b>Lost-in-the-Middle Mitigation</b> put key facts at the edges</p>
+          <p class="adv-item"><b>Prompt Compression</b> shrink the prompt to save cost</p>
+          <p class="adv-item"><b>Analogical Prompting</b> reason from a similar case</p>
+          <p class="adv-item"><b>Tree-of-Thoughts</b> explore several paths, pick best</p>
+          <p class="adv-item"><b>Skeleton-of-Thought</b> outline first, fill in parallel</p>
+          <p class="adv-item"><b>Schema Enforcement</b> force valid fields</p>
+          <p class="adv-item"><b>Constrained Decoding</b> only allow valid tokens</p>
+          <p class="adv-item"><b>Streaming with Validation</b> check it as it streams</p>
+          <p class="adv-item"><b>Format Coercion</b> repair the format after</p>
+          <p class="adv-item"><b>Logit Biasing</b> nudge specific words</p>
+          <p class="adv-item"><b>Beam Search</b> keep the best few continuations</p>
+        </div>
+      </section>
 
-        <section class="group">
-          <h3 style="margin:0">
-            <button type="button" class="group-toggle" aria-expanded="false" aria-controls="grp-out" id="grp-out-btn">
-              <span class="gt-text">
-                <span class="gt-name">Control what comes out</span>
-                <span class="gt-gloss">format and decoding</span>
-              </span>
-              <span class="gt-count">9 techniques</span>
-              <span class="gt-chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
-            </button>
-          </h3>
-          <div class="group-panel" id="grp-out" role="region" aria-labelledby="grp-out-btn" hidden>
-          <a class="map-row is-link" href="pattern-structured-output.html">
-            <span class="row-name">Structured Output<span class="arr" aria-hidden="true">&#8599;</span></span>
-            <span class="row-what">return a fixed shape</span>
-          </a>
-          <div class="map-row">
-            <span class="row-name">Schema Enforcement</span>
-            <span class="row-what">force valid fields</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Constrained Decoding</span>
-            <span class="row-what">only allow valid tokens</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Streaming with Validation</span>
-            <span class="row-what">check it as it streams</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Format Coercion</span>
-            <span class="row-what">repair the format after</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Temperature &amp; Sampling</span>
-            <span class="row-what">dial randomness up or down</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Logit Biasing</span>
-            <span class="row-what">nudge specific words</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Stop Sequences</span>
-            <span class="row-what">tell it where to stop</span>
-          </div>
-          <div class="map-row">
-            <span class="row-name">Beam Search</span>
-            <span class="row-what">keep the best few continuations</span>
-          </div>
-          </div>
-        </section>
-
-      </div>
-
-      <p class="closing">All of this happens inside one model call. A second call is L5; a second model is L2.</p>
+      <p class="closing">All of these happen inside one message to the AI.</p>
 
     </div>
 
     <footer class="foot"><strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.</footer>
   </div>
 
-  <script>
-    (function(){
-      var toggles = document.querySelectorAll('.group-toggle');
-      Array.prototype.forEach.call(toggles, function(btn){
-        btn.addEventListener('click', function(){
-          var panel = document.getElementById(btn.getAttribute('aria-controls'));
-          var open = btn.getAttribute('aria-expanded') === 'true';
-          btn.setAttribute('aria-expanded', open ? 'false' : 'true');
-          if(panel){ panel.hidden = open; }
-        });
-      });
-    })();
-  </script>
 </body>
 </html>
