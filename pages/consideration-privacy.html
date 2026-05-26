@@ -420,35 +420,35 @@
     <div class="covers-axis">
       <span class="covers-axis-label">Axis:</span> protecting data, users, and tenants.
     </div>
-    <p class="covers-note">C3 is a discipline crosscut. The mechanisms (scoped retrieval, per-tenant context limits) live in Serving Infrastructure (L0) and Stateless Retrieval (L3a). What lives here is the reasoning framework: which controls to apply, why, and how they compose.</p>
+    <p class="covers-note">C3 is a discipline crosscut. Runtime mechanisms live in L0 and L3a; this page covers which controls to apply and why.</p>
     <div class="covers-list">
       <div class="covers-item">
         <div class="covers-item-name">Access Control</div>
-        <div class="covers-item-line">Who is allowed to see what. Defines the permission model for users, roles, and API keys across the system.</div>
+        <div class="covers-item-line">Permission model for users, roles, and API keys.</div>
       </div>
       <div class="covers-item">
         <div class="covers-item-name">Tenant Isolation Discipline</div>
-        <div class="covers-item-line">Keeping one customer's data strictly separate from another's. A discipline: the actual runtime mechanisms (scoped queries, per-tenant limits) live in L0 and L3a.</div>
+        <div class="covers-item-line">One customer's data never reaches another's session.</div>
       </div>
       <div class="covers-item">
         <div class="covers-item-name">Audit-Logging</div>
-        <div class="covers-item-line">Recording what happened, who triggered it, and when. An immutable trail that lets you answer "what did the system do with this user's data?"</div>
+        <div class="covers-item-line">Immutable record of who accessed what and when.</div>
       </div>
       <div class="covers-item">
         <div class="covers-item-name">Compliance Mapping (GDPR, HIPAA, SOC2)</div>
-        <div class="covers-item-line">Translating legal and regulatory obligations into concrete system requirements. Each regime names different controls; this discipline maps them to the patterns you build.</div>
+        <div class="covers-item-line">Translates legal obligations into concrete system controls.</div>
       </div>
       <div class="covers-item">
         <div class="covers-item-name">Data Residency</div>
-        <div class="covers-item-line">Ensuring data is stored and processed only in allowed geographic regions. Critical when regulations restrict cross-border data flows.</div>
+        <div class="covers-item-line">Data stays in its permitted geographic region.</div>
       </div>
       <div class="covers-item">
         <div class="covers-item-name">Runtime PII-Handling</div>
-        <div class="covers-item-line">Detecting, redacting, or tokenizing personal information (PII) as it flows through the system at inference time, before data reaches the model or logs.</div>
+        <div class="covers-item-line">Detects and redacts personal data before the model sees it.</div>
       </div>
       <div class="covers-item">
         <div class="covers-item-name">Provenance &amp; Watermarking</div>
-        <div class="covers-item-line">Tracking where output came from and marking generated content so it can be identified as AI-produced. Supports attribution and misuse detection.</div>
+        <div class="covers-item-line">Marks AI-generated output for attribution and misuse detection.</div>
       </div>
     </div>
   </div>
@@ -542,7 +542,7 @@
       </div>
     </div>
     <div class="tradeoff-quote">
-      Redaction is fast and worth it. The hard part is recall: catching unusual formats, nicknames, and new types of identifiers. Missed detections are the real risk, not the latency.
+      Missed detections are the real risk, not the latency.
     </div>
   </div>
 </section>
