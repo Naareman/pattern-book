@@ -28,6 +28,7 @@
     -webkit-font-smoothing: antialiased;
   }
   body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
 
   /* a11y */
   a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
@@ -93,6 +94,20 @@
   }
   .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
+  /* flow legend (stage pills + arrows) */
+  .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
+  .flow-chip {
+    font-family: inherit; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; box-shadow: var(--shadow); padding: 7px 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--soft); white-space: nowrap;
+    letter-spacing: .01em; cursor: pointer;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .flow-chip:hover { color: var(--accent-hover); border-color: var(--border-strong); }
+  .flow-chip.lit { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); }
+  .flow-arrow { flex: none; color: var(--accent); font-size: 15px; line-height: 1; }
+  .flow-caption { text-align: center; color: var(--faint); font-size: 13px; line-height: 1.5; margin-top: 12px; }
+
   /* sections */
   section {
     max-width: 920px; margin: 0 auto;
@@ -126,7 +141,6 @@
   }
   .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
 
-  /* the task bubble */
   .task-bubble {
     background: var(--bg); border: 1px solid var(--border);
     border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 20px;
@@ -140,10 +154,8 @@
   .task-label { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
   .task-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; line-height: 1.35; color: var(--text); }
 
-  /* the loop track */
   .loop-track { display: flex; flex-direction: column; gap: 10px; min-height: 280px; }
 
-  /* each step card */
   .step-card {
     border: 1px solid var(--border); border-radius: var(--radius-sm);
     padding: 14px 16px; background: var(--surface);
@@ -154,8 +166,6 @@
   .step-card.shown { opacity: 1; transform: translateY(0); }
   .step-card.active { border-color: var(--accent); box-shadow: 0 4px 18px rgba(124,92,246,.14); }
   .step-card.done { border-color: var(--border-strong); }
-
-  /* left colored stripe by phase */
   .step-card::before {
     content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
     border-radius: var(--radius-sm) 0 0 var(--radius-sm);
@@ -189,7 +199,6 @@
     border-radius: 4px; padding: 1px 6px; font-weight: 600;
   }
 
-  /* the final answer card */
   .answer-card {
     background: var(--text); color: #fff;
     border-radius: var(--radius-sm); padding: 16px 18px;
@@ -201,7 +210,6 @@
   .answer-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: rgba(255,255,255,.55); margin-bottom: 6px; }
   .answer-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; line-height: 1.4; }
 
-  /* loop arrow connector */
   .loop-arrow {
     display: flex; align-items: center; gap: 8px;
     font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
@@ -213,7 +221,6 @@
   .loop-arrow.loop-back { color: var(--accent); }
   .loop-arrow.loop-back .arr-line { background: var(--accent); opacity: 0.4; }
 
-  /* controls */
   .demo-controls {
     display: flex; gap: 10px; flex-wrap: wrap;
     padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
@@ -251,7 +258,7 @@
   }
   .example-val strong { color: var(--accent-hover); font-weight: 600; }
 
-  /* ============ TRADEOFFS (canonical monochrome meter) ============ */
+  /* ============ TRADEOFFS ============ */
   .tradeoffs-stage {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
@@ -282,37 +289,72 @@
     .tradeoff-label { min-width: 0; }
   }
 
-  /* ============ INSIDE THIS LAYER ============ */
-  .layer-map {
+  /* ============ STAGE CARDS (L4-style) ============ */
+  .stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 6px; }
+
+  .stage-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+    scroll-margin-top: 80px;
+    transition: box-shadow .55s ease, border-color .55s ease;
   }
-  .layer-axis {
-    font-size: 13px; font-style: italic; color: var(--soft);
-    border-left: 3px solid var(--accent); padding-left: 14px;
-    margin-bottom: 26px; line-height: 1.55;
+  .stage-card.glow {
+    box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42);
+    border-color: var(--accent);
   }
-  .subaxis-block { margin-bottom: 26px; }
-  .subaxis-block:last-child { margin-bottom: 0; }
-  .subaxis-head {
-    font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-    color: var(--accent-hover); margin-bottom: 12px;
-    padding-bottom: 6px; border-bottom: 1px solid var(--border);
+  @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
+
+  .stage-card.clickable {
+    cursor: pointer;
+    transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
   }
-  .cat-row { display: flex; flex-direction: column; gap: 10px; }
-  .cat-item { display: flex; flex-direction: column; gap: 3px; }
-  .cat-name {
-    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
-    color: var(--text); line-height: 1.2;
+  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
+  @media (prefers-reduced-motion: reduce) {
+    .stage-card.clickable { transition: none; }
+    .stage-card.clickable:hover { transform: none; }
   }
-  .cat-desc {
-    font-size: 13.5px; color: var(--soft); line-height: 1.5;
+
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 4px; }
+  .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
+  .stage-head .sico svg { width: 18px; height: 18px; display: block; }
+  .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
+  a.stage-name { transition: color .15s ease; }
+  a.stage-name:hover { color: var(--accent-hover); }
+
+  .see-how {
+    display: inline-flex; align-items: center; gap: 3px; margin-left: auto;
+    font-size: 12.5px; font-weight: 600; color: var(--accent-hover);
+    transition: color .15s ease;
   }
-  .layer-filing-rule {
-    margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border);
-    font-size: 13px; color: var(--faint); line-height: 1.6;
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion: reduce) {
+    a.stage-name, .see-how, .see-how .arr { transition: none; }
+    .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; }
   }
-  .layer-filing-rule strong { color: var(--soft); font-weight: 600; }
+
+  .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    flex: none; display: inline-flex; align-items: center; gap: 3px;
+    padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    line-height: 1.2; white-space: nowrap;
+    border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
+  }
+  a.chip {
+    border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft);
+    cursor: pointer; transition: background .15s ease;
+  }
+  a.chip:hover { background: #E3DBFD; }
+  a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
+  a.chip:hover .arr { transform: translate(1px, -1px); }
+  @media (prefers-reduced-motion: reduce) {
+    a.chip, a.chip .arr { transition: none; }
+    a.chip:hover .arr { transform: none; }
+  }
 
   /* back link */
   .back-link {
@@ -349,13 +391,16 @@
   footer strong { color: var(--soft); font-weight: 500; }
 
   /* responsive */
+  @media (max-width: 720px) {
+    .stages { grid-template-columns: 1fr; gap: 14px; }
+  }
   @media (max-width: 560px) {
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .layer-map { padding: 18px 16px; }
     .example-row { grid-template-columns: 1fr; }
     .example-key { border-right: none; border-bottom: 1px solid var(--border); }
+    .flow-chip { font-size: 12px; padding: 6px 12px; }
   }
   @media (max-width: 480px) {
     .demo-controls { flex-direction: column; align-items: stretch; }
@@ -388,6 +433,15 @@
   </span>
   <h1 class="pattern-title">Orchestration</h1>
   <p class="explainer">How the system organizes its calls across time, takes action in the world, and talks to other AI actors.</p>
+
+  <div class="flow" aria-label="Jump to a dimension of orchestration">
+    <button type="button" class="flow-chip" data-target="card-structure">Structure the steps</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-action">Act in the world</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-coordinate">Coordinate agents</button>
+  </div>
+  <p class="flow-caption">Three dimensions of how systems organize their work.</p>
 </header>
 
 <!-- 01 · THE IDEA -->
@@ -508,103 +562,73 @@
 <!-- 05 · INSIDE THIS LAYER -->
 <section>
   <div class="section-label"><span class="num">05</span>Inside This Layer</div>
-  <h2>Everything that <em>lives</em> here.</h2>
+  <h2>Three dimensions, one <em>system</em>.</h2>
 
-  <div class="layer-map">
-    <div class="layer-axis">Axis: how a system's calls and actions are organized across time, the world, and other actors.</div>
+  <div class="stages">
 
-    <!-- SUB-AXIS: SHAPE -->
-    <div class="subaxis-block">
-      <div class="subaxis-head">Shape: Structure of Execution Across Calls</div>
-      <div class="cat-row">
-        <div class="cat-item">
-          <div class="cat-name">Single-Call Patterns</div>
-          <div class="cat-desc">The entire task is answered in one round trip to the model. Nothing loops or fans out.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Sequential Pipelines</div>
-          <div class="cat-desc">Steps run one after another in a fixed order. The output of each step feeds the next.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Parallel / Fan-Out / Fan-In</div>
-          <div class="cat-desc">Multiple sub-tasks run at the same time and their results are gathered back into one answer.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Iterative Loops (ReAct, Reflection)</div>
-          <div class="cat-desc">The model repeats a Think-Act-Observe cycle until it has enough to stop. The ReAct loop demonstrated above is this pattern.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Router / Dispatcher</div>
-          <div class="cat-desc">An entry point inspects the request and sends it to whichever specialist or sub-pipeline is the right fit.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Hierarchical Planning (Planner-Executor)</div>
-          <div class="cat-desc">A planner model breaks the goal into a high-level plan. Separate executor agents carry out each step of that plan.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Conditional Branching</div>
-          <div class="cat-desc">The path through the system changes based on what the model or a check discovers at runtime.</div>
-        </div>
+    <section class="stage-card clickable" id="card-structure" aria-labelledby="g-structure">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18M3 12h18M3 18h18"/>
+          </svg>
+        </span>
+        <h2 id="g-structure"><a class="stage-name" href="orchestration-structure.html">Structure the steps</a></h2>
+        <a class="see-how" href="orchestration-structure.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
       </div>
-    </div>
-
-    <!-- SUB-AXIS: ACTION -->
-    <div class="subaxis-block">
-      <div class="subaxis-head">Action: State-Changing Operations on the Outside World</div>
-      <div class="cat-row">
-        <div class="cat-item">
-          <div class="cat-name">External Action (State-Changing Tool Invocation)</div>
-          <div class="cat-desc">The agent calls a tool that writes, books, sends, or otherwise changes something outside the model. A read-only search belongs in L3a, not here.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Idempotency and Action Verification</div>
-          <div class="cat-desc">Ensuring the same action run twice leaves the world in the same state, and confirming the action actually succeeded.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Compensating Actions and Rollback</div>
-          <div class="cat-desc">When a step fails mid-sequence, the system runs an undo operation to restore a safe state.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Approval Gates</div>
-          <div class="cat-desc">The agent pauses and waits for a human to approve before a high-stakes action executes. The user-facing display of that pause lives in L7.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Side-Effect Sandboxing</div>
-          <div class="cat-desc">Running potentially dangerous code or actions in an isolated environment so failures cannot escape to production.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Multi-Step Action Transactions</div>
-          <div class="cat-desc">Treating a sequence of actions as one atomic unit: all succeed together or all roll back together.</div>
-        </div>
+      <p class="stage-lead">How calls are ordered.</p>
+      <div class="chips">
+        <span class="chip">Single-call patterns</span>
+        <span class="chip">Sequential pipelines</span>
+        <span class="chip">Parallel / fan-out</span>
+        <span class="chip">Iterative loops (ReAct, reflection)</span>
+        <span class="chip">Router / dispatcher</span>
+        <span class="chip">Hierarchical planning</span>
+        <span class="chip">Conditional branching</span>
       </div>
-    </div>
+    </section>
 
-    <!-- SUB-AXIS: COORDINATION -->
-    <div class="subaxis-block">
-      <div class="subaxis-head">Coordination: Communication Between Multiple Actors</div>
-      <div class="cat-row">
-        <div class="cat-item">
-          <div class="cat-name">Agent-to-Agent Protocols (MCP, A2A)</div>
-          <div class="cat-desc">Standard message formats that let one AI agent call or delegate to another. MCP (Model Context Protocol) and A2A (Agent-to-Agent) are the current leading protocols.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Shared Workspace / Blackboard</div>
-          <div class="cat-desc">Multiple agents read and write to a common space so they can build on each other's partial results without a direct hand-off.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Agent Identity and Auth</div>
-          <div class="cat-desc">How an agent proves who it is, holds credentials securely, and operates with only the permissions it needs.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Capability Negotiation and Tool Discovery</div>
-          <div class="cat-desc">Agents advertise what they can do, and callers discover which tools or sub-agents are available at runtime.</div>
-        </div>
+    <section class="stage-card clickable" id="card-action" aria-labelledby="g-action">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </span>
+        <h2 id="g-action"><a class="stage-name" href="orchestration-action.html">Act in the world</a></h2>
+        <a class="see-how" href="orchestration-action.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
       </div>
-    </div>
+      <p class="stage-lead">Changing things outside the model.</p>
+      <div class="chips">
+        <span class="chip">External action (tools that change things)</span>
+        <span class="chip">Idempotency</span>
+        <span class="chip">Compensating actions and rollback</span>
+        <span class="chip">Approval gates</span>
+        <span class="chip">Side-effect sandboxing</span>
+        <span class="chip">Multi-step transactions</span>
+      </div>
+    </section>
 
-    <div class="layer-filing-rule">
-      <strong>Filing rule:</strong> Shape = in what order or structure do calls execute? Action = what does the system do to outside state? Coordination = how do multiple actors communicate? When you see a ReAct loop, the loop itself is Shape. Each tool call inside the loop is Action.
-    </div>
+    <section class="stage-card clickable" id="card-coordinate" aria-labelledby="g-coordinate">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="12" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="18" cy="18" r="2"/>
+            <path d="M8 12h8M16 8l-6 4M16 16l-6-4"/>
+          </svg>
+        </span>
+        <h2 id="g-coordinate"><a class="stage-name" href="orchestration-coordination.html">Coordinate agents</a></h2>
+        <a class="see-how" href="orchestration-coordination.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      </div>
+      <p class="stage-lead">Many agents working together.</p>
+      <div class="chips">
+        <span class="chip">Agent-to-agent protocols (MCP, A2A)</span>
+        <span class="chip">Shared workspace</span>
+        <span class="chip">Agent identity and auth</span>
+        <span class="chip">Capability negotiation and tool discovery</span>
+      </div>
+    </section>
+
   </div>
 </section>
 
@@ -636,10 +660,6 @@
 
 <script>
 // ============ AGENT LOOP DEMO ============
-// Each entry in STEPS is one beat of the think-act-observe loop.
-// phase: think | act | observe | answer
-// The last step is the final answer card.
-
 const STEPS = [
   {
     phase: 'think',
@@ -686,7 +706,7 @@ const STEPS = [
   {
     phase: 'answer',
     pillLabel: 'Answer',
-    body: null, // rendered as answer card
+    body: null,
     answerText: 'The 2023 Nobel Prize in Physics went to Agostini, Krausz, and L\'Huillier. L\'Huillier is from France. The capital of France is Paris.',
     connector: { label: 'done', loopBack: false },
     num: '7'
@@ -702,7 +722,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 
 let currentStep = -1;
 let playing = false;
-const renderedEls = []; // parallel array of DOM elements per step
+const renderedEls = [];
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -711,159 +731,169 @@ function buildConnector(step) {
   const el = document.createElement('div');
   el.className = 'loop-arrow' + (step.connector.loopBack ? ' loop-back' : '');
   el.setAttribute('aria-hidden', 'true');
-  el.innerHTML = `<div class="arr-line"></div><span>${step.connector.loopBack ? '&#8634; ' : ''}${step.connector.label}</span><div class="arr-line"></div>`;
+  el.innerHTML = '<div class="arr-line"></div><span>' + (step.connector.loopBack ? '&#8634; ' : '') + step.connector.label + '</span><div class="arr-line"></div>';
   return el;
 }
 
 function buildStepEl(step) {
   const wrapper = document.createElement('div');
-
-  // connector above (if any)
+  const idx = STEPS.indexOf(step);
   if (step.connector) {
     const conn = buildConnector(step);
     wrapper.appendChild(conn);
-    renderedEls[STEPS.indexOf(step)].connEl = conn;
+    renderedEls[idx].connEl = conn;
   }
-
   if (step.phase === 'answer' && step.answerText) {
-    // answer card
     const card = document.createElement('div');
     card.className = 'answer-card';
     card.setAttribute('role', 'status');
-    card.innerHTML = `<div class="answer-label">Answer</div><div class="answer-text">${step.answerText}</div>`;
+    card.innerHTML = '<div class="answer-label">Answer</div><div class="answer-text">' + step.answerText + '</div>';
     wrapper.appendChild(card);
-    renderedEls[STEPS.indexOf(step)].card = card;
+    renderedEls[idx].card = card;
   } else {
-    // step card
     const card = document.createElement('div');
-    card.className = `step-card phase-${step.phase}`;
-    card.innerHTML = `
-      <div class="step-header">
-        <span class="phase-pill ${step.phase}">${step.pillLabel}</span>
-        <span class="step-num">Step ${step.num}</span>
-      </div>
-      <div class="step-body">${step.body}</div>
-    `;
+    card.className = 'step-card phase-' + step.phase;
+    card.innerHTML = '<div class="step-header"><span class="phase-pill ' + step.phase + '">' + step.pillLabel + '</span><span class="step-num">Step ' + step.num + '</span></div><div class="step-body">' + step.body + '</div>';
     wrapper.appendChild(card);
-    renderedEls[STEPS.indexOf(step)].card = card;
+    renderedEls[idx].card = card;
   }
-
   return wrapper;
 }
 
 function initRendered() {
-  for (let i = 0; i < STEPS.length; i++) {
-    renderedEls[i] = {};
-  }
+  for (var i = 0; i < STEPS.length; i++) { renderedEls[i] = {}; }
 }
 
 function renderAll() {
   track.innerHTML = '';
   initRendered();
-  STEPS.forEach((step, i) => {
-    const wrapper = buildStepEl(step);
-    track.appendChild(wrapper);
-  });
+  STEPS.forEach(function(step) { track.appendChild(buildStepEl(step)); });
 }
 
 function showStep(i, animate) {
   const { card, connEl } = renderedEls[i];
   if (connEl) {
-    if (animate && !reduceMotion) {
-      setTimeout(() => connEl.classList.add('shown'), 80);
-    } else {
-      connEl.classList.add('shown');
-    }
+    if (animate && !reduceMotion) { setTimeout(function(){ connEl.classList.add('shown'); }, 80); }
+    else { connEl.classList.add('shown'); }
   }
   if (!card) return;
   if (STEPS[i].phase === 'answer') {
-    if (animate && !reduceMotion) {
-      setTimeout(() => card.classList.add('shown'), connEl ? 260 : 80);
-    } else {
-      card.classList.add('shown');
-    }
+    if (animate && !reduceMotion) { setTimeout(function(){ card.classList.add('shown'); }, connEl ? 260 : 80); }
+    else { card.classList.add('shown'); }
   } else {
-    // deactivate prev
-    if (i > 0 && renderedEls[i - 1].card) {
-      renderedEls[i - 1].card.classList.remove('active');
-      renderedEls[i - 1].card.classList.add('done');
+    if (i > 0 && renderedEls[i-1].card) {
+      renderedEls[i-1].card.classList.remove('active');
+      renderedEls[i-1].card.classList.add('done');
     }
     card.classList.add('shown');
-    if (animate && !reduceMotion) {
-      setTimeout(() => card.classList.add('active'), 40);
-    } else {
-      card.classList.add('active');
-    }
+    if (animate && !reduceMotion) { setTimeout(function(){ card.classList.add('active'); }, 40); }
+    else { card.classList.add('active'); }
   }
 }
 
 function showAllInstant() {
-  for (let i = 0; i < STEPS.length; i++) {
-    showStep(i, false);
-  }
-  // deactivate all except last step card
-  for (let i = 0; i < STEPS.length - 1; i++) {
-    if (renderedEls[i].card) {
-      renderedEls[i].card.classList.remove('active');
-      renderedEls[i].card.classList.add('done');
-    }
+  for (var i = 0; i < STEPS.length; i++) { showStep(i, false); }
+  for (var j = 0; j < STEPS.length - 1; j++) {
+    if (renderedEls[j].card) { renderedEls[j].card.classList.remove('active'); renderedEls[j].card.classList.add('done'); }
   }
   currentStep = STEPS.length - 1;
 }
 
 function resetDemo() {
-  track.innerHTML = '';
-  initRendered();
-  renderAll();
-  currentStep = -1;
+  track.innerHTML = ''; initRendered(); renderAll(); currentStep = -1;
 }
 
-// Step button
-stepBtn.addEventListener('click', async () => {
+stepBtn.addEventListener('click', function() {
   if (playing) return;
   if (currentStep >= STEPS.length - 1) { resetDemo(); return; }
   currentStep++;
   showStep(currentStep, !reduceMotion);
-  // scroll last card into view gently
-  setTimeout(() => {
+  setTimeout(function() {
     if (renderedEls[currentStep].card) {
       renderedEls[currentStep].card.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
     }
   }, 200);
 });
 
-// Play button
-playBtn.addEventListener('click', async () => {
+playBtn.addEventListener('click', async function() {
   if (playing) return;
   if (reduceMotion) { showAllInstant(); return; }
-  playing = true;
-  playBtn.disabled = true;
-  stepBtn.disabled = true;
+  playing = true; playBtn.disabled = true; stepBtn.disabled = true;
   resetDemo();
   await sleep(300);
-  for (let i = 0; i < STEPS.length; i++) {
+  for (var i = 0; i < STEPS.length; i++) {
     currentStep = i;
     showStep(i, true);
     await sleep(i === STEPS.length - 1 ? 500 : 900);
-    if (renderedEls[i].card) {
-      renderedEls[i].card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    if (renderedEls[i].card) { renderedEls[i].card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
     await sleep(200);
   }
-  playing = false;
-  playBtn.disabled = false;
-  stepBtn.disabled = false;
+  playing = false; playBtn.disabled = false; stepBtn.disabled = false;
 });
 
-// Reset button
-resetBtn.addEventListener('click', () => {
-  if (playing) return;
-  resetDemo();
-});
+resetBtn.addEventListener('click', function() { if (!playing) resetDemo(); });
 
-// init
+// flow legend: scroll + glow on card click
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var stages = ['card-structure','card-action','card-coordinate'];
+  var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
+
+  function pillFor(cardId){
+    for(var i=0;i<pills.length;i++){ if(pills[i].getAttribute('data-target')===cardId) return pills[i]; }
+    return null;
+  }
+
+  pills.forEach(function(btn){
+    var target = btn.getAttribute('data-target');
+    var card = document.getElementById(target);
+    btn.addEventListener('click', function(){
+      if(!card) return;
+      card.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+      card.classList.add('glow');
+      window.setTimeout(function(){ card.classList.remove('glow'); }, 1200);
+    });
+  });
+
+  if(!reduce){
+    var step = 0;
+    function tour(){
+      if(step > 0){
+        var prevCard = document.getElementById(stages[step-1]);
+        var prevPill = pillFor(stages[step-1]);
+        if(prevCard) prevCard.classList.remove('glow');
+        if(prevPill) prevPill.classList.remove('lit');
+      }
+      if(step >= stages.length) return;
+      var curCard = document.getElementById(stages[step]);
+      var curPill = pillFor(stages[step]);
+      if(curCard) curCard.classList.add('glow');
+      if(curPill) curPill.classList.add('lit');
+      step++;
+      window.setTimeout(tour, 900);
+    }
+    window.setTimeout(tour, 350);
+  }
+
+  // each stage card is a door
+  var doors = {
+    'card-structure': 'orchestration-structure.html',
+    'card-action': 'orchestration-action.html',
+    'card-coordinate': 'orchestration-coordination.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('a')) return;
+      window.location.href = doorHref;
+    });
+  });
+})();
+
 renderAll();
-if (reduceMotion) showAllInstant();
+if(reduceMotion) showAllInstant();
 </script>
 </body>
 </html>
