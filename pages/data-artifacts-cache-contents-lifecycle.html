@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cache-Contents Lifecycle · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0;
+    margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* topbar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 24px 24px 36px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* prose block */
+  .prose {
+    font-size: 16px; line-height: 1.7; color: var(--soft); max-width: 700px;
+  }
+  .prose strong, .key-term { color: var(--accent-hover); font-weight: 600; }
+
+  /* divider */
+  .divider { border: none; border-top: 1px solid var(--border); max-width: 920px; margin: 0 auto; }
+
+  /* ============ EXAMPLE VISUAL ============ */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .ex-timeline {
+    display: flex; flex-direction: column; gap: 0;
+  }
+  .ex-event {
+    display: flex; align-items: flex-start; gap: 0;
+    border-bottom: 1px solid var(--border);
+    cursor: default;
+    transition: background 0.18s ease;
+  }
+  .ex-event:last-child { border-bottom: none; }
+  .ex-event:hover { background: var(--bg-subtle); }
+  .ex-event.highlight { background: var(--accent-soft); }
+  .ex-event.highlight:hover { background: var(--accent-soft); }
+  .ex-time {
+    flex-shrink: 0; width: 90px; padding: 16px 14px 16px 20px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--faint); line-height: 1.4; border-right: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .ex-body { flex: 1; padding: 16px 20px; }
+  .ex-tag {
+    display: inline-block; margin-bottom: 5px;
+    font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 20px;
+  }
+  .tag-populate { background: #E7F7F0; color: #0E9F6E; }
+  .tag-stale   { background: #FEF9EC; color: #B45309; }
+  .tag-evict   { background: #FDECEC; color: #C0392B; }
+  .tag-schema  { background: var(--accent-soft); color: var(--accent-hover); }
+  .ex-text { font-size: 14px; color: var(--text); line-height: 1.55; }
+  .ex-note { font-size: 12.5px; color: var(--soft); margin-top: 4px; line-height: 1.45; }
+
+  .ex-legend {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-subtle);
+  }
+  .leg-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--soft); }
+  .leg-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ============ WHERE IT FITS ============ */
+  .split-card {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin-top: 4px;
+  }
+  .split-half {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 18px 18px; background: var(--bg-subtle);
+  }
+  .split-half.this-page { border-color: var(--accent); background: var(--accent-soft); }
+  .split-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .split-label.here { color: var(--accent-hover); }
+  .split-label.there { color: var(--faint); }
+  .split-name {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px;
+    color: var(--text); margin-bottom: 6px;
+  }
+  .split-desc { font-size: 13px; color: var(--soft); line-height: 1.55; }
+  .split-rule {
+    margin-top: 14px; padding: 13px 16px;
+    background: var(--surface); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); font-size: 13.5px; color: var(--soft); line-height: 1.6;
+  }
+  .split-rule strong { color: var(--text); font-weight: 600; }
+
+  /* ============ BACK CARD ============ */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 18px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow {
+    font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent);
+    line-height: 1; transition: transform 0.2s ease;
+  }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* footer */
+  footer {
+    max-width: 920px; margin: 32px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 600px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .split-card { grid-template-columns: 1fr; }
+    .ex-time { width: 70px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-data-artifacts.html">Data &amp; Artifact Lifecycle</a><span class="sep">/</span><span class="here">Cache-Contents Lifecycle</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">L&minus;1 &middot; Deployable Artifacts</span>
+  <h1 class="page-title">Cache-Contents Lifecycle</h1>
+  <p class="explainer">Managing what goes into a cache and when it is refreshed or thrown out.</p>
+</header>
+
+<!-- 01 WHAT IT IS -->
+<section aria-labelledby="h-what">
+  <div class="section-label"><span class="num">01</span>What It Is</div>
+  <h2 id="h-what">The <em>concept</em></h2>
+  <p class="prose">
+    A cache stores answers or retrieved results so the system can skip re-running expensive work. But cached content does not manage itself.
+    <span class="key-term">Cache-contents lifecycle</span> is the set of rules that govern four things: how entries get <strong>populated</strong> (written into the cache in the first place), when they are declared <strong>stale</strong> (the source has changed, so the cached answer is no longer trustworthy), how they are <strong>evicted</strong> (removed, whether by expiry, size pressure, or an explicit invalidation signal), and how the <strong>cache schema</strong> evolves when the shape of a cached entry changes across deployments without silently corrupting old entries still in the store.
+    Without explicit lifecycle rules, a cache becomes a source of wrong answers rather than a source of speed.
+  </p>
+</section>
+
+<hr class="divider">
+
+<!-- 02 AN EXAMPLE -->
+<section aria-labelledby="h-example">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="h-example">A cached answer goes <em>stale</em></h2>
+
+  <p class="prose" style="margin-bottom: 20px;">
+    A legal Q&amp;A system caches generated answers. A source regulation is updated. Here is what the lifecycle rules do.
+  </p>
+
+  <div class="example-stage" role="region" aria-label="Cache lifecycle timeline">
+    <div class="ex-timeline">
+
+      <div class="ex-event">
+        <div class="ex-time" aria-hidden="true">T+0<br>Populate</div>
+        <div class="ex-body">
+          <span class="ex-tag tag-populate">Populate</span>
+          <div class="ex-text">User asks "What is the penalty for late filing?" The system generates an answer from Regulation 42 and writes it to the cache with key <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg-subtle);padding:1px 5px;border-radius:4px;">q:penalty-late-filing</code>.</div>
+          <div class="ex-note">Subsequent users get the cached answer instantly, with no model call.</div>
+        </div>
+      </div>
+
+      <div class="ex-event">
+        <div class="ex-time" aria-hidden="true">T+30d<br>Source changes</div>
+        <div class="ex-body">
+          <span class="ex-tag tag-stale">Stale</span>
+          <div class="ex-text">Regulation 42 is amended. The document store registers a <strong>change event</strong> on that source document.</div>
+          <div class="ex-note">The cached answer now reflects the old rule. Without invalidation, users will keep receiving the wrong answer.</div>
+        </div>
+      </div>
+
+      <div class="ex-event highlight">
+        <div class="ex-time" aria-hidden="true">T+30d<br>Evict</div>
+        <div class="ex-body">
+          <span class="ex-tag tag-evict">Evict</span>
+          <div class="ex-text">An <strong>invalidation rule</strong> fires: any cache entry whose source document changed is evicted. The key <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg-subtle);padding:1px 5px;border-radius:4px;">q:penalty-late-filing</code> is deleted from the store.</div>
+          <div class="ex-note">This is the core mechanism: source change triggers eviction, not a timer.</div>
+        </div>
+      </div>
+
+      <div class="ex-event">
+        <div class="ex-time" aria-hidden="true">T+30d<br>Re-populate</div>
+        <div class="ex-body">
+          <span class="ex-tag tag-populate">Populate</span>
+          <div class="ex-text">The next user query re-runs the full pipeline against the updated regulation. The fresh answer is written back to the cache.</div>
+          <div class="ex-note">Speed is restored after the first post-change request; correctness is never sacrificed.</div>
+        </div>
+      </div>
+
+      <div class="ex-event">
+        <div class="ex-time" aria-hidden="true">T+60d<br>Schema bump</div>
+        <div class="ex-body">
+          <span class="ex-tag tag-schema">Schema v2</span>
+          <div class="ex-text">The team adds a <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg-subtle);padding:1px 5px;border-radius:4px;">citations</code> field to every cache entry. A <strong>schema version tag</strong> (<code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg-subtle);padding:1px 5px;border-radius:4px;">v:1</code> vs <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--bg-subtle);padding:1px 5px;border-radius:4px;">v:2</code>) is embedded in each key. Old v1 entries are ignored or lazily evicted; new queries write v2 entries.</div>
+          <div class="ex-note">Schema versioning prevents the reader from crashing on entries that predate a new field.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="ex-legend" aria-hidden="true">
+      <div class="leg-item"><div class="leg-dot" style="background:#0E9F6E"></div> Populate</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#B45309"></div> Stale</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#C0392B"></div> Evict</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--accent)"></div> Schema version</div>
+      <div class="leg-item" style="margin-left:auto;font-style:italic;color:var(--faint)">Highlighted row: the invalidation rule firing</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- 03 WHERE IT FITS -->
+<section aria-labelledby="h-fits">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="h-fits">The <em>L&minus;1 / L0</em> split</h2>
+
+  <p class="prose" style="margin-bottom: 18px;">
+    "Caching" has two homes in the taxonomy. The key is the axis each layer slices on.
+  </p>
+
+  <div class="split-card">
+    <div class="split-half this-page">
+      <div class="split-label here">This page (L&minus;1)</div>
+      <div class="split-name">Cache-Contents Lifecycle</div>
+      <div class="split-desc">
+        The artifact side. What is stored, when it is written, when it expires, what invalidates it, and how the schema of stored entries evolves. This is a <strong>management</strong> concern: you are governing the contents of the cache as a deployable artifact.
+      </div>
+    </div>
+    <div class="split-half">
+      <div class="split-label there">Neighbor (L0)</div>
+      <div class="split-name">Cache Check &amp; Substitution</div>
+      <div class="split-desc">
+        The runtime side. At request time, the serving layer checks whether a valid cached result exists and, if so, returns it instead of calling the model. This is an <strong>infrastructure</strong> concern: operating on the model call as a black box.
+      </div>
+    </div>
+  </div>
+
+  <div class="split-rule">
+    <strong>Filing rule:</strong> if the question is "does this entry exist and is it still valid right now?" that is L0 (runtime decision). If the question is "what goes into the cache, how long does it live, and what does its shape look like?" that is L−1 (artifact lifecycle). Both exist for every caching system; looking one up in two places is the cost of axis-pure taxonomy.
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- 04 WHEN IT MATTERS -->
+<section aria-labelledby="h-when">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="h-when">Who needs <em>this</em></h2>
+  <p class="prose">
+    Any system that caches generated answers, retrieved passages, or rendered prompts against a corpus that can change. The risk is not speed, it is correctness: a cache with no invalidation rules will confidently serve stale answers long after the source of truth has moved. The cost compounds whenever a cached entry references a schema field that a newer version of the code no longer writes, or a reader assumes a field that older entries do not have. Cache-contents lifecycle rules are the difference between a cache that is an asset and one that is a liability.
+  </p>
+</section>
+
+<!-- BACK CARD -->
+<section style="padding-top: 16px; padding-bottom: 44px;">
+  <a href="layer-data-artifacts.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div>
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Data &amp; Artifact Lifecycle</div>
+    </div>
+  </a>
+</section>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+</body>
+</html>

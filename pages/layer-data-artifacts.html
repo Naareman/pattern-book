@@ -28,6 +28,7 @@
     -webkit-font-smoothing: antialiased;
   }
   body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
 
   /* a11y */
   a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
@@ -69,6 +70,14 @@
   }
   .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
+  /* flow legend */
+  .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
+  .flow-chip { font-family: inherit; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow); padding: 7px 14px; font-size: 12.5px; font-weight: 600; color: var(--soft); white-space: nowrap; letter-spacing: .01em; cursor: pointer; transition: background .2s ease, color .2s ease, border-color .2s ease; }
+  .flow-chip:hover { color: var(--accent-hover); border-color: var(--border-strong); }
+  .flow-chip.lit { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); }
+  .flow-arrow { flex: none; color: var(--accent); font-size: 15px; line-height: 1; }
+  .flow-caption { text-align: center; color: var(--faint); font-size: 13px; line-height: 1.5; margin-top: 12px; }
+
   /* sections */
   section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
   .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
@@ -80,7 +89,7 @@
   .idea-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
   .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.6; color: var(--text); }
 
-  /* artifact grid (the 4 things) */
+  /* artifact grid */
   .artifact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
   .artifact-card {
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -105,10 +114,8 @@
   .demo-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
   .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 20px; }
 
-  /* pipeline: raw text -> clean -> embeddings */
+  /* pipeline */
   .pipeline { display: flex; flex-direction: column; gap: 0; }
-
-  /* stage row */
   .pipe-row { display: flex; align-items: flex-start; gap: 14px; }
   .pipe-row + .pipe-row { margin-top: 10px; }
   .pipe-connector { width: 30px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; padding-top: 24px; }
@@ -127,8 +134,6 @@
   .pipe-box.active .pipe-label { color: var(--accent-hover); }
   .pipe-content { font-size: 14px; line-height: 1.55; color: var(--text); min-height: 20px; }
   .pipe-note { font-size: 12px; color: var(--soft); margin-top: 5px; line-height: 1.4; }
-
-  /* the embedding canvas */
   .embed-canvas-wrap { margin-top: 6px; }
   #embedCanvas { display: block; width: 100%; max-width: 480px; height: 220px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-subtle); }
 
@@ -140,7 +145,7 @@
   .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
   .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 
-  /* real example section */
+  /* real example */
   .example-row { display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap; margin-top: 6px; }
   .example-cell { flex: 1; min-width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 16px; box-shadow: var(--shadow-sm); }
   .example-cell .ec-step { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
@@ -148,116 +153,57 @@
   .example-cell .ec-note { font-size: 12.5px; color: var(--soft); margin-top: 6px; line-height: 1.45; }
   .example-arrow { align-self: center; color: var(--accent); font-size: 20px; flex-shrink: 0; }
 
-  /* ============ INSIDE THIS LAYER MAP ============ */
-  .layer-map {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 26px 28px;
-  }
-  .layer-axis {
-    font-size: 13px;
-    color: var(--soft);
-    line-height: 1.6;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  .layer-axis strong { color: var(--text); font-weight: 600; }
-  .subaxis-block { margin-bottom: 28px; }
-  .subaxis-block:last-child { margin-bottom: 0; }
-  .subaxis-head {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    color: var(--accent-hover);
-    background: var(--accent-soft);
-    border-radius: 6px;
-    padding: 4px 10px;
-    display: inline-block;
-    margin-bottom: 14px;
-  }
-  .cat-list { display: flex; flex-direction: column; gap: 10px; }
-  .cat-item {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding: 12px 14px;
-    background: var(--bg-subtle);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
-    border-radius: var(--radius-sm);
-  }
-  .cat-name {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 15px;
-    color: var(--text);
-  }
-  .cat-desc {
-    font-size: 13px;
-    color: var(--soft);
-    line-height: 1.5;
-  }
-  .filing-rule {
-    margin-top: 22px;
-    padding: 14px 16px;
-    background: var(--bg-subtle);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-sm);
-    font-size: 13.5px;
-    color: var(--soft);
-    line-height: 1.6;
-  }
-  .filing-rule strong { color: var(--text); font-weight: 600; }
+  /* ============ STAGE CARDS (L4 pattern) ============ */
+  .stages { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 6px; }
+
+  .stage-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; scroll-margin-top: 80px; transition: box-shadow .55s ease, border-color .55s ease; }
+  .stage-card.glow { box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42); border-color: var(--accent); }
+  @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
+
+  .stage-card.clickable { cursor: pointer; transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease; }
+  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
+  @media (prefers-reduced-motion: reduce) { .stage-card.clickable { transition: none; } .stage-card.clickable:hover { transform: none; } }
+
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 4px; }
+  .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
+  .stage-head .sico svg { width: 18px; height: 18px; display: block; }
+  .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
+  a.stage-name { transition: color .15s ease; }
+  a.stage-name:hover { color: var(--accent-hover); }
+  .see-how { display: inline-flex; align-items: center; gap: 3px; margin-left: auto; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion: reduce) { a.stage-name, .see-how, .see-how .arr { transition: none; } .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; } }
+
+  .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
+
+  /* chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip { flex: none; display: inline-flex; align-items: center; gap: 3px; padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500; line-height: 1.2; white-space: nowrap; }
+  .chip { border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default; }
+  a.chip { border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; }
+  a.chip:hover { background: #E3DBFD; }
+  a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
+  a.chip:hover .arr { transform: translate(1px, -1px); }
+  @media (prefers-reduced-motion: reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
 
   /* ============ TRADEOFFS ============ */
   .tradeoffs-stage {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    box-shadow: var(--shadow);
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px; box-shadow: var(--shadow);
   }
-  .tradeoff-row {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    margin-bottom: 16px;
-  }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
   .tradeoff-row:last-of-type { margin-bottom: 0; }
-  .tradeoff-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--soft);
-    min-width: 100px;
-  }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); min-width: 100px; }
   .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
-  .tradeoff-bars .seg {
-    flex: 1;
-    height: 22px;
-    background: var(--bg-subtle);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-  }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
   .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
   .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
   .tradeoff-scale .spacer { min-width: 100px; }
   .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
-  .tradeoff-quote {
-    margin-top: 18px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-    font-size: 15px;
-    line-height: 1.6;
-    color: var(--soft);
-  }
-  @media (max-width: 480px) {
-    .tradeoff-row { flex-direction: column; align-items: stretch; }
-    .tradeoff-label { min-width: 0; }
-  }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
 
   /* back link */
   .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; cursor: pointer; }
@@ -287,10 +233,14 @@
     .artifact-grid { grid-template-columns: 1fr; }
     .example-arrow { display: none; }
     .example-row { flex-direction: column; }
+    .stages { grid-template-columns: 1fr; gap: 14px; }
+    .flow-chip { font-size: 12px; padding: 6px 12px; }
   }
   @media (max-width: 480px) {
     .demo-controls { flex-direction: column; align-items: stretch; }
     .diagram-btn { flex: 1; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
+    .tradeoff-label { min-width: 0; }
   }
 </style>
 </head>
@@ -317,7 +267,14 @@
     </span>Layer &middot; L&minus;1
   </span>
   <h1 class="page-title">Data &amp; Artifact Lifecycle</h1>
-  <p class="explainer">Everything AI systems are built from: the data they learn and look things up in, and the versioned artifacts (like prompts and model files) that define how they behave at runtime.</p>
+  <p class="explainer">Everything AI systems are built from: the data they learn and look things up in, and the versioned artifacts that define how they behave at runtime.</p>
+
+  <div class="flow" aria-label="Jump to a part of this layer">
+    <button type="button" class="flow-chip" data-target="card-data">The data</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-deployable">The versioned files</button>
+  </div>
+  <p class="flow-caption">Two kinds of thing the system depends on before it can run.</p>
 </header>
 
 <!-- 01 THE IDEA -->
@@ -328,7 +285,7 @@
     <p>Before any AI can answer a question, four things have to exist. First, <span style="color:var(--accent-hover);font-weight:600">training data</span>: the enormous pile of text the model read to learn how language works. Second, <span style="color:var(--accent-hover);font-weight:600">documents</span>: the specific files or web pages you give it to look things up in. Third, <span style="color:var(--accent-hover);font-weight:600">embeddings</span> (number-lists that encode meaning, so similar ideas sit close together): every piece of text turned into a list of numbers so that "find the most relevant paragraph" is fast. Fourth, <span style="color:var(--accent-hover);font-weight:600">weights</span>: the actual trained model file, billions of numbers that encode everything it learned. Every other layer in this book sits on top of these four.</p>
   </div>
 
-  <!-- Tap-to-explore cards for the four artifacts -->
+  <!-- Tap-to-explore cards -->
   <div class="artifact-grid" role="list" aria-label="The four data artifacts">
     <div class="artifact-card" role="listitem" tabindex="0" data-id="training" aria-pressed="false">
       <div class="a-icon" aria-hidden="true">&#128218;</div>
@@ -365,7 +322,6 @@
   <div class="demo-stage">
     <div class="pipeline" id="pipeline" aria-live="polite">
 
-      <!-- Step 1: raw text -->
       <div class="pipe-row">
         <div class="pipe-connector">
           <div class="pipe-dot" id="dot0"></div>
@@ -378,7 +334,6 @@
         </div>
       </div>
 
-      <!-- Step 2: cleaned -->
       <div class="pipe-row">
         <div class="pipe-connector">
           <div class="pipe-dot" id="dot1"></div>
@@ -391,7 +346,6 @@
         </div>
       </div>
 
-      <!-- Step 3: embedding canvas -->
       <div class="pipe-row">
         <div class="pipe-connector">
           <div class="pipe-dot" id="dot2"></div>
@@ -440,108 +394,97 @@
   </div>
 </section>
 
-<!-- 04 INSIDE THIS LAYER -->
+<!-- 04 TRADEOFFS -->
 <section>
-  <div class="section-label"><span class="num">04</span>Inside This Layer</div>
-  <h2>Every category in <em>L&minus;1</em>.</h2>
-  <div class="layer-map">
-    <div class="layer-axis"><strong>Axis:</strong> the lifecycle stage of the artifacts that feed and define the system.</div>
-
-    <!-- Sub-axis: Data -->
-    <div class="subaxis-block">
-      <div class="subaxis-head">Data</div>
-      <div class="cat-list">
-
-        <div class="cat-item">
-          <div class="cat-name">Collection &amp; Sourcing</div>
-          <div class="cat-desc">Finding and pulling in the raw text, images, or signals the system will learn from or look things up in.</div>
-        </div>
-
-        <div class="cat-item">
-          <div class="cat-name">Labeling &amp; Annotation</div>
-          <div class="cat-desc">Human (or automated) tagging of examples so the model can learn what "correct" looks like.</div>
-        </div>
-
-        <div class="cat-item">
-          <div class="cat-name">Data Quality &amp; Deduplication</div>
-          <div class="cat-desc">Filtering out noise, duplicates, and low-quality samples so the model trains on signal, not garbage.</div>
-        </div>
-
-        <div class="cat-item">
-          <div class="cat-name">Synthetic Data Generation</div>
-          <div class="cat-desc">Creating artificial training examples (often from another AI) when real data is scarce or expensive to label.</div>
-        </div>
-
-        <div class="cat-item">
-          <div class="cat-name">Versioning &amp; Lineage</div>
-          <div class="cat-desc">Tracking which version of a dataset produced which model, so you can reproduce or audit any result.</div>
-        </div>
-
-        <div class="cat-item">
-          <div class="cat-name">PII Scrubbing &amp; Redaction</div>
-          <div class="cat-desc">Removing personally identifiable information (PII: names, emails, phone numbers, and similar private details) before data is used for training or retrieval.</div>
-        </div>
-
-        <div class="cat-item">
-          <div class="cat-name">Retention &amp; Deletion Policies</div>
-          <div class="cat-desc">Rules for how long data is kept and when it must be purged, often driven by regulation or user consent.</div>
-        </div>
-
-        <div class="cat-item">
-          <div class="cat-name">Feedback Data Pipelines</div>
-          <div class="cat-desc">Capturing user thumbs-up/down, corrections, or behavioral signals and routing them back into future training runs.</div>
-        </div>
-
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>What you're always <em>balancing</em>.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <div class="spacer"></div>
+      <div class="scale-track"><span>Low</span><span>High</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Data freshness</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
       </div>
     </div>
-
-    <!-- Sub-axis: Deployable Artifacts -->
-    <div class="subaxis-block">
-      <div class="subaxis-head">Deployable Artifacts</div>
-      <div class="cat-list">
-
-        <div class="cat-item">
-          <div class="cat-name">Prompt Versioning</div>
-          <div class="cat-desc">Treating the text instructions you send the AI (the prompt) like code: saving versions, comparing them, and rolling back when a change makes things worse.</div>
-        </div>
-
-        <div class="cat-item">
-          <div class="cat-name">Model Versioning</div>
-          <div class="cat-desc">Managing which trained model checkpoint is live in production, so upgrades and rollbacks are deliberate and traceable.</div>
-        </div>
-
-        <div class="cat-item">
-          <div class="cat-name">Eval-Suite Versioning</div>
-          <div class="cat-desc">Versioning the set of test questions and scoring rubrics used to grade the AI, so benchmark scores are comparable across time.</div>
-        </div>
-
-        <div class="cat-item">
-          <div class="cat-name">Retrieval-Index Versioning</div>
-          <div class="cat-desc">Tracking when the search index (the database of embeddings the AI queries) was last rebuilt and from which data snapshot.</div>
-        </div>
-
-        <div class="cat-item">
-          <div class="cat-name">Cache-Contents Lifecycle</div>
-          <div class="cat-desc">Managing what is stored in the response cache: when entries are populated, when they expire, and how the schema evolves without breaking old entries.</div>
-        </div>
-
-        <div class="cat-item">
-          <div class="cat-name">Artifact-Lineage Tracking</div>
-          <div class="cat-desc">Recording the full chain of custody from raw data through processed dataset through model through deployment, so any output can be traced to its origin.</div>
-        </div>
-
-        <div class="cat-item">
-          <div class="cat-name">Rollback &amp; Roll-Forward</div>
-          <div class="cat-desc">The ability to safely switch any deployed artifact (prompt, model, index) back to a prior version or forward to a new one without downtime.</div>
-        </div>
-
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Privacy risk</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
       </div>
     </div>
-
-    <!-- Filing rule -->
-    <div class="filing-rule">
-      <strong>Filing rule:</strong> Data consumed by training or retrieval belongs in the Data sub-axis. A config that defines runtime behavior (like a prompt or model version) belongs in Deployable Artifacts. The runtime <em>reads</em> the artifact (that is L0); the artifact's lifecycle lives here.
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Reproduce&shy;ability</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
     </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Rollback speed</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Fresher data means more work to re-clean, re-version, and re-validate. Better versioning costs storage but makes every incident easier to diagnose.
+    </div>
+  </div>
+</section>
+
+<!-- 05 INSIDE THIS LAYER: stage cards -->
+<section id="stage-section">
+  <div class="section-label"><span class="num">05</span>Inside This Layer</div>
+  <h2>Two kinds of thing to manage in <em>L&minus;1</em>.</h2>
+
+  <div class="stages">
+
+    <section class="stage-card clickable" id="card-data" aria-labelledby="g-data">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+          </svg>
+        </span>
+        <h2 id="g-data"><a class="stage-name" href="data-artifacts-data.html">The data</a></h2>
+        <a class="see-how" href="data-artifacts-data.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      </div>
+      <p class="stage-lead">The datasets it learns from and looks things up in.</p>
+      <div class="chips">
+        <span class="chip">Collection and sourcing</span>
+        <span class="chip">Labeling and annotation</span>
+        <span class="chip">Data quality and deduplication</span>
+        <span class="chip">Synthetic data generation</span>
+        <span class="chip">Versioning and lineage</span>
+        <a class="chip" href="data-artifacts-pii-scrubbing.html">PII scrubbing and redaction<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <span class="chip">Retention and deletion policies</span>
+        <span class="chip">Feedback data pipelines</span>
+      </div>
+    </section>
+
+    <section class="stage-card clickable" id="card-deployable" aria-labelledby="g-deployable">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </span>
+        <h2 id="g-deployable"><a class="stage-name" href="data-artifacts-deployable.html">The versioned files</a></h2>
+        <a class="see-how" href="data-artifacts-deployable.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      </div>
+      <p class="stage-lead">Prompts, models, indexes as releasable artifacts.</p>
+      <div class="chips">
+        <a class="chip" href="data-artifacts-prompt-versioning.html">Prompt versioning<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <span class="chip">Model versioning</span>
+        <span class="chip">Eval-suite versioning</span>
+        <span class="chip">Retrieval-index versioning</span>
+        <a class="chip" href="data-artifacts-cache-contents-lifecycle.html">Cache-contents lifecycle<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <span class="chip">Artifact-lineage tracking</span>
+        <span class="chip">Rollback and roll-forward</span>
+      </div>
+    </section>
+
   </div>
 </section>
 
@@ -562,7 +505,7 @@
   <ul>
     <li>Mikolov et al. (2013). <em>Distributed Representations of Words and Phrases.</em> <span class="note">Foundational paper on word embeddings showing that similar words cluster in vector space.</span></li>
     <li>Reimers &amp; Gurevych (2019). <em>Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks.</em> <span class="note">Established sentence-level embeddings used in modern retrieval systems.</span></li>
-    <li>Lewis et al. (2020). <em>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.</em> <span class="note">Shows how documents, embeddings, and model weights work together in RAG (Retrieval-Augmented Generation).</span></li>
+    <li>Lewis et al. (2020). <em>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.</em> <span class="note">Shows how documents, embeddings, and model weights work together in RAG.</span></li>
     <li>OpenAI. <em>Embeddings guide.</em> platform.openai.com/docs/guides/embeddings <span class="note">Practical walkthrough of how embeddings work in production systems.</span></li>
   </ul>
 </div>
@@ -597,136 +540,105 @@ const artifactDetail = document.getElementById('artifactDetail');
 
 function showArtifact(id) {
   const d = artifactDetails[id];
-  artifactDetail.innerHTML = `<div class="d-label">${d.label}</div>${d.text}`;
-  artifactCards.forEach(c => {
-    const active = c.dataset.id === id;
+  artifactDetail.innerHTML = '<div class="d-label">' + d.label + '</div>' + d.text;
+  artifactCards.forEach(function(c) {
+    var active = c.dataset.id === id;
     c.classList.toggle('active', active);
     c.setAttribute('aria-pressed', String(active));
   });
 }
 
-artifactCards.forEach(card => {
-  card.addEventListener('click', () => showArtifact(card.dataset.id));
-  card.addEventListener('keydown', e => {
+artifactCards.forEach(function(card) {
+  card.addEventListener('click', function() { showArtifact(card.dataset.id); });
+  card.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showArtifact(card.dataset.id); }
   });
 });
 
 // ============ PIPELINE DEMO ============
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const boxes = [
+var boxes = [
   document.getElementById('box0'),
   document.getElementById('box1'),
   document.getElementById('box2')
 ];
-const dots = [
+var dots = [
   document.getElementById('dot0'),
   document.getElementById('dot1'),
   document.getElementById('dot2')
 ];
-const lines = [
+var lines = [
   document.getElementById('line01'),
   document.getElementById('line12')
 ];
 
-const playBtn = document.getElementById('playBtn');
-const resetBtn = document.getElementById('resetBtn');
+var playBtn = document.getElementById('playBtn');
+var resetBtn = document.getElementById('resetBtn');
+var demoStep = -1;
+var demoPlaying = false;
 
-let demoStep = -1;
-let demoPlaying = false;
-
-// embedding dot data: [x, y, label, group]
-// 3 groups: finance (purple), nature (green), food (orange)
-const embDots = [
-  // finance cluster
+var embDots = [
   { x: 0.18, y: 0.28, label: 'interest rates', group: 0, highlight: true },
   { x: 0.22, y: 0.38, label: 'monetary policy', group: 0 },
   { x: 0.12, y: 0.35, label: 'inflation data', group: 0 },
   { x: 0.28, y: 0.25, label: 'bank reserves', group: 0 },
-  // nature cluster
   { x: 0.70, y: 0.22, label: 'ocean waves', group: 1 },
   { x: 0.78, y: 0.32, label: 'mountain peaks', group: 1 },
   { x: 0.65, y: 0.30, label: 'forest canopy', group: 1 },
-  // food cluster
   { x: 0.55, y: 0.72, label: 'pasta recipe', group: 2 },
   { x: 0.65, y: 0.78, label: 'bread baking', group: 2 },
-  { x: 0.48, y: 0.80, label: 'vegetable soup', group: 2 },
+  { x: 0.48, y: 0.80, label: 'vegetable soup', group: 2 }
 ];
-const groupColors = ['#7C5CF6', '#0E9F6E', '#E8882A'];
-const groupColorsSoft = ['rgba(124,92,246,0.15)', 'rgba(14,159,110,0.12)', 'rgba(232,136,42,0.12)'];
-const groupLabels = ['finance', 'nature', 'food'];
+var groupColors = ['#7C5CF6', '#0E9F6E', '#E8882A'];
+var groupColorsSoft = ['rgba(124,92,246,0.15)', 'rgba(14,159,110,0.12)', 'rgba(232,136,42,0.12)'];
+var groupLabels = ['finance', 'nature', 'food'];
 
-let canvas, ctx;
-let canvasW, canvasH;
-let visibleDots = 0;     // how many dots are shown
-let animFrame = null;
+var canvas, ctx, canvasW, canvasH, visibleDots = 0;
 
 function setupCanvas() {
   canvas = document.getElementById('embedCanvas');
   ctx = canvas.getContext('2d');
   resizeCanvas();
 }
-
 function resizeCanvas() {
-  const rect = canvas.parentElement.getBoundingClientRect();
+  var rect = canvas.parentElement.getBoundingClientRect();
   canvasW = Math.min(480, rect.width || 320);
   canvasH = 220;
   canvas.width = canvasW;
   canvas.height = canvasH;
 }
-
 function drawCanvas(showN) {
   if (!ctx) return;
   ctx.clearRect(0, 0, canvasW, canvasH);
-
-  // draw cluster halos first
   if (showN >= embDots.length) {
-    [0, 1, 2].forEach(g => {
-      const gDots = embDots.filter(d => d.group === g);
-      if (gDots.length === 0) return;
-      const cx = gDots.reduce((s, d) => s + d.x * canvasW, 0) / gDots.length;
-      const cy = gDots.reduce((s, d) => s + d.y * canvasH, 0) / gDots.length;
-      const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 90);
+    [0, 1, 2].forEach(function(g) {
+      var gDots = embDots.filter(function(d) { return d.group === g; });
+      if (!gDots.length) return;
+      var cx = gDots.reduce(function(s, d) { return s + d.x * canvasW; }, 0) / gDots.length;
+      var cy = gDots.reduce(function(s, d) { return s + d.y * canvasH; }, 0) / gDots.length;
+      var grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 90);
       grad.addColorStop(0, groupColorsSoft[g]);
       grad.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.beginPath();
-      ctx.arc(cx, cy, 90, 0, Math.PI * 2);
-      ctx.fillStyle = grad;
-      ctx.fill();
-
-      // group label
+      ctx.beginPath(); ctx.arc(cx, cy, 90, 0, Math.PI * 2);
+      ctx.fillStyle = grad; ctx.fill();
       ctx.font = '600 11px Inter, sans-serif';
-      ctx.fillStyle = groupColors[g];
-      ctx.globalAlpha = 0.8;
+      ctx.fillStyle = groupColors[g]; ctx.globalAlpha = 0.8;
       ctx.fillText(groupLabels[g], cx - ctx.measureText(groupLabels[g]).width / 2, cy + 78);
       ctx.globalAlpha = 1;
     });
   }
-
-  // draw dots
-  for (let i = 0; i < Math.min(showN, embDots.length); i++) {
-    const d = embDots[i];
-    const px = d.x * canvasW;
-    const py = d.y * canvasH;
-    const r = d.highlight ? 7 : 5;
-
-    // glow for the highlight dot
+  for (var i = 0; i < Math.min(showN, embDots.length); i++) {
+    var d = embDots[i];
+    var px = d.x * canvasW; var py = d.y * canvasH;
+    var r = d.highlight ? 7 : 5;
     if (d.highlight) {
-      ctx.beginPath();
-      ctx.arc(px, py, r + 6, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(124,92,246,0.18)';
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(px, py, r + 6, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(124,92,246,0.18)'; ctx.fill();
     }
-
-    ctx.beginPath();
-    ctx.arc(px, py, r, 0, Math.PI * 2);
+    ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2);
     ctx.fillStyle = d.highlight ? '#7C5CF6' : groupColors[d.group];
-    ctx.globalAlpha = d.highlight ? 1 : 0.8;
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    // label for highlight dot and when fully shown
+    ctx.globalAlpha = d.highlight ? 1 : 0.8; ctx.fill(); ctx.globalAlpha = 1;
     if (d.highlight || showN >= embDots.length) {
       ctx.font = d.highlight ? '600 12px Inter, sans-serif' : '400 11px Inter, sans-serif';
       ctx.fillStyle = d.highlight ? '#6D4DE6' : '#565C68';
@@ -734,78 +646,104 @@ function drawCanvas(showN) {
     }
   }
 }
-
 function resetDemo() {
-  demoStep = -1;
-  visibleDots = 0;
-  boxes.forEach(b => b.classList.remove('active'));
-  dots.forEach(d => d.classList.remove('active'));
-  lines.forEach(l => l.classList.remove('active'));
-  if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+  demoStep = -1; visibleDots = 0;
+  boxes.forEach(function(b) { b.classList.remove('active'); });
+  dots.forEach(function(d) { d.classList.remove('active'); });
+  lines.forEach(function(l) { l.classList.remove('active'); });
   if (canvas && ctx) drawCanvas(0);
 }
-
 function activateStep(n) {
-  boxes[n].classList.add('active');
-  dots[n].classList.add('active');
+  boxes[n].classList.add('active'); dots[n].classList.add('active');
   if (n > 0) lines[n - 1].classList.add('active');
 }
-
+function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
 async function runPlay() {
   if (demoPlaying) return;
-  demoPlaying = true;
-  playBtn.disabled = true;
-  resetBtn.disabled = true;
+  demoPlaying = true; playBtn.disabled = true; resetBtn.disabled = true;
   resetDemo();
-
   await sleep(300);
-
-  // step 0: raw text
-  activateStep(0);
-  await sleep(reduceMotion ? 0 : 900);
-
-  // step 1: cleaned text
-  activateStep(1);
-  await sleep(reduceMotion ? 0 : 900);
-
-  // step 2: embedding space, dots appear one by one
-  activateStep(2);
-  await sleep(reduceMotion ? 0 : 300);
-
+  activateStep(0); await sleep(reduceMotion ? 0 : 900);
+  activateStep(1); await sleep(reduceMotion ? 0 : 900);
+  activateStep(2); await sleep(reduceMotion ? 0 : 300);
   if (reduceMotion) {
-    visibleDots = embDots.length;
-    drawCanvas(visibleDots);
+    visibleDots = embDots.length; drawCanvas(visibleDots);
   } else {
-    for (let i = 1; i <= embDots.length; i++) {
-      visibleDots = i;
-      drawCanvas(visibleDots);
+    for (var i = 1; i <= embDots.length; i++) {
+      visibleDots = i; drawCanvas(visibleDots);
       await sleep(i === 1 ? 600 : 160);
     }
-    // final redraw with labels and halos
     drawCanvas(embDots.length);
   }
-
-  demoStep = 2;
-  demoPlaying = false;
-  playBtn.disabled = false;
-  resetBtn.disabled = false;
+  demoStep = 2; demoPlaying = false; playBtn.disabled = false; resetBtn.disabled = false;
 }
+playBtn.addEventListener('click', function() { if (!demoPlaying) runPlay(); });
+resetBtn.addEventListener('click', function() { if (!demoPlaying) resetDemo(); });
 
-playBtn.addEventListener('click', () => { if (!demoPlaying) runPlay(); });
-resetBtn.addEventListener('click', () => { if (!demoPlaying) resetDemo(); });
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-// init
-window.addEventListener('DOMContentLoaded', () => {
-  setupCanvas();
-  drawCanvas(0);
+window.addEventListener('DOMContentLoaded', function() {
+  setupCanvas(); drawCanvas(0);
   if (reduceMotion) runPlay();
 });
-window.addEventListener('resize', () => {
-  resizeCanvas();
-  drawCanvas(visibleDots);
-});
+window.addEventListener('resize', function() { resizeCanvas(); drawCanvas(visibleDots); });
+
+// ============ FLOW LEGEND + LOAD TOUR ============
+(function() {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var stages = ['card-data', 'card-deployable'];
+  var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
+
+  function pillFor(cardId) {
+    for (var i = 0; i < pills.length; i++) {
+      if (pills[i].getAttribute('data-target') === cardId) return pills[i];
+    }
+    return null;
+  }
+
+  pills.forEach(function(btn) {
+    var target = btn.getAttribute('data-target');
+    var card = document.getElementById(target);
+    btn.addEventListener('click', function() {
+      if (!card) return;
+      card.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      card.classList.add('glow');
+      window.setTimeout(function() { card.classList.remove('glow'); }, 1200);
+    });
+  });
+
+  if (!reduce) {
+    var step = 0;
+    function tour() {
+      if (step > 0) {
+        var prevCard = document.getElementById(stages[step - 1]);
+        var prevPill = pillFor(stages[step - 1]);
+        if (prevCard) prevCard.classList.remove('glow');
+        if (prevPill) prevPill.classList.remove('lit');
+      }
+      if (step >= stages.length) return;
+      var curCard = document.getElementById(stages[step]);
+      var curPill = pillFor(stages[step]);
+      if (curCard) curCard.classList.add('glow');
+      if (curPill) curPill.classList.add('lit');
+      step++;
+      window.setTimeout(tour, 900);
+    }
+    window.setTimeout(tour, 350);
+  }
+
+  var doors = {
+    'card-data': 'data-artifacts-data.html',
+    'card-deployable': 'data-artifacts-deployable.html'
+  };
+  Object.keys(doors).forEach(function(cardId) {
+    var doorCard = document.getElementById(cardId);
+    if (!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e) {
+      if (e.target.closest('a')) return;
+      window.location.href = doorHref;
+    });
+  });
+})();
 </script>
 </body>
 </html>
