@@ -69,6 +69,14 @@
   .stage-head .sico{flex:none;width:18px;height:18px;color:var(--accent);display:block}
   .stage-head .sico svg{width:18px;height:18px;display:block}
   .stage-name{font-size:16px;font-weight:600;color:var(--text);letter-spacing:-.005em;line-height:1.2}
+  /* the one stage whose guide exists: its name links out */
+  a.stage-name{transition:color .15s ease}
+  a.stage-name:hover{color:var(--accent-hover)}
+  /* subtle "see how" affordance on the linked card */
+  .see-how{display:inline-block;margin-top:2px;font-size:12.5px;font-weight:500;color:var(--accent-hover);transition:color .15s ease}
+  .see-how .arr{display:inline-block;transition:transform .18s ease}
+  .stage-card:hover .see-how .arr,.see-how:hover .arr{transform:translateX(2px)}
+  @media (prefers-reduced-motion:reduce){a.stage-name,.see-how,.see-how .arr{transition:none}.stage-card:hover .see-how .arr,.see-how:hover .arr{transform:none}}
 
   .stage-lead{color:var(--soft);font-size:13.5px;line-height:1.45;margin:0 0 14px}
 
@@ -132,9 +140,10 @@
         <section class="stage-card" id="card-ask" aria-labelledby="g-ask">
           <div class="stage-head">
             <span class="sico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 2 2-7 7-3 1 1-3z"/><path d="M18 13l-1.5-1.5"/><path d="M5 5h9M5 9h7M5 13h4"/></svg></span>
-            <h2 class="stage-name" id="g-ask">Ask it well</h2>
+            <h2 id="g-ask"><a class="stage-name" href="single-call-ask-it-well.html">Ask it well</a></h2>
           </div>
           <p class="stage-lead">Frame the question well.</p>
+          <a class="see-how" href="single-call-ask-it-well.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
           <div class="chips">
             <a class="chip" href="pattern-few-shot.html">Few-Shot<span class="arr" aria-hidden="true">&#8599;</span></a>
             <a class="chip" href="pattern-zero-shot.html">Zero-Shot<span class="arr" aria-hidden="true">&#8599;</span></a>
