@@ -212,44 +212,28 @@
   }
   .answer-hint { font-size: 13px; color: var(--faint); font-family: 'Inter', sans-serif; font-weight: 500; }
 
-  /* INSIDE THIS LAYER */
-  .layer-map {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
-  }
-  .layer-axis {
-    font-size: 13px; font-weight: 600; color: var(--soft);
-    padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 20px;
-  }
-  .layer-axis span { color: var(--text); }
-  .category-list { display: flex; flex-direction: column; gap: 12px; }
-  .category-row {
-    display: flex; gap: 14px; align-items: flex-start;
-  }
-  .category-name {
-    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; color: var(--text);
-    min-width: 220px; flex-shrink: 0; line-height: 1.35;
-  }
-  .category-desc {
-    font-size: 14px; color: var(--soft); line-height: 1.55;
-  }
-  .layer-filing {
-    margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
-    font-size: 14px; color: var(--soft); line-height: 1.6;
-  }
-  .layer-filing strong { color: var(--text); }
-  .layer-sidebar {
-    margin-top: 14px;
-    background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm);
-    padding: 13px 16px; font-size: 13.5px; color: var(--soft); line-height: 1.6;
-  }
-  .layer-sidebar strong { color: var(--text); }
-  .reader-trap {
-    margin-top: 14px;
-    background: var(--bg-subtle); border-left: 3px solid var(--accent); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    padding: 13px 16px; font-size: 13.5px; color: var(--soft); line-height: 1.6;
-  }
-  .reader-trap strong { color: var(--text); }
+  /* INSIDE THIS LAYER: goal-first guide (in-place, no sub-axes) */
+  .guide { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .guide-row { display: flex; align-items: baseline; justify-content: flex-start; flex-wrap: wrap; gap: 4px 10px; padding: 17px 22px; border-top: 1px solid var(--border); }
+  .guide-row:first-child { border-top: none; }
+  .want { font-size: 15px; line-height: 1.4; color: var(--text); }
+  .resolve { display: inline-flex; align-items: baseline; gap: 8px; flex: none; }
+  .connect { color: var(--faint); font-size: 15px; line-height: 1.4; }
+  .tech { font-family: 'Fraunces', serif; font-size: 16px; color: var(--text); line-height: 1.4; }
+  a.tech { color: var(--accent-hover); transition: color .15s ease; }
+  a.tech:hover { color: var(--accent); }
+  a.tech .ext { font-size: 11px; color: var(--accent); margin-left: 2px; vertical-align: baseline; }
+  @media (prefers-reduced-motion: reduce) { a.tech { transition: none; } }
+  .cluster-head { padding: 16px 22px 8px; }
+  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
+  .cluster-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text); line-height: 1.3; }
+  .cluster-head + .guide-row { border-top: none; }
+  .cluster-head ~ .guide-row { padding-left: 40px; }
+  /* notes below guide */
+  .guide-note { margin-top: 14px; background: var(--bg-subtle); border-left: 3px solid var(--accent); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 13px 16px; font-size: 13.5px; color: var(--soft); line-height: 1.6; }
+  .guide-note strong { color: var(--text); }
+  .guide-aside { margin-top: 10px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 13px 16px; font-size: 13.5px; color: var(--soft); line-height: 1.6; }
+  .guide-aside strong { color: var(--text); }
 
   /* TRADEOFFS */
   .tradeoffs-stage {
@@ -299,8 +283,7 @@
 
   /* RESPONSIVE */
   @media (max-width: 600px) {
-    .category-row { flex-direction: column; gap: 4px; }
-    .category-name { min-width: 0; }
+    .guide-row { padding-left: 18px !important; }
   }
   @media (max-width: 560px) {
     h1.pattern-title { font-size: 30px; }
@@ -413,65 +396,97 @@
 <!-- 03: INSIDE THIS LAYER -->
 <section>
   <div class="section-label"><span class="num">03</span>Inside This Layer</div>
-  <h2>Every category <em>mapped</em>.</h2>
-  <div class="layer-map">
-    <div class="layer-axis">Axis: <span>how external information enters a single call from a corpus.</span></div>
+  <h2>What do you want to <em>do</em>?</h2>
 
-    <div class="category-list">
+  <div class="guide" role="list" aria-label="Goal-first guide to Stateless Retrieval">
 
-      <div class="category-row">
-        <div class="category-name">Indexing and embedding</div>
-        <div class="category-desc">Before any search happens, documents are chopped into chunks and turned into numbers (vectors) so the system can compare them to a question mathematically.</div>
-      </div>
-
-      <div class="category-row">
-        <div class="category-name">Retrieval (dense, sparse, hybrid)</div>
-        <div class="category-desc">The core search step. Dense search uses vector similarity (meaning-level). Sparse search uses keyword overlap (BM25-style). Hybrid does both and merges the scores. This is the heart of RAG.</div>
-      </div>
-
-      <div class="category-row">
-        <div class="category-name">Reranking</div>
-        <div class="category-desc">A second pass over the top candidates that scores them more carefully, so the most useful chunks bubble to the top before they enter the prompt.</div>
-      </div>
-
-      <div class="category-row">
-        <div class="category-name">Context assembly</div>
-        <div class="category-desc">Deciding which chunks to include, in what order, and how to format them so the AI can use them well. Poorly assembled context wastes tokens and confuses the model.</div>
-      </div>
-
-      <div class="category-row">
-        <div class="category-name">Knowledge tool invocation (read-only)</div>
-        <div class="category-desc">Calling an external knowledge source, such as a database SELECT, a file read, or a read-only web search, to pull in information for this one call without changing anything.</div>
-      </div>
-
-      <div class="category-row">
-        <div class="category-name">Caching of knowledge results</div>
-        <div class="category-desc">Storing the results of a retrieval so the same question does not trigger a full search again. The runtime check is L0; this category owns the cache contents and their lifecycle.</div>
-      </div>
-
-      <div class="category-row">
-        <div class="category-name">Freshness and invalidation</div>
-        <div class="category-desc">Deciding when cached or indexed knowledge is stale and needs to be refreshed, so the AI is not answering from outdated documents.</div>
-      </div>
-
-      <div class="category-row">
-        <div class="category-name">Citation and provenance</div>
-        <div class="category-desc">Tracking which chunks produced which parts of the answer, so the AI can tell the user where the information came from and so hallucinations can be checked.</div>
-      </div>
-
+    <!-- Cluster 1 -->
+    <div class="cluster-head" role="listitem">
+      <h3 class="cluster-label">Find the right information</h3>
     </div>
 
-    <div class="reader-trap">
-      <strong>Common filing mistake:</strong> the L3a vs L5 boundary is read-only vs side-effectful, not who does the work. A live web search by an agent is still L3a because it only reads. Writing or changing something in the world is L5 Action.
+    <div class="guide-row" role="listitem">
+      <span class="want">Want to prepare your documents so they can be searched?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Indexing and Embedding</span>
+      </span>
     </div>
 
-    <div class="layer-filing">
-      <strong>Filing rule:</strong> Read-only (a SELECT, a file read, read-only web search) goes here, in Stateless Retrieval (L3a). Writing or changing something goes in Orchestration Action (L5).
+    <div class="guide-row" role="listitem">
+      <span class="want">Want to search by meaning, by keywords, or both at once?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Retrieval (dense, sparse, hybrid)</span>
+      </span>
     </div>
 
-    <div class="layer-sidebar">
-      <strong>When everything fits in the prompt:</strong> if the entire corpus fits inside the context window, the retrieval stack collapses. You can skip L3a entirely and pack the content in directly (a Single-Call Control choice). Whether to use RAG or long-context is a Cost, Latency, and Reliability tradeoff (a C5 concern), not a retrieval decision.
+    <div class="guide-row" role="listitem">
+      <span class="want">Want a second pass to surface the most useful chunks before they enter the prompt?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Reranking</span>
+      </span>
     </div>
+
+    <!-- Cluster 2 -->
+    <div class="cluster-head cluster-break" role="listitem">
+      <h3 class="cluster-label">Feed it in well</h3>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">Want to decide which chunks to include, in what order, and how to format them for the model?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Context Assembly</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">Want to call an external source (a database, a file, a live search) without changing anything?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Knowledge Tool Invocation (read-only)</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">Want the answer to say where each piece of information came from?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Citation and Provenance</span>
+      </span>
+    </div>
+
+    <!-- Cluster 3 -->
+    <div class="cluster-head cluster-break" role="listitem">
+      <h3 class="cluster-label">Keep it fresh</h3>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">Want to avoid repeating the same retrieval work for repeated questions?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Caching of Knowledge Results</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">Want to decide when cached or indexed content is stale and needs refreshing?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Freshness and Invalidation</span>
+      </span>
+    </div>
+
+  </div>
+
+  <div class="guide-note">
+    <strong>Common filing mistake:</strong> the L3a vs L5 boundary is read-only vs side-effectful, not who does the work. A live web search by an agent is still L3a because it only reads. Writing or changing something in the world is L5 Action.
+  </div>
+
+  <div class="guide-aside">
+    <strong>When everything fits in the prompt:</strong> if the entire corpus fits inside the context window, the retrieval stack collapses. You can skip L3a entirely and pack the content in directly. Whether to use RAG or long-context is a cost and latency question, covered under Cost, Latency and Reliability (C5).
   </div>
 </section>
 
