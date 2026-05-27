@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Format Coercion · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px; --bg-subtle:#F6F7F9;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.10);
+    --red:#D92D20; --red-soft:rgba(217,45,32,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none; padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* coercion pipeline */
+  .coerce-pipeline { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .coerce-bar { padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--bg-subtle); font-size: 12px; font-weight: 600; color: var(--soft); text-transform: uppercase; letter-spacing: .06em; }
+  .coerce-steps { display: flex; flex-direction: column; }
+  .coerce-step { display: flex; align-items: flex-start; gap: 16px; padding: 16px 22px; border-bottom: 1px solid var(--border); }
+  .coerce-step:last-child { border-bottom: none; }
+  .coerce-icon { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; margin-top: 1px; }
+  .coerce-icon.raw { background: var(--red-soft); color: var(--red); border: 1px solid rgba(217,45,32,0.2); }
+  .coerce-icon.fix { background: var(--accent-soft); color: var(--accent-hover); border: 1px solid var(--border); }
+  .coerce-icon.ok  { background: var(--green-soft); color: var(--green); border: 1px solid rgba(14,159,110,0.25); }
+  .coerce-body { flex: 1; min-width: 0; }
+  .coerce-step-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); margin-bottom: 5px; }
+  .coerce-step-code { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6; color: var(--text); background: var(--bg-subtle); border-radius: var(--radius-sm); padding: 8px 12px; }
+  .coerce-step-note { font-size: 13px; color: var(--soft); margin-top: 6px; line-height: 1.5; }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-layer { flex-shrink: 0; min-width: 40px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; color: var(--accent-hover); background: var(--accent-soft); border-radius: 6px; padding: 2px 8px; text-align: center; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+  .filing-note { padding: 12px 16px; background: var(--bg-subtle); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); font-size: 13px; color: var(--soft); line-height: 1.6; }
+  .filing-note strong { color: var(--text); }
+
+  .matters-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; font-size: 15px; line-height: 1.7; color: var(--soft); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) { h1.page-title { font-size: 30px; } .explainer { font-size: 15px; } h2 { font-size: 21px; } .fits-row { flex-wrap: wrap; } .fits-label { min-width: 0; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="single-call-shape-its-output.html"><span aria-hidden="true">&larr;</span> Shape its output</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep" aria-hidden="true">/</span><a href="single-call-shape-its-output.html">Shape its output</a><span class="sep" aria-hidden="true">/</span><span class="here">Format Coercion</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Single-Call Control &middot; Shape its output</span>
+  <h1 class="page-title">Format Coercion</h1>
+  <p class="explainer">Repair the format of a model's response after it arrives, using code rather than a second model call.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What It Is</div>
+  <h2 id="what-heading">Fix it <em>in code</em>, not in the prompt.</h2>
+  <div class="what-card">
+    <p><strong style="color:var(--accent-hover)">Format coercion</strong> is a post-processing step that runs after the model responds and before the output is consumed. Instead of relying entirely on the model to produce the right format, a deterministic code layer cleans up common deviations: stripping markdown fences from a response asked for plain text, extracting a JSON object buried in prose, normalizing date strings, or trimming whitespace. It is the pragmatic complement to schema enforcement: you ask the model nicely, then fix what it gets slightly wrong. Coercion is not re-generation; it operates on the existing string without calling the model again.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Three common <em>fixes</em>.</h2>
+  <div class="coerce-pipeline" role="region" aria-label="Format coercion pipeline example">
+    <div class="coerce-bar">Model returned JSON wrapped in markdown</div>
+    <div class="coerce-steps">
+      <div class="coerce-step">
+        <div class="coerce-icon raw" aria-label="Problem">!</div>
+        <div class="coerce-body">
+          <div class="coerce-step-label">Raw model output</div>
+          <div class="coerce-step-code">```json
+{ "city": "Geneva", "year": "2024" }
+```</div>
+          <div class="coerce-step-note">The model wrapped valid JSON in a markdown fence the caller didn't ask for.</div>
+        </div>
+      </div>
+      <div class="coerce-step">
+        <div class="coerce-icon fix" aria-label="Fix applied">&#8594;</div>
+        <div class="coerce-body">
+          <div class="coerce-step-label">Coercion: strip fences + cast types</div>
+          <div class="coerce-step-code">text = re.sub(r"^```\w*\n|```$", "", text, flags=re.M)
+data = json.loads(text.strip())
+data["year"] = int(data["year"])  # "2024" &#8594; 2024</div>
+          <div class="coerce-step-note">Regex strips the fences. A type cast fixes the numeric field stored as a string.</div>
+        </div>
+      </div>
+      <div class="coerce-step">
+        <div class="coerce-icon ok" aria-label="Result">&#10003;</div>
+        <div class="coerce-body">
+          <div class="coerce-step-label">Clean output</div>
+          <div class="coerce-step-code">{ "city": "Geneva", "year": 2024 }</div>
+          <div class="coerce-step-note">Parseable, typed correctly. No second model call needed.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-layer">L4</div>
+      <div class="fits-label">Home layer</div>
+      <div class="fits-desc">Output Shape &amp; Decoding sub-axis. Coercion acts on the output of a single model call. It is code running after decoding, not a second model call.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-layer">L4</div>
+      <div class="fits-label">Neighbor</div>
+      <div class="fits-desc">Schema Enforcement prevents the problem before it occurs; Format Coercion cleans it up afterward. In practice both are used together: enforce a schema where possible, coerce edge cases that slip through.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-layer">L2</div>
+      <div class="fits-label">Cross-reference</div>
+      <div class="fits-desc">If the fix requires another model call (asking the model to reformat its own output), that moves to L2 Verify or L5 if it triggers a retry loop. Pure code transformation stays in L4.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="filing-note">
+      <strong>Filing rule:</strong> Deterministic code operating on a single call's output. No new model call, no second actor. L4 Output Shape &amp; Decoding.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <div class="matters-card">
+    Any team integrating with third-party models where you cannot control the decoding parameters, or where the model occasionally wraps JSON in markdown, uses smart quotes instead of straight quotes, or returns numbers as strings. Format coercion is the defensive layer that makes the pipeline robust to minor model inconsistencies without adding latency or cost from a retry or a second call.
+  </div>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="single-call-shape-its-output.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Shape its output</div>
+    </div>
+  </a>
+</section>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+</body>
+</html>

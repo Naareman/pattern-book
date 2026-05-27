@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Step-Back Prompting · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* toggle example */
+  .toggle-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .toggle-header {
+    display: flex; align-items: center; gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .toggle-tab {
+    flex: 1; padding: 13px 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+    border: none; background: var(--bg-subtle); color: var(--faint);
+    transition: background .15s, color .15s; text-align: center;
+  }
+  .toggle-tab:first-child { border-right: 1px solid var(--border); }
+  .toggle-tab.active { background: var(--surface); color: var(--accent-hover); }
+  .toggle-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .toggle-panel { padding: 20px 24px; display: none; }
+  .toggle-panel.active { display: block; }
+  .toggle-panel p { font-size: 14px; color: var(--soft); line-height: 1.65; }
+  .toggle-panel .q { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text); margin-bottom: 10px; padding: 10px 14px; background: var(--bg-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+  .toggle-panel .q .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); margin-bottom: 5px; }
+  .toggle-panel .q .val { color: var(--accent-hover); }
+
+  .fits-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-layer {
+    flex-shrink: 0; min-width: 40px; font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border-radius: 6px; padding: 2px 8px; text-align: center;
+  }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+  .filing-note {
+    padding: 12px 16px; background: var(--bg-subtle);
+    border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    font-size: 13px; color: var(--soft); line-height: 1.6;
+  }
+  .filing-note strong { color: var(--text); }
+
+  .matters-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    font-size: 15px; line-height: 1.7; color: var(--soft);
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="single-call-guide-its-thinking.html"><span aria-hidden="true">&larr;</span> Guide its thinking</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep" aria-hidden="true">/</span><a href="single-call-guide-its-thinking.html">Guide its thinking</a><span class="sep" aria-hidden="true">/</span><span class="here">Step-Back</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Single-Call Control &middot; Guide its thinking</span>
+  <h1 class="page-title">Step-Back Prompting</h1>
+  <p class="explainer">Ask the model a broader question before the specific one so it retrieves the right concepts first.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What It Is</div>
+  <h2 id="what-heading">Zoom out, <em>then</em> zoom in.</h2>
+  <div class="what-card">
+    <p>With <strong style="color:var(--accent-hover)">Step-Back prompting</strong>, you instruct the model to first answer a more general, abstract question about the topic before tackling the original specific question. That abstraction step activates the relevant background knowledge and principles in context, making the subsequent specific answer more accurate. Think of it as asking "what field does this belong to and what are its core rules?" before asking the original question.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Physics question, <em>two steps</em>.</h2>
+  <div class="toggle-card" role="region" aria-label="Step-Back two-step example">
+    <div class="toggle-header" role="tablist" aria-label="Toggle between step-back question and specific question">
+      <button class="toggle-tab active" role="tab" aria-selected="true" aria-controls="panel-step-back" id="tab-step-back">Step-back question first</button>
+      <button class="toggle-tab" role="tab" aria-selected="false" aria-controls="panel-specific" id="tab-specific">Then the specific question</button>
+    </div>
+    <div class="toggle-panel active" id="panel-step-back" role="tabpanel" aria-labelledby="tab-step-back">
+      <div class="q">
+        <div class="label">Step-back question (you send this first)</div>
+        <div class="val">What physics principles govern how temperature affects the resistance of a conductor?</div>
+      </div>
+      <p>The model recalls the relevant principles (Ohm's law, thermal motion of electrons, resistivity formula) and surfaces them before touching the original problem. This primes the context with the right concepts.</p>
+    </div>
+    <div class="toggle-panel" id="panel-specific" role="tabpanel" aria-labelledby="tab-specific">
+      <div class="q">
+        <div class="label">Original specific question (sent after)</div>
+        <div class="val">A copper wire at 20 C has resistance 5 ohms. What is its resistance at 80 C?</div>
+      </div>
+      <p>Now grounded in the correct principles, the model applies the temperature coefficient formula accurately instead of guessing.</p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-layer">L4</div>
+      <div class="fits-label">Home</div>
+      <div class="fits-desc">Single-Call Control, Cognitive Strategy sub-axis, in-prompt tier. The step-back instruction is text in the prompt that the model follows within one inference pass.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-layer">L4</div>
+      <div class="fits-label">Neighbor</div>
+      <div class="fits-desc">Least-to-Most also decomposes before answering, but it breaks a hard question into easier sub-questions. Step-Back abstracts upward to a broader principle rather than breaking down.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="filing-note">
+      <strong>Filing rule:</strong> In-prompt Cognitive Strategy. The abstraction step happens inside the model's reasoning trace, not across separate API calls or an orchestration layer.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <div class="matters-card">
+    Step-Back is most useful when the model gives plausible-sounding but factually wrong answers to domain-specific questions. It works well in science, law, and medicine where the wrong framework produces a confident wrong answer. If your model often answers the right question with the wrong underlying reasoning, a step-back question is a lightweight fix.
+  </div>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="single-call-guide-its-thinking.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Guide its thinking</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Zheng et al. (2023). <em>Take a Step Back: Evoking Reasoning via Abstraction in Large Language Models.</em> arXiv:2310.06117. <span class="note">Introduces the technique and shows accuracy gains on STEM and knowledge-intensive QA benchmarks.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  const tabs = document.querySelectorAll('.toggle-tab');
+  const panels = document.querySelectorAll('.toggle-panel');
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+      panels.forEach(function (p) { p.classList.remove('active'); });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      panels[i].classList.add('active');
+    });
+  });
+}());
+</script>
+</body>
+</html>

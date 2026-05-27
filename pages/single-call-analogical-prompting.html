@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analogical Prompting · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* analog/target card */
+  .pair-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .pair-cols {
+    display: grid; grid-template-columns: 1fr 1fr;
+  }
+  .pair-col { padding: 20px 22px; }
+  .pair-col:first-child { border-right: 1px solid var(--border); }
+  .pair-col-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--faint); margin-bottom: 10px;
+  }
+  .pair-col-label.analog { color: var(--accent-hover); }
+  .pair-col-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .pair-col-text { font-size: 13px; color: var(--soft); line-height: 1.6; }
+  .pair-col-text .key { color: var(--accent-hover); font-weight: 500; }
+  .pair-bridge {
+    padding: 13px 22px; border-top: 1px solid var(--border); background: var(--bg-subtle);
+    font-size: 13px; color: var(--soft); line-height: 1.55;
+  }
+  .pair-bridge strong { color: var(--text); }
+
+  .fits-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-layer {
+    flex-shrink: 0; min-width: 40px; font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border-radius: 6px; padding: 2px 8px; text-align: center;
+  }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+  .filing-note {
+    padding: 12px 16px; background: var(--bg-subtle);
+    border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    font-size: 13px; color: var(--soft); line-height: 1.6;
+  }
+  .filing-note strong { color: var(--text); }
+
+  .matters-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    font-size: 15px; line-height: 1.7; color: var(--soft);
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .pair-cols { grid-template-columns: 1fr; }
+    .pair-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="single-call-guide-its-thinking.html"><span aria-hidden="true">&larr;</span> Guide its thinking</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep" aria-hidden="true">/</span><a href="single-call-guide-its-thinking.html">Guide its thinking</a><span class="sep" aria-hidden="true">/</span><span class="here">Analogical Prompting</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Single-Call Control &middot; Guide its thinking</span>
+  <h1 class="page-title">Analogical Prompting</h1>
+  <p class="explainer">Ask the model to generate its own examples of similar problems, then reason from those examples to solve yours.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What It Is</div>
+  <h2 id="what-heading">Self-generated <em>examples</em>, then the answer.</h2>
+  <div class="what-card">
+    <p><strong style="color:var(--accent-hover)">Analogical Prompting</strong> asks the model to recall or invent analogous problems with known solutions before solving the target problem. Rather than you hand-crafting few-shot examples (as in standard few-shot prompting), the model surfaces its own relevant examples from training. It then reasons by analogy from those self-generated examples to the target. This removes the burden of example curation and often produces examples more structurally similar to the specific problem than a human would choose.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">A coding problem solved <em>by analogy</em>.</h2>
+  <div class="pair-card" role="region" aria-label="Analogical prompting: analog problem and target problem side by side">
+    <div class="pair-cols">
+      <div class="pair-col">
+        <div class="pair-col-label analog">Self-generated analogy</div>
+        <div class="pair-col-title">Reversing a string</div>
+        <div class="pair-col-text">The model recalls: walk from both ends toward the center, <span class="key">swap</span> characters at each position until the pointers meet. Time: O(n), Space: O(1).</div>
+      </div>
+      <div class="pair-col">
+        <div class="pair-col-label">Target problem</div>
+        <div class="pair-col-title">Reversing a linked list</div>
+        <div class="pair-col-text">The same two-pointer swap logic applies. Use <span class="key">prev / curr / next</span> pointers, redirect each link, advance. Time: O(n), Space: O(1).</div>
+      </div>
+    </div>
+    <div class="pair-bridge">
+      <strong>Prompt instruction:</strong> "Before solving this problem, recall a similar problem and its solution. Then apply the same reasoning here."
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-layer">L4</div>
+      <div class="fits-label">Home</div>
+      <div class="fits-desc">Single-Call Control, Cognitive Strategy sub-axis, "Try a different angle" cluster. The analogy recall and reasoning happen inside the model's response to a single prompt.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-layer">L4</div>
+      <div class="fits-label">Neighbor</div>
+      <div class="fits-desc">Few-Shot prompting (an anchor) also uses examples, but you provide them. Analogical Prompting delegates example selection to the model itself, which is what distinguishes it here.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="filing-note">
+      <strong>Filing rule:</strong> Cognitive Strategy, in-prompt. The model generates its own reasoning scaffold as text within the response; no separate retrieval system or external example database is involved.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <div class="matters-card">
+    Use Analogical Prompting when you want the benefits of few-shot examples but cannot curate them for every problem type, or when your tasks are diverse enough that fixed examples miss. It is particularly effective on math and coding tasks where structural similarity matters more than surface similarity.
+  </div>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="single-call-guide-its-thinking.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Guide its thinking</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Yasunaga et al. (2023). <em>Large Language Models as Analogical Reasoners.</em> arXiv:2310.01714. <span class="note">Proposes the self-generated exemplar approach and shows gains on math (GSM8K, MATH) and code tasks over zero-shot CoT.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+</body>
+</html>

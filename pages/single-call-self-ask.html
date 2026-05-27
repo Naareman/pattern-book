@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Self-Ask · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0;
+    margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+    white-space: nowrap; border: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none;
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* what it is */
+  .what-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* example: folding chain of sub-questions */
+  .chain {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .chain-header {
+    padding: 14px 20px; background: var(--bg-subtle); border-bottom: 1px solid var(--border);
+    font-size: 13px; font-weight: 600; color: var(--soft);
+  }
+  .chain-q-root {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.4;
+  }
+  .chain-step {
+    display: flex; border-bottom: 1px solid var(--border);
+  }
+  .chain-step:last-of-type { border-bottom: none; }
+  .chain-num {
+    flex-shrink: 0; width: 44px; padding: 14px 0 14px 20px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500;
+    color: var(--accent-hover);
+  }
+  .chain-body { flex: 1; padding: 14px 20px 14px 0; }
+  .chain-sub-q { font-size: 14px; font-style: italic; color: var(--soft); margin-bottom: 5px; }
+  .chain-ans { font-size: 14px; color: var(--text); font-weight: 500; line-height: 1.4; }
+  .chain-final {
+    padding: 14px 20px; background: var(--accent-soft);
+    border-top: 1px solid var(--border);
+    font-size: 14px; color: var(--accent-hover); font-weight: 600; line-height: 1.5;
+  }
+  .chain-final span { font-weight: 400; color: var(--text); }
+
+  /* where it fits */
+  .fits-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-layer {
+    flex-shrink: 0; min-width: 40px; font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border-radius: 6px; padding: 2px 8px;
+    text-align: center;
+  }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+  .filing-note {
+    padding: 12px 16px; background: var(--bg-subtle);
+    border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    font-size: 13px; color: var(--soft); line-height: 1.6;
+  }
+  .filing-note strong { color: var(--text); }
+
+  /* when it matters */
+  .matters-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    font-size: 15px; line-height: 1.7; color: var(--soft);
+  }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* footer */
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="single-call-make-it-check-itself.html"><span aria-hidden="true">&larr;</span> Make it check itself</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep" aria-hidden="true">/</span><a href="single-call-make-it-check-itself.html">Make it check itself</a><span class="sep" aria-hidden="true">/</span><span class="here">Self-Ask</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">Single-Call Control &middot; Make it check itself</span>
+  <h1 class="page-title">Self-Ask</h1>
+  <p class="explainer">The model explicitly asks itself the sub-questions it needs to answer before tackling the original question, turning a hard leap into a chain of smaller steps.</p>
+</header>
+
+<!-- 01 WHAT IT IS -->
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What It Is</div>
+  <h2 id="what-heading">Questions <em>before</em> the answer.</h2>
+  <div class="what-card">
+    <p>Rather than jumping straight to a final answer, the model is prompted to first write out the follow-up questions it would need to resolve in order to answer reliably. It answers each sub-question in sequence, building up intermediate facts. Only then does it compose the final answer from those verified pieces. The technique is named for the explicit <strong style="color:var(--accent-hover)">follow-up question</strong> format the model uses: "Follow-up: ... Intermediate answer: ..." repeated until the chain bottoms out and the final answer can be stated with confidence.</p>
+  </div>
+</section>
+
+<!-- 02 AN EXAMPLE -->
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Answering a <em>multi-hop</em> geography question.</h2>
+
+  <div class="chain" role="region" aria-label="Self-Ask reasoning chain example">
+    <div class="chain-header">Self-Ask trace</div>
+    <div class="chain-q-root">Who was the president of the country that first landed humans on the moon, when that landing happened?</div>
+
+    <div class="chain-step">
+      <div class="chain-num">Q1</div>
+      <div class="chain-body">
+        <div class="chain-sub-q">Which country first landed humans on the moon?</div>
+        <div class="chain-ans">The United States (Apollo 11, July 1969).</div>
+      </div>
+    </div>
+
+    <div class="chain-step">
+      <div class="chain-num">Q2</div>
+      <div class="chain-body">
+        <div class="chain-sub-q">Who was the president of the United States in July 1969?</div>
+        <div class="chain-ans">Richard Nixon (took office January 1969).</div>
+      </div>
+    </div>
+
+    <div class="chain-final">
+      Final answer: <span>Richard Nixon was president of the United States when Apollo 11 landed on the moon in July 1969.</span>
+    </div>
+  </div>
+</section>
+
+<!-- 03 WHERE IT FITS -->
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <div class="fits-card">
+
+    <div class="fits-row">
+      <div class="fits-layer">L4</div>
+      <div class="fits-label">Home layer</div>
+      <div class="fits-desc">Self-Verification sub-axis of Single-Call Control. All sub-questions and intermediate answers live inside one model call. The model verifies its own understanding by resolving each dependency before committing to a final answer.</div>
+    </div>
+
+    <div class="fits-divider" role="separator"></div>
+
+    <div class="fits-row">
+      <div class="fits-layer">L4</div>
+      <div class="fits-label">Compare to</div>
+      <div class="fits-desc">Least-to-Most prompting (Cognitive Strategy) also decomposes a hard question into smaller ones, but focuses on scaffold difficulty, not self-checking. Self-Ask's defining feature is the explicit follow-up question format used as a verification loop.</div>
+    </div>
+
+    <div class="fits-divider" role="separator"></div>
+
+    <div class="fits-row">
+      <div class="fits-layer">L2</div>
+      <div class="fits-label">Not this</div>
+      <div class="fits-desc">If each sub-question triggers a separate retrieval or model call, that is L5 Shape (iterative loop) or L3a (retrieval), not L4. Self-Ask stays in L4 when every step is resolved within the single generation.</div>
+    </div>
+
+    <div class="fits-divider" role="separator"></div>
+
+    <div class="filing-note">
+      <strong>Filing rule:</strong> Self-checking inside one call to one model = L4 Self-Verification. A separate verifier call or a different model = L2 Verify.
+    </div>
+  </div>
+</section>
+
+<!-- 04 WHEN IT MATTERS -->
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <div class="matters-card">
+    Most useful for multi-hop questions where a single leap from question to answer skips over intermediate facts the model may get wrong. Knowledge-intensive tasks (history, geography, law, science) benefit most. It also makes the reasoning auditable: the chain of follow-up questions is visible, so reviewers can pinpoint exactly where the model's knowledge broke down.
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="single-call-make-it-check-itself.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Make it check itself</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Press et al. (2022). <em>Measuring and Narrowing the Compositionality Gap in Language Models.</em> arXiv:2210.03350. <span class="note">The paper that named Self-Ask and showed it closes the compositionality gap on multi-hop questions.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+</body>
+</html>

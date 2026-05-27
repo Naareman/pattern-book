@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lost-in-the-Middle Mitigation · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --red:#D92D20; --red-soft:rgba(217,45,32,0.08);
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none;
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* attention heatmap */
+  .heat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .heat-header {
+    padding: 12px 18px; background: #F6F7F9; border-bottom: 1px solid var(--border);
+    font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft);
+  }
+  .heat-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 16px; }
+  .heat-row { display: flex; flex-direction: column; gap: 6px; }
+  .heat-label { font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .heat-bar-row { display: flex; gap: 3px; align-items: stretch; height: 32px; border-radius: 8px; overflow: hidden; }
+  .hb { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.85); transition: none; }
+  .hb-high { background: rgba(109,77,230,0.85); }
+  .hb-med { background: rgba(109,77,230,0.35); color: var(--accent-hover); }
+  .hb-low { background: rgba(109,77,230,0.12); color: var(--faint); }
+  .heat-caption { font-size: 13px; color: var(--soft); line-height: 1.55; }
+  .heat-divider { height: 1px; background: var(--border); }
+  .heat-fix { padding: 12px 0 0; }
+  .heat-fix-label { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--green); margin-bottom: 8px; }
+  .fix-row { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; color: var(--soft); line-height: 1.5; margin-bottom: 6px; }
+  .fix-dot { flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--green); margin-top: 6px; }
+
+  .fits-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-layer {
+    flex-shrink: 0; min-width: 40px; font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border-radius: 6px; padding: 2px 8px; text-align: center;
+  }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 110px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+  .filing-note {
+    padding: 12px 16px; background: #F6F7F9;
+    border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    font-size: 13px; color: var(--soft); line-height: 1.6;
+  }
+  .filing-note strong { color: var(--text); }
+
+  .matters-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    font-size: 15px; line-height: 1.7; color: var(--soft);
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="single-call-ask-it-well.html"><span aria-hidden="true">&larr;</span> Ask it well</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep" aria-hidden="true">/</span><a href="single-call-ask-it-well.html">Ask it well</a><span class="sep" aria-hidden="true">/</span><span class="here">Lost-in-the-Middle Mitigation</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Single-Call Control &middot; Ask it well</span>
+  <h1 class="page-title">Lost-in-the-Middle Mitigation</h1>
+  <p class="explainer">Models pay less attention to content buried in the middle of long prompts. This technique counters that by controlling where critical information lands.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What It Is</div>
+  <h2 id="what-heading">The <em>U-shaped</em> attention problem.</h2>
+  <div class="what-card">
+    <p>Research shows that language models have a <strong style="color:var(--accent-hover)">lost-in-the-middle</strong> bias: they attend more strongly to content at the beginning and end of a long prompt, and tend to under-use information in the middle. This is a structural property of current attention mechanisms, not a bug to be patched. Mitigation strategies work around it by positioning the most important information at the edges, repeating key instructions near the end, and breaking large documents into smaller labeled chunks so no single critical passage gets buried.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Where the model <em>looks</em>, and how to fix it.</h2>
+  <div class="heat-card" role="region" aria-label="Attention pattern and mitigation strategies">
+    <div class="heat-header">Relative attention across a long packed prompt</div>
+    <div class="heat-body">
+      <div class="heat-row">
+        <div class="heat-label">Typical attention pattern (without mitigation)</div>
+        <div class="heat-bar-row" aria-label="High attention at start, low in middle, high at end">
+          <div class="hb hb-high" style="flex:1" title="System prompt">high</div>
+          <div class="hb hb-med" style="flex:0.6">med</div>
+          <div class="hb hb-low" style="flex:2">low</div>
+          <div class="hb hb-low" style="flex:2">low</div>
+          <div class="hb hb-low" style="flex:2">low</div>
+          <div class="hb hb-med" style="flex:0.6">med</div>
+          <div class="hb hb-high" style="flex:1" title="Query">high</div>
+        </div>
+        <div class="heat-caption">The critical clause is buried in document 3 of 5. The model gives it low attention and misses it in its answer.</div>
+      </div>
+      <div class="heat-divider" role="separator"></div>
+      <div class="heat-fix">
+        <div class="heat-fix-label">Mitigation strategies</div>
+        <div class="fix-row"><div class="fix-dot" aria-hidden="true"></div><div><strong>Position critical documents first or last</strong> in the context block, not in the middle of a stack.</div></div>
+        <div class="fix-row"><div class="fix-dot" aria-hidden="true"></div><div><strong>Repeat key instructions near the query.</strong> A brief restatement at the end ("Remember: cite only the documents above") pulls attention back to the constraint.</div></div>
+        <div class="fix-row"><div class="fix-dot" aria-hidden="true"></div><div><strong>Label every chunk clearly</strong> with a heading like [Document 3 of 5: Liability Clause] so the model can identify what it is reading as it processes the middle.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-layer">L4</div>
+      <div class="fits-label">Home layer</div>
+      <div class="fits-desc">Input Shape sub-axis. All mitigation strategies are structural choices about how you arrange text in the prompt before the model call.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-layer">L4</div>
+      <div class="fits-label">Companion</div>
+      <div class="fits-desc">Context Packing (also L4 Input Shape) is often where this problem first appears. Lost-in-the-Middle Mitigation is the discipline that makes packed prompts work reliably.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="filing-note">
+      <strong>Filing rule:</strong> Rearranging and labeling content in the prompt is a text structuring decision made before the single call. It requires no second call or external system, so it stays in L4 Input Shape.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <div class="matters-card">
+    Anyone sending prompts over 10k tokens, especially in document Q&amp;A, legal review, or code analysis. If users report that the model "ignored the relevant section" despite it being present in the prompt, lost-in-the-middle is the likely culprit. Apply this before reaching for a more expensive solution like fine-tuning or retrieval.
+  </div>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="single-call-ask-it-well.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Ask it well</div>
+    </div>
+  </a>
+</section>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+</body>
+</html>

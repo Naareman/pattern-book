@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Context Packing · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none;
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* window visual */
+  .window-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .window-header {
+    padding: 12px 18px; background: #F6F7F9; border-bottom: 1px solid var(--border);
+    font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .token-badge {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;
+    background: var(--accent-soft); color: var(--accent-hover);
+    border: 1px solid rgba(124,92,246,0.2); border-radius: 8px; padding: 2px 10px;
+  }
+  .window-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .segment {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border);
+  }
+  .seg-bar {
+    flex-shrink: 0; height: 12px; border-radius: 6px;
+  }
+  .seg-label { font-size: 13.5px; color: var(--soft); flex: 1; }
+  .seg-tokens { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--faint); flex-shrink: 0; }
+  .seg-system { background: rgba(124,92,246,0.2); width: 50px; }
+  .seg-docs { background: rgba(14,159,110,0.2); width: 140px; }
+  .seg-hist { background: rgba(217,45,32,0.15); width: 60px; }
+  .seg-query { background: rgba(16,24,40,0.12); width: 20px; }
+  .window-note {
+    margin: 6px 0 4px; padding: 10px 14px;
+    background: #F6F7F9; border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--soft); line-height: 1.55;
+  }
+
+  .fits-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-layer {
+    flex-shrink: 0; min-width: 40px; font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border-radius: 6px; padding: 2px 8px; text-align: center;
+  }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 110px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+  .filing-note {
+    padding: 12px 16px; background: #F6F7F9;
+    border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    font-size: 13px; color: var(--soft); line-height: 1.6;
+  }
+  .filing-note strong { color: var(--text); }
+
+  .matters-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    font-size: 15px; line-height: 1.7; color: var(--soft);
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .seg-docs { width: 80px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="single-call-ask-it-well.html"><span aria-hidden="true">&larr;</span> Ask it well</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep" aria-hidden="true">/</span><a href="single-call-ask-it-well.html">Ask it well</a><span class="sep" aria-hidden="true">/</span><span class="here">Context Packing</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Single-Call Control &middot; Ask it well</span>
+  <h1 class="page-title">Context Packing</h1>
+  <p class="explainer">Put everything the model needs into one prompt when the data fits. No retrieval, no multi-turn loop: one call, full context, one answer.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What It Is</div>
+  <h2 id="what-heading">Load the whole <em>corpus</em>.</h2>
+  <div class="what-card">
+    <p><strong style="color:var(--accent-hover)">Context packing</strong> is the strategy of stuffing all relevant information directly into the prompt when your data fits within the model's context window. Instead of building a retrieval pipeline, you concatenate documents, conversation history, schemas, and instructions into one long prompt and send it in a single call. This collapses the L3a retrieval stack entirely. It works well when the corpus is bounded and fits the window; it fails (by cost, latency, or recall) when the corpus grows beyond it.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Anatomy of a <em>packed prompt</em>.</h2>
+  <div class="window-card" role="region" aria-label="Context window breakdown">
+    <div class="window-header">
+      <span>128k token context window</span>
+      <span class="token-badge">92k used</span>
+    </div>
+    <div class="window-body">
+      <div class="segment">
+        <div class="seg-bar seg-system" aria-hidden="true"></div>
+        <div class="seg-label">System prompt + instructions</div>
+        <div class="seg-tokens">~800 tok</div>
+      </div>
+      <div class="segment">
+        <div class="seg-bar seg-docs" aria-hidden="true"></div>
+        <div class="seg-label">All 38 product spec PDFs (packed directly)</div>
+        <div class="seg-tokens">~88k tok</div>
+      </div>
+      <div class="segment">
+        <div class="seg-bar seg-hist" aria-hidden="true"></div>
+        <div class="seg-label">Conversation history (last 10 turns)</div>
+        <div class="seg-tokens">~3k tok</div>
+      </div>
+      <div class="segment">
+        <div class="seg-bar seg-query" aria-hidden="true"></div>
+        <div class="seg-label">User's current question</div>
+        <div class="seg-tokens">~80 tok</div>
+      </div>
+    </div>
+    <div class="window-note">No retrieval pipeline. No chunking. No embedding model. The model reads every spec on every call. Simple to build, expensive to scale: each call costs the full token count regardless of what the user actually asks about.</div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-layer">L4</div>
+      <div class="fits-label">Home layer</div>
+      <div class="fits-desc">Input Shape sub-axis. Context packing decides what text goes into the prompt. The entire strategy is about constructing the input to one model call.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-layer">L3a</div>
+      <div class="fits-label">Replaces</div>
+      <div class="fits-desc">When context packing is viable, it collapses the Stateless Retrieval layer. The taxonomy notes this explicitly: "when the corpus fits the context window, the L3a stack collapses into L4 Input Shape."</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-layer">C5</div>
+      <div class="fits-label">Cross-reference</div>
+      <div class="fits-desc">The decision between context packing and RAG (cost, latency, recall, precision tradeoffs) is a C5 Cost &amp; Performance framework question.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="filing-note">
+      <strong>Filing rule:</strong> The information is placed inside one prompt, consumed by one model call. That is Input Shape. If a retrieval step selected what to include, that step would be L3a; the packing of the result is still L4.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <div class="matters-card">
+    Teams whose corpus is bounded and stable: a fixed product catalog, a set of internal policy documents, a codebase small enough to fit. Context packing is the fastest path to a working prototype because it eliminates the retrieval engineering entirely. Switch to RAG when cost per call becomes significant or when the corpus outgrows the window.
+  </div>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="single-call-ask-it-well.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Ask it well</div>
+    </div>
+  </a>
+</section>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+</body>
+</html>
