@@ -269,12 +269,11 @@
   /* 05 - WHAT THIS COVERS */
   .covers-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
   }
   .covers-meta {
     display: flex; flex-direction: column; gap: 4px;
-    margin-bottom: 20px; padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
+    padding: 22px 24px 18px; border-bottom: 1px solid var(--border);
   }
   .covers-meta-row { font-size: 14px; color: var(--soft); line-height: 1.5; }
   .covers-meta-row strong { color: var(--text); font-weight: 600; }
@@ -282,13 +281,24 @@
     margin-top: 10px; font-size: 13px; color: var(--faint);
     line-height: 1.55; font-style: italic;
   }
-  .discipline-list { display: flex; flex-direction: column; gap: 14px; margin-top: 4px; }
-  .discipline-item {}
-  .discipline-name {
-    font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px;
-    color: var(--text); line-height: 1.2; margin-bottom: 3px;
+  /* cluster labels: flush-left, uppercase, bold -- rows indent under them */
+  .cluster-head { padding: 18px 24px 6px; }
+  .cluster-head.cluster-break { padding-top: 6px; border-top: 1px solid var(--border); }
+  .cluster-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .07em; color: var(--text); line-height: 1.3;
   }
-  .discipline-line { font-size: 14px; color: var(--soft); line-height: 1.5; }
+  /* discipline rows: indented under their cluster label */
+  .discipline-row {
+    display: flex; flex-direction: column; gap: 3px;
+    padding: 12px 24px 12px 40px; border-top: 1px solid var(--border);
+  }
+  .cluster-head + .discipline-row { border-top: none; }
+  .discipline-name {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
+    color: var(--text); line-height: 1.2;
+  }
+  .discipline-line { font-size: 13.5px; color: var(--soft); line-height: 1.55; }
 
   /* RESPONSIVE */
   @media (max-width: 560px) {
@@ -505,31 +515,39 @@
       <div class="covers-meta-row"><strong>Axis:</strong> how to explain what the system did after the fact.</div>
       <p class="covers-note">Observability &amp; Debuggability is a discipline, not a mechanism. The hooks that actually emit traces (the raw recordings) belong to Serving Infrastructure (L0). This crosscut is the thinking framework for what to record, how to read it, and how to act on it.</p>
     </div>
-    <div class="discipline-list">
-      <div class="discipline-item">
-        <div class="discipline-name">Tracing Discipline</div>
-        <div class="discipline-line">How to design and structure the step-by-step record for a request so it is useful when things go wrong.</div>
-      </div>
-      <div class="discipline-item">
-        <div class="discipline-name">Replay Frameworks</div>
-        <div class="discipline-line">How to take a past request and run it again, exactly, so you can reproduce a bug or test a fix without waiting for it to happen in production.</div>
-      </div>
-      <div class="discipline-item">
-        <div class="discipline-name">Attribution Thinking</div>
-        <div class="discipline-line">How to trace a bad output back to the specific step or input that caused it, rather than blaming the whole system.</div>
-      </div>
-      <div class="discipline-item">
-        <div class="discipline-name">Drift Detection Methodology</div>
-        <div class="discipline-line">How to notice when the system's behavior has quietly shifted over time, for example because the underlying model changed or new input patterns arrived.</div>
-      </div>
-      <div class="discipline-item">
-        <div class="discipline-name">Incident Postmortem Patterns</div>
-        <div class="discipline-line">How to write up what went wrong after an incident in a way that leads to real fixes rather than vague promises to be more careful.</div>
-      </div>
-      <div class="discipline-item">
-        <div class="discipline-name">Causal Analysis Frameworks</div>
-        <div class="discipline-line">How to distinguish the root cause of a failure from its symptoms, so you fix the actual problem and not just the surface error message.</div>
-      </div>
+
+    <!-- Cluster 1: See what happened -->
+    <div class="cluster-head">
+      <div class="cluster-label">See what happened</div>
+    </div>
+    <div class="discipline-row">
+      <div class="discipline-name">Tracing Discipline</div>
+      <div class="discipline-line">How to design and structure the step-by-step record for a request so it is useful when things go wrong.</div>
+    </div>
+    <div class="discipline-row">
+      <div class="discipline-name">Replay Frameworks</div>
+      <div class="discipline-line">How to take a past request and run it again, exactly, so you can reproduce a bug or test a fix without waiting for it to happen in production.</div>
+    </div>
+    <div class="discipline-row">
+      <div class="discipline-name">Attribution Thinking</div>
+      <div class="discipline-line">How to trace a bad output back to the specific step or input that caused it, rather than blaming the whole system.</div>
+    </div>
+
+    <!-- Cluster 2: Find and explain problems -->
+    <div class="cluster-head cluster-break">
+      <div class="cluster-label">Find and explain problems</div>
+    </div>
+    <div class="discipline-row">
+      <div class="discipline-name">Drift Detection Methodology</div>
+      <div class="discipline-line">How to notice when the system's behavior has quietly shifted over time, for example because the underlying model changed or new input patterns arrived.</div>
+    </div>
+    <div class="discipline-row">
+      <div class="discipline-name">Incident Postmortem Patterns</div>
+      <div class="discipline-line">How to write up what went wrong after an incident in a way that leads to real fixes rather than vague promises to be more careful.</div>
+    </div>
+    <div class="discipline-row">
+      <div class="discipline-name">Causal Analysis Frameworks</div>
+      <div class="discipline-line">How to distinguish the root cause of a failure from its symptoms, so you fix the actual problem and not just the surface error message.</div>
     </div>
   </div>
 </section>
