@@ -327,6 +327,21 @@
   .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
   .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
 
+  /* 05 GOAL-FIRST GUIDE (in-place, no separate page) */
+  .guide { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .guide-row { display: flex; align-items: baseline; justify-content: flex-start; flex-wrap: wrap; gap: 4px 10px; padding: 17px 22px; border-top: 1px solid var(--border); }
+  .guide-row:first-child { border-top: none; }
+  .want { font-size: 15px; line-height: 1.4; color: var(--text); }
+  .resolve { display: inline-flex; align-items: baseline; gap: 8px; flex: none; }
+  .connect { color: var(--faint); font-size: 15px; line-height: 1.4; }
+  .tech { font-family: 'Fraunces', serif; font-size: 16px; color: var(--text); line-height: 1.4; }
+  .cluster-head { padding: 16px 22px 8px; }
+  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
+  .cluster-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text); line-height: 1.3; }
+  .cluster-head + .guide-row { border-top: none; }
+  .cluster-head ~ .guide-row { padding-left: 40px; }
+  @media (max-width: 560px) { .guide-row { padding: 15px 18px; } .cluster-head ~ .guide-row { padding-left: 24px; } }
+
   /* SOURCES */
   .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
   .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
@@ -529,60 +544,97 @@
 <!-- 05 INSIDE THIS LAYER -->
 <section>
   <div class="section-label"><span class="num">05</span>Inside This Layer</div>
-  <h2>Every category <em>in L7</em>.</h2>
-  <div class="layer-map">
-    <div class="layer-map-axis">
-      <strong>Axis: UX function</strong> &mdash; how the user experiences and controls the AI.
+  <h2>What do you want to <em>build</em>?</h2>
+
+  <div class="guide" role="list" aria-label="L7 technique guide">
+
+    <!-- Cluster 1: Where you meet the AI -->
+    <div class="cluster-head" role="listitem">
+      <h3 class="cluster-label">Where you meet the AI</h3>
     </div>
 
-    <div class="layer-map-category">
-      <div class="layer-map-name">Conversational Surfaces</div>
-      <div class="layer-map-desc">Chat windows, voice turns, and any interface where the user and AI take alternating turns: the most familiar form of AI interaction.</div>
+    <div class="guide-row" role="listitem">
+      <span class="want">Want a turn-by-turn chat window or voice interface?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Conversational Surfaces</span>
+      </span>
     </div>
 
-    <div class="layer-map-category">
-      <div class="layer-map-name">Inline / Embedded Surfaces</div>
-      <div class="layer-map-desc">AI that lives inside another tool: a writing assistant inside a doc editor, autocomplete inside a code editor, or suggestions inside a form. The user never leaves their workflow.</div>
+    <div class="guide-row" role="listitem">
+      <span class="want">Want AI to appear inside an existing tool without breaking flow?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Inline / Embedded Surfaces</span>
+      </span>
     </div>
 
-    <div class="layer-map-category">
-      <div class="layer-map-name">Background / Agentic Surfaces</div>
-      <div class="layer-map-desc">AI that runs tasks on its own, out of sight, and surfaces a result when done. The user delegates rather than directs, checking back rather than watching every step.</div>
+    <div class="guide-row" role="listitem">
+      <span class="want">Want the AI to work in the background and surface results when done?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Background / Agentic Surfaces</span>
+      </span>
     </div>
 
-    <div class="layer-map-category">
-      <div class="layer-map-name">Streaming and Progressive Disclosure</div>
-      <div class="layer-map-desc">Showing output as it is generated, word by word or chunk by chunk, so the user sees progress immediately. This is the UX mechanism; the real-time streaming discipline lives in C7 (Real-time / Streaming).</div>
+    <!-- Cluster 2: How answers show up -->
+    <div class="cluster-head cluster-break" role="listitem">
+      <h3 class="cluster-label">How answers show up</h3>
     </div>
 
-    <div class="layer-map-category">
-      <div class="layer-map-name">Handoff and Escalation</div>
-      <div class="layer-map-desc">The moment when the AI passes a conversation or task to a human agent, or when the user asks to escalate. Good handoff design preserves context so the human does not start from zero.</div>
+    <div class="guide-row" role="listitem">
+      <span class="want">Want the answer to appear word by word so it feels fast?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Streaming &amp; Progressive Disclosure</span>
+      </span>
     </div>
 
-    <div class="layer-map-category">
-      <div class="layer-map-name">Approval Gates</div>
-      <div class="layer-map-desc">Checkpoints where the system pauses and asks the user to confirm before taking a consequential action. The UX of that confirmation lives here; the runtime mechanism that enforces the pause lives in L5 (Orchestration) Action.</div>
+    <div class="guide-row" role="listitem">
+      <span class="want">Want the AI to ask a follow-up when it is not sure what you meant?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Clarification &amp; Disambiguation Surfaces</span>
+      </span>
     </div>
 
-    <div class="layer-map-category">
-      <div class="layer-map-name">Autonomy Levels and Guardrails</div>
-      <div class="layer-map-desc">Controls that let users (or operators) dial how much the AI can do without asking: read-only, suggest-only, act-with-approval, or fully autonomous. Guardrails set the ceiling; autonomy levels set where the slider is today.</div>
+    <div class="guide-row" role="listitem">
+      <span class="want">Want to collect thumbs, ratings, or corrections from users?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Feedback Capture Surfaces</span>
+      </span>
     </div>
 
-    <div class="layer-map-category">
-      <div class="layer-map-name">Feedback Capture Surfaces</div>
-      <div class="layer-map-desc">Thumbs up / down buttons, star ratings, correction flows, and any surface that collects the user's signal about quality. This raw signal feeds back into model improvement via RLHF (Reinforcement Learning from Human Feedback).</div>
+    <!-- Cluster 3: Staying in control -->
+    <div class="cluster-head cluster-break" role="listitem">
+      <h3 class="cluster-label">Staying in control</h3>
     </div>
 
-    <div class="layer-map-category">
-      <div class="layer-map-name">Clarification and Disambiguation Surfaces</div>
-      <div class="layer-map-desc">When the AI is uncertain what the user wants, it asks a follow-up question. The UX of presenting and answering that question is here. The control-flow shape of the clarification loop (how the system decides when to ask) lives in L5 Shape Conditional Branching.</div>
+    <div class="guide-row" role="listitem">
+      <span class="want">Want a graceful path from AI to a human agent?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Handoff &amp; Escalation</span>
+      </span>
     </div>
 
-    <div class="layer-map-rule">
-      Filing rule: if the user interacts with it directly, it is here. If the system uses it without the user seeing, it is not.
+    <div class="guide-row" role="listitem">
+      <span class="want">Want the AI to pause and ask before doing something consequential?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Approval Gates</span>
+      </span>
     </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">Want to set how much the AI can do without asking each time?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Autonomy Levels &amp; Guardrails</span>
+      </span>
+    </div>
+
   </div>
 </section>
 

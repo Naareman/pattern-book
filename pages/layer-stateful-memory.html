@@ -164,35 +164,23 @@
   .pw-tag.ai { background: var(--bg-subtle); color: var(--soft); border: 1px solid var(--border); }
   .pw-text { flex: 1; color: var(--text); }
 
-  /* INSIDE THIS LAYER card */
-  .layer-map {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 28px;
-  }
-  .layer-map-axis {
-    font-size: 13px; color: var(--soft); line-height: 1.6;
-    padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--border);
-  }
-  .layer-map-axis strong { color: var(--text); font-weight: 600; }
-  .category-list { display: flex; flex-direction: column; gap: 0; }
-  .category-item {
-    display: flex; align-items: flex-start; gap: 14px;
-    padding: 13px 0; border-bottom: 1px solid var(--border);
-  }
-  .category-item:last-of-type { border-bottom: none; padding-bottom: 0; }
-  .category-name {
-    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
-    color: var(--text); flex-shrink: 0; min-width: 210px; line-height: 1.3;
-  }
-  .category-desc {
-    font-size: 13.5px; color: var(--soft); line-height: 1.55; flex: 1;
-  }
-  .filing-rule {
-    margin-top: 20px; padding: 14px 16px;
-    background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); font-size: 13.5px; color: var(--soft); line-height: 1.6;
-  }
-  .filing-rule strong { color: var(--text); font-weight: 600; }
+  /* GUIDE (goal-first, in-place) */
+  .guide { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .guide-row { display: flex; align-items: baseline; justify-content: flex-start; flex-wrap: wrap; gap: 4px 10px; padding: 17px 22px; border-top: 1px solid var(--border); }
+  .guide-row:first-child { border-top: none; }
+  .want { font-size: 15px; line-height: 1.4; color: var(--text); }
+  .resolve { display: inline-flex; align-items: baseline; gap: 8px; flex: none; }
+  .connect { color: var(--faint); font-size: 15px; line-height: 1.4; }
+  .tech { font-family: 'Fraunces', serif; font-size: 16px; color: var(--text); line-height: 1.4; }
+  a.tech { color: var(--accent-hover); transition: color .15s ease; }
+  a.tech:hover { color: var(--accent); }
+  a.tech .ext { font-size: 11px; color: var(--accent); margin-left: 2px; vertical-align: baseline; }
+  @media (prefers-reduced-motion: reduce) { a.tech { transition: none; } }
+  .cluster-head { padding: 16px 22px 8px; }
+  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
+  .cluster-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text); line-height: 1.3; }
+  .cluster-head + .guide-row { border-top: none; }
+  .cluster-head ~ .guide-row { padding-left: 40px; }
 
   /* DIAGRAM BUTTONS */
   .diagram-btn {
@@ -258,8 +246,6 @@
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .category-name { min-width: 0; width: 100%; }
-    .category-item { flex-direction: column; gap: 4px; }
   }
   @media (max-width: 480px) {
     .tradeoff-row { flex-direction: column; align-items: stretch; }
@@ -345,55 +331,74 @@
 <!-- 03: INSIDE THIS LAYER -->
 <section>
   <div class="section-label"><span class="num">03</span>Inside This Layer</div>
-  <h2>All the <em>categories</em> in L3b.</h2>
+  <h2>What do you want <em>memory to do</em>?</h2>
 
-  <div class="layer-map">
-    <div class="layer-map-axis">
-      <strong>Axis:</strong> how persistent knowledge accumulates and is recalled across sessions.
+  <div class="guide">
+
+    <div class="cluster-head">
+      <h3 class="cluster-label">What it remembers</h3>
     </div>
 
-    <div class="category-list" role="list">
-
-      <div class="category-item" role="listitem">
-        <div class="category-name">Conversation memory</div>
-        <div class="category-desc">The rolling window of recent turns, sometimes compressed into a summary, that keeps the current session coherent. Earlier turns stay in the prompt until the window fills; then the oldest ones are dropped or summarized.</div>
-      </div>
-
-      <div class="category-item" role="listitem">
-        <div class="category-name">Long-term user memory</div>
-        <div class="category-desc">Preferences and facts about you that persist across sessions: your name, your preferred language, topics you care about. The system writes these into future prompts so the AI does not ask again what it already knows.</div>
-      </div>
-
-      <div class="category-item" role="listitem">
-        <div class="category-name">Episodic memory</div>
-        <div class="category-desc">Recollection of specific past events: "last Tuesday we were debugging your login flow." Episodic memories are stored with enough detail that the AI can surface them when the current context makes them relevant.</div>
-      </div>
-
-      <div class="category-item" role="listitem">
-        <div class="category-name">Memory consolidation</div>
-        <div class="category-desc">The process of compressing or promoting memories over time. Short-term notes get merged into a summary; important facts get moved to long-term storage; redundant memories get merged so the store does not grow without bound.</div>
-      </div>
-
-      <div class="category-item" role="listitem">
-        <div class="category-name">Memory retrieval triggers</div>
-        <div class="category-desc">The rules or signals that decide when to surface a stored memory. A trigger might be a keyword, a topic match, or a similarity score that says "this moment is enough like a past moment to be worth remembering."</div>
-      </div>
-
-      <div class="category-item" role="listitem">
-        <div class="category-name">Memory eviction and forgetting</div>
-        <div class="category-desc">The deliberate removal of memories: old or low-value ones are evicted to make room, or deleted on user request. Forgetting is not a failure; it is how the system stays manageable and respects privacy.</div>
-      </div>
-
-      <div class="category-item" role="listitem">
-        <div class="category-name">Cross-session identity and continuity</div>
-        <div class="category-desc">Connecting who the user is across separate sessions so memory is correctly attributed. Without this, memory is anonymous and cannot be personalized. With it, the AI can greet you by name and pick up where you left off.</div>
-      </div>
-
+    <div class="guide-row">
+      <span class="want">Want to keep track of what was said earlier in this conversation?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Conversation Memory</span>
+      </span>
     </div>
 
-    <div class="filing-rule">
-      <strong>Filing rule:</strong> Persists across sessions and is tied to a user or conversation &rarr; Stateful Memory (L3b). Loaded fresh for one answer &rarr; Stateless Retrieval (L3a).
+    <div class="guide-row">
+      <span class="want">Want to remember a user's name, preferences, or habits across sessions?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Long-Term User Memory</span>
+      </span>
     </div>
+
+    <div class="guide-row">
+      <span class="want">Want to recall a specific past event, like a bug you fixed together last week?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Episodic Memory</span>
+      </span>
+    </div>
+
+    <div class="cluster-head cluster-break">
+      <h3 class="cluster-label">Managing the memory</h3>
+    </div>
+
+    <div class="guide-row">
+      <span class="want">Want to compress old memories so the store does not grow forever?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Memory Consolidation</span>
+      </span>
+    </div>
+
+    <div class="guide-row">
+      <span class="want">Want to decide when the right moment is to surface a stored memory?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Memory Retrieval Triggers</span>
+      </span>
+    </div>
+
+    <div class="guide-row">
+      <span class="want">Want to drop old or low-value memories, or let users delete what the AI knows?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Memory Eviction &amp; Forgetting</span>
+      </span>
+    </div>
+
+    <div class="guide-row">
+      <span class="want">Want the AI to recognize the same user across separate sessions and pick up where they left off?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Cross-Session Identity &amp; Continuity</span>
+      </span>
+    </div>
+
   </div>
 </section>
 
