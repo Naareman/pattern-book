@@ -122,12 +122,8 @@
 <section>
   <div class="guide">
 
-    <div class="cluster-head">
-      <h2 class="cluster-label">Using a separate judgment call</h2>
-    </div>
-
     <div class="guide-row">
-      <span class="want">Want a separate call to check the answer is correct or faithful?</span>
+      <span class="want">Want a separate call to judge whether the answer is correct?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
         <span class="tech">Verification composition (LLM-as-Judge)</span>
@@ -135,15 +131,7 @@
     </div>
 
     <div class="guide-row">
-      <span class="want">Want to score an answer on a rubric (accuracy, helpfulness, safety) before letting it through?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Verification composition (LLM-as-Judge)</span>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want one call to write a draft and a separate call to review it and suggest fixes?</span>
+      <span class="want">Want one pass to write and a separate pass to critique and fix it?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
         <span class="tech">Generator-critic pairs</span>
@@ -151,38 +139,10 @@
     </div>
 
     <div class="guide-row">
-      <span class="want">Want the generator to revise based on the critic's notes, iterating until it passes?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Generator-critic pairs</span>
-      </span>
-    </div>
-
-    <div class="cluster-head cluster-break">
-      <h2 class="cluster-label">Blocking bad outputs before they ship</h2>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want a fast, lightweight check that blocks outputs violating a policy or format rule?</span>
+      <span class="want">Want a classifier to block bad outputs before they ship?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
         <span class="tech">Output filtering by classifier</span>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want to flag low-quality outputs for human review rather than passing them to the user?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Output filtering by classifier</span>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want to check for hallucination by having a verifier score factual claims against a source?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Verification composition (LLM-as-Judge)</span>
       </span>
     </div>
 

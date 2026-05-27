@@ -122,12 +122,8 @@
 <section>
   <div class="guide">
 
-    <div class="cluster-head">
-      <h2 class="cluster-label">Saving cost with smarter routing</h2>
-    </div>
-
     <div class="guide-row">
-      <span class="want">Want to try a cheap model first and only use a more powerful one when needed?</span>
+      <span class="want">Want to try a cheap model first and escalate only if needed?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
         <span class="tech">Cascading (cheap to expensive)</span>
@@ -135,7 +131,7 @@
     </div>
 
     <div class="guide-row">
-      <span class="want">Want to escalate to a stronger model only when the first answer looks uncertain?</span>
+      <span class="want">Want to use the model's confidence to decide whether to escalate?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
         <span class="tech">Confidence-based routing</span>
@@ -143,38 +139,10 @@
     </div>
 
     <div class="guide-row">
-      <span class="want">Want to inspect the model's own confidence score and act on it programmatically?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Confidence-based routing</span>
-      </span>
-    </div>
-
-    <div class="cluster-head cluster-break">
-      <h2 class="cluster-label">Sending questions to the right model</h2>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want to read the incoming question and decide which specialist model handles it?</span>
+      <span class="want">Want to send each question to the model that specializes in its topic?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
         <span class="tech">Specialist-of-experts routing</span>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want a classifier that sorts questions by topic before sending them to a dedicated model?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Specialist-of-experts routing</span>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want to combine topic routing with cost tiers, so simple questions in each topic stay cheap?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Cascading (cheap to expensive)</span>
       </span>
     </div>
 
