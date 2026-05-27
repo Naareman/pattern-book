@@ -46,47 +46,47 @@
   .title{font-family:'Fraunces',serif;font-weight:500;font-size:38px;letter-spacing:-.015em;margin:16px 0 0;line-height:1.08}
   .explainer{color:var(--soft);font-size:16px;line-height:1.6;max-width:660px;margin-top:14px}
 
-  /* flow diagram */
-  .flow{display:flex;align-items:stretch;gap:10px;margin-top:22px;max-width:560px}
-  .flow-cell{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:14px 12px;text-align:center;font-size:13px;font-weight:500;color:var(--soft);display:flex;align-items:center;justify-content:center}
-  .flow-cell.is-ai{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover);font-family:'Fraunces',serif;font-weight:500;font-size:15px}
-  .flow-arrow{flex:none;align-self:center;color:var(--accent);font-size:17px;line-height:1}
-  @media(max-width:480px){
-    .flow{flex-direction:column;max-width:240px}
-    .flow-arrow{transform:rotate(90deg)}
-  }
+  /* top flow legend: four stages of one call, joined by accent arrows */
+  .flow{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 10px;margin-top:24px}
+  .flow-chip{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--soft);white-space:nowrap;letter-spacing:.01em}
+  .flow-arrow{flex:none;color:var(--accent);font-size:15px;line-height:1}
+  .flow-caption{text-align:center;color:var(--faint);font-size:13px;line-height:1.5;margin-top:12px}
 
-  /* intent guide */
-  .section{padding:14px 0 32px}
+  /* the call itself */
+  .section{padding:16px 0 32px}
 
-  /* problem-first groups */
-  .group{margin-top:26px}
-  .group:first-of-type{margin-top:6px}
+  /* four stage cards in a 2x2 grid (desktop), single column (mobile) */
+  .stages{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:6px}
 
-  .group-head{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-hover);padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:6px}
+  .stage-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
 
-  /* methodology-first: technique NAME leads on the left, plain description follows */
-  .want-row{display:flex;align-items:baseline;justify-content:flex-start;gap:14px;padding:9px 10px;border-radius:8px;min-width:0}
-  .want-row.is-link{transition:background .15s ease}
-  .want-row.is-link:hover{background:var(--accent-soft)}
+  .stage-head{display:flex;align-items:center;gap:9px;margin:0 0 4px}
+  .stage-head .sico{flex:none;width:18px;height:18px;color:var(--accent);display:block}
+  .stage-head .sico svg{width:18px;height:18px;display:block}
+  .stage-name{font-size:16px;font-weight:600;color:var(--text);letter-spacing:-.005em;line-height:1.2}
 
-  .want-tag{flex:none;width:220px;font-family:'Fraunces',serif;font-size:16px;font-weight:500;color:var(--text);line-height:1.35}
-  .want-row.is-link .want-tag{color:var(--accent-hover)}
-  .want-tag .arr{font-size:12px;margin-left:4px;vertical-align:1px}
+  .stage-lead{color:var(--soft);font-size:13.5px;line-height:1.45;margin:0 0 14px}
 
-  .want-do{font-weight:400;font-size:14px;color:var(--soft);line-height:1.45;min-width:0}
-  .want-row.is-link .want-do{color:var(--soft)}
+  /* technique name chips */
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{display:inline-flex;align-items:center;gap:3px;padding:6px 11px;border-radius:20px;font-size:13px;font-weight:500;line-height:1.2;white-space:nowrap}
+  /* quiet (non-anchor) chip */
+  .chip{border:1px solid var(--border);color:var(--soft);background:transparent;cursor:default}
+  /* anchor (link) chip */
+  a.chip{border:1px solid transparent;color:var(--accent-hover);background:var(--accent-soft);cursor:pointer;transition:background .15s ease}
+  a.chip:hover{background:#E3DBFD}
+  a.chip .arr{font-size:11px;display:inline-block;transition:transform .18s ease}
+  a.chip:hover .arr{transform:translate(1px,-1px)}
+  @media (prefers-reduced-motion:reduce){a.chip,a.chip .arr{transition:none}a.chip:hover .arr{transform:none}}
 
   .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
   .foot strong{color:var(--soft);font-weight:500}
 
-  .closing{margin:26px 4px 0;color:var(--soft);font-size:14px;line-height:1.6}
-
   @media(max-width:560px){
     .title{font-size:30px}
     .explainer{font-size:15px}
-    .want-row{padding:10px 8px;flex-direction:column;gap:2px}
-    .want-tag{width:auto}
+    .flow-chip{font-size:12px;padding:6px 12px}
+    .stages{grid-template-columns:1fr;gap:14px}
   }
 </style>
 </head>
@@ -106,157 +106,97 @@
       <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>Layer · L4</span>
       <h1 class="title">Single-Call Control</h1>
       <p class="explainer">How do you get the best answer out of a single message to the AI?</p>
+
+      <div class="flow" role="list" aria-label="The four stages of a single call">
+        <span class="flow-chip" role="listitem">Ask it well</span>
+        <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+        <span class="flow-chip" role="listitem">Guide its thinking</span>
+        <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+        <span class="flow-chip" role="listitem">Shape its output</span>
+        <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+        <span class="flow-chip" role="listitem">Make it check itself</span>
+      </div>
+      <p class="flow-caption">Everything you control in a single message, in the order it happens.</p>
     </header>
 
     <div class="section" id="main" role="main">
 
-      <section class="group" aria-labelledby="g-ask">
-        <h2 class="group-head" id="g-ask">Ask it well</h2>
-        <a class="want-row is-link" href="pattern-few-shot.html">
-          <span class="want-tag">Few-Shot<span class="arr" aria-hidden="true">&#8599;</span></span>
-          <span class="want-do">give it a few examples to copy</span>
-        </a>
-        <a class="want-row is-link" href="pattern-zero-shot.html">
-          <span class="want-tag">Zero-Shot<span class="arr" aria-hidden="true">&#8599;</span></span>
-          <span class="want-do">just ask, no examples</span>
-        </a>
-        <div class="want-row">
-          <span class="want-tag">Role / Persona</span>
-          <span class="want-do">tell it who to be</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Negative Prompting</span>
-          <span class="want-do">say what to avoid</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Prompt Templates</span>
-          <span class="want-do">reusable fill-in-the-blank prompts</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Delimiters</span>
-          <span class="want-do">mark where each part starts</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Meta-Prompting</span>
-          <span class="want-do">let it write the prompt</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Example Selection</span>
-          <span class="want-do">pick the best examples</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Example Ordering</span>
-          <span class="want-do">order examples on purpose</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Context Packing</span>
-          <span class="want-do">fit the key info in</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Lost-in-the-Middle Mitigation</span>
-          <span class="want-do">put key facts at the edges</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Prompt Compression</span>
-          <span class="want-do">shrink the prompt to save cost</span>
-        </div>
-      </section>
+      <div class="stages">
 
-      <section class="group" aria-labelledby="g-think">
-        <h2 class="group-head" id="g-think">Guide its thinking</h2>
-        <a class="want-row is-link" href="pattern-chain-of-thought.html">
-          <span class="want-tag">Chain-of-Thought<span class="arr" aria-hidden="true">&#8599;</span></span>
-          <span class="want-do">think step by step</span>
-        </a>
-        <div class="want-row">
-          <span class="want-tag">Plan-and-Solve</span>
-          <span class="want-do">plan, then do each step</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Step-Back</span>
-          <span class="want-do">answer a simpler version first</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Least-to-Most</span>
-          <span class="want-do">solve the easy parts first</span>
-        </div>
-        <a class="want-row is-link" href="pattern-self-consistency.html">
-          <span class="want-tag">Self-Consistency<span class="arr" aria-hidden="true">&#8599;</span></span>
-          <span class="want-do">answer a few times, vote</span>
-        </a>
-        <div class="want-row">
-          <span class="want-tag">Analogical Prompting</span>
-          <span class="want-do">reason from a similar case</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Tree-of-Thoughts</span>
-          <span class="want-do">explore several paths, pick best</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Skeleton-of-Thought</span>
-          <span class="want-do">outline first, fill in parallel</span>
-        </div>
-      </section>
+        <section class="stage-card" aria-labelledby="g-ask">
+          <div class="stage-head">
+            <span class="sico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 2 2-7 7-3 1 1-3z"/><path d="M18 13l-1.5-1.5"/><path d="M5 5h9M5 9h7M5 13h4"/></svg></span>
+            <h2 class="stage-name" id="g-ask">Ask it well</h2>
+          </div>
+          <p class="stage-lead">Frame the question well.</p>
+          <div class="chips">
+            <a class="chip" href="pattern-few-shot.html">Few-Shot<span class="arr" aria-hidden="true">&#8599;</span></a>
+            <a class="chip" href="pattern-zero-shot.html">Zero-Shot<span class="arr" aria-hidden="true">&#8599;</span></a>
+            <span class="chip">Role / Persona</span>
+            <span class="chip">Negative Prompting</span>
+            <span class="chip">Prompt Templates</span>
+            <span class="chip">Delimiters</span>
+            <span class="chip">Meta-Prompting</span>
+            <span class="chip">Example Selection</span>
+            <span class="chip">Example Ordering</span>
+            <span class="chip">Context Packing</span>
+            <span class="chip">Lost-in-the-Middle Mitigation</span>
+            <span class="chip">Prompt Compression</span>
+          </div>
+        </section>
 
-      <section class="group" aria-labelledby="g-shape">
-        <h2 class="group-head" id="g-shape">Shape the output</h2>
-        <a class="want-row is-link" href="pattern-structured-output.html">
-          <span class="want-tag">Structured Output<span class="arr" aria-hidden="true">&#8599;</span></span>
-          <span class="want-do">return a fixed shape</span>
-        </a>
-        <div class="want-row">
-          <span class="want-tag">Stop Sequences</span>
-          <span class="want-do">tell it where to stop</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Temperature &amp; Sampling</span>
-          <span class="want-do">dial randomness up or down</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Schema Enforcement</span>
-          <span class="want-do">force valid fields</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Constrained Decoding</span>
-          <span class="want-do">only allow valid output</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Streaming with Validation</span>
-          <span class="want-do">check it as it streams</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Format Coercion</span>
-          <span class="want-do">repair the format after</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Logit Biasing</span>
-          <span class="want-do">nudge specific words</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Beam Search</span>
-          <span class="want-do">keep the best few options</span>
-        </div>
-      </section>
+        <section class="stage-card" aria-labelledby="g-think">
+          <div class="stage-head">
+            <span class="sico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.3 1 2.5h6c0-1.2.3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg></span>
+            <h2 class="stage-name" id="g-think">Guide its thinking</h2>
+          </div>
+          <p class="stage-lead">Shape how it reasons.</p>
+          <div class="chips">
+            <a class="chip" href="pattern-chain-of-thought.html">Chain-of-Thought<span class="arr" aria-hidden="true">&#8599;</span></a>
+            <span class="chip">Plan-and-Solve</span>
+            <span class="chip">Step-Back</span>
+            <span class="chip">Least-to-Most</span>
+            <span class="chip">Self-Ask</span>
+            <span class="chip">Analogical Prompting</span>
+            <span class="chip">Tree-of-Thoughts</span>
+            <span class="chip">Skeleton-of-Thought</span>
+            <a class="chip" href="pattern-self-consistency.html">Self-Consistency<span class="arr" aria-hidden="true">&#8599;</span></a>
+          </div>
+        </section>
 
-      <section class="group" aria-labelledby="g-check">
-        <h2 class="group-head" id="g-check">Make it check itself</h2>
-        <a class="want-row is-link" href="pattern-reflection.html">
-          <span class="want-tag">Self-Reflection<span class="arr" aria-hidden="true">&#8599;</span></span>
-          <span class="want-do">review and fix its answer</span>
-        </a>
-        <div class="want-row">
-          <span class="want-tag">Chain-of-Verification</span>
-          <span class="want-do">draft check questions, answer them</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Self-Ask</span>
-          <span class="want-do">ask itself sub-questions first</span>
-        </div>
-        <div class="want-row">
-          <span class="want-tag">Debate-Then-Decide</span>
-          <span class="want-do">argue both sides, then choose</span>
-        </div>
-      </section>
+        <section class="stage-card" aria-labelledby="g-shape">
+          <div class="stage-head">
+            <span class="sico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H6a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2 2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2 2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2"/></svg></span>
+            <h2 class="stage-name" id="g-shape">Shape its output</h2>
+          </div>
+          <p class="stage-lead">Control the answer's form.</p>
+          <div class="chips">
+            <a class="chip" href="pattern-structured-output.html">Structured Output<span class="arr" aria-hidden="true">&#8599;</span></a>
+            <span class="chip">Stop Sequences</span>
+            <span class="chip">Temperature &amp; Sampling</span>
+            <span class="chip">Schema Enforcement</span>
+            <span class="chip">Constrained Decoding</span>
+            <span class="chip">Streaming with Validation</span>
+            <span class="chip">Format Coercion</span>
+            <span class="chip">Logit Biasing</span>
+            <span class="chip">Beam Search</span>
+          </div>
+        </section>
+
+        <section class="stage-card" aria-labelledby="g-check">
+          <div class="stage-head">
+            <span class="sico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3.5-7.1"/><path d="M9 11l3 3 8.5-8.5"/></svg></span>
+            <h2 class="stage-name" id="g-check">Make it check itself</h2>
+          </div>
+          <p class="stage-lead">Have it verify itself.</p>
+          <div class="chips">
+            <a class="chip" href="pattern-reflection.html">Self-Reflection<span class="arr" aria-hidden="true">&#8599;</span></a>
+            <span class="chip">Chain-of-Verification</span>
+            <span class="chip">Debate-Then-Decide</span>
+          </div>
+        </section>
+
+      </div>
 
     </div>
 
