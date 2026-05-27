@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Observability &amp; Debuggability . The Pattern Book</title>
+<title>Observability &amp; Debuggability &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -266,14 +266,14 @@
   footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
   footer strong { color: var(--soft); font-weight: 500; }
 
-  /* 05 - WHAT THIS COVERS */
-  .covers-card {
+  /* 05 - WHAT THIS COVERS: guide-card style */
+  .guide {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
   }
   .covers-meta {
     display: flex; flex-direction: column; gap: 4px;
-    padding: 22px 24px 18px; border-bottom: 1px solid var(--border);
+    padding: 22px 22px 18px; border-bottom: 1px solid var(--border);
   }
   .covers-meta-row { font-size: 14px; color: var(--soft); line-height: 1.5; }
   .covers-meta-row strong { color: var(--text); font-weight: 600; }
@@ -281,24 +281,24 @@
     margin-top: 10px; font-size: 13px; color: var(--faint);
     line-height: 1.55; font-style: italic;
   }
-  /* cluster labels: flush-left, uppercase, bold -- rows indent under them */
-  .cluster-head { padding: 18px 24px 6px; }
-  .cluster-head.cluster-break { padding-top: 6px; border-top: 1px solid var(--border); }
+  /* cluster labels */
+  .cluster-head { padding: 16px 22px 8px; }
+  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
   .cluster-label {
     font-size: 11px; font-weight: 700; text-transform: uppercase;
     letter-spacing: .07em; color: var(--text); line-height: 1.3;
   }
-  /* discipline rows: indented under their cluster label */
-  .discipline-row {
+  /* discipline rows: name on its own line, description below, indented under the cluster label */
+  .guide-row {
     display: flex; flex-direction: column; gap: 3px;
-    padding: 12px 24px 12px 40px; border-top: 1px solid var(--border);
+    padding: 13px 22px 13px 40px; border-top: 1px solid var(--border);
   }
-  .cluster-head + .discipline-row { border-top: none; }
-  .discipline-name {
+  .cluster-head + .guide-row { border-top: none; }
+  .disc-name {
     font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
-    color: var(--text); line-height: 1.2;
+    color: var(--text); line-height: 1.3;
   }
-  .discipline-line { font-size: 13.5px; color: var(--soft); line-height: 1.55; }
+  .disc-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
 
   /* RESPONSIVE */
   @media (max-width: 560px) {
@@ -333,7 +333,7 @@
 <header class="header" id="main">
   <span class="eyebrow">
     <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/></svg></span>
-    Consideration
+    C4 &middot; Consideration
   </span>
   <h1 class="page-title">Observability &amp; Debuggability</h1>
   <p class="explainer">Being able to see what the AI did and why, like a flight recorder for every answer.</p>
@@ -509,7 +509,7 @@
 <section>
   <div class="section-label"><span class="num">05</span>What This Covers</div>
   <h2>Inside <em>C4</em>.</h2>
-  <div class="covers-card">
+  <div class="guide">
     <div class="covers-meta">
       <div class="covers-meta-row"><strong>Applies to:</strong> every system in production.</div>
       <div class="covers-meta-row"><strong>Axis:</strong> how to explain what the system did after the fact.</div>
@@ -518,36 +518,36 @@
 
     <!-- Cluster 1: See what happened -->
     <div class="cluster-head">
-      <div class="cluster-label">See what happened</div>
+      <h3 class="cluster-label">See what happened</h3>
     </div>
-    <div class="discipline-row">
-      <div class="discipline-name">Tracing Discipline</div>
-      <div class="discipline-line">How to design and structure the step-by-step record for a request so it is useful when things go wrong.</div>
+    <div class="guide-row">
+      <span class="disc-name">Tracing Discipline</span>
+      <span class="disc-desc">How to design and structure the step-by-step record for a request so it is useful when things go wrong.</span>
     </div>
-    <div class="discipline-row">
-      <div class="discipline-name">Replay Frameworks</div>
-      <div class="discipline-line">How to take a past request and run it again, exactly, so you can reproduce a bug or test a fix without waiting for it to happen in production.</div>
+    <div class="guide-row">
+      <span class="disc-name">Replay Frameworks</span>
+      <span class="disc-desc">How to take a past request and run it again, exactly, so you can reproduce a bug or test a fix without waiting for it to happen in production.</span>
     </div>
-    <div class="discipline-row">
-      <div class="discipline-name">Attribution Thinking</div>
-      <div class="discipline-line">How to trace a bad output back to the specific step or input that caused it, rather than blaming the whole system.</div>
+    <div class="guide-row">
+      <span class="disc-name">Attribution Thinking</span>
+      <span class="disc-desc">How to trace a bad output back to the specific step or input that caused it, rather than blaming the whole system.</span>
     </div>
 
     <!-- Cluster 2: Find and explain problems -->
     <div class="cluster-head cluster-break">
-      <div class="cluster-label">Find and explain problems</div>
+      <h3 class="cluster-label">Find and explain problems</h3>
     </div>
-    <div class="discipline-row">
-      <div class="discipline-name">Drift Detection Methodology</div>
-      <div class="discipline-line">How to notice when the system's behavior has quietly shifted over time, for example because the underlying model changed or new input patterns arrived.</div>
+    <div class="guide-row">
+      <span class="disc-name">Drift Detection Methodology</span>
+      <span class="disc-desc">How to notice when the system's behavior has quietly shifted over time, for example because the underlying model changed or new input patterns arrived.</span>
     </div>
-    <div class="discipline-row">
-      <div class="discipline-name">Incident Postmortem Patterns</div>
-      <div class="discipline-line">How to write up what went wrong after an incident in a way that leads to real fixes rather than vague promises to be more careful.</div>
+    <div class="guide-row">
+      <span class="disc-name">Incident Postmortem Patterns</span>
+      <span class="disc-desc">How to write up what went wrong after an incident in a way that leads to real fixes rather than vague promises to be more careful.</span>
     </div>
-    <div class="discipline-row">
-      <div class="discipline-name">Causal Analysis Frameworks</div>
-      <div class="discipline-line">How to distinguish the root cause of a failure from its symptoms, so you fix the actual problem and not just the surface error message.</div>
+    <div class="guide-row">
+      <span class="disc-name">Causal Analysis Frameworks</span>
+      <span class="disc-desc">How to distinguish the root cause of a failure from its symptoms, so you fix the actual problem and not just the surface error message.</span>
     </div>
   </div>
 </section>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Privacy, Security &amp; Governance . The Pattern Book</title>
+<title>Privacy, Security &amp; Governance &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -254,8 +254,8 @@
   .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
   .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
 
-  /* WHAT THIS COVERS CARD */
-  .covers-card {
+  /* WHAT THIS COVERS: guide-card style */
+  .guide {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
   }
@@ -282,27 +282,17 @@
     font-size: 11px; font-weight: 700; text-transform: uppercase;
     letter-spacing: .07em; color: var(--text); line-height: 1.3;
   }
-  /* discipline rows */
-  .disc-row {
-    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
-    padding: 14px 22px 14px 40px; border-top: 1px solid var(--border);
+  /* discipline rows: name on its own line, description below, indented under the cluster label */
+  .guide-row {
+    display: flex; flex-direction: column; gap: 3px;
+    padding: 13px 22px 13px 40px; border-top: 1px solid var(--border);
   }
-  .cluster-head + .disc-row { border-top: none; }
+  .cluster-head + .guide-row { border-top: none; }
   .disc-name {
-    font-family: 'Fraunces', serif; font-weight: 500;
-    font-size: 15px; color: var(--text); line-height: 1.4;
-    flex-shrink: 0;
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
+    color: var(--text); line-height: 1.3;
   }
-  .disc-sep {
-    color: var(--faint); font-size: 14px; flex-shrink: 0;
-  }
-  .disc-line {
-    font-size: 14px; color: var(--soft); line-height: 1.55;
-  }
-  @media (max-width: 560px) {
-    .disc-row { flex-direction: column; gap: 3px; padding-left: 22px; }
-    .disc-sep { display: none; }
-  }
+  .disc-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
 
   /* BACK LINK */
   .back-link {
@@ -381,7 +371,7 @@
         <path d="M8 11V8a4 4 0 0 1 8 0v3"/>
       </svg>
     </span>
-    C3 &nbsp;&middot;&nbsp; Consideration
+    C3 &middot; Consideration
   </span>
   <h1 class="pattern-title">Privacy, Security &amp; Governance</h1>
   <p class="explainer">Personal details belong to people, not to models. This crosscut covers how to protect data, users, and tenants across every part of a system that handles user, customer, or tenant data.</p>
@@ -425,7 +415,7 @@
 <section>
   <div class="section-label"><span class="num">03</span>What This Covers</div>
   <h2>Every discipline in <em>this crosscut</em>.</h2>
-  <div class="covers-card">
+  <div class="guide">
 
     <div class="covers-meta">
       <div class="covers-scope">
@@ -436,54 +426,47 @@
 
     <!-- Cluster 1 -->
     <div class="cluster-head">
-      <span class="cluster-label">Protecting the data</span>
+      <h3 class="cluster-label">Protecting the data</h3>
     </div>
 
-    <div class="disc-row">
+    <div class="guide-row">
       <span class="disc-name">Access Control</span>
-      <span class="disc-sep" aria-hidden="true">:</span>
-      <span class="disc-line">Permission model for users, roles, and API keys.</span>
+      <span class="disc-desc">Permission model for users, roles, and API keys.</span>
     </div>
 
-    <div class="disc-row">
+    <div class="guide-row">
       <span class="disc-name">Tenant Isolation Discipline</span>
-      <span class="disc-sep" aria-hidden="true">:</span>
-      <span class="disc-line">One customer's data never reaches another's session.</span>
+      <span class="disc-desc">One customer's data never reaches another's session.</span>
     </div>
 
-    <div class="disc-row">
+    <div class="guide-row">
       <span class="disc-name">Runtime PII-Handling</span>
-      <span class="disc-sep" aria-hidden="true">:</span>
-      <span class="disc-line">Detects and redacts personal data before the model sees it.</span>
+      <span class="disc-desc">Detects and redacts personal data before the model sees it.</span>
     </div>
 
-    <div class="disc-row">
+    <div class="guide-row">
       <span class="disc-name">Data Residency</span>
-      <span class="disc-sep" aria-hidden="true">:</span>
-      <span class="disc-line">Data stays in its permitted geographic region.</span>
+      <span class="disc-desc">Data stays in its permitted geographic region.</span>
     </div>
 
     <!-- Cluster 2 -->
     <div class="cluster-head cluster-break">
-      <span class="cluster-label">Proving and tracking it</span>
+      <h3 class="cluster-label">Proving and tracking it</h3>
     </div>
 
-    <div class="disc-row">
+    <div class="guide-row">
       <span class="disc-name">Audit-Logging</span>
-      <span class="disc-sep" aria-hidden="true">:</span>
-      <span class="disc-line">Immutable record of who accessed what and when.</span>
+      <span class="disc-desc">Immutable record of who accessed what and when.</span>
     </div>
 
-    <div class="disc-row">
+    <div class="guide-row">
       <span class="disc-name">Compliance Mapping (GDPR, HIPAA, SOC2)</span>
-      <span class="disc-sep" aria-hidden="true">:</span>
-      <span class="disc-line">Translates legal obligations into concrete system controls.</span>
+      <span class="disc-desc">Translates legal obligations into concrete system controls.</span>
     </div>
 
-    <div class="disc-row">
+    <div class="guide-row">
       <span class="disc-name">Provenance &amp; Watermarking</span>
-      <span class="disc-sep" aria-hidden="true">:</span>
-      <span class="disc-line">Marks AI-generated output for attribution and misuse detection.</span>
+      <span class="disc-desc">Marks AI-generated output for attribution and misuse detection.</span>
     </div>
 
   </div>

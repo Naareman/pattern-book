@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Real-time / Streaming . The Pattern Book</title>
+<title>Real-time / Streaming &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -185,8 +185,8 @@
   .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
   .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
 
-  /* WHAT THIS COVERS — guide-card style */
-  .covers-card {
+  /* WHAT THIS COVERS: guide-card style */
+  .guide {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -202,15 +202,10 @@
     border-bottom: 1px solid var(--border);
   }
   .covers-note strong { color: var(--text); font-style: normal; }
-  /* cluster label rows */
-  .c-cluster-head {
-    padding: 18px 22px 8px;
-  }
-  .c-cluster-head.c-cluster-break {
-    padding-top: 26px;
-    border-top: 1px solid var(--border);
-  }
-  .c-cluster-label {
+  /* cluster labels */
+  .cluster-head { padding: 16px 22px 8px; }
+  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
+  .cluster-label {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -218,30 +213,24 @@
     color: var(--text);
     line-height: 1.3;
   }
-  /* discipline rows */
-  .c-row {
+  /* discipline rows: name on its own line, description below, indented under the cluster label */
+  .guide-row {
+    display: flex; flex-direction: column; gap: 3px;
     padding: 13px 22px 13px 40px;
     border-top: 1px solid var(--border);
   }
-  .c-cluster-head + .c-row { border-top: none; }
-  .c-row:last-of-type { padding-bottom: 18px; }
-  .c-name {
+  .cluster-head + .guide-row { border-top: none; }
+  .disc-name {
     font-family: 'Fraunces', serif;
     font-weight: 500;
     font-size: 15px;
     color: var(--text);
-    margin-bottom: 3px;
+    line-height: 1.3;
   }
-  .c-line {
+  .disc-desc {
     font-size: 14px;
     color: var(--soft);
-    line-height: 1.5;
-  }
-  .c-xref {
-    font-size: 12px;
-    color: var(--faint);
-    margin-top: 3px;
-    font-style: italic;
+    line-height: 1.55;
   }
   .covers-map-note {
     padding: 14px 22px 16px;
@@ -401,67 +390,60 @@
 <section>
   <div class="section-label"><span class="num">03</span>What This Covers</div>
   <h2>Eight <em>disciplines</em> in this crosscut.</h2>
-  <div class="covers-card" role="region" aria-label="Disciplines in this crosscut">
+  <div class="guide" role="region" aria-label="Disciplines in this crosscut">
 
     <div class="covers-note">
       <strong>This is a discipline crosscut, not a mechanism layer.</strong> The streaming UX mechanism (the actual UI behavior of tokens appearing progressively) lives in L7 User Surface. C7 owns the thinking frameworks that apply once you commit to streaming.
     </div>
 
     <!-- CLUSTER 1 -->
-    <div class="c-cluster-head">
-      <h3 class="c-cluster-label">Streaming the output</h3>
+    <div class="cluster-head">
+      <h3 class="cluster-label">Streaming the output</h3>
     </div>
 
-    <div class="c-row">
-      <div class="c-name">Streaming Output Discipline</div>
-      <div class="c-line">How to decide when streaming is worth the engineering cost and when batch is fine. Includes rules for chunking output so each partial response is still useful to a reader.</div>
-      <div class="c-xref">UX mechanism for the user lives in L7 User Surface (Streaming and Progressive Disclosure).</div>
+    <div class="guide-row">
+      <span class="disc-name">Streaming Output Discipline</span>
+      <span class="disc-desc">How to decide when streaming is worth the engineering cost and when batch is fine. Includes rules for chunking output so each partial response is still useful to a reader. UX mechanism for the user lives in L7 User Surface (Streaming and Progressive Disclosure).</span>
     </div>
 
-    <div class="c-row">
-      <div class="c-name">Time-to-First-Token Frameworks</div>
-      <div class="c-line">TTFT is the primary number users feel. Covers how to measure it, how to set targets per product type (voice is tighter than chat), and which infrastructure levers move it.</div>
-      <div class="c-xref">Cross-ref C5 Cost, Latency and Reliability for latency budget design.</div>
+    <div class="guide-row">
+      <span class="disc-name">Time-to-First-Token Frameworks</span>
+      <span class="disc-desc">TTFT is the primary number users feel. Covers how to measure it, how to set targets per product type (voice is tighter than chat), and which infrastructure levers move it. Cross-ref C5 Cost, Latency and Reliability for latency budget design.</span>
     </div>
 
-    <div class="c-row">
-      <div class="c-name">Continuous Context for Voice</div>
-      <div class="c-line">Voice adds turn-taking, interruption, and barge-in on top of streaming. Covers the state machine for managing these transitions and keeping context coherent across interrupted turns.</div>
-      <div class="c-xref">Voice surface mechanism lives in L7 User Surface.</div>
+    <div class="guide-row">
+      <span class="disc-name">Continuous Context for Voice</span>
+      <span class="disc-desc">Voice adds turn-taking, interruption, and barge-in on top of streaming. Covers the state machine for managing these transitions and keeping context coherent across interrupted turns. Voice surface mechanism lives in L7 User Surface.</span>
     </div>
 
     <!-- CLUSTER 2 -->
-    <div class="c-cluster-head c-cluster-break">
-      <h3 class="c-cluster-label">Doing it safely and cheaply</h3>
+    <div class="cluster-head cluster-break">
+      <h3 class="cluster-label">Doing it safely and cheaply</h3>
     </div>
 
-    <div class="c-row">
-      <div class="c-name">Streaming Eval</div>
-      <div class="c-line">Standard evals wait for a full response. Streaming eval measures quality at intermediate checkpoints: coherence mid-sentence, drift detection, and whether the final answer matches where it started.</div>
-      <div class="c-xref">Cross-ref C1 Evaluation for general eval methodology.</div>
+    <div class="guide-row">
+      <span class="disc-name">Streaming Eval</span>
+      <span class="disc-desc">Standard evals wait for a full response. Streaming eval measures quality at intermediate checkpoints: coherence mid-sentence, drift detection, and whether the final answer matches where it started. Cross-ref C1 Evaluation for general eval methodology.</span>
     </div>
 
-    <div class="c-row">
-      <div class="c-name">Streaming Safety</div>
-      <div class="c-line">A filter that reads the complete response cannot work with streaming. Covers real-time harm detection on partial outputs: sliding-window classifiers, early-exit rules, and interrupting a stream without confusing the user.</div>
-      <div class="c-xref">Cross-ref C2 Safety, Alignment and Refusal for harm taxonomy and refusal calibration.</div>
+    <div class="guide-row">
+      <span class="disc-name">Streaming Safety</span>
+      <span class="disc-desc">A filter that reads the complete response cannot work with streaming. Covers real-time harm detection on partial outputs: sliding-window classifiers, early-exit rules, and interrupting a stream without confusing the user. Cross-ref C2 Safety, Alignment and Refusal for harm taxonomy and refusal calibration.</span>
     </div>
 
-    <div class="c-row">
-      <div class="c-name">Streaming Validation</div>
-      <div class="c-line">Partial tokens may be syntactically invalid mid-stream when output must be structured. Covers incremental schema checking, buffering strategies, and surfacing validation errors without waiting for the full response.</div>
-      <div class="c-xref">Cross-ref L4 Output Shape for the schema enforcement mechanism itself.</div>
+    <div class="guide-row">
+      <span class="disc-name">Streaming Validation</span>
+      <span class="disc-desc">Partial tokens may be syntactically invalid mid-stream when output must be structured. Covers incremental schema checking, buffering strategies, and surfacing validation errors without waiting for the full response. Cross-ref L4 Output Shape for the schema enforcement mechanism itself.</span>
     </div>
 
-    <div class="c-row">
-      <div class="c-name">Backpressure and Cancellation</div>
-      <div class="c-line">When a client cannot consume tokens as fast as the model produces them, or the user navigates away, the system needs a clean path to pause or abort. Covers propagating cancellation upstream and avoiding wasted compute on abandoned streams.</div>
+    <div class="guide-row">
+      <span class="disc-name">Backpressure and Cancellation</span>
+      <span class="disc-desc">When a client cannot consume tokens as fast as the model produces them, or the user navigates away, the system needs a clean path to pause or abort. Covers propagating cancellation upstream and avoiding wasted compute on abandoned streams.</span>
     </div>
 
-    <div class="c-row">
-      <div class="c-name">Streaming Cost Attribution</div>
-      <div class="c-line">A cancelled stream still consumed prefill compute, and partial responses still count as output tokens. Covers how to attribute cost to users or features when the full response was never delivered.</div>
-      <div class="c-xref">Cross-ref C5 Cost, Latency and Reliability for general cost attribution frameworks.</div>
+    <div class="guide-row">
+      <span class="disc-name">Streaming Cost Attribution</span>
+      <span class="disc-desc">A cancelled stream still consumed prefill compute, and partial responses still count as output tokens. Covers how to attribute cost to users or features when the full response was never delivered. Cross-ref C5 Cost, Latency and Reliability for general cost attribution frameworks.</span>
     </div>
 
     <div class="covers-map-note">All eight are disciplines for reasoning and decision-making. The mechanisms they reference (schema enforcement, output filtering, streaming UI) each have a home in the layer taxonomy.</div>
