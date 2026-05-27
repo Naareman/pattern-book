@@ -135,17 +135,23 @@
     .tradeoff-label{min-width:0}
   }
 
-  /* ======== INSIDE THIS LAYER ======== */
-  .layer-map{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 28px}
-  .layer-axis{font-size:13px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border-radius:20px;display:inline-block;padding:4px 14px;margin-bottom:20px}
-  .category-list{display:flex;flex-direction:column;gap:14px}
-  .cat-row{display:flex;gap:14px;align-items:flex-start}
-  .cat-dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:6px}
-  .cat-body{}
-  .cat-name{font-family:'Fraunces',serif;font-weight:500;font-size:16px;color:var(--text);line-height:1.2;margin-bottom:3px}
-  .cat-line{font-size:14px;color:var(--soft);line-height:1.5}
-  .layer-filing{margin-top:22px;padding-top:16px;border-top:1px solid var(--border);font-size:13px;color:var(--soft);line-height:1.6}
-  .layer-filing strong{color:var(--text);font-weight:600}
+  /* ======== GUIDE (section 05, in-place goal-first) ======== */
+  .guide{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .guide-row{display:flex;align-items:baseline;justify-content:flex-start;flex-wrap:wrap;gap:4px 10px;padding:17px 22px;border-top:1px solid var(--border)}
+  .guide-row:first-child{border-top:none}
+  .want{font-size:15px;line-height:1.4;color:var(--text)}
+  .resolve{display:inline-flex;align-items:baseline;gap:8px;flex:none}
+  .connect{color:var(--faint);font-size:15px;line-height:1.4}
+  .tech{font-family:'Fraunces',serif;font-size:16px;color:var(--text);line-height:1.4}
+  a.tech{color:var(--accent-hover);transition:color .15s ease}
+  a.tech:hover{color:var(--accent)}
+  a.tech .ext{font-size:11px;color:var(--accent);margin-left:2px;vertical-align:baseline}
+  @media(prefers-reduced-motion:reduce){a.tech{transition:none}}
+  .cluster-head{padding:16px 22px 8px}
+  .cluster-head.cluster-break{padding-top:26px;border-top:1px solid var(--border)}
+  .cluster-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text);line-height:1.3}
+  .cluster-head + .guide-row{border-top:none}
+  .cluster-head ~ .guide-row{padding-left:40px}
 
   /* ======== BACK LINK ======== */
   .back-link{display:inline-flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);text-decoration:none;color:var(--text);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;cursor:pointer}
@@ -347,86 +353,93 @@
 <!-- 05 INSIDE THIS LAYER -->
 <section>
   <div class="section-label"><span class="num">05</span>Inside This Layer</div>
-  <h2>Every category <em>mapped</em>.</h2>
-  <div class="layer-map">
-    <div class="layer-axis">Axis: training lifecycle stage</div>
-    <div class="category-list">
+  <h2>What each training stage <em>is for</em>.</h2>
+  <div class="guide">
 
-      <div class="cat-row">
-        <div class="cat-dot" aria-hidden="true"></div>
-        <div class="cat-body">
-          <div class="cat-name">Pretraining Objectives &amp; Data</div>
-          <div class="cat-line">The foundation step: a model reads an enormous corpus and learns to predict the next word (or token, a small piece of text the AI works in: roughly a word, or a slice of an image or sound). This is where general language ability comes from.</div>
-        </div>
-      </div>
-
-      <div class="cat-row">
-        <div class="cat-dot" aria-hidden="true"></div>
-        <div class="cat-body">
-          <div class="cat-name">Continued Pretraining</div>
-          <div class="cat-line">Running the pretraining objective further, usually on a domain-specific corpus (legal documents, medical literature, code) after the main pretraining run ends. Keeps the full language capability while shifting the model's knowledge toward a new area.</div>
-        </div>
-      </div>
-
-      <div class="cat-row">
-        <div class="cat-dot" aria-hidden="true"></div>
-        <div class="cat-body">
-          <div class="cat-name">Supervised Fine-Tuning (SFT)</div>
-          <div class="cat-line">Training on labelled examples: a prompt (the text you send the AI) paired with the ideal response. This is what turns a raw language model into something that follows instructions and converses helpfully.</div>
-        </div>
-      </div>
-
-      <div class="cat-row">
-        <div class="cat-dot" aria-hidden="true"></div>
-        <div class="cat-body">
-          <div class="cat-name">Preference Optimization (Reinforcement Learning from Human Feedback, DPO, Constitutional AI / RLAIF)</div>
-          <div class="cat-line">After SFT, preference signals shape behaviour. Reinforcement Learning from Human Feedback (RLHF) uses human raters to score answers; Direct Preference Optimization (DPO) achieves a similar goal without a separate reward model; Constitutional AI (RLAIF) substitutes AI-generated preferences for human labels to scale the process.</div>
-        </div>
-      </div>
-
-      <div class="cat-row">
-        <div class="cat-dot" aria-hidden="true"></div>
-        <div class="cat-body">
-          <div class="cat-name">Reasoning-Capability Training</div>
-          <div class="cat-line">Dedicated training to improve the model's ability to reason step by step, using reinforcement learning on reasoning traces, distillation from reasoning examples, or process-reward models that score each step, not just the final answer.</div>
-        </div>
-      </div>
-
-      <div class="cat-row">
-        <div class="cat-dot" aria-hidden="true"></div>
-        <div class="cat-body">
-          <div class="cat-name">Parameter-Efficient Fine-Tuning (LoRA, QLoRA, Adapters, Prefix Tuning)</div>
-          <div class="cat-line">Techniques that update only a small fraction of a model's weights (or add a tiny extra module) instead of retraining the whole thing. Makes fine-tuning feasible on a single consumer GPU (the chip that does the heavy computing) rather than a large cluster.</div>
-        </div>
-      </div>
-
-      <div class="cat-row">
-        <div class="cat-dot" aria-hidden="true"></div>
-        <div class="cat-body">
-          <div class="cat-name">Distillation</div>
-          <div class="cat-line">Training a smaller model (the student) to mimic the outputs of a larger model (the teacher). The student inherits capability at a fraction of the size and cost, making deployment practical.</div>
-        </div>
-      </div>
-
-      <div class="cat-row">
-        <div class="cat-dot" aria-hidden="true"></div>
-        <div class="cat-body">
-          <div class="cat-name">Model Merging</div>
-          <div class="cat-line">Combining the weights of separately trained models (often by averaging) to blend their capabilities without additional training. Can combine a coding specialist and a language specialist into one model with both strengths.</div>
-        </div>
-      </div>
-
-      <div class="cat-row">
-        <div class="cat-dot" aria-hidden="true"></div>
-        <div class="cat-body">
-          <div class="cat-name">Evaluation During Training</div>
-          <div class="cat-line">Tracking quality on a held-out dev set throughout the training run: deciding which checkpoint to keep, catching overfitting early, and maintaining hygiene so the eval set does not leak into the training data.</div>
-        </div>
-      </div>
-
+    <div class="cluster-head">
+      <h2 class="cluster-label">Build the base model</h2>
     </div>
 
-    <div class="layer-filing"><strong>Filing rule:</strong> What stage of the training lifecycle is this? If the purpose is to build native reasoning capability into the weights, it is Reasoning-Capability Training regardless of mechanism shape. If it operates on the model at serving time as a black box, it belongs to L0 (Serving Infrastructure), not here.</div>
+    <div class="guide-row">
+      <span class="want">To teach it language from scratch</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Pretraining Objectives &amp; Data</span>
+      </span>
+    </div>
+
+    <div class="guide-row">
+      <span class="want">To keep general ability but shift knowledge into a new domain</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Continued Pretraining</span>
+      </span>
+    </div>
+
+    <div class="guide-row">
+      <span class="want">To track whether the model is improving during a training run</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Evaluation During Training</span>
+      </span>
+    </div>
+
+    <div class="cluster-head cluster-break">
+      <h2 class="cluster-label">Tune it to behave</h2>
+    </div>
+
+    <div class="guide-row">
+      <span class="want">To tune it for a job using worked examples</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Supervised Fine-Tuning (SFT)</span>
+      </span>
+    </div>
+
+    <div class="guide-row">
+      <span class="want">To shape behaviour using human or AI preference signals</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Preference Optimization (RLHF, DPO, Constitutional AI)</span>
+      </span>
+    </div>
+
+    <div class="guide-row">
+      <span class="want">To build native step-by-step reasoning into the weights</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Reasoning-Capability Training</span>
+      </span>
+    </div>
+
+    <div class="cluster-head cluster-break">
+      <h2 class="cluster-label">Make it smaller or cheaper</h2>
+    </div>
+
+    <div class="guide-row">
+      <span class="want">To fine-tune without retraining the full model</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">PEFT (LoRA, QLoRA, Adapters)</span>
+      </span>
+    </div>
+
+    <div class="guide-row">
+      <span class="want">To compress capability from a large model into a small one</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Distillation</span>
+      </span>
+    </div>
+
+    <div class="guide-row">
+      <span class="want">To blend two trained models into one without extra training</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Model Merging</span>
+      </span>
+    </div>
+
   </div>
 </section>
 

@@ -222,31 +222,23 @@
   .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
   .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
 
-  /* ======== INSIDE THIS LAYER ======== */
-  .inside-layer-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 28px;
-  }
-  .inside-axis {
-    font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 20px;
-    padding-bottom: 16px; border-bottom: 1px solid var(--border);
-  }
-  .inside-categories { display: flex; flex-direction: column; gap: 14px; }
-  .inside-cat {
-    display: flex; flex-direction: column; gap: 4px;
-  }
-  .inside-cat-name {
-    font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px;
-    color: var(--text); line-height: 1.2;
-  }
-  .inside-cat-desc {
-    font-size: 14px; color: var(--soft); line-height: 1.55;
-  }
-  .inside-filing {
-    margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
-    font-size: 13.5px; color: var(--soft); line-height: 1.6;
-  }
-  .inside-filing strong { color: var(--text); }
+  /* ======== GUIDE (in-place, section 05) ======== */
+  .guide { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .guide-row { display: flex; align-items: baseline; justify-content: flex-start; flex-wrap: wrap; gap: 4px 10px; padding: 17px 22px; border-top: 1px solid var(--border); }
+  .guide-row:first-child { border-top: none; }
+  .want { font-size: 15px; line-height: 1.4; color: var(--text); }
+  .resolve { display: inline-flex; align-items: baseline; gap: 8px; flex: none; }
+  .connect { color: var(--faint); font-size: 15px; line-height: 1.4; }
+  .tech { font-family: 'Fraunces', serif; font-size: 16px; color: var(--text); line-height: 1.4; }
+  a.tech { color: var(--accent-hover); transition: color .15s ease; }
+  a.tech:hover { color: var(--accent); }
+  a.tech .ext { font-size: 11px; color: var(--accent); margin-left: 2px; vertical-align: baseline; }
+  @media (prefers-reduced-motion: reduce) { a.tech { transition: none; } }
+  .cluster-head { padding: 16px 22px 8px; }
+  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
+  .cluster-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text); line-height: 1.3; }
+  .cluster-head + .guide-row { border-top: none; }
+  .cluster-head ~ .guide-row { padding-left: 40px; }
 
   /* back link */
   .back-link {
@@ -479,56 +471,119 @@
   <div class="section-label"><span class="num">05</span>Inside This Layer</div>
   <h2>What <em>lives</em> here.</h2>
 
-  <div class="inside-layer-card">
-    <p class="inside-axis"><strong>Axis:</strong> infrastructure function: what the runtime provides between caller and model.</p>
+  <div class="guide" role="list" aria-label="Infrastructure functions in this layer">
 
-    <div class="inside-categories">
-
-      <div class="inside-cat">
-        <span class="inside-cat-name">Inference Serving</span>
-        <span class="inside-cat-desc">The techniques that make a GPU (the chip that does the heavy computing) process many requests at once: batching (grouping requests), KV-cache (reusing computed memory across tokens), paged attention (managing that memory in pages so big requests don't waste space), and speculative decoding (drafting tokens fast and verifying them).</span>
-      </div>
-
-      <div class="inside-cat">
-        <span class="inside-cat-name">Routing and Load Balancing</span>
-        <span class="inside-cat-desc">Deciding which server handles which request so no single machine gets overwhelmed and every caller gets a response quickly.</span>
-      </div>
-
-      <div class="inside-cat">
-        <span class="inside-cat-name">Fallback Chains</span>
-        <span class="inside-cat-desc">Ordered lists of backup models or providers: if the first choice fails or is too slow, the next one in line takes over automatically.</span>
-      </div>
-
-      <div class="inside-cat">
-        <span class="inside-cat-name">Circuit Breakers and Retry Policies</span>
-        <span class="inside-cat-desc">Rules that stop hammering a failing service (circuit breaker) and decide when it is safe to try again, so temporary failures don't cascade into system-wide outages.</span>
-      </div>
-
-      <div class="inside-cat">
-        <span class="inside-cat-name">Cache Check and Substitution</span>
-        <span class="inside-cat-desc">At request time: check whether an identical or very similar prompt was already answered, and return the stored result if so. This covers both prompt-prefix caching and semantic similarity caching. Note: the runtime check and substitution live here; the cache's contents, population, and eviction lifecycle live in L-1 (Data and Artifact Lifecycle).</span>
-      </div>
-
-      <div class="inside-cat">
-        <span class="inside-cat-name">Cost/Latency-Optimized Model Selection at Runtime</span>
-        <span class="inside-cat-desc">Picking which model variant to route a call to based on live cost or speed constraints, applying the C5 (Cost, Latency, and Reliability) framework at the moment of the call.</span>
-      </div>
-
-      <div class="inside-cat">
-        <span class="inside-cat-name">Observability Hooks</span>
-        <span class="inside-cat-desc">Instrumentation wired into the serving path that emits latency, token counts, and error signals. The traces go to dashboards; the discipline of reading and acting on those traces lives in C4 (Observability and Debuggability).</span>
-      </div>
-
-      <div class="inside-cat">
-        <span class="inside-cat-name">Quantization and Compression at Serving Time</span>
-        <span class="inside-cat-desc">Shrinking the model's internal numbers (weights and activations) so it fits on fewer or cheaper chips, reducing inference cost without retraining.</span>
-      </div>
-
+    <!-- CLUSTER 1 -->
+    <div class="cluster-head" role="listitem">
+      <h3 class="cluster-label">Run the model fast</h3>
     </div>
 
-    <div class="inside-filing">
-      <strong>Filing rule:</strong> operates on the model call as a black box, without caring what the model says = here (L0). Operates on what the model says, or which model should speak = L2 (Structural Composition). Manages the lifecycle of an artifact the runtime reads = L-1 (Data and Artifact Lifecycle). A cache's runtime check lives here; the cache's contents and lifecycle live in L-1.
+    <div class="guide-row" role="listitem">
+      <span class="want">To handle many users at once</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Inference Serving</span>
+      </span>
     </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">To make the GPU work on many requests in one pass</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Batching</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">To reuse computed memory across tokens in a sequence</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">KV-Cache</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">To manage GPU memory so large requests don't waste space</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Paged Attention</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">To draft tokens fast and verify them before committing</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Speculative Decoding</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">To shrink the model so it fits on fewer or cheaper chips</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Quantization and Compression at Serving Time</span>
+      </span>
+    </div>
+
+    <!-- CLUSTER 2 -->
+    <div class="cluster-head cluster-break" role="listitem">
+      <h3 class="cluster-label">Keep it up for everyone</h3>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">To spread requests across servers so no one machine gets overwhelmed</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Routing and Load Balancing</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">To switch to a backup model when the first one fails or is too slow</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Fallback Chains</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">To stop hammering a failing service and know when to try again</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Circuit Breakers and Retry Policies</span>
+      </span>
+    </div>
+
+    <!-- CLUSTER 3 -->
+    <div class="cluster-head cluster-break" role="listitem">
+      <h3 class="cluster-label">Save time and money</h3>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">To answer repeated questions instantly without running the model</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Cache Check and Substitution</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">To pick the cheapest or fastest model variant for each call at runtime</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Cost/Latency-Optimized Model Selection</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">To emit latency, token counts, and errors so dashboards can show what happened</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Observability Hooks</span>
+      </span>
+    </div>
+
   </div>
 </section>
 
