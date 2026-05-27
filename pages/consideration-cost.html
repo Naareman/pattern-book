@@ -74,28 +74,42 @@
   .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
   .idea-card p + p { margin-top: 14px; }
 
-  /* WHAT THIS COVERS MAP */
+  /* WHAT THIS COVERS: guide-style surface card */
   .covers-card {
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    box-shadow: var(--shadow); padding: 24px 28px;
+    box-shadow: var(--shadow); overflow: hidden;
   }
   .covers-scope {
-    font-size: 13px; color: var(--soft); margin-bottom: 6px; line-height: 1.5;
+    font-size: 13px; color: var(--soft); line-height: 1.5; padding: 18px 22px 0;
   }
   .covers-scope strong { color: var(--text); }
-  .covers-axis {
-    font-size: 13px; color: var(--soft); margin-bottom: 18px; line-height: 1.5;
-  }
-  .covers-axis strong { color: var(--text); }
   .covers-note {
-    margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);
+    margin: 0; padding: 14px 22px 18px; border-top: 1px solid var(--border);
     font-size: 12.5px; color: var(--faint); line-height: 1.5;
   }
   .covers-note strong { color: var(--soft); }
-  .discipline-list { display: flex; flex-direction: column; gap: 10px; }
-  .discipline-item { display: flex; flex-direction: column; gap: 3px; }
-  .discipline-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; color: var(--text); }
-  .discipline-line { font-size: 13px; color: var(--soft); line-height: 1.5; }
+
+  /* cluster head */
+  .cov-cluster { padding: 16px 22px 8px; }
+  .cov-cluster.cov-break { padding-top: 6px; border-top: 1px solid var(--border); }
+  .cov-cluster-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--text); line-height: 1.3;
+  }
+
+  /* discipline rows: indented under label */
+  .disc-row {
+    display: flex; flex-direction: column; gap: 2px;
+    padding: 13px 22px 13px 40px; border-top: 1px solid var(--border);
+  }
+  /* suppress top border when disc-row immediately follows its cluster head */
+  .cov-cluster + .disc-row { border-top: none; }
+  .disc-name {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; color: var(--text); line-height: 1.3;
+  }
+  .disc-line {
+    font-size: 13px; color: var(--soft); line-height: 1.5;
+  }
 
   /* 02 INTERACTIVE COST METER */
   .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
@@ -318,51 +332,57 @@
   <div class="section-label"><span class="num">00</span>What This Covers</div>
   <h2>The <em>disciplines</em> inside this crosscut.</h2>
   <div class="covers-card">
+
     <p class="covers-scope"><strong>Applies to:</strong> every system with cost, latency, or reliability constraints.</p>
-    <p class="covers-axis"><strong>Axis:</strong> engineering AI systems against budgets and SLAs (service-level agreements).</p>
 
-    <div class="discipline-list">
+    <!-- Cluster 1: Managing cost -->
+    <div class="cov-cluster">
+      <h3 class="cov-cluster-label">Managing cost</h3>
+    </div>
 
-      <div class="discipline-item">
-        <span class="discipline-name">Cost Attribution</span>
-        <span class="discipline-line">Working out which part of the system (prompt, model call, retrieval step) is responsible for which fraction of the bill.</span>
-      </div>
+    <div class="disc-row">
+      <span class="disc-name">Cost Attribution</span>
+      <span class="disc-line">Working out which part of the system (prompt, model call, retrieval step) is responsible for which fraction of the bill.</span>
+    </div>
 
-      <div class="discipline-item">
-        <span class="discipline-name">Cost-Quality Tradeoff</span>
-        <span class="discipline-line">Deciding when spending more on a bigger model or longer context actually improves the answer enough to be worth it.</span>
-      </div>
+    <div class="disc-row">
+      <span class="disc-name">Cost-Quality Tradeoff</span>
+      <span class="disc-line">Deciding when spending more on a bigger model or longer context actually improves the answer enough to be worth it.</span>
+    </div>
 
-      <div class="discipline-item">
-        <span class="discipline-name">Latency Budgets</span>
-        <span class="discipline-line">Splitting the total time a user is willing to wait across all the steps in the pipeline: retrieval, model call, post-processing. Covers perceived latency, actual latency, and tail latency.</span>
-      </div>
+    <div class="disc-row">
+      <span class="disc-name">Context-Strategy Tradeoff</span>
+      <span class="disc-line">Choosing between RAG (find relevant chunks and inject them), long-context (put the whole document in the window), or a hybrid. Each carries a different cost, latency, and recall profile. See also: L3a Stateless Retrieval.</span>
+    </div>
 
-      <div class="discipline-item">
-        <span class="discipline-name">Latency-Quality Tradeoff</span>
-        <span class="discipline-line">Understanding what quality you give up when you cut response time: fewer reasoning steps, smaller model, truncated context.</span>
-      </div>
+    <!-- Cluster 2: Managing speed and reliability -->
+    <div class="cov-cluster cov-break">
+      <h3 class="cov-cluster-label">Managing speed and reliability</h3>
+    </div>
 
-      <div class="discipline-item">
-        <span class="discipline-name">Context-Strategy Tradeoff</span>
-        <span class="discipline-line">Choosing between RAG (Retrieval-Augmented Generation: find relevant chunks and inject them), long-context (put the whole document in the window), or a hybrid. Each has a different cost, latency, and recall profile. See also: L3a Stateless Retrieval.</span>
-      </div>
+    <div class="disc-row">
+      <span class="disc-name">Latency Budgets</span>
+      <span class="disc-line">Splitting the total time a user is willing to wait across all the steps in the pipeline: retrieval, model call, post-processing. Covers perceived latency, actual latency, and tail latency.</span>
+    </div>
 
-      <div class="discipline-item">
-        <span class="discipline-name">SLA/SLO Design</span>
-        <span class="discipline-line">Setting the service-level agreements (SLAs: contracts with users) and service-level objectives (SLOs: internal targets) that cost and latency decisions must satisfy.</span>
-      </div>
+    <div class="disc-row">
+      <span class="disc-name">Latency-Quality Tradeoff</span>
+      <span class="disc-line">Understanding what quality you give up when you cut response time: fewer reasoning steps, smaller model, truncated context.</span>
+    </div>
 
-      <div class="discipline-item">
-        <span class="discipline-name">Error Budgets &amp; Graceful Degradation</span>
-        <span class="discipline-line">Deciding how much failure is acceptable before triggering a response, and what the system does when it hits that limit: fall back to a cached answer, use a cheaper model, or surface an honest error.</span>
-      </div>
+    <div class="disc-row">
+      <span class="disc-name">SLA/SLO Design</span>
+      <span class="disc-line">Setting the service-level agreements (SLAs: contracts with users) and service-level objectives (SLOs: internal targets) that cost and latency decisions must satisfy.</span>
+    </div>
 
-      <div class="discipline-item">
-        <span class="discipline-name">Incident Response</span>
-        <span class="discipline-line">The playbook for what to do when cost spikes, latency blows out, or the model goes down: who gets paged, what gets throttled, how you roll back.</span>
-      </div>
+    <div class="disc-row">
+      <span class="disc-name">Error Budgets &amp; Graceful Degradation</span>
+      <span class="disc-line">Deciding how much failure is acceptable before triggering a response, and what the system does when it hits that limit: fall back to a cached answer, use a cheaper model, or surface an honest error.</span>
+    </div>
 
+    <div class="disc-row">
+      <span class="disc-name">Incident Response</span>
+      <span class="disc-line">The playbook for what to do when cost spikes, latency blows out, or the model goes down: who gets paged, what gets throttled, how you roll back.</span>
     </div>
 
     <p class="covers-note">
