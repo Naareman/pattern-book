@@ -684,7 +684,7 @@ function resetDemo() {
   finalBlock.classList.remove('visible');
 }
 
-// Phase 1: Split — reveal chunk grid cards one by one
+// Phase 1: Split: reveal chunk grid cards one by one
 async function doPhase1(animate) {
   phaseSplit.classList.add('visible', 'active');
   statusSplit.textContent = 'splitting…';
@@ -699,7 +699,7 @@ async function doPhase1(animate) {
   statusSplit.textContent = 'done';
 }
 
-// Phase 2: Map — light up each chunk to show it is being summarized, then mark summarized
+// Phase 2: Map: light up each chunk to show it is being summarized, then mark summarized
 async function doPhase2(animate) {
   phaseMap.classList.add('visible', 'active');
   statusMap.textContent = 'summarizing…';
@@ -715,7 +715,7 @@ async function doPhase2(animate) {
   statusMap.textContent = 'done';
 }
 
-// Phase 3: Reduce — show final summary
+// Phase 3: Reduce: show final summary
 async function doPhase3(animate) {
   phaseReduce.classList.add('visible', 'active');
   statusReduce.textContent = 'combining…';

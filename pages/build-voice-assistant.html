@@ -571,7 +571,7 @@ const latencyNum = document.getElementById('latencyNum');
 const playBtn = document.getElementById('playBtn');
 const resetBtn = document.getElementById('resetBtn');
 
-const stepMs = [220, 410, 170]; // ms each stage takes (summing to 800ms — "feels live")
+const stepMs = [220, 410, 170]; // ms each stage takes (summing to 800ms, "feels live")
 const TOTAL_MS = stepMs.reduce((a, b) => a + b, 0);
 const PLAY_DELAY = [0, 900, 1700]; // real animation delay between stage activations (ms)
 

@@ -499,7 +499,7 @@ const questions = [
       { result: 'Matched: <strong>"Account access and passwords"</strong> (score 0.91)' },
       { result: 'Found section: <strong>"To reset your password, click Forgot Password on the login page. A reset link is sent to your email and expires in 15 minutes."</strong>' },
       { result: '"Go to the login page, tap Forgot Password, then check your email for a reset link. It expires in 15 minutes."' },
-      { result: 'Confidence: <strong>0.91</strong> — article directly answers the question.' }
+      { result: 'Confidence: <strong>0.91</strong>: article directly answers the question.' }
     ],
     reply: 'Go to the login page, tap "Forgot Password," and check your email for a reset link. It expires in 15 minutes.',
     outcome: 'resolved'
@@ -509,8 +509,8 @@ const questions = [
     steps: [
       { result: 'Matched: <strong>"Payment troubleshooting"</strong> (score 0.61)' },
       { result: 'Found section: <strong>"Failed payments may briefly appear on your statement before being voided. Allow 3-5 business days for the hold to drop."</strong>' },
-      { result: 'Draft: "The charge may be a temporary hold that will reverse within 3-5 days — but if you see two settled charges…"' },
-      { result: 'Confidence: <strong>0.61</strong> — article partially covers this; a duplicate settled charge is not in the docs.' }
+      { result: 'Draft: "The charge may be a temporary hold that will reverse within 3-5 days. But if you see two settled charges…"' },
+      { result: 'Confidence: <strong>0.61</strong>: article partially covers this; a duplicate settled charge is not in the docs.' }
     ],
     reply: null,
     outcome: 'escalated',
@@ -521,8 +521,8 @@ const questions = [
     steps: [
       { result: 'Matched: <strong>"Refund policy"</strong> (score 0.88)' },
       { result: 'Found section: <strong>"Refunds are available within 30 days of purchase. Requests after 30 days are reviewed on a case-by-case basis by the billing team."</strong>' },
-      { result: '"Refunds are available within the first 30 days. After that, requests go to the billing team for review — outcomes vary case by case."' },
-      { result: 'Confidence: <strong>0.88</strong> — policy is documented but outcome is uncertain; routing to billing for a definitive answer.' }
+      { result: '"Refunds are available within the first 30 days. After that, requests go to the billing team for review. Outcomes vary case by case."' },
+      { result: 'Confidence: <strong>0.88</strong>: policy is documented but outcome is uncertain; routing to billing for a definitive answer.' }
     ],
     reply: null,
     outcome: 'escalated',
