@@ -65,6 +65,12 @@
   .stage-card.glow{box-shadow:0 0 0 3px var(--accent-soft),0 0 22px 2px rgba(124,92,246,.42);border-color:var(--accent)}
   @media (prefers-reduced-motion:reduce){.stage-card{transition:none}}
 
+  /* the prototype card (Ask it well) is a door: whole card is clickable + lifts on hover */
+  .stage-card.clickable{cursor:pointer;transition:box-shadow .2s ease,border-color .2s ease,transform .2s ease,background .2s ease}
+  .stage-card.clickable:hover{transform:translateY(-1px);border-color:var(--accent);background:var(--accent-soft)}
+  .stage-card.clickable:hover .stage-name{color:var(--accent-hover)}
+  @media (prefers-reduced-motion:reduce){.stage-card.clickable{transition:none}.stage-card.clickable:hover{transform:none}}
+
   .stage-head{display:flex;align-items:center;gap:9px;margin:0 0 4px}
   .stage-head .sico{flex:none;width:18px;height:18px;color:var(--accent);display:block}
   .stage-head .sico svg{width:18px;height:18px;display:block}
@@ -72,10 +78,11 @@
   /* the one stage whose guide exists: its name links out */
   a.stage-name{transition:color .15s ease}
   a.stage-name:hover{color:var(--accent-hover)}
-  /* subtle "see how" affordance on the linked card */
-  .see-how{display:inline-block;margin-top:2px;font-size:12.5px;font-weight:500;color:var(--accent-hover);transition:color .15s ease}
+  /* "see how" reads clearly as a link: bolder accent, underline on hover, arrow nudges right */
+  .see-how{display:inline-flex;align-items:center;gap:3px;margin-left:auto;font-size:12.5px;font-weight:600;color:var(--accent-hover);transition:color .15s ease}
+  .see-how:hover{text-decoration:underline;text-underline-offset:2px}
   .see-how .arr{display:inline-block;transition:transform .18s ease}
-  .stage-card:hover .see-how .arr,.see-how:hover .arr{transform:translateX(2px)}
+  .stage-card:hover .see-how .arr,.see-how:hover .arr{transform:translateX(3px)}
   @media (prefers-reduced-motion:reduce){a.stage-name,.see-how,.see-how .arr{transition:none}.stage-card:hover .see-how .arr,.see-how:hover .arr{transform:none}}
 
   .stage-lead{color:var(--soft);font-size:13.5px;line-height:1.45;margin:0 0 14px}
@@ -137,13 +144,13 @@
 
       <div class="stages">
 
-        <section class="stage-card" id="card-ask" aria-labelledby="g-ask">
+        <section class="stage-card clickable" id="card-ask" aria-labelledby="g-ask">
           <div class="stage-head">
             <span class="sico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 2 2-7 7-3 1 1-3z"/><path d="M18 13l-1.5-1.5"/><path d="M5 5h9M5 9h7M5 13h4"/></svg></span>
             <h2 id="g-ask"><a class="stage-name" href="single-call-ask-it-well.html">Ask it well</a></h2>
+            <a class="see-how" href="single-call-ask-it-well.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
           </div>
           <p class="stage-lead">Frame the question well.</p>
-          <a class="see-how" href="single-call-ask-it-well.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
           <div class="chips">
             <a class="chip" href="pattern-few-shot.html">Few-Shot<span class="arr" aria-hidden="true">&#8599;</span></a>
             <a class="chip" href="pattern-zero-shot.html">Zero-Shot<span class="arr" aria-hidden="true">&#8599;</span></a>
@@ -261,6 +268,18 @@
         window.setTimeout(tour, 900);
       }
       window.setTimeout(tour, 350);
+    }
+
+    // the prototype card (Ask it well) acts as one big link: a click anywhere on the
+    // card opens its page, except on the inner anchors (stage-name, see-how, chips),
+    // which navigate on their own.
+    var doorCard = document.getElementById('card-ask');
+    if(doorCard){
+      var doorHref = 'single-call-ask-it-well.html';
+      doorCard.addEventListener('click', function(e){
+        if(e.target.closest('a')) return; // let real links handle their own clicks
+        window.location.href = doorHref;
+      });
     }
   })();
   </script>

@@ -55,18 +55,19 @@
 
   /* the goal-first guide: a surface card holding rows split by hairlines */
   .guide{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-  .guide-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:17px 22px;border-top:1px solid var(--border)}
+  /* each row reads as ONE connected statement, left-aligned, wrapping gracefully */
+  .guide-row{display:flex;align-items:baseline;justify-content:flex-start;flex-wrap:wrap;gap:4px 10px;padding:17px 22px;border-top:1px solid var(--border)}
   .guide-row:first-child{border-top:none}
   /* the WANT leads: prominent, the thing you want */
-  .want{font-size:16px;line-height:1.4;color:var(--text);min-width:0}
-  /* the technique name, on the right, in Fraunces */
-  .tech{font-family:'Fraunces',serif;font-size:15px;color:var(--soft);white-space:nowrap;flex:none;text-align:right}
-  /* the two that link: accent + small up-right arrow */
+  .want{font-size:16px;line-height:1.4;color:var(--text)}
+  /* the connector arrow that joins goal to technique */
+  .connect{color:var(--accent);font-size:15px;line-height:1.4;flex:none}
+  /* the technique name, immediately after the arrow, in Fraunces */
+  .tech{font-family:'Fraunces',serif;font-size:15px;color:var(--text);line-height:1.4}
+  /* the two that link: accent only (no extra arrow; the connector is enough) */
   a.tech{color:var(--accent-hover);transition:color .15s ease}
   a.tech:hover{color:var(--accent)}
-  a.tech .arr{font-size:12px;display:inline-block;margin-left:3px;transition:transform .18s ease}
-  a.tech:hover .arr{transform:translate(1px,-1px)}
-  @media (prefers-reduced-motion:reduce){a.tech,a.tech .arr{transition:none}a.tech:hover .arr{transform:none}}
+  @media (prefers-reduced-motion:reduce){a.tech{transition:none}}
 
   /* back link card */
   .back-link{display:inline-flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);text-decoration:none;color:var(--text);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;cursor:pointer}
@@ -82,8 +83,7 @@
   @media (max-width:560px){
     h1.title{font-size:30px}
     .explainer{font-size:15px}
-    .guide-row{flex-direction:column;align-items:flex-start;gap:6px;padding:15px 18px}
-    .tech{text-align:left}
+    .guide-row{padding:15px 18px}
   }
 </style>
 </head>
@@ -102,7 +102,7 @@
 <header class="header" id="main">
   <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 2 2-7 7-3 1 1-3z"/><path d="M18 13l-1.5-1.5"/><path d="M5 5h9M5 9h7M5 13h4"/></svg></span>Single-Call Control</span>
   <h1 class="title">Ask it well</h1>
-  <p class="explainer">Frame the question well, the right way to set up a single message.</p>
+  <p class="explainer">Everything you set up before the AI even thinks: how you word the message, what you show it, and how you frame the task.</p>
 </header>
 
 <!-- THE GUIDE -->
@@ -112,61 +112,73 @@
 
     <div class="guide-row">
       <span class="want">Want it to copy a format or style you show?</span>
-      <a class="tech" href="pattern-few-shot.html">Few-Shot<span class="arr" aria-hidden="true">&#8599;</span></a>
+      <span class="connect" aria-hidden="true">&rarr;</span>
+      <a class="tech" href="pattern-few-shot.html">Few-Shot</a>
     </div>
 
     <div class="guide-row">
       <span class="want">Want an answer with no examples, just asking?</span>
-      <a class="tech" href="pattern-zero-shot.html">Zero-Shot<span class="arr" aria-hidden="true">&#8599;</span></a>
+      <span class="connect" aria-hidden="true">&rarr;</span>
+      <a class="tech" href="pattern-zero-shot.html">Zero-Shot</a>
     </div>
 
     <div class="guide-row">
       <span class="want">Want it to take on a role or voice?</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
       <span class="tech">Role / Persona</span>
     </div>
 
     <div class="guide-row">
       <span class="want">Want to tell it what to avoid?</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
       <span class="tech">Negative Prompting</span>
     </div>
 
     <div class="guide-row">
       <span class="want">Want a reusable, fill-in-the-blank prompt?</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
       <span class="tech">Prompt Templates</span>
     </div>
 
     <div class="guide-row">
       <span class="want">Want to keep instructions and data from blurring together?</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
       <span class="tech">Delimiters</span>
     </div>
 
     <div class="guide-row">
       <span class="want">Want the AI to help write the prompt itself?</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
       <span class="tech">Meta-Prompting</span>
     </div>
 
     <div class="guide-row">
       <span class="want">Want to choose which examples to show it?</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
       <span class="tech">Example Selection</span>
     </div>
 
     <div class="guide-row">
       <span class="want">Want the examples in a deliberate order?</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
       <span class="tech">Example Ordering</span>
     </div>
 
     <div class="guide-row">
       <span class="want">Want to fit a lot of information into the prompt?</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
       <span class="tech">Context Packing</span>
     </div>
 
     <div class="guide-row">
       <span class="want">Worried it ignores the middle of a long prompt?</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
       <span class="tech">Lost-in-the-Middle Mitigation</span>
     </div>
 
     <div class="guide-row">
       <span class="want">Want to shrink the prompt to save cost?</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
       <span class="tech">Prompt Compression</span>
     </div>
 
