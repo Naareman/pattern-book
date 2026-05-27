@@ -29,6 +29,7 @@
     -webkit-font-smoothing: antialiased;
   }
   body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
 
   /* a11y */
   a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
@@ -80,6 +81,20 @@
     font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
   }
   .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* flow legend */
+  .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
+  .flow-chip {
+    font-family: inherit;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    box-shadow: var(--shadow); padding: 7px 14px; font-size: 12.5px; font-weight: 600;
+    color: var(--soft); white-space: nowrap; letter-spacing: .01em;
+    cursor: pointer; transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .flow-chip:hover { color: var(--accent-hover); border-color: var(--border-strong); }
+  .flow-chip.lit { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); }
+  .flow-arrow { flex: none; color: var(--accent); font-size: 15px; line-height: 1; }
+  .flow-caption { text-align: center; color: var(--faint); font-size: 13px; line-height: 1.5; margin-top: 12px; }
 
   /* sections */
   section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
@@ -230,20 +245,45 @@
   .tradeoff-quote { font-size: 12px; color: var(--faint); line-height: 1.45; margin-top: 2px; padding-top: 10px; border-top: 1px solid var(--border); font-style: italic; }
   @media(max-width:480px){.tradeoff-row{flex-direction:column;align-items:stretch}.tradeoff-label{min-width:0}}
 
-  /* ---- inside this layer map ---- */
-  .layer-map { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 26px; }
-  .layer-axis { font-size: 13px; color: var(--soft); line-height: 1.5; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
-  .layer-axis strong { color: var(--text); font-weight: 600; }
-  .subaxis-group { margin-bottom: 20px; }
-  .subaxis-group:last-of-type { margin-bottom: 0; }
-  .subaxis-head { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--accent-hover); margin-bottom: 10px; padding: 5px 10px; background: var(--accent-soft); border-radius: 6px; display: inline-block; }
-  .cat-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-  .cat-item { display: flex; flex-direction: column; gap: 2px; }
-  .cat-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; color: var(--text); }
-  .cat-line { font-size: 13px; color: var(--soft); line-height: 1.5; }
-  .filing-rule { margin-top: 20px; padding: 14px 16px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--soft); line-height: 1.6; }
-  .filing-rule strong { color: var(--text); font-weight: 600; }
-  .filing-note { margin-top: 10px; font-size: 12.5px; color: var(--faint); line-height: 1.5; }
+  /* ---- stage cards (L4-pattern) ---- */
+  .stages { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: 6px; }
+
+  .stage-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+    scroll-margin-top: 80px;
+    transition: box-shadow .55s ease, border-color .55s ease;
+  }
+  .stage-card.glow { box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42); border-color: var(--accent); }
+  @media (prefers-reduced-motion:reduce) { .stage-card { transition: none; } }
+
+  .stage-card.clickable { cursor: pointer; transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease; }
+  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
+  @media (prefers-reduced-motion:reduce) { .stage-card.clickable { transition: none; } .stage-card.clickable:hover { transform: none; } }
+
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 4px; }
+  .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
+  .stage-head .sico svg { width: 18px; height: 18px; display: block; }
+  .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
+  a.stage-name { transition: color .15s ease; }
+  a.stage-name:hover { color: var(--accent-hover); }
+  .see-how { display: inline-flex; align-items: center; gap: 3px; margin-left: auto; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion:reduce) { a.stage-name, .see-how, .see-how .arr { transition: none; } .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; } }
+
+  .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
+
+  /* chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip { flex: none; display: inline-flex; align-items: center; gap: 3px; padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500; line-height: 1.2; white-space: nowrap; border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default; }
+  a.chip { border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; }
+  a.chip:hover { background: #E3DBFD; }
+  a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
+  a.chip:hover .arr { transform: translate(1px,-1px); }
+  @media (prefers-reduced-motion:reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
 
   /* ---- back link ---- */
   .back-link {
@@ -272,11 +312,15 @@
   footer strong { color: var(--soft); font-weight: 500; }
 
   /* responsive */
+  @media (max-width: 700px) {
+    .stages { grid-template-columns: 1fr; gap: 14px; }
+  }
   @media (max-width: 560px) {
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
     .board-controls { flex-direction: column; align-items: stretch; }
+    .flow-chip { font-size: 12px; padding: 6px 12px; }
   }
 </style>
 </head>
@@ -305,10 +349,19 @@
         <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/>
         <path d="M12 3v18M4 7.5l8 4.5 8-4.5"/>
       </svg>
-    </span>Layer · L2
+    </span>Layer &middot; L2
   </span>
   <h1 class="pattern-title">Structural Composition</h1>
   <p class="explainer">How multiple model calls are organized into a single good answer: combine, choose, or check.</p>
+
+  <div class="flow" aria-label="Jump to a stage of composition">
+    <button type="button" class="flow-chip" data-target="card-combine">Combine answers</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-select">Pick the best</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-verify">Check the answer</button>
+  </div>
+  <p class="flow-caption">Three moves. One final answer.</p>
 </header>
 
 <!-- 01 THE IDEA -->
@@ -478,75 +531,69 @@
   </div>
 </section>
 
-<!-- 05 INSIDE THIS LAYER -->
+<!-- 05 INSIDE THIS LAYER: stage cards -->
 <section>
   <div class="section-label"><span class="num">05</span>Inside This Layer</div>
-  <h2>Every category <em>in L2</em>.</h2>
+  <h2>Three ways to <em>use multiple calls</em>.</h2>
 
-  <div class="layer-map">
-    <div class="layer-axis"><strong>Axis:</strong> how multiple potential model calls are organized into a single answering act.</div>
+  <div class="stages">
 
-    <!-- COMBINE -->
-    <div class="subaxis-group">
-      <div class="subaxis-head">Combine</div>
-      <p style="font-size:13px;color:var(--soft);line-height:1.5;margin-bottom:10px;">Multiple outputs are fused together to produce one result.</p>
-      <div class="cat-list">
-        <div class="cat-item">
-          <div class="cat-name">Ensembling (vote, average, blend)</div>
-          <div class="cat-line">Run the same or similar question through several models or prompts (the instructions you send the AI), then combine the outputs by majority vote, numerical average, or weighted blend.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Decomposition and Recomposition</div>
-          <div class="cat-line">Break a complex task into independent sub-tasks, solve each with its own model call, then reassemble the pieces into a final answer.</div>
-        </div>
+    <section class="stage-card clickable" id="card-combine" aria-labelledby="g-combine">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 6H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3"/>
+            <path d="M16 6h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3"/>
+            <path d="M12 3v18M8 12h8"/>
+          </svg>
+        </span>
+        <h2 id="g-combine"><a class="stage-name" href="composition-combine.html">Combine answers</a></h2>
+        <a class="see-how" href="composition-combine.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
       </div>
-    </div>
-
-    <!-- SELECT -->
-    <div class="subaxis-group">
-      <div class="subaxis-head">Select</div>
-      <p style="font-size:13px;color:var(--soft);line-height:1.5;margin-bottom:10px;">One output is chosen from a set of candidates.</p>
-      <div class="cat-list">
-        <div class="cat-item">
-          <div class="cat-name">Cascading (Cheap to Expensive)</div>
-          <div class="cat-line">Try the smallest, cheapest model first. If its confidence is high enough, stop. Otherwise escalate to a larger, more capable model.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Confidence-Based Routing</div>
-          <div class="cat-line">Inspect the model's confidence score on its own output. Route low-confidence outputs to a stronger model or a fallback path.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Specialist-of-Experts Routing</div>
-          <div class="cat-line">A classifier reads the incoming question and sends it to whichever specialist model is best matched to that topic or task type.</div>
-        </div>
+      <p class="stage-lead">Fuse several outputs into one.</p>
+      <div class="chips">
+        <span class="chip">Ensembling (vote, average, blend)</span>
+        <span class="chip">Decomposition and recomposition</span>
       </div>
-    </div>
+    </section>
 
-    <!-- VERIFY -->
-    <div class="subaxis-group">
-      <div class="subaxis-head">Verify</div>
-      <p style="font-size:13px;color:var(--soft);line-height:1.5;margin-bottom:10px;">One output is gated, scored, or revised by a separate judgment step.</p>
-      <div class="cat-list">
-        <div class="cat-item">
-          <div class="cat-name">Verification Composition (LLM-as-Judge)</div>
-          <div class="cat-line">A second LLM call is used specifically to judge whether the first answer is correct, faithful, or high-quality. The judge's verdict determines whether the output passes.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Generator-Critic Pairs</div>
-          <div class="cat-line">One model generates a draft. A separate critic model reviews that draft and flags problems. The generator may then revise based on the critic's notes.</div>
-        </div>
-        <div class="cat-item">
-          <div class="cat-name">Output Filtering by Classifier</div>
-          <div class="cat-line">A fast classifier (not necessarily an LLM) scans the model's output for policy violations, format errors, or low quality, and blocks or flags outputs that fail.</div>
-        </div>
+    <section class="stage-card clickable" id="card-select" aria-labelledby="g-select">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18M7 12h10M11 18h2"/>
+          </svg>
+        </span>
+        <h2 id="g-select"><a class="stage-name" href="composition-select.html">Pick the best</a></h2>
+        <a class="see-how" href="composition-select.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
       </div>
-    </div>
+      <p class="stage-lead">Choose one output from many.</p>
+      <div class="chips">
+        <span class="chip">Cascading (cheap to expensive)</span>
+        <span class="chip">Confidence-based routing</span>
+        <span class="chip">Specialist-of-experts routing</span>
+      </div>
+    </section>
 
-    <!-- FILING RULE -->
-    <div class="filing-rule">
-      <strong>Filing rule:</strong> fused from multiple outputs = Combine. Chosen from candidates = Select. Gated or scored by a separate judgment = Verify. Self-checking inside one call is L4 Single-Call Control, not L2.
-      <div class="filing-note">Note on Self-Consistency: when N samples come from the same model with the same prompt (in-decoding search), that is L4. When the samples use different models or different prompts, it is L2 Combine (Ensembling). The boundary is implementation, not intent.</div>
-    </div>
+    <section class="stage-card clickable" id="card-verify" aria-labelledby="g-verify">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 1 1-3.5-7.1"/>
+            <path d="M9 11l3 3 8.5-8.5"/>
+          </svg>
+        </span>
+        <h2 id="g-verify"><a class="stage-name" href="composition-verify.html">Check the answer</a></h2>
+        <a class="see-how" href="composition-verify.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      </div>
+      <p class="stage-lead">A separate judgment gates or fixes it.</p>
+      <div class="chips">
+        <span class="chip">Verification composition (LLM-as-Judge)</span>
+        <span class="chip">Generator-critic pairs</span>
+        <span class="chip">Output filtering by classifier</span>
+      </div>
+    </section>
+
   </div>
 </section>
 
@@ -597,8 +644,6 @@ const verdict = document.getElementById('verdict');
 const playBtn = document.getElementById('playBtn');
 const resetBtn = document.getElementById('resetBtn');
 
-// ans0 and ans1 agree on 16:40; ans2 has 16:30 (the mistake)
-// tag classes: match = correct group, default = accent (minority)
 tag0.classList.add('match');
 tag1.classList.add('match');
 
@@ -620,7 +665,6 @@ async function demoPlay() {
   playBtn.disabled = true;
 
   if (reduceMotion) {
-    // instant: show everything
     [ans0, ans1, ans2].forEach(c => c.classList.add('shown'));
     [tag0, tag1, tag2].forEach(t => t.classList.add('visible'));
     tallyEl.style.opacity = '1';
@@ -633,7 +677,6 @@ async function demoPlay() {
     return;
   }
 
-  // step 1: show answer cards one by one
   ans0.classList.add('shown');
   await sleep(550);
   ans1.classList.add('shown');
@@ -641,7 +684,6 @@ async function demoPlay() {
   ans2.classList.add('shown');
   await sleep(700);
 
-  // step 2: reveal answer tags
   tag0.classList.add('visible');
   await sleep(300);
   tag1.classList.add('visible');
@@ -649,7 +691,6 @@ async function demoPlay() {
   tag2.classList.add('visible');
   await sleep(600);
 
-  // step 3: show tally, count up
   tallyEl.style.opacity = '1';
   await sleep(400);
 
@@ -660,13 +701,11 @@ async function demoPlay() {
   countB.textContent = '1';
   await sleep(500);
 
-  // step 4: mark winner
   optA.classList.add('winner-opt');
   ans0.classList.add('winner');
   ans1.classList.add('winner');
   await sleep(400);
 
-  // step 5: verdict
   verdict.classList.add('shown');
 
   running = false;
@@ -694,6 +733,66 @@ document.querySelectorAll('.eg-card').forEach(card => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
   });
 });
+
+// ====== FLOW LEGEND: scroll-to + glow ======
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var stages = ['card-combine','card-select','card-verify'];
+  var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
+
+  function pillFor(cardId){
+    for(var i=0;i<pills.length;i++){ if(pills[i].getAttribute('data-target')===cardId) return pills[i]; }
+    return null;
+  }
+
+  pills.forEach(function(btn){
+    var target = btn.getAttribute('data-target');
+    var card = document.getElementById(target);
+    btn.addEventListener('click', function(){
+      if(!card) return;
+      card.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+      card.classList.add('glow');
+      window.setTimeout(function(){ card.classList.remove('glow'); }, 1200);
+    });
+  });
+
+  // one-time load sweep
+  if(!reduce){
+    var step = 0;
+    function tour(){
+      if(step > 0){
+        var prevCard = document.getElementById(stages[step-1]);
+        var prevPill = pillFor(stages[step-1]);
+        if(prevCard) prevCard.classList.remove('glow');
+        if(prevPill) prevPill.classList.remove('lit');
+      }
+      if(step >= stages.length) return;
+      var curCard = document.getElementById(stages[step]);
+      var curPill = pillFor(stages[step]);
+      if(curCard) curCard.classList.add('glow');
+      if(curPill) curPill.classList.add('lit');
+      step++;
+      window.setTimeout(tour, 900);
+    }
+    window.setTimeout(tour, 350);
+  }
+
+  // whole-card door click
+  var doors = {
+    'card-combine': 'composition-combine.html',
+    'card-select':  'composition-select.html',
+    'card-verify':  'composition-verify.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('a')) return;
+      window.location.href = doorHref;
+    });
+  });
+})();
 </script>
 </body>
 </html>
