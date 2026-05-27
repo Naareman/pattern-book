@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Single-Call Control · How it works · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* core palette: aligned to the rest of The Pattern Book */
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#C2554F; --error-soft:#FBECEB;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  .serif { font-family: 'Fraunces', serif; }
+
+  /* a11y: visible keyboard focus, skip link, reduced motion */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 11px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    padding: 5px 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb {
+    font-size: 12.5px;
+    color: var(--faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* ============ HEADER ============ */
+  .header {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 40px 24px 8px;
+    scroll-margin-top: 80px;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--accent-hover);
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    scroll-margin-top: 80px;
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 38px;
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    margin: 16px 0 0;
+  }
+  .explainer {
+    color: var(--soft);
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 660px;
+    margin-top: 14px;
+  }
+
+  /* ============ SECTIONS ============ */
+  section {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 18px 24px 34px;
+    position: relative;
+    scroll-margin-top: 80px;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 9px;
+  }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 23px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* ============ IDEA CARD ============ */
+  .idea-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  /* ============ THE DEMO ============ */
+  .demo-lede {
+    font-size: 15px;
+    color: var(--soft);
+    line-height: 1.6;
+    max-width: 640px;
+    margin-bottom: 18px;
+  }
+  .demo-stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  /* toggle row: the things you can add to the one message */
+  .toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 18px;
+  }
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: 22px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--soft);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .toggle:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .toggle .dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-strong);
+    flex-shrink: 0;
+    position: relative;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .toggle .dot::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #fff;
+    transform: translate(-50%,-50%) scale(0);
+    transition: transform 0.2s ease;
+  }
+  .toggle[aria-pressed="true"] {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent-hover);
+  }
+  .toggle[aria-pressed="true"] .dot { background: var(--accent); border-color: var(--accent); }
+  .toggle[aria-pressed="true"] .dot::after { transform: translate(-50%,-50%) scale(1); }
+
+  /* the two panels: the message you send, and the answer that comes back */
+  .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .panel {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    min-width: 0;
+  }
+  .panel-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 12px;
+  }
+  .panel-label .plico { width: 14px; height: 14px; color: var(--accent); display: block; }
+  .panel-label .plico svg { width: 14px; height: 14px; display: block; }
+
+  /* the prompt: a stack of lines, each line appears as its toggle turns on */
+  .prompt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .prompt-line {
+    display: block;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(-4px);
+    transition: max-height 0.3s ease, opacity 0.3s ease, transform 0.3s ease, margin 0.3s ease;
+  }
+  .prompt-line.on { max-height: 140px; opacity: 1; transform: translateY(0); }
+  /* the base question is always there */
+  .prompt-line.base { max-height: 140px; opacity: 1; transform: none; }
+  .prompt-line .add {
+    color: var(--accent-hover);
+    background: var(--accent-soft);
+    border-radius: 3px;
+    padding: 1px 3px;
+  }
+  .prompt-q { color: var(--text); font-weight: 500; }
+
+  /* the answer: rewritten and faded in each time the prompt changes */
+  .answer {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--text);
+    min-height: 120px;
+    transition: opacity 0.28s ease, transform 0.28s ease;
+  }
+  .answer.swapping { opacity: 0; transform: translateY(6px); }
+  .answer .a-role {
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    color: var(--accent-hover);
+    background: var(--accent-soft);
+    border-radius: 20px;
+    padding: 2px 9px;
+    margin-bottom: 9px;
+  }
+  .answer .a-body { display: block; }
+  .answer .a-steps {
+    margin: 9px 0 0;
+    padding-left: 18px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    color: var(--soft);
+    line-height: 1.6;
+  }
+  .answer .a-steps li { margin-bottom: 3px; }
+  .answer .a-format {
+    margin-top: 11px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .answer .a-format .k { color: var(--accent-hover); }
+
+  /* the meter: a plain read on how much better the answer is */
+  .meter {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .meter-label { font-size: 13px; font-weight: 600; color: var(--soft); white-space: nowrap; }
+  .meter-bars { flex: 1; display: flex; gap: 5px; }
+  .meter-bars .seg {
+    flex: 1;
+    height: 18px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    transition: background 0.35s ease, border-color 0.35s ease;
+  }
+  .meter-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .meter-read {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-hover);
+    white-space: nowrap;
+    min-width: 64px;
+    text-align: right;
+  }
+  .meter-hint {
+    font-size: 13px;
+    color: var(--soft);
+    line-height: 1.5;
+    margin-top: 12px;
+  }
+  .demo-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 16px;
+    margin-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ BACK LINK ============ */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--accent);
+    line-height: 1;
+    transition: transform 0.2s ease;
+  }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    margin-bottom: 3px;
+  }
+  .back-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  /* ============ FOOTER ============ */
+  footer {
+    max-width: 920px;
+    margin: 30px auto 48px;
+    padding: 16px 24px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--faint);
+    line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 640px) {
+    .panels { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+  }
+  @media (max-width: 480px) {
+    .meter { flex-direction: column; align-items: stretch; gap: 9px; }
+    .meter-read { text-align: left; }
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="layer-single-call-control.html"><span aria-hidden="true">&larr;</span> Single-Call Control</a>
+    <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep">/</span><span class="here">How it works</span></nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>Layer · L4</span>
+  <h1 class="pattern-title">Single-Call Control</h1>
+  <p class="explainer">How do you get the best answer out of a single message to the AI?</p>
+</header>
+
+<!-- 01 · THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>Everything you shape inside one message, before the AI even thinks, changes the answer you get back. Same question, but how you frame it decides what comes out.</p>
+  </div>
+</section>
+
+<!-- 02 · THE DEMO -->
+<section>
+  <div class="section-label"><span class="num">02</span>How it Works</div>
+  <h2>Shape the <em>one message</em>.</h2>
+
+  <p class="demo-lede">One question, sent to the AI. Tap the things you can add to your message and watch the answer change:</p>
+
+  <div class="demo-stage">
+    <!-- the toggles: things you can add to the single message -->
+    <div class="toggles" role="group" aria-label="Things you can add to your message">
+      <button type="button" class="toggle" id="t-role" aria-pressed="false">
+        <span class="dot" aria-hidden="true"></span>Add a role
+      </button>
+      <button type="button" class="toggle" id="t-example" aria-pressed="false">
+        <span class="dot" aria-hidden="true"></span>Show an example
+      </button>
+      <button type="button" class="toggle" id="t-steps" aria-pressed="false">
+        <span class="dot" aria-hidden="true"></span>Think step by step
+      </button>
+      <button type="button" class="toggle" id="t-format" aria-pressed="false">
+        <span class="dot" aria-hidden="true"></span>Ask for a fixed format
+      </button>
+    </div>
+
+    <div class="panels">
+      <!-- the message you send -->
+      <div class="panel">
+        <div class="panel-label">
+          <span class="plico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H7l-3 3z"/></svg></span>
+          Your message
+        </div>
+        <div class="prompt" id="prompt">
+          <span class="prompt-line on" id="p-role"><span class="add">You are a careful financial analyst.</span></span>
+          <span class="prompt-line on" id="p-example"><span class="add">Example: "Revenue rose 8%" &rarr; "Up 8%."</span></span>
+          <span class="prompt-line base"><span class="prompt-q">Q: Our revenue went from $40k to $50k this quarter. What happened?</span></span>
+          <span class="prompt-line on" id="p-steps"><span class="add">Let's think step by step.</span></span>
+          <span class="prompt-line on" id="p-format"><span class="add">Answer as: change %, then one-line takeaway.</span></span>
+        </div>
+      </div>
+
+      <!-- the answer that comes back -->
+      <div class="panel">
+        <div class="panel-label">
+          <span class="plico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a7 7 0 0 0-4 12.7V18h8v-2.3A7 7 0 0 0 12 3z"/><path d="M9 21h6"/></svg></span>
+          The AI's answer
+        </div>
+        <div class="answer" id="answer" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- a plain read on how much the shaping helped -->
+    <div class="meter">
+      <span class="meter-label">Answer quality</span>
+      <div class="meter-bars" id="meterBars" aria-hidden="true">
+        <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+      <span class="meter-read" id="meterRead">Plain</span>
+    </div>
+    <p class="meter-hint" id="meterHint">Start plain, then add one thing at a time and watch the answer sharpen.</p>
+
+    <div class="demo-controls">
+      <button class="diagram-btn primary" id="addAllBtn">Add all four</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-single-call-control.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Single-Call Control</div>
+    </div>
+  </a>
+</section>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ SHAPE THE ONE MESSAGE ============
+// One question to the AI. Four things you can add to the single message.
+// Each toggle adds a line to the prompt (left panel) and rewrites the answer
+// (right panel) so the effect of shaping the message is visible. Tap, not hover.
+// aria-live on the answer announces each rewrite to screen readers.
+var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+var state = { role: false, example: false, steps: false, format: false };
+
+var toggles = {
+  role: document.getElementById('t-role'),
+  example: document.getElementById('t-example'),
+  steps: document.getElementById('t-steps'),
+  format: document.getElementById('t-format')
+};
+var promptLines = {
+  role: document.getElementById('p-role'),
+  example: document.getElementById('p-example'),
+  steps: document.getElementById('p-steps'),
+  format: document.getElementById('p-format')
+};
+var answerEl = document.getElementById('answer');
+var meterBars = document.getElementById('meterBars').querySelectorAll('.seg');
+var meterRead = document.getElementById('meterRead');
+var meterHint = document.getElementById('meterHint');
+
+// The plain answer: vague, no shape. This is what one bare question gets you.
+var BASE_BODY = "Your revenue went up by quite a bit this quarter, which is a good sign for the business overall.";
+
+// Build the answer HTML from the current state, so each toggle visibly changes it.
+function buildAnswer() {
+  var html = '';
+
+  // "Add a role" -> the answer speaks as that role
+  if (state.role) {
+    html += '<span class="a-role">Financial analyst</span>';
+  }
+
+  // The core body. It gets concrete once steps are on, terser once an example is shown.
+  var body;
+  if (state.steps) {
+    body = "Revenue grew from $40k to $50k, a gain of $10k, which is a 25% rise quarter over quarter.";
+  } else if (state.example) {
+    body = "Revenue is up this quarter, by roughly a quarter on last quarter.";
+  } else if (state.role) {
+    body = "Revenue improved this quarter, a healthy move worth noting in the next review.";
+  } else {
+    body = BASE_BODY;
+  }
+  html += '<span class="a-body">' + body + '</span>';
+
+  // "Think step by step" -> the working is shown, so the number is right, not guessed
+  if (state.steps) {
+    html += '<ol class="a-steps">'
+      + '<li>Start $40k, end $50k.</li>'
+      + '<li>Change = $50k &minus; $40k = $10k.</li>'
+      + '<li>$10k / $40k = <strong>+25%</strong>.</li>'
+      + '</ol>';
+  }
+
+  // "Ask for a fixed format" -> the answer arrives in the exact shape you asked for
+  if (state.format) {
+    var pct = state.steps ? '+25%' : '~+25%';
+    html += '<div class="a-format"><span class="k">change:</span> ' + pct
+      + '<br><span class="k">takeaway:</span> Revenue up a quarter on last quarter.</div>';
+  }
+
+  return html;
+}
+
+// Score: each thing you add nudges the answer toward sharper. Plain = 1 bar.
+function score() {
+  var n = (state.role?1:0) + (state.example?1:0) + (state.steps?1:0) + (state.format?1:0);
+  return n + 1; // 1..5 bars
+}
+var READS = ['', 'Plain', 'Sharper', 'Sharper', 'Sharp', 'Sharpest'];
+var HINTS = [
+  '',
+  'A bare question gets a vague answer. Add one thing and watch it sharpen.',
+  'Better already. One small addition to the same message moved the answer.',
+  'Tighter still. Each thing you add shapes the answer a little more.',
+  'Almost there. Notice the numbers and shape, not just the words.',
+  'Same question, much better answer, all from shaping one message.'
+];
+
+function renderMeter() {
+  var s = score();
+  for (var i = 0; i < meterBars.length; i++) {
+    meterBars[i].classList.toggle('on', i < s);
+  }
+  meterRead.textContent = READS[s];
+  meterHint.textContent = HINTS[s];
+}
+
+// Rewrite the answer with a brief fade, so the change reads as "the answer changed".
+var swapTimer = null;
+function renderAnswer() {
+  if (reduceMotion) {
+    answerEl.innerHTML = buildAnswer();
+    return;
+  }
+  answerEl.classList.add('swapping');
+  if (swapTimer) clearTimeout(swapTimer);
+  swapTimer = setTimeout(function () {
+    answerEl.innerHTML = buildAnswer();
+    answerEl.classList.remove('swapping');
+  }, 200);
+}
+
+function syncToggle(key) {
+  toggles[key].setAttribute('aria-pressed', state[key] ? 'true' : 'false');
+  promptLines[key].classList.toggle('on', state[key]);
+}
+
+function renderAll() {
+  Object.keys(state).forEach(syncToggle);
+  renderAnswer();
+  renderMeter();
+}
+
+Object.keys(toggles).forEach(function (key) {
+  toggles[key].addEventListener('click', function () {
+    state[key] = !state[key];
+    syncToggle(key);
+    renderAnswer();
+    renderMeter();
+  });
+});
+
+document.getElementById('addAllBtn').addEventListener('click', function () {
+  state = { role: true, example: true, steps: true, format: true };
+  renderAll();
+});
+document.getElementById('resetBtn').addEventListener('click', function () {
+  state = { role: false, example: false, steps: false, format: false };
+  renderAll();
+});
+
+// start plain
+renderAll();
+</script>
+
+</body>
+</html>
