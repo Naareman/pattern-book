@@ -324,7 +324,7 @@
   .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
   .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
 
-  /* WHAT THIS COVERS MAP */
+  /* WHAT THIS COVERS */
   .covers-stage {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
@@ -333,12 +333,8 @@
     background: var(--accent-soft); border-bottom: 1px solid var(--border);
     padding: 14px 22px; display: flex; align-items: flex-start; gap: 12px;
   }
-  .scope-icon {
-    font-size: 18px; flex: none; margin-top: 1px;
-  }
-  .scope-text {
-    font-size: 14px; line-height: 1.55; color: var(--text);
-  }
+  .scope-icon { font-size: 18px; flex: none; margin-top: 1px; }
+  .scope-text { font-size: 14px; line-height: 1.55; color: var(--text); }
   .scope-text strong { font-weight: 700; color: var(--accent-hover); }
   .scope-text .scope-skip { color: var(--soft); font-size: 13px; display: block; margin-top: 3px; }
   .axis-line {
@@ -346,32 +342,48 @@
     font-size: 13px; color: var(--soft); line-height: 1.55;
   }
   .axis-line strong { color: var(--text); font-weight: 600; }
-  .disciplines-list {
-    padding: 16px 22px 20px; display: flex; flex-direction: column; gap: 0;
+
+  /* cluster structure matching the guide template */
+  .covers-cluster-head {
+    padding: 16px 22px 8px;
   }
-  .discipline-row {
-    display: flex; align-items: baseline; gap: 12px;
-    padding: 10px 0; border-bottom: 1px solid var(--border);
+  .covers-cluster-head.cluster-break {
+    padding-top: 22px; border-top: 1px solid var(--border);
   }
-  .discipline-row:last-child { border-bottom: none; }
-  .discipline-name {
+  .covers-cluster-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .07em; color: var(--text); line-height: 1.3;
+  }
+  .covers-row {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px;
+    padding: 11px 22px 11px 40px; border-top: 1px solid var(--border);
+  }
+  .covers-cluster-head + .covers-row { border-top: none; }
+  .covers-name {
     font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
-    color: var(--text); flex: none; min-width: 220px;
+    color: var(--text); flex: none;
   }
-  .discipline-desc {
+  .covers-sep {
+    color: var(--border-strong); font-size: 13px; flex: none;
+  }
+  .covers-desc {
     font-size: 13.5px; color: var(--soft); line-height: 1.5;
   }
-  .crossref {
+  .covers-xref {
     font-size: 12px; color: var(--faint); white-space: nowrap;
     padding: 2px 7px; border: 1px solid var(--border-strong);
-    border-radius: 10px; margin-left: 6px; font-weight: 500; flex: none;
+    border-radius: 10px; font-weight: 500; flex: none; margin-left: 4px;
   }
   .mechanism-note {
-    margin: 0 22px 16px; padding: 12px 16px;
+    margin: 14px 22px 16px; padding: 12px 16px;
     background: var(--bg-subtle); border: 1px solid var(--border);
     border-radius: var(--radius-sm); font-size: 13px; color: var(--soft); line-height: 1.55;
   }
   .mechanism-note strong { color: var(--text); font-weight: 600; }
+
+  @media (max-width: 560px) {
+    .covers-row { padding-left: 22px; }
+  }
 
   /* SOURCES */
   .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
@@ -407,10 +419,6 @@
   }
   @media (max-width: 420px) {
     .board-controls { flex-direction: column; align-items: stretch; }
-  }
-  @media (max-width: 560px) {
-    .discipline-name { min-width: 160px; }
-    .discipline-row { flex-wrap: wrap; gap: 4px; }
   }
 </style>
 </head>
@@ -619,56 +627,69 @@
       <strong>Axis:</strong> how to reason about systems that span text, vision, audio, or mixed modalities.
     </div>
 
-    <!-- Discipline rows -->
-    <div class="disciplines-list">
+    <!-- Cluster 1 -->
+    <div class="covers-cluster-head" role="presentation">
+      <h3 class="covers-cluster-label">Choosing and combining modalities</h3>
+    </div>
 
-      <div class="discipline-row">
-        <span class="discipline-name">Modality Selection</span>
-        <span class="discipline-desc">Choosing which modality to use for a task: OCR-then-reason versus native vision, speech-to-text versus end-to-end audio.</span>
-      </div>
+    <div class="covers-row">
+      <span class="covers-name">Modality selection</span>
+      <span class="covers-sep" aria-hidden="true">&middot;</span>
+      <span class="covers-desc">Pick which modality to use for a task: OCR-then-reason versus native vision, speech-to-text versus end-to-end audio.</span>
+    </div>
 
-      <div class="discipline-row">
-        <span class="discipline-name">Cross-Modal Grounding</span>
-        <span class="discipline-desc">Making sure the model's text output faithfully refers to what it saw or heard, not a hallucinated version of it.</span>
-        <span class="crossref">see C1</span>
-      </div>
+    <div class="covers-row">
+      <span class="covers-name">Cross-modal grounding</span>
+      <span class="covers-sep" aria-hidden="true">&middot;</span>
+      <span class="covers-desc">Keep the model's output faithfully tied to what it saw or heard, not a hallucinated version of it.</span>
+      <span class="covers-xref">see C1</span>
+    </div>
 
-      <div class="discipline-row">
-        <span class="discipline-name">Fusion Strategy</span>
-        <span class="discipline-desc">Deciding when to combine signals from different modalities: early (shared encoder from the start) versus late (separate encoders merged before the final layer).</span>
-        <span class="crossref">see L1</span>
-      </div>
+    <div class="covers-row">
+      <span class="covers-name">Fusion strategy</span>
+      <span class="covers-sep" aria-hidden="true">&middot;</span>
+      <span class="covers-desc">Decide when to combine signals: early fusion (shared encoder from the start) versus late fusion (separate encoders merged before the final layer).</span>
+      <span class="covers-xref">see L1</span>
+    </div>
 
-      <div class="discipline-row">
-        <span class="discipline-name">Modality-Specific Eval</span>
-        <span class="discipline-desc">Designing evaluation benchmarks and rubrics for non-text outputs where standard text metrics (BLEU, exact match) break down.</span>
-        <span class="crossref">see C1</span>
-      </div>
+    <div class="covers-row">
+      <span class="covers-name">Mixed-modality handoff</span>
+      <span class="covers-sep" aria-hidden="true">&middot;</span>
+      <span class="covers-desc">Reason about transitions between modalities inside a conversation: when a voice turn should switch to a visual, or when a vision input should trigger an audio response.</span>
+      <span class="covers-xref">mechanism: L7</span>
+    </div>
 
-      <div class="discipline-row">
-        <span class="discipline-name">Latency Budgets Across Modalities</span>
-        <span class="discipline-desc">Allocating response-time budgets when different encoders (vision, audio, text) each add their own processing time before the model can begin.</span>
-        <span class="crossref">see C5, L0</span>
-      </div>
+    <!-- Cluster 2 -->
+    <div class="covers-cluster-head cluster-break" role="presentation">
+      <h3 class="covers-cluster-label">Evaluating and costing them</h3>
+    </div>
 
-      <div class="discipline-row">
-        <span class="discipline-name">Modality-Specific Safety and Refusal</span>
-        <span class="discipline-desc">Calibrating refusal policies per modality: a harmful image prompt requires different detection logic than a harmful text prompt.</span>
-        <span class="crossref">see C2</span>
-      </div>
+    <div class="covers-row">
+      <span class="covers-name">Modality-specific eval</span>
+      <span class="covers-sep" aria-hidden="true">&middot;</span>
+      <span class="covers-desc">Design benchmarks and rubrics for non-text outputs where standard metrics like BLEU or exact match break down.</span>
+      <span class="covers-xref">see C1</span>
+    </div>
 
-      <div class="discipline-row">
-        <span class="discipline-name">Multimodal Cost Attribution</span>
-        <span class="discipline-desc">Tracking and attributing cost per modality: image tokens are priced differently from text tokens, and video multiplies image cost by frame count.</span>
-        <span class="crossref">see C5</span>
-      </div>
+    <div class="covers-row">
+      <span class="covers-name">Latency budgets across modalities</span>
+      <span class="covers-sep" aria-hidden="true">&middot;</span>
+      <span class="covers-desc">Allocate response-time budgets when vision, audio, and text encoders each add processing time before the model can begin.</span>
+      <span class="covers-xref">see C5, L0</span>
+    </div>
 
-      <div class="discipline-row">
-        <span class="discipline-name">Mixed-Modality Handoff</span>
-        <span class="discipline-desc">Reasoning about transitions between modalities inside a conversation: for example, when a voice turn should switch to showing a visual, or when a vision input should trigger an audio response.</span>
-        <span class="crossref">mechanism: L7</span>
-      </div>
+    <div class="covers-row">
+      <span class="covers-name">Modality-specific safety and refusal</span>
+      <span class="covers-sep" aria-hidden="true">&middot;</span>
+      <span class="covers-desc">Calibrate refusal policies per modality: a harmful image prompt requires different detection logic than a harmful text prompt.</span>
+      <span class="covers-xref">see C2</span>
+    </div>
 
+    <div class="covers-row">
+      <span class="covers-name">Multimodal cost attribution</span>
+      <span class="covers-sep" aria-hidden="true">&middot;</span>
+      <span class="covers-desc">Track and attribute cost per modality: image tokens are priced differently from text tokens, and video multiplies image cost by frame count.</span>
+      <span class="covers-xref">see C5</span>
     </div>
 
     <!-- Mechanism note -->
