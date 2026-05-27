@@ -48,7 +48,9 @@
 
   /* top flow legend: four stages of one call, joined by accent arrows */
   .flow{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 10px;margin-top:24px}
-  .flow-chip{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--soft);white-space:nowrap;letter-spacing:.01em}
+  .flow-chip{font-family:inherit;background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--soft);white-space:nowrap;letter-spacing:.01em;cursor:pointer;transition:background .2s ease,color .2s ease,border-color .2s ease}
+  .flow-chip:hover{color:var(--accent-hover);border-color:var(--border-strong)}
+  .flow-chip.lit{background:var(--accent-soft);color:var(--accent-hover);border-color:var(--accent)}
   .flow-arrow{flex:none;color:var(--accent);font-size:15px;line-height:1}
   .flow-caption{text-align:center;color:var(--faint);font-size:13px;line-height:1.5;margin-top:12px}
 
@@ -58,7 +60,10 @@
   /* four stage cards in a 2x2 grid (desktop), single column (mobile) */
   .stages{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:6px}
 
-  .stage-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+  .stage-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;scroll-margin-top:80px;transition:box-shadow .55s ease,border-color .55s ease}
+  /* brief neon highlight (nav click + load tour) */
+  .stage-card.glow{box-shadow:0 0 0 3px var(--accent-soft),0 0 22px 2px rgba(124,92,246,.42);border-color:var(--accent)}
+  @media (prefers-reduced-motion:reduce){.stage-card{transition:none}}
 
   .stage-head{display:flex;align-items:center;gap:9px;margin:0 0 4px}
   .stage-head .sico{flex:none;width:18px;height:18px;color:var(--accent);display:block}
@@ -67,9 +72,10 @@
 
   .stage-lead{color:var(--soft);font-size:13.5px;line-height:1.45;margin:0 0 14px}
 
-  /* technique name chips */
+  /* wrapping chip grid: each technique is just its name */
   .chips{display:flex;flex-wrap:wrap;gap:7px}
-  .chip{display:inline-flex;align-items:center;gap:3px;padding:6px 11px;border-radius:20px;font-size:13px;font-weight:500;line-height:1.2;white-space:nowrap}
+  /* technique name chips */
+  .chip{flex:none;display:inline-flex;align-items:center;gap:3px;padding:6px 11px;border-radius:20px;font-size:13px;font-weight:500;line-height:1.2;white-space:nowrap}
   /* quiet (non-anchor) chip */
   .chip{border:1px solid var(--border);color:var(--soft);background:transparent;cursor:default}
   /* anchor (link) chip */
@@ -107,23 +113,23 @@
       <h1 class="title">Single-Call Control</h1>
       <p class="explainer">How do you get the best answer out of a single message to the AI?</p>
 
-      <div class="flow" role="list" aria-label="The four stages of a single call">
-        <span class="flow-chip" role="listitem">Ask it well</span>
+      <div class="flow" aria-label="Jump to a stage of a single call">
+        <button type="button" class="flow-chip" data-target="card-ask">Ask it well</button>
         <span class="flow-arrow" aria-hidden="true">&rarr;</span>
-        <span class="flow-chip" role="listitem">Guide its thinking</span>
+        <button type="button" class="flow-chip" data-target="card-think">Guide its thinking</button>
         <span class="flow-arrow" aria-hidden="true">&rarr;</span>
-        <span class="flow-chip" role="listitem">Shape its output</span>
+        <button type="button" class="flow-chip" data-target="card-shape">Shape its output</button>
         <span class="flow-arrow" aria-hidden="true">&rarr;</span>
-        <span class="flow-chip" role="listitem">Make it check itself</span>
+        <button type="button" class="flow-chip" data-target="card-check">Make it check itself</button>
       </div>
-      <p class="flow-caption">Everything you control in a single message, in the order it happens.</p>
+      <p class="flow-caption">Small tweaks to one message, much better answers.</p>
     </header>
 
     <div class="section" id="main" role="main">
 
       <div class="stages">
 
-        <section class="stage-card" aria-labelledby="g-ask">
+        <section class="stage-card" id="card-ask" aria-labelledby="g-ask">
           <div class="stage-head">
             <span class="sico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 2 2-7 7-3 1 1-3z"/><path d="M18 13l-1.5-1.5"/><path d="M5 5h9M5 9h7M5 13h4"/></svg></span>
             <h2 class="stage-name" id="g-ask">Ask it well</h2>
@@ -145,7 +151,7 @@
           </div>
         </section>
 
-        <section class="stage-card" aria-labelledby="g-think">
+        <section class="stage-card" id="card-think" aria-labelledby="g-think">
           <div class="stage-head">
             <span class="sico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.3 1 2.5h6c0-1.2.3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg></span>
             <h2 class="stage-name" id="g-think">Guide its thinking</h2>
@@ -164,7 +170,7 @@
           </div>
         </section>
 
-        <section class="stage-card" aria-labelledby="g-shape">
+        <section class="stage-card" id="card-shape" aria-labelledby="g-shape">
           <div class="stage-head">
             <span class="sico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4H6a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2 2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2 2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2"/></svg></span>
             <h2 class="stage-name" id="g-shape">Shape its output</h2>
@@ -183,7 +189,7 @@
           </div>
         </section>
 
-        <section class="stage-card" aria-labelledby="g-check">
+        <section class="stage-card" id="card-check" aria-labelledby="g-check">
           <div class="stage-head">
             <span class="sico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3.5-7.1"/><path d="M9 11l3 3 8.5-8.5"/></svg></span>
             <h2 class="stage-name" id="g-check">Make it check itself</h2>
@@ -202,6 +208,53 @@
 
     <footer class="foot"><strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.</footer>
   </div>
+
+  <script>
+  (function(){
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    // four stages in flow order (card ids, matching each pill's data-target)
+    var stages = ['card-ask','card-think','card-shape','card-check'];
+    var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
+
+    function pillFor(cardId){
+      for(var i=0;i<pills.length;i++){ if(pills[i].getAttribute('data-target')===cardId) return pills[i]; }
+      return null;
+    }
+
+    // nav buttons: smooth-scroll to the stage card + brief glow (~1.2s)
+    pills.forEach(function(btn){
+      var target = btn.getAttribute('data-target');
+      var card = document.getElementById(target);
+      btn.addEventListener('click', function(){
+        if(!card) return;
+        card.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+        card.classList.add('glow');
+        window.setTimeout(function(){ card.classList.remove('glow'); }, 1200);
+      });
+    });
+
+    // one-time load tour: highlight each card in order, lighting the matching pill
+    if(!reduce){
+      var step = 0;
+      function tour(){
+        if(step > 0){
+          var prevCard = document.getElementById(stages[step-1]);
+          var prevPill = pillFor(stages[step-1]);
+          if(prevCard) prevCard.classList.remove('glow');
+          if(prevPill) prevPill.classList.remove('lit');
+        }
+        if(step >= stages.length) return;
+        var curCard = document.getElementById(stages[step]);
+        var curPill = pillFor(stages[step]);
+        if(curCard) curCard.classList.add('glow');
+        if(curPill) curPill.classList.add('lit');
+        step++;
+        window.setTimeout(tour, 900);
+      }
+      window.setTimeout(tour, 350);
+    }
+  })();
+  </script>
 
 </body>
 </html>
