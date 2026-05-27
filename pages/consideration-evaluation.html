@@ -217,45 +217,50 @@
   .method-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
   .method-desc { font-size: 14px; color: var(--soft); line-height: 1.5; }
 
-  /* 04 WHAT THIS COVERS */
-  .covers-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    box-shadow: var(--shadow); padding: 26px 28px;
-  }
-  .covers-scope {
+  /* 04 WHAT THIS COVERS: guide-card style */
+  .covers-meta {
     font-size: 13px; font-weight: 600; color: var(--faint);
     text-transform: uppercase; letter-spacing: .05em;
-    margin-bottom: 6px;
+    margin-bottom: 14px;
   }
-  .covers-scope span { color: var(--text); font-weight: 500; text-transform: none; letter-spacing: 0; }
-  .covers-axis {
-    font-size: 14px; color: var(--soft); line-height: 1.55;
-    padding: 10px 14px; background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: 8px; margin-bottom: 22px;
+  .covers-meta span { color: var(--text); font-weight: 500; text-transform: none; letter-spacing: 0; }
+
+  /* surface card matches the layer guide aesthetic */
+  .guide {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
   }
-  .covers-axis strong { color: var(--text); font-weight: 600; }
-  .discipline-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
-  .discipline-item {
-    display: flex; gap: 14px; align-items: flex-start;
-    padding: 13px 0; border-bottom: 1px solid var(--border);
+  .guide-row {
+    display: flex; align-items: baseline; justify-content: flex-start;
+    flex-wrap: wrap; gap: 4px 10px;
+    padding: 17px 22px; border-top: 1px solid var(--border);
   }
-  .discipline-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .discipline-name {
-    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
-    color: var(--text); min-width: 220px; flex-shrink: 0; padding-top: 1px;
+  .guide-row:first-child { border-top: none; }
+  .disc-name {
+    font-family: 'Fraunces', serif; font-size: 15px; color: var(--text);
+    line-height: 1.4; flex: none;
   }
-  .discipline-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .connect { color: var(--faint); font-size: 15px; line-height: 1.4; flex: none; }
+  .disc-desc {
+    font-size: 14px; color: var(--soft); line-height: 1.5;
+  }
+  /* cluster labels */
+  .cluster-head { padding: 16px 22px 8px; }
+  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
+  .cluster-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .07em; color: var(--text); line-height: 1.3;
+  }
+  .cluster-head + .guide-row { border-top: none; }
+  .cluster-head ~ .guide-row { padding-left: 40px; }
+
+  /* note stripe */
   .covers-note {
-    margin-top: 20px; padding: 12px 14px;
-    background: var(--accent-soft); border: 1px solid var(--border);
-    border-radius: 8px; font-size: 13px; color: var(--soft); line-height: 1.55;
+    margin: 0; padding: 14px 22px;
+    background: var(--accent-soft); border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--soft); line-height: 1.55;
   }
   .covers-note strong { color: var(--text); font-weight: 600; }
-
-  @media (max-width: 560px) {
-    .discipline-item { flex-direction: column; gap: 4px; }
-    .discipline-name { min-width: 0; }
-  }
 
   /* BACK LINK */
   .back-link {
@@ -483,48 +488,70 @@
   <div class="section-label"><span class="num">04</span>What This Covers</div>
   <h2>The <em>disciplines</em> inside Evaluation.</h2>
 
-  <div class="covers-card">
+  <p class="covers-meta">Applies to: <span>every AI system</span></p>
 
-    <div class="covers-scope">Applies to: <span>every AI system</span></div>
-    <div class="covers-axis"><strong>Axis:</strong> how to judge whether the system produces the right output or the right trajectory.</div>
+  <div class="guide">
 
-    <ul class="discipline-list">
-      <li class="discipline-item">
-        <div class="discipline-name">Eval Methodology</div>
-        <div class="discipline-desc">The overall framework: benchmarks, golden test sets, human eval, and rubrics. Decides what "right" means before measuring anything.</div>
-      </li>
-      <li class="discipline-item">
-        <div class="discipline-name">Agent Trajectory Evaluation</div>
-        <div class="discipline-desc">Judges not just the final answer but every step the agent took to get there. A correct result via a broken path is still a problem.</div>
-      </li>
-      <li class="discipline-item">
-        <div class="discipline-name">Regression Testing</div>
-        <div class="discipline-desc">Running the same eval suite after every change to confirm nothing that worked before has broken. The safety net for iterative development.</div>
-      </li>
-      <li class="discipline-item">
-        <div class="discipline-name">Eval-Driven Development</div>
-        <div class="discipline-desc">Writing the eval before writing the system, so you know exactly what "done" looks like before you start building.</div>
-      </li>
-      <li class="discipline-item">
-        <div class="discipline-name">Statistical Rigor</div>
-        <div class="discipline-desc">Making sure eval results are real, not noise. Covers sample sizes, confidence intervals, and avoiding lucky-run bias.</div>
-      </li>
-      <li class="discipline-item">
-        <div class="discipline-name">Prompt Lifecycle Thinking</div>
-        <div class="discipline-desc">Treating prompts as versioned artifacts with their own eval coverage, so a prompt change triggers a re-run, not just a re-read.</div>
-      </li>
-      <li class="discipline-item">
-        <div class="discipline-name">Faithfulness and Groundedness Evaluation</div>
-        <div class="discipline-desc">Checking that the AI's answer actually follows from the documents or facts it was given, not from something it invented.</div>
-      </li>
-      <li class="discipline-item">
-        <div class="discipline-name">Hallucination Detection Methodology</div>
-        <div class="discipline-desc">The overall discipline for finding made-up claims. The actual pieces live across layers: claim extraction in Single-Call Control (L4), verifier scoring in Structural Composition (L2), and citation grounding in Stateless Retrieval (L3a).</div>
-      </li>
-    </ul>
+    <!-- Cluster 1 -->
+    <div class="cluster-head">
+      <h3 class="cluster-label">How you measure</h3>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Eval Methodology</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
+      <span class="disc-desc">The overall framework: benchmarks, golden test sets, human eval, and rubrics. Decides what "right" means before you count anything.</span>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Agent Trajectory Evaluation</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
+      <span class="disc-desc">Judges not just the final answer but every step the agent took to get there. A correct result via a broken path is still a problem.</span>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Statistical Rigor</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
+      <span class="disc-desc">Making sure results are real, not noise. Covers sample sizes, confidence intervals, and avoiding lucky-run bias.</span>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Faithfulness and Groundedness Evaluation</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
+      <span class="disc-desc">Checking that answers follow from the documents or facts provided, not from something invented.</span>
+    </div>
+
+    <!-- Cluster 2 -->
+    <div class="cluster-head cluster-break">
+      <h3 class="cluster-label">How you keep quality up</h3>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Regression Testing</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
+      <span class="disc-desc">Running the same eval suite after every change to confirm nothing that worked before has broken. The safety net for iterative work.</span>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Eval-Driven Development</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
+      <span class="disc-desc">Writing the eval before writing the system, so "done" has a concrete, measurable definition from the start.</span>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Prompt Lifecycle Thinking</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
+      <span class="disc-desc">Treating prompts as versioned artifacts with their own eval coverage, so a prompt change triggers a re-run, not just a re-read.</span>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Hallucination Detection Methodology</span>
+      <span class="connect" aria-hidden="true">&rarr;</span>
+      <span class="disc-desc">The framework for finding made-up claims. The mechanisms live in the layers: claim extraction in L4, verifier scoring in L2, citation grounding in L3a.</span>
+    </div>
 
     <div class="covers-note">
-      <strong>Considerations are disciplines, not mechanisms.</strong> A consideration is a way of reasoning about a concern. The actual building blocks live in the layers. Hallucination detection is a good example: the methodology lives here in C1, but its pieces are spread across L4, L2, and L3a. When you want to build something, follow the cross-references into the layers.
+      <strong>Considerations are disciplines, not mechanisms.</strong> The reasoning framework lives here in C1. The actual building blocks live in the layers. When you want to build something, follow the cross-references.
     </div>
 
   </div>

@@ -257,12 +257,16 @@
   /* WHAT THIS COVERS CARD */
   .covers-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 26px;
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
   }
-  .covers-scope, .covers-axis {
-    font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 6px;
+  .covers-meta {
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--border);
   }
-  .covers-scope-label, .covers-axis-label {
+  .covers-scope {
+    font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 4px;
+  }
+  .covers-scope-label {
     font-weight: 600; color: var(--text);
   }
   .covers-note {
@@ -271,25 +275,33 @@
     background: var(--bg-subtle); border-radius: var(--radius-sm);
     border: 1px solid var(--border);
   }
-  .covers-list {
-    margin-top: 18px; display: flex; flex-direction: column; gap: 0;
+  /* cluster labels */
+  .cluster-head { padding: 16px 22px 8px; }
+  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
+  .cluster-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .07em; color: var(--text); line-height: 1.3;
   }
-  .covers-item {
-    padding: 13px 0; border-bottom: 1px solid var(--border);
-    display: flex; gap: 14px; align-items: baseline;
+  /* discipline rows */
+  .disc-row {
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+    padding: 14px 22px 14px 40px; border-top: 1px solid var(--border);
   }
-  .covers-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .covers-item-name {
+  .cluster-head + .disc-row { border-top: none; }
+  .disc-name {
     font-family: 'Fraunces', serif; font-weight: 500;
-    font-size: 15px; color: var(--text);
-    min-width: 230px; flex-shrink: 0; line-height: 1.4;
+    font-size: 15px; color: var(--text); line-height: 1.4;
+    flex-shrink: 0;
   }
-  .covers-item-line {
-    font-size: 14px; color: var(--soft); line-height: 1.55; flex: 1;
+  .disc-sep {
+    color: var(--faint); font-size: 14px; flex-shrink: 0;
+  }
+  .disc-line {
+    font-size: 14px; color: var(--soft); line-height: 1.55;
   }
   @media (max-width: 560px) {
-    .covers-item { flex-direction: column; gap: 4px; }
-    .covers-item-name { min-width: 0; }
+    .disc-row { flex-direction: column; gap: 3px; padding-left: 22px; }
+    .disc-sep { display: none; }
   }
 
   /* BACK LINK */
@@ -414,43 +426,66 @@
   <div class="section-label"><span class="num">03</span>What This Covers</div>
   <h2>Every discipline in <em>this crosscut</em>.</h2>
   <div class="covers-card">
-    <div class="covers-scope">
-      <span class="covers-scope-label">Applies to:</span> every system that handles user, customer, or tenant data.
+
+    <div class="covers-meta">
+      <div class="covers-scope">
+        <span class="covers-scope-label">Applies to:</span> every system that handles user, customer, or tenant data.
+      </div>
+      <p class="covers-note">C3 is a discipline crosscut. Runtime mechanisms live in L0 and L3a; this page covers which controls to apply and why.</p>
     </div>
-    <div class="covers-axis">
-      <span class="covers-axis-label">Axis:</span> protecting data, users, and tenants.
+
+    <!-- Cluster 1 -->
+    <div class="cluster-head">
+      <span class="cluster-label">Protecting the data</span>
     </div>
-    <p class="covers-note">C3 is a discipline crosscut. Runtime mechanisms live in L0 and L3a; this page covers which controls to apply and why.</p>
-    <div class="covers-list">
-      <div class="covers-item">
-        <div class="covers-item-name">Access Control</div>
-        <div class="covers-item-line">Permission model for users, roles, and API keys.</div>
-      </div>
-      <div class="covers-item">
-        <div class="covers-item-name">Tenant Isolation Discipline</div>
-        <div class="covers-item-line">One customer's data never reaches another's session.</div>
-      </div>
-      <div class="covers-item">
-        <div class="covers-item-name">Audit-Logging</div>
-        <div class="covers-item-line">Immutable record of who accessed what and when.</div>
-      </div>
-      <div class="covers-item">
-        <div class="covers-item-name">Compliance Mapping (GDPR, HIPAA, SOC2)</div>
-        <div class="covers-item-line">Translates legal obligations into concrete system controls.</div>
-      </div>
-      <div class="covers-item">
-        <div class="covers-item-name">Data Residency</div>
-        <div class="covers-item-line">Data stays in its permitted geographic region.</div>
-      </div>
-      <div class="covers-item">
-        <div class="covers-item-name">Runtime PII-Handling</div>
-        <div class="covers-item-line">Detects and redacts personal data before the model sees it.</div>
-      </div>
-      <div class="covers-item">
-        <div class="covers-item-name">Provenance &amp; Watermarking</div>
-        <div class="covers-item-line">Marks AI-generated output for attribution and misuse detection.</div>
-      </div>
+
+    <div class="disc-row">
+      <span class="disc-name">Access Control</span>
+      <span class="disc-sep" aria-hidden="true">:</span>
+      <span class="disc-line">Permission model for users, roles, and API keys.</span>
     </div>
+
+    <div class="disc-row">
+      <span class="disc-name">Tenant Isolation Discipline</span>
+      <span class="disc-sep" aria-hidden="true">:</span>
+      <span class="disc-line">One customer's data never reaches another's session.</span>
+    </div>
+
+    <div class="disc-row">
+      <span class="disc-name">Runtime PII-Handling</span>
+      <span class="disc-sep" aria-hidden="true">:</span>
+      <span class="disc-line">Detects and redacts personal data before the model sees it.</span>
+    </div>
+
+    <div class="disc-row">
+      <span class="disc-name">Data Residency</span>
+      <span class="disc-sep" aria-hidden="true">:</span>
+      <span class="disc-line">Data stays in its permitted geographic region.</span>
+    </div>
+
+    <!-- Cluster 2 -->
+    <div class="cluster-head cluster-break">
+      <span class="cluster-label">Proving and tracking it</span>
+    </div>
+
+    <div class="disc-row">
+      <span class="disc-name">Audit-Logging</span>
+      <span class="disc-sep" aria-hidden="true">:</span>
+      <span class="disc-line">Immutable record of who accessed what and when.</span>
+    </div>
+
+    <div class="disc-row">
+      <span class="disc-name">Compliance Mapping (GDPR, HIPAA, SOC2)</span>
+      <span class="disc-sep" aria-hidden="true">:</span>
+      <span class="disc-line">Translates legal obligations into concrete system controls.</span>
+    </div>
+
+    <div class="disc-row">
+      <span class="disc-name">Provenance &amp; Watermarking</span>
+      <span class="disc-sep" aria-hidden="true">:</span>
+      <span class="disc-line">Marks AI-generated output for attribution and misuse detection.</span>
+    </div>
+
   </div>
 </section>
 
