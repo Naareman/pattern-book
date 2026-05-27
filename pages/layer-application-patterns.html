@@ -110,18 +110,23 @@
   .tradeoff-quote{font-size:13px;color:var(--soft);line-height:1.6;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
   @media(max-width:480px){.tradeoff-row{flex-direction:column;align-items:stretch}.tradeoff-label{min-width:0}}
 
-  /* inside-layer map */
-  .inside-layer{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px 28px}
-  .axis-line{font-size:13px;color:var(--soft);border-left:3px solid var(--accent);padding-left:12px;margin-bottom:22px;line-height:1.5}
-  .axis-line strong{color:var(--text);font-weight:600}
-  .cat-list{display:flex;flex-direction:column;gap:0}
-  .cat-row{display:flex;align-items:baseline;gap:12px;padding:11px 0;border-top:1px solid var(--border)}
-  .cat-row:first-of-type{border-top:0}
-  .cat-name{font-family:'Fraunces',serif;font-weight:500;font-size:16px;color:var(--text);min-width:220px;flex-shrink:0}
-  .cat-desc{font-size:14px;color:var(--soft);line-height:1.5}
-  .filing-rule{font-size:13px;color:var(--soft);border-top:1px solid var(--border);padding-top:14px;margin-top:14px;line-height:1.6}
-  .filing-rule strong{color:var(--text);font-weight:600}
-  @media(max-width:560px){.cat-row{flex-direction:column;gap:4px}.cat-name{min-width:0;font-size:15px}}
+  /* goal-first guide (replaces inside-layer map) */
+  .guide{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .guide-row{display:flex;align-items:baseline;justify-content:flex-start;flex-wrap:wrap;gap:4px 10px;padding:17px 22px;border-top:1px solid var(--border)}
+  .guide-row:first-child{border-top:none}
+  .want{font-size:15px;line-height:1.4;color:var(--text)}
+  .resolve{display:inline-flex;align-items:baseline;gap:8px;flex:none}
+  .connect{color:var(--faint);font-size:15px;line-height:1.4}
+  .tech{font-family:'Fraunces',serif;font-size:16px;color:var(--text);line-height:1.4}
+  a.tech{color:var(--accent-hover);transition:color .15s ease}
+  a.tech:hover{color:var(--accent)}
+  a.tech .ext{font-size:11px;color:var(--accent);margin-left:2px;vertical-align:baseline}
+  @media(prefers-reduced-motion:reduce){a.tech{transition:none}}
+  .cluster-head{padding:16px 22px 8px}
+  .cluster-head.cluster-break{padding-top:26px;border-top:1px solid var(--border)}
+  .cluster-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text);line-height:1.3}
+  .cluster-head + .guide-row{border-top:none}
+  .cluster-head ~ .guide-row{padding-left:40px}
 
   /* back link */
   .back-link{display:inline-flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);text-decoration:none;color:var(--text);transition:transform .18s,box-shadow .18s,border-color .18s;cursor:pointer}
@@ -320,39 +325,66 @@
 <!-- 05 INSIDE THIS LAYER -->
 <section>
   <div class="section-label"><span class="num">05</span>Inside This Layer</div>
-  <h2>The six categories of <em>L6</em>.</h2>
+  <h2>What do you want to <em>do</em>?</h2>
 
-  <div class="inside-layer">
-    <div class="axis-line"><strong>Axis:</strong> the relationship between input and output.</div>
+  <div class="guide" role="list" aria-label="Goal-first guide to L6 categories">
 
-    <div class="cat-list">
-      <div class="cat-row">
-        <div class="cat-name">Retrieval &amp; Q&amp;A</div>
-        <div class="cat-desc">Finds and surfaces content that already exists.</div>
-      </div>
-      <div class="cat-row">
-        <div class="cat-name">Transformation</div>
-        <div class="cat-desc">Same meaning, different language, length, or style.</div>
-      </div>
-      <div class="cat-row">
-        <div class="cat-name">Extraction &amp; Classification</div>
-        <div class="cat-desc">Pulls structured facts or labels from the source.</div>
-      </div>
-      <div class="cat-row">
-        <div class="cat-name">Generation</div>
-        <div class="cat-desc">Produces content that did not exist in the input.</div>
-      </div>
-      <div class="cat-row">
-        <div class="cat-name">Decision &amp; Recommendation</div>
-        <div class="cat-desc">Picks, ranks, or scores options from a defined set.</div>
-      </div>
-      <div class="cat-row">
-        <div class="cat-name">Automation &amp; Workflow Execution</div>
-        <div class="cat-desc">Takes real-world actions across multiple steps.</div>
-      </div>
+    <div class="cluster-head">
+      <h3 class="cluster-label">Understand or reshape what&rsquo;s given</h3>
     </div>
 
-    <p class="filing-rule"><strong>Filing rule:</strong> Ask what transformation it performs on the input to make the output; file under the primary purpose. When a task spans multiple categories, cross-reference the secondary ones.</p>
+    <div class="guide-row" role="listitem">
+      <span class="want">Want to find and surface content that already exists?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Retrieval &amp; Q&amp;A</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">Want to rewrite, translate, or condense something without changing its meaning?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Transformation</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">Want to pull structured facts out of a document, or label what type something is?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Extraction &amp; Classification</span>
+      </span>
+    </div>
+
+    <div class="cluster-head cluster-break">
+      <h3 class="cluster-label">Make something new or act</h3>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">Want to produce content that did not exist in the input?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Generation</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">Want to pick, rank, or score options from a defined set?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Decision &amp; Recommendation</span>
+      </span>
+    </div>
+
+    <div class="guide-row" role="listitem">
+      <span class="want">Want the AI to take real-world actions across multiple steps, without a human in the loop?</span>
+      <span class="resolve">
+        <span class="connect" aria-hidden="true">&rarr;</span>
+        <span class="tech">Automation &amp; Workflow Execution</span>
+      </span>
+    </div>
+
   </div>
 </section>
 
