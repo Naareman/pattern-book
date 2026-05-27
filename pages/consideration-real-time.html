@@ -185,64 +185,66 @@
   .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
   .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
 
-  /* WHAT THIS COVERS MAP */
-  .map-card {
+  /* WHAT THIS COVERS — guide-card style */
+  .covers-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    padding: 24px 28px;
+    overflow: hidden;
   }
-  .map-axis {
+  .covers-note {
+    padding: 16px 22px;
     font-size: 14px;
     font-style: italic;
     color: var(--soft);
-    margin-bottom: 22px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
     line-height: 1.55;
-  }
-  .map-axis strong { color: var(--text); font-style: normal; }
-  .discipline-list { display: flex; flex-direction: column; gap: 0; }
-  .discipline-item {
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    padding: 13px 0;
     border-bottom: 1px solid var(--border);
   }
-  .discipline-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .discipline-item:first-child { padding-top: 0; }
-  .di-dot {
-    flex: none;
-    margin-top: 6px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
+  .covers-note strong { color: var(--text); font-style: normal; }
+  /* cluster label rows */
+  .c-cluster-head {
+    padding: 18px 22px 8px;
   }
-  .di-body { flex: 1; }
-  .di-name {
+  .c-cluster-head.c-cluster-break {
+    padding-top: 26px;
+    border-top: 1px solid var(--border);
+  }
+  .c-cluster-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  /* discipline rows */
+  .c-row {
+    padding: 13px 22px 13px 40px;
+    border-top: 1px solid var(--border);
+  }
+  .c-cluster-head + .c-row { border-top: none; }
+  .c-row:last-of-type { padding-bottom: 18px; }
+  .c-name {
     font-family: 'Fraunces', serif;
     font-weight: 500;
     font-size: 15px;
     color: var(--text);
     margin-bottom: 3px;
   }
-  .di-line {
+  .c-line {
     font-size: 14px;
     color: var(--soft);
     line-height: 1.5;
   }
-  .di-xref {
+  .c-xref {
     font-size: 12px;
     color: var(--faint);
     margin-top: 3px;
     font-style: italic;
   }
-  .map-note {
-    margin-top: 18px;
-    padding-top: 16px;
+  .covers-map-note {
+    padding: 14px 22px 16px;
     border-top: 1px solid var(--border);
     font-size: 13px;
     color: var(--faint);
@@ -399,85 +401,70 @@
 <section>
   <div class="section-label"><span class="num">03</span>What This Covers</div>
   <h2>Eight <em>disciplines</em> in this crosscut.</h2>
-  <div class="map-card">
-    <div class="map-axis">
+  <div class="covers-card" role="region" aria-label="Disciplines in this crosscut">
+
+    <div class="covers-note">
       <strong>This is a discipline crosscut, not a mechanism layer.</strong> The streaming UX mechanism (the actual UI behavior of tokens appearing progressively) lives in L7 User Surface. C7 owns the thinking frameworks that apply once you commit to streaming.
     </div>
-    <div class="discipline-list">
 
-      <div class="discipline-item">
-        <div class="di-dot" aria-hidden="true"></div>
-        <div class="di-body">
-          <div class="di-name">Streaming Output Discipline</div>
-          <div class="di-line">How to decide when streaming is worth the engineering cost and when batch is fine. Includes the rules for chunking output so each partial response is still useful to a reader.</div>
-          <div class="di-xref">UX mechanism for the user lives in L7 User Surface (Streaming and Progressive Disclosure).</div>
-        </div>
-      </div>
-
-      <div class="discipline-item">
-        <div class="di-dot" aria-hidden="true"></div>
-        <div class="di-body">
-          <div class="di-name">Time-to-First-Token Frameworks</div>
-          <div class="di-line">TTFT (time to first word) is the primary number users feel. This discipline covers how to measure it, how to set targets per product type (voice is tighter than chat), and which infrastructure levers move it (prefill caching, model size, batching policy).</div>
-          <div class="di-xref">Cross-ref C5 Cost, Latency and Reliability for latency budget design.</div>
-        </div>
-      </div>
-
-      <div class="discipline-item">
-        <div class="di-dot" aria-hidden="true"></div>
-        <div class="di-body">
-          <div class="di-name">Streaming Eval</div>
-          <div class="di-line">Standard evals wait for a complete response. Streaming eval frameworks measure quality at intermediate checkpoints: does the partial output stay coherent, does it drift mid-sentence, does the final answer match where it started?</div>
-          <div class="di-xref">Cross-ref C1 Evaluation for general eval methodology.</div>
-        </div>
-      </div>
-
-      <div class="discipline-item">
-        <div class="di-dot" aria-hidden="true"></div>
-        <div class="di-body">
-          <div class="di-name">Streaming Safety</div>
-          <div class="di-line">A filter that reads the complete response before sending it cannot work with streaming. This discipline covers real-time harm detection on partial outputs: sliding-window classifiers, early-exit rules, and how to interrupt a stream mid-generation without creating a confusing user experience.</div>
-          <div class="di-xref">Cross-ref C2 Safety, Alignment and Refusal for harm taxonomy and refusal calibration.</div>
-        </div>
-      </div>
-
-      <div class="discipline-item">
-        <div class="di-dot" aria-hidden="true"></div>
-        <div class="di-body">
-          <div class="di-name">Streaming Validation</div>
-          <div class="di-line">When the output must be structured (JSON, XML, code), partial tokens may be syntactically invalid mid-stream. This discipline covers incremental schema checking, buffering strategies, and how to surface validation errors to users without waiting for the full response.</div>
-          <div class="di-xref">Cross-ref L4 Output Shape for the schema enforcement mechanism itself.</div>
-        </div>
-      </div>
-
-      <div class="discipline-item">
-        <div class="di-dot" aria-hidden="true"></div>
-        <div class="di-body">
-          <div class="di-name">Backpressure and Cancellation</div>
-          <div class="di-line">When a client cannot consume tokens as fast as the model produces them, or when the user navigates away, the system needs a clean way to pause or abort generation. This discipline covers how to propagate cancellation signals upstream, how to avoid wasting compute on abandoned streams, and how to resume gracefully.</div>
-        </div>
-      </div>
-
-      <div class="discipline-item">
-        <div class="di-dot" aria-hidden="true"></div>
-        <div class="di-body">
-          <div class="di-name">Streaming Cost Attribution</div>
-          <div class="di-line">Streaming changes cost accounting: a cancelled stream still consumed prefill compute, and partial responses still count as output tokens. This discipline covers how to attribute cost to users or features when the full response was never delivered.</div>
-          <div class="di-xref">Cross-ref C5 Cost, Latency and Reliability for general cost attribution frameworks.</div>
-        </div>
-      </div>
-
-      <div class="discipline-item">
-        <div class="di-dot" aria-hidden="true"></div>
-        <div class="di-body">
-          <div class="di-name">Continuous Context for Voice</div>
-          <div class="di-line">Voice introduces three challenges batch text does not have: turn-taking (who speaks next?), interruption (the user cuts in mid-sentence), and barge-in (the user speaks while the AI is still talking). This discipline covers the state machine for managing these transitions and how to keep context coherent across interrupted turns.</div>
-          <div class="di-xref">Voice surface mechanism lives in L7 User Surface.</div>
-        </div>
-      </div>
-
+    <!-- CLUSTER 1 -->
+    <div class="c-cluster-head">
+      <h3 class="c-cluster-label">Streaming the output</h3>
     </div>
-    <div class="map-note">All eight are disciplines for reasoning and decision-making. The mechanisms they reference (schema enforcement, output filtering, streaming UI) each have a home in the layer taxonomy.</div>
+
+    <div class="c-row">
+      <div class="c-name">Streaming Output Discipline</div>
+      <div class="c-line">How to decide when streaming is worth the engineering cost and when batch is fine. Includes rules for chunking output so each partial response is still useful to a reader.</div>
+      <div class="c-xref">UX mechanism for the user lives in L7 User Surface (Streaming and Progressive Disclosure).</div>
+    </div>
+
+    <div class="c-row">
+      <div class="c-name">Time-to-First-Token Frameworks</div>
+      <div class="c-line">TTFT is the primary number users feel. Covers how to measure it, how to set targets per product type (voice is tighter than chat), and which infrastructure levers move it.</div>
+      <div class="c-xref">Cross-ref C5 Cost, Latency and Reliability for latency budget design.</div>
+    </div>
+
+    <div class="c-row">
+      <div class="c-name">Continuous Context for Voice</div>
+      <div class="c-line">Voice adds turn-taking, interruption, and barge-in on top of streaming. Covers the state machine for managing these transitions and keeping context coherent across interrupted turns.</div>
+      <div class="c-xref">Voice surface mechanism lives in L7 User Surface.</div>
+    </div>
+
+    <!-- CLUSTER 2 -->
+    <div class="c-cluster-head c-cluster-break">
+      <h3 class="c-cluster-label">Doing it safely and cheaply</h3>
+    </div>
+
+    <div class="c-row">
+      <div class="c-name">Streaming Eval</div>
+      <div class="c-line">Standard evals wait for a full response. Streaming eval measures quality at intermediate checkpoints: coherence mid-sentence, drift detection, and whether the final answer matches where it started.</div>
+      <div class="c-xref">Cross-ref C1 Evaluation for general eval methodology.</div>
+    </div>
+
+    <div class="c-row">
+      <div class="c-name">Streaming Safety</div>
+      <div class="c-line">A filter that reads the complete response cannot work with streaming. Covers real-time harm detection on partial outputs: sliding-window classifiers, early-exit rules, and interrupting a stream without confusing the user.</div>
+      <div class="c-xref">Cross-ref C2 Safety, Alignment and Refusal for harm taxonomy and refusal calibration.</div>
+    </div>
+
+    <div class="c-row">
+      <div class="c-name">Streaming Validation</div>
+      <div class="c-line">Partial tokens may be syntactically invalid mid-stream when output must be structured. Covers incremental schema checking, buffering strategies, and surfacing validation errors without waiting for the full response.</div>
+      <div class="c-xref">Cross-ref L4 Output Shape for the schema enforcement mechanism itself.</div>
+    </div>
+
+    <div class="c-row">
+      <div class="c-name">Backpressure and Cancellation</div>
+      <div class="c-line">When a client cannot consume tokens as fast as the model produces them, or the user navigates away, the system needs a clean path to pause or abort. Covers propagating cancellation upstream and avoiding wasted compute on abandoned streams.</div>
+    </div>
+
+    <div class="c-row">
+      <div class="c-name">Streaming Cost Attribution</div>
+      <div class="c-line">A cancelled stream still consumed prefill compute, and partial responses still count as output tokens. Covers how to attribute cost to users or features when the full response was never delivered.</div>
+      <div class="c-xref">Cross-ref C5 Cost, Latency and Reliability for general cost attribution frameworks.</div>
+    </div>
+
+    <div class="covers-map-note">All eight are disciplines for reasoning and decision-making. The mechanisms they reference (schema enforcement, output filtering, streaming UI) each have a home in the layer taxonomy.</div>
   </div>
 </section>
 
@@ -573,9 +560,9 @@
 <div class="sources">
   <div class="sources-title">Sources</div>
   <ul>
-    <li>Anthropic. <em>Streaming Messages.</em> <span class="note"><a href="https://docs.anthropic.com/en/api/messages-streaming" target="_blank" rel="noopener">docs.anthropic.com</a> — official streaming API reference.</span></li>
-    <li>Google. <em>Streaming responses in the Gemini API.</em> <span class="note"><a href="https://ai.google.dev/gemini-api/docs/text-generation#streaming" target="_blank" rel="noopener">ai.google.dev</a> — explains why TTFT matters for perceived performance.</span></li>
-    <li>Nielsen Norman Group. <em>Response Times: The 3 Important Limits.</em> <span class="note"><a href="https://www.nngroup.com/articles/response-times-3-important-limits/" target="_blank" rel="noopener">nngroup.com</a> — 0.1s feels instant, 1s loses flow, 10s loses attention.</span></li>
+    <li>Anthropic. <em>Streaming Messages.</em> <span class="note"><a href="https://docs.anthropic.com/en/api/messages-streaming" target="_blank" rel="noopener">docs.anthropic.com</a>. Official streaming API reference.</span></li>
+    <li>Google. <em>Streaming responses in the Gemini API.</em> <span class="note"><a href="https://ai.google.dev/gemini-api/docs/text-generation#streaming" target="_blank" rel="noopener">ai.google.dev</a>. Explains why TTFT matters for perceived performance.</span></li>
+    <li>Nielsen Norman Group. <em>Response Times: The 3 Important Limits.</em> <span class="note"><a href="https://www.nngroup.com/articles/response-times-3-important-limits/" target="_blank" rel="noopener">nngroup.com</a>. 0.1s feels instant, 1s loses flow, 10s loses attention.</span></li>
     <li>Sardana et al. (2024). <em>Beyond Throughput: Time-to-First-Token in LLM Serving.</em> <span class="note">MLSys workshop paper analysing TTFT as the primary user-perceived latency metric.</span></li>
   </ul>
 </div>
@@ -678,11 +665,11 @@ function setFeel(level) {
     p.classList.remove('on', 'half');
     if (i < level) p.classList.add('on');
   });
-  if (level <= 1)      feelDesc.textContent = 'impatient — where is it?';
-  else if (level <= 2) feelDesc.textContent = 'slow — something is happening...';
-  else if (level <= 3) feelDesc.textContent = 'ok — it is coming';
-  else if (level <= 4) feelDesc.textContent = 'good — reading already';
-  else                 feelDesc.textContent = 'instant — feels like talking';
+  if (level <= 1)      feelDesc.textContent = 'impatient: where is it?';
+  else if (level <= 2) feelDesc.textContent = 'slow: something is happening...';
+  else if (level <= 3) feelDesc.textContent = 'ok: it is coming';
+  else if (level <= 4) feelDesc.textContent = 'good: reading already';
+  else                 feelDesc.textContent = 'instant: feels like talking';
 }
 
 function sleep(ms) { return new Promise(r => { const t = setTimeout(r, ms); timers.push(t); }); }
