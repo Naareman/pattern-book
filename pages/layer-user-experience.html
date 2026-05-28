@@ -130,7 +130,7 @@
   h2 em { font-style: italic; color: var(--accent); }
 
   /* ============ STAGE CARDS ============ */
-  .stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 6px; }
+  .stages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 6px; }
 
   .stage-card {
     background: var(--surface); border: 1px solid var(--border);
@@ -138,6 +138,7 @@
     scroll-margin-top: 80px;
     transition: box-shadow .55s ease, border-color .55s ease;
     display: flex; flex-direction: column;
+    min-width: 0;
   }
   .stage-card.glow {
     box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42);
@@ -157,7 +158,7 @@
   }
 
   /* de-squeezed: icon + name share a full-width row of their own */
-  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; }
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; min-width: 0; }
   .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
   .stage-head .sico svg { width: 18px; height: 18px; display: block; }
   .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
@@ -165,11 +166,11 @@
   .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
   /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
-  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; }
   .chip {
     flex: none; display: inline-flex; align-items: center; gap: 3px;
     padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500;
-    line-height: 1.2; white-space: nowrap;
+    line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
 
@@ -271,11 +272,11 @@
         </span>
         <h2 id="g-meet"><span class="stage-name">Where you meet the AI</span></h2>
       </div>
-      <p class="stage-lead">The kind of surface that delivers it: a chat, a sidebar inside another app, a voice line, or a quiet helper that just gets work done.</p>
+      <p class="stage-lead">The kind of surface you meet the AI through.</p>
       <div class="chips">
         <span class="chip">A chat window</span>
         <span class="chip">A sidebar inside another app</span>
-        <span class="chip">A quiet helper working in the background</span>
+        <span class="chip">A quiet helper in the background</span>
         <span class="chip">A voice you talk to</span>
         <span class="chip">A camera that looks and answers</span>
       </div>
@@ -292,7 +293,7 @@
         </span>
         <h2 id="g-show"><span class="stage-name">How answers show up</span></h2>
       </div>
-      <p class="stage-lead">The shape and rhythm of the reply: word-by-word streaming, a clarifying follow-up when the AI is unsure, and a quick way to say if it landed.</p>
+      <p class="stage-lead">The shape and rhythm of the reply.</p>
       <div class="chips">
         <span class="chip">Answers that stream word by word</span>
         <span class="chip">A follow-up question when it is unsure</span>
@@ -311,11 +312,11 @@
         </span>
         <h2 id="g-control"><span class="stage-name">Staying in control</span></h2>
       </div>
-      <p class="stage-lead">The brakes and the steering wheel: a path to a real person, a pause before anything serious, and a dial for how much the AI may do on its own.</p>
+      <p class="stage-lead">The brakes and the steering wheel.</p>
       <div class="chips">
         <span class="chip">A path to a real person</span>
-        <span class="chip">A pause to ask before a big action</span>
-        <span class="chip">A dial for how much the AI may do on its own</span>
+        <span class="chip">A pause before a big action</span>
+        <span class="chip">A dial for how much the AI may do</span>
       </div>
       <a class="see-how" href="user-experience-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>

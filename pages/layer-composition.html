@@ -113,14 +113,14 @@
   h2 em { font-style: italic; color: var(--accent); }
 
   /* ---- stage cards ---- */
-  .stages { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: 6px; }
+  .stages { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: 6px; align-items: stretch; }
 
   .stage-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
     scroll-margin-top: 80px;
     transition: box-shadow .55s ease, border-color .55s ease;
-    display: flex; flex-direction: column;
+    display: flex; flex-direction: column; height: 100%;
   }
   .stage-card.glow { box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42); border-color: var(--accent); }
   @media (prefers-reduced-motion:reduce) { .stage-card { transition: none; } }
@@ -167,14 +167,6 @@
   .back-link:hover .back-arrow { transform: translateX(-3px); }
   .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
   .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
-
-  /* sources */
-  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
-  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
-  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
-  .sources li em { font-style: italic; color: var(--text); }
-  .sources li .note { color: var(--faint); }
 
   /* footer */
   footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
@@ -305,17 +297,6 @@
     </div>
   </a>
 </section>
-
-<!-- SOURCES -->
-<div class="sources">
-  <div class="sources-title">Sources</div>
-  <ul>
-    <li>Wang et al. (2023). <em>Self-Consistency Improves Chain of Thought Reasoning in Language Models.</em> <span class="note">ICLR 2023. Origin of the majority-vote approach.</span></li>
-    <li>Chase (2022). <em>LangChain: Building applications with LLMs through composability.</em> <span class="note">Popularized chaining and routing as first-class patterns.</span></li>
-    <li>Anthropic (2024). <em>Building effective agents.</em> <span class="note">Covers chaining, routing, and parallelisation in production systems.</span></li>
-    <li>Shen et al. (2024). <em>Small LLMs are Weak Tool Learners: A Multi-LLM Agent.</em> <span class="note">Shows routing between models improving quality over a single-model approach.</span></li>
-  </ul>
-</div>
 
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
