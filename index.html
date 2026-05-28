@@ -277,9 +277,18 @@
 
   let activeConcern = null;
   // pause/resume scheduler: a demo is a list of {at, fn} steps; pause freezes, resume continues
-  let steps = [], elapsed = 0, startedAt = 0, activeTimers = [], demoState = 'idle', activeBtn = null;
-  function schedule(){ startedAt = performance.now(); activeTimers = []; steps.forEach(s=>{ const d = s.at - elapsed; if(d >= 0) activeTimers.push(setTimeout(s.fn, d)); }); }
-  function clearTimers(){ activeTimers.forEach(clearTimeout); activeTimers = []; }
+  // generation: incremented on every pause/stop so stale timer callbacks from a cancelled run are no-ops
+  let steps = [], elapsed = 0, startedAt = 0, activeTimers = [], demoState = 'idle', activeBtn = null, generation = 0;
+  function schedule(){
+    const gen = generation;
+    startedAt = performance.now();
+    activeTimers = [];
+    steps.forEach(s=>{
+      const d = s.at - elapsed;
+      if(d >= 0) activeTimers.push(setTimeout(()=>{ if(generation === gen) s.fn(); }, d));
+    });
+  }
+  function clearTimers(){ generation++; activeTimers.forEach(clearTimeout); activeTimers = []; }
 
   function resetVisual(){
     document.body.classList.add('snapping');
@@ -368,7 +377,8 @@
     return a;
   }
   function startDemo(btn, kind){
-    if(activeBtn && activeBtn!==btn) endDemo(true);   // stop & clear any other demo first
+    clearTimers();   // bump generation + cancel any residual timers regardless of previous state
+    if(activeBtn && activeBtn!==btn){ document.body.classList.remove('demoing','touring'); hideBoxCaps(); setTourPhase(0); if(activeBtn) activeBtn.innerHTML = activeBtn.dataset.cta; }
     resetVisual();
     document.body.classList.add('demoing');
     activeBtn=btn; demoState='playing'; elapsed=0;

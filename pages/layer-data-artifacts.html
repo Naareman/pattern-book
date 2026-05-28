@@ -739,6 +739,7 @@ window.addEventListener('resize', function() { resizeCanvas(); drawCanvas(visibl
     if (!doorCard) return;
     var doorHref = doors[cardId];
     doorCard.addEventListener('click', function(e) {
+      if (e.target.closest('.chip')) return; // chip clicks never trigger the card door
       if (e.target.closest('a')) return;
       window.location.href = doorHref;
     });

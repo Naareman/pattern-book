@@ -283,7 +283,8 @@
 
     // each stage card acts as one big link: a click anywhere on the card opens its
     // guide, except on the inner anchors (stage-name, see-how, chips), which navigate
-    // on their own.
+    // on their own. Chip spans are also excluded so clicking a not-yet-live chip
+    // does nothing rather than wrongly opening the card guide.
     var doors = {
       'card-ask': 'single-call-ask-it-well.html',
       'card-think': 'single-call-guide-its-thinking.html',
@@ -295,6 +296,7 @@
       if(!doorCard) return;
       var doorHref = doors[cardId];
       doorCard.addEventListener('click', function(e){
+        if(e.target.closest('.chip')) return; // chip clicks never trigger the card door
         if(e.target.closest('a')) return; // let real links handle their own clicks
         window.location.href = doorHref;
       });

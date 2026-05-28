@@ -2,11 +2,18 @@
 
 The standing gate. Every page, and every agent that builds or edits a page, must pass ALL of these before the page is "done." Compiled from Nareman's feedback. Reference pages: **layer-single-call-control.html** (hub model) and **pattern-chain-of-thought.html** (approved section/tradeoff reference).
 
+## 0. Guiding stance
+- Operate, don't read: the page is something you DO, not a wall you read.
+- Subtract first: default to removing before adding. Agents over-build. When in doubt, less and simpler.
+
 ## 1. Matches the template
+- Every page at the same level as Single-Call Control (all layer hubs) must MATCH ITS DESIGN, not just its structure: same header, same "See it in action" pill, same flow legend, same stage cards, same spacing. Single-Call Control is THE reference for hubs; Chain-of-Thought is THE reference for section/tradeoff styling.
 - Layer hub shows the BREAKDOWN only: eyebrow pill -> title with a "See it in action ->" pill on the title row -> flow legend + caption -> stage cards directly. NO "01 Inside this layer" numbered label or serif heading before the cards.
 - The interactive concept demo + tradeoffs live on a separate `<layer>-how-it-works.html` page, never on the hub.
 - Section titles use ONE canonical wording site-wide: `See It Work`, `A Real Example` (atomic pages: `An Example`), `When It Matters`, idea h2 `What is it?`, and the tradeoffs h2 is `The price you pay.` everywhere it is the Low->High cost meter (leave a genuine comparison section alone).
 - Tradeoff meter: every bar starts from the same left baseline (fixed 170px label column), monochrome accent, Low->High, stacks on mobile.
+- Cross-page consistency: a recurring element (section title, tradeoff meter, a block, a connector) must look and read IDENTICALLY on every page. Parallel agents drift, so always normalize back to the reference.
+- Logical order: order items the way a person actually does them; a "check / review / verify" step comes last. Do not follow raw taxonomy order if it reads illogically.
 
 ## 2. Links never lie
 - Link a thing ONLY if its target page actually exists. Not built yet = not clickable AND must not look clickable (no accent color, no underline, default cursor).
@@ -18,19 +25,26 @@ The standing gate. Every page, and every agent that builds or edits a page, must
 - 10-year-old plain. Define any necessary term inline. No clever metaphors. No condescending negations like "(not different AIs)".
 - No em dashes, ever. Use colons, periods, or parentheses.
 - Goal/intent first ("Want to X? -> Technique"), not abstract category lists.
+- No unexplained jargon or bare acronyms (RLHF, ReAct, zero/few-shot). Spell out and define on first use, or cut. If a beginner would ask "what's that?", it is not done.
+- Distinct labels: never reuse a sibling's word (e.g. a cluster "Shape the input" next to a stage "Shape its output").
 
 ## 4. Short + best representation
 - One-line intros. No explanatory paragraphs or prose walls. If a block is a wall, cut it or convert it to a visual (chips, small flow, before/after, tap-to-reveal).
 - One representation per idea. MECE, no redundancy across sections.
 - Always ask: is a list the best way to show this, or would a small visual / before-after / tap interaction land better?
+- Strong lead copy: if an intro line or title reads flat or weak, rewrite it stronger or remove it. No filler openers.
+- No duplication: do not repeat what already lives on the homepage or in another section. Link to it or cut it.
 
 ## 5. Interactive, tap not hover
 - At least one thing to operate where it genuinely helps. Do NOT force a heavy animated demo onto a concept that does not warrant one.
 - Everything works on tap/click + keyboard. No hover-only reveals (the site is used on phones).
+- Phone-first reach: every control is visible and tappable on a small screen. No tiny text, no buttons placed so far away you would have to zoom out to find them.
 
 ## 6. Accurate + complete
 - AI-expert accuracy pass: claims are correct, not just plausible-sounding (no hallucination).
-- Taxonomy completeness: every category/bullet for that layer/crosscut is present, nothing invented, nothing dropped. MECE.
+- Taxonomy completeness: every category/bullet for that layer/crosscut is present, nothing invented, nothing dropped.
+- Cross-check against `taxonomy.md`, both for THIS page and across the WHOLE site: every layer, sub-axis, category, crosscut, and recipe in the taxonomy has a real page/section and is actually built. We keep silently dropping items (6 layers were missed once), so re-run this sweep and never assume it is done.
+- MECE: the breakdown is mutually exclusive (items/sections do not overlap or repeat) AND collectively exhaustive (covers everything in the taxonomy, no gaps).
 - Include a few credible sources. A few is enough.
 
 ## 7. Design system + accessibility
@@ -39,5 +53,6 @@ The standing gate. Every page, and every agent that builds or edits a page, must
 
 ## 8. The gate (before "done")
 - Four-reviewer loop: UI/UX (consistent with the template?), content writer, primary student, AI-expert (accuracy + taxonomy completeness). Revise and re-review until genuinely solid.
+- Simplify + delight check: can it be simpler (less text, fewer elements)? Can it be more interactive / more enjoyable? If yes, do it before shipping.
 - VERIFY before declaring done: screenshot the page against Single-Call / Chain-of-Thought and confirm it matches. Never claim "done" without showing the result.
 - Agents do not git commit or push; commits are central.
