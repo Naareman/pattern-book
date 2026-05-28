@@ -138,7 +138,7 @@
   <div class="section-label"><span class="num">01</span>What Is It?</div>
   <h2 id="what-heading">Answer once, then <em>serve it again</em>.</h2>
   <div class="what-card">
-    <p>Before sending a request to the model, the system checks a store of past requests. If the same one (exact match) or a very close one (meaning match) is already there, return that saved answer. No model call. No new cost. Two flavors: exact-prefix caching reuses the start of identical prompts so the model only pays for the new tail, and semantic caching matches by meaning so "how do I reset my password" hits the cached answer for "I forgot my password".</p>
+    <p>Before each model call, the system checks a store of past requests; if an identical or semantically close one is found, it returns the saved answer and skips the model entirely.</p>
   </div>
 </section>
 

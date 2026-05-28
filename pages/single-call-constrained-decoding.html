@@ -120,7 +120,7 @@
   <div class="section-label"><span class="num">01</span>What It Is</div>
   <h2 id="what-heading">Validity enforced at the <em>token level</em>.</h2>
   <div class="what-card">
-    <p><strong style="color:var(--accent-hover)">Constrained decoding</strong> works by running a grammar or finite-state machine alongside the model's forward pass. At each decoding step, the grammar says which tokens are legal continuations given what has been produced so far. All other token probabilities are forced to zero (masked) before sampling. The result is that the model can never produce text that violates the grammar, regardless of what the prompt says or what the weights prefer. Common grammars used in practice are JSON, EBNF rule sets, and regular expressions. Libraries such as Outlines and llama.cpp's grammar support implement this for open models; hosted APIs surface it as structured output modes.</p>
+    <p><strong style="color:var(--accent-hover)">Constrained decoding</strong> runs a grammar or finite-state machine alongside generation, masking illegal token continuations at each step so the model physically cannot produce output that violates the grammar.</p>
   </div>
 </section>
 

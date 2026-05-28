@@ -220,7 +220,7 @@
   <div class="section-label"><span class="num">01</span>What It Is</div>
   <h2 id="what-heading">Catch a quiet <em>step back</em>.</h2>
   <div class="what-card">
-    <p>Regression testing runs the same frozen golden set on every change to the system: a new prompt, a new model, a new retrieval index, an upstream library bump. Each case has a known good answer. If a case that used to pass starts failing, the run is blocked until someone explains why. The whole point is to catch the silent step backwards: a tweak that helps 20 cases while breaking 3 others, where the average score barely moves.</p>
+    <p>Regression testing runs the same frozen set of cases after every change and blocks the release if anything that previously passed now fails.</p>
   </div>
 </section>
 

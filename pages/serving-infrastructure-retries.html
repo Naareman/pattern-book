@@ -130,7 +130,7 @@
   <div class="section-label"><span class="num">01</span>What is it?</div>
   <h2 id="what-heading">Try again, with <em>patience</em>.</h2>
   <div class="what-card">
-    <p>A naive retry asks again right away. If thousands of users are doing that at the same moment, the recovering service gets a wave of traffic and falls over for a second time. <strong style="color:var(--accent-hover)">Retrying safely</strong> means waiting an increasing amount of time between tries (exponential backoff), adding a small random pause so requests spread out (jitter), and stopping after a set number of attempts so a stubborn failure stays bounded instead of turning into an infinite loop.</p>
+    <p><strong style="color:var(--accent-hover)">Retrying safely</strong> means waiting an increasing amount of time between attempts, adding a small random jitter so callers spread out, and capping the total number of tries so a stubborn failure stays bounded.</p>
   </div>
 </section>
 

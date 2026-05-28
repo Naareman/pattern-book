@@ -131,7 +131,7 @@
   <div class="section-label"><span class="num">01</span>What is it?</div>
   <h2 id="what-heading">Score first, <em>route second</em>.</h2>
   <div class="what-card">
-    <p>After the first model answers, compute how sure it is (token log-probability, a separate scorer, or asking the model to rate itself). If the score clears your bar, ship the answer. If it falls below, send the question to a bigger model or to a person.</p>
+    <p>After the first model answers, its confidence score determines whether to ship the answer or escalate to a stronger model or a human reviewer.</p>
   </div>
 </section>
 

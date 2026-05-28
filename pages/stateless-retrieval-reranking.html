@@ -130,7 +130,7 @@
   <div class="section-label"><span class="num">01</span>What is it?</div>
   <h2 id="what-heading">A <em>second look</em> at the search results.</h2>
   <div class="what-card">
-    <p>The first search step is fast and casts a wide net: it grabs maybe twenty plausible pieces. A reranker is a smaller, slower model that scores each of those twenty against the actual question, one pair at a time. The few that score highest go to the model; the rest are dropped. The same model that ran the search would have been too slow to do this for every piece in the whole library, which is why it happens in two stages.</p>
+    <p>Reranking runs a second, slower pass over the initial search results, scoring each candidate piece against the actual question so the strongest matches rise to the top.</p>
   </div>
 </section>
 

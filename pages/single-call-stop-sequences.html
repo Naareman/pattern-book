@@ -114,7 +114,7 @@
   <div class="section-label"><span class="num">01</span>What It Is</div>
   <h2 id="what-heading">A <em>hard boundary</em> on generation.</h2>
   <div class="what-card">
-    <p>A <strong style="color:var(--accent-hover)">stop sequence</strong> is a string you pass to the API that acts as a hard cut-off: the moment the model produces that exact text, generation halts and the sequence itself is usually omitted from the response. You can supply several at once. Common examples are <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;background:var(--bg-subtle);padding:1px 5px;border-radius:4px;">\n\n</code>, a closing XML tag like <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;background:var(--bg-subtle);padding:1px 5px;border-radius:4px;">&lt;/answer&gt;</code>, or a sentinel like <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;background:var(--bg-subtle);padding:1px 5px;border-radius:4px;">###</code>. This is distinct from telling the model in the prompt to "be concise" because the cut-off is enforced mechanically, not persuasively.</p>
+    <p>A <strong style="color:var(--accent-hover)">stop sequence</strong> is a string passed to the API that mechanically halts generation the moment the model produces it, enforcing a hard boundary that no amount of prompting can override.</p>
   </div>
 </section>
 

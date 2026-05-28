@@ -158,7 +158,7 @@
   <div class="section-label"><span class="num">01</span>The idea</div>
   <h2 id="h-what">What <em>is it?</em></h2>
   <div class="prose-card">
-    <p>A search index (the structure that finds passages for a question) is rebuilt every time the source data or the embedding model changes. <strong>Index versioning</strong> builds the new index into a fresh, tagged copy. The live system keeps using the old one. When the new index passes its checks, the pointer flips, and users see no interruption.</p>
+    <p><strong>Index versioning</strong> builds every new search index into a fresh tagged copy alongside the live one, then flips a pointer to switch over only once the new index passes its checks.</p>
   </div>
 </section>
 

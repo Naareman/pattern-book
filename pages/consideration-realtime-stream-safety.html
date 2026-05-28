@@ -131,7 +131,7 @@
   <div class="section-label"><span class="num">01</span>What is it?</div>
   <h2 id="what-heading">A guard sits <em>on the wire</em>.</h2>
   <div class="what-card">
-    <p>A streamed answer is leaving the server one chunk at a time. A <strong style="color:var(--accent-hover)">mid-stream safety guard</strong> sits in that flow and looks at every new chunk before it is forwarded to the user. Each rule is small and fast: short blocklist matches, a lightweight classifier, or a pattern that watches for personal data leaking out. As long as nothing fires, the chunks pass through untouched. The moment a rule fires, the guard can swap in a safe phrase, hold the next few words for review, or end the stream and tell the user the answer was stopped. The key word is <em>before</em>: the harmful piece never reaches the screen.</p>
+    <p>Streaming safety sits a fast safety guard in the token flow between the model and the user, so a harmful chunk can be swapped out or the stream ended before that content ever reaches the screen.</p>
   </div>
 </section>
 

@@ -134,7 +134,7 @@
   <div class="section-label"><span class="num">01</span>What Is It?</div>
   <h2 id="what-heading">Leave a <em>trail</em> for every call.</h2>
   <div class="what-card">
-    <p>The runtime emits a small record for each request: a trace. Each step (cache check, model call, tool call, retrieval) writes its time, its token count, its cost, and any errors. Later you can replay the trail to see why a call was slow, which model the router picked, and what the total bill was. The runtime only emits the signals. Deciding what to look at and what to fix is a separate discipline that lives in the observability crosscut.</p>
+    <p>The runtime emits a trace for every request, recording the time, token count, cost, and errors for each step, so you can later replay the trail and see exactly where a call was slow or expensive.</p>
   </div>
 </section>
 

@@ -137,7 +137,7 @@
   <div class="section-label"><span class="num">01</span>What is it?</div>
   <h2 id="what-heading">Read the shape <em>as it grows</em>.</h2>
   <div class="what-card">
-    <p>Structured replies (JSON, key-value lists, function calls) often stream in the same way as plain text. A normal parser waits for the whole thing and falls over on anything that looks half-built. A <strong style="color:var(--accent-hover)">partial-answer parser</strong> tolerates the unfinished shape: open braces, half-typed strings, missing commas. It keeps a running picture of what is complete, what is still being typed, and what is still expected. Each time a field finishes (the name, then the price, then the tags), the parser fires that field downstream so the page can render or the next step can begin. Latency drops because work starts on field one before field five exists.</p>
+    <p>Streaming validation parses structured output (JSON, function calls) as it arrives rather than waiting for the full reply, so completed fields can be acted on immediately and latency drops because downstream work starts before the stream ends.</p>
   </div>
 </section>
 

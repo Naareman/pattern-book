@@ -124,7 +124,7 @@
   <div class="section-label"><span class="num">01</span>What is it?</div>
   <h2 id="what-heading">Push words out <em>as they come</em>.</h2>
   <div class="what-card">
-    <p><strong style="color:var(--accent-hover)">Streaming</strong> means the server starts forwarding pieces of the answer to the client the instant the model produces them, rather than buffering the whole reply and shipping it as one block. It is a delivery move, not a smarter model: the total time to finish is roughly the same, but the experience is transformed. The reader starts reading at the first word, the system feels alive, and any later step (cancelling, validating, displaying a typing animation) gets the chance to happen mid-flight. Most modern model APIs offer it through server-sent events or web sockets, so the cost of turning it on is small and the win is large.</p>
+    <p>Streaming output discipline means forwarding each token to the client the moment the model produces it rather than buffering the full reply, which transforms the perceived experience without changing the total generation time.</p>
   </div>
 </section>
 

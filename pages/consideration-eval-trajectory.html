@@ -224,7 +224,7 @@
   <div class="section-label"><span class="num">01</span>What It Is</div>
   <h2 id="what-heading">Score the <em>path</em>, not only the destination.</h2>
   <div class="what-card">
-    <p>When an agent reaches an answer by calling tools, browsing, and running code, the final reply alone hides a lot. Trajectory evaluation records each step the agent took, then scores both the steps and the result: did it pick the right tool, in the right order, with reasonable inputs, before stopping? An agent that gets the answer by luck after twelve wasted calls deserves a worse score than one that gets the same answer in three.</p>
+    <p>Trajectory evaluation scores the full sequence of steps an agent took to reach its answer, not just the answer itself, so an agent that lucked into the right result via wasteful steps is rated lower than one that took the direct path.</p>
   </div>
 </section>
 

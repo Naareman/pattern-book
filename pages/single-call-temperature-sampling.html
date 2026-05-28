@@ -117,7 +117,7 @@
   <div class="section-label"><span class="num">01</span>What It Is</div>
   <h2 id="what-heading">One dial, <em>two extremes</em>.</h2>
   <div class="what-card">
-    <p>Every token the model generates comes with a probability distribution over the whole vocabulary. <strong style="color:var(--accent-hover)">Temperature</strong> scales that distribution before sampling: low values (near 0) sharpen it so the most likely token almost always wins; high values (near 1 or above) flatten it so unlikely words get a real chance. Related parameters like <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;background:var(--bg-subtle);padding:1px 5px;border-radius:4px;">top_p</code> (nucleus sampling) and <code style="font-family:'JetBrains Mono',monospace;font-size:0.9em;background:var(--bg-subtle);padding:1px 5px;border-radius:4px;">top_k</code> trim the candidate pool before sampling rather than rescaling probabilities, but all three serve the same purpose: tuning the randomness of each token pick.</p>
+    <p><strong style="color:var(--accent-hover)">Temperature</strong> scales the token probability distribution before each pick: low values make the most likely token dominate, high values give rare words a real chance.</p>
   </div>
 </section>
 

@@ -128,7 +128,7 @@
   <div class="section-label"><span class="num">01</span>What Is It?</div>
   <h2 id="what-heading">Score the <em>meaning</em>, not the words.</h2>
   <div class="what-card">
-    <p>Standard scoring compares the model's answer to a single "gold" string. That works for short, fixed answers. Multimodal questions tend to have many valid wordings: a photo of a sunset might be correctly described in a hundred ways. The fix is a rubric (a short list of facts the answer should contain) plus a judge model that reads both the answer and the original image or audio and decides which facts are covered. Each fact gets a tick or a cross, and the score is the share of facts present.</p>
+    <p>Modality-specific evaluation replaces simple text matching with a fact rubric scored by a judge model that reads both the answer and the original image or audio, because visual or spoken questions often have dozens of equally valid wordings.</p>
   </div>
 </section>
 

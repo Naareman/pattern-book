@@ -136,7 +136,7 @@
   <div class="section-label"><span class="num">01</span>What is it?</div>
   <h2 id="what-heading">A switch that <em>trips</em>.</h2>
   <div class="what-card">
-    <p>Borrowed from the fuse box on a wall: a <strong style="color:var(--accent-hover)">circuit breaker</strong> watches how many calls to a model or tool are failing. Once the failure rate crosses a line, the breaker trips and the system stops calling that service for a short pause. After the pause, it tries one careful test call. If that works, the breaker closes and traffic flows again. If it fails, the pause restarts.</p>
+    <p>A <strong style="color:var(--accent-hover)">circuit breaker</strong> tracks failures to a model or tool and, once the rate crosses a threshold, stops sending traffic for a short pause before trying a single test call to see if the service has recovered.</p>
   </div>
 </section>
 

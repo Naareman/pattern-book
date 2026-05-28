@@ -119,7 +119,7 @@
   <div class="section-label"><span class="num">01</span>What It Is</div>
   <h2 id="what-heading">Fields, types, <em>required</em>.</h2>
   <div class="what-card">
-    <p><strong style="color:var(--accent-hover)">Schema enforcement</strong> means passing a formal field specification alongside the prompt so the model must populate every declared key with a value of the correct type. Modern APIs accept a JSON Schema object in the request; the model's output is then validated against it before being returned. This goes beyond asking the model to "reply in JSON" in the prompt: the schema is machine-readable, the validation is automatic, and missing or wrongly typed fields are caught before your code ever sees the response.</p>
+    <p><strong style="color:var(--accent-hover)">Schema enforcement</strong> passes a formal field specification with the request so the API validates the model's output against it before returning, catching missing or wrongly typed fields automatically.</p>
   </div>
 </section>
 

@@ -212,7 +212,7 @@
   <div class="section-label"><span class="num">01</span>What It Is</div>
   <h2 id="what-heading">Start <em>easy</em>, build up.</h2>
   <div class="what-card">
-    <p><strong style="color:var(--accent-hover)">Least-to-Most prompting</strong> has two stages: first, ask the model to break the original problem into a list of simpler sub-problems ordered from easiest to hardest. Then work through each sub-problem in sequence, feeding the answer to each one forward into the context before asking the next. The technique was designed specifically for compositional generalization tasks where the final answer requires chaining many small inferences that Chain-of-Thought tends to shortcut.</p>
+    <p><strong style="color:var(--accent-hover)">Least-to-Most prompting</strong> first asks the model to decompose a problem into sub-problems ordered easiest to hardest, then solves each in sequence, feeding each answer forward as context for the next.</p>
   </div>
 </section>
 

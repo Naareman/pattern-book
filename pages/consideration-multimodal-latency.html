@@ -124,7 +124,7 @@
   <div class="section-label"><span class="num">01</span>What Is It?</div>
   <h2 id="what-heading">Time, <em>broken into pieces</em>.</h2>
   <div class="what-card">
-    <p>Wait time for a multimodal call is the sum of several steps: the user's input travels to the server (small for text, big for an image, bigger for a video), the server turns it into tokens or features (vision encoders take real time, audio transcription takes seconds), the model thinks (slower because images become hundreds of tokens), and the answer travels back. A latency budget assigns a time cap to each step and a total cap for the user. When one step blows its slice, that is the one to fix.</p>
+    <p>Multimodal latency is the sum of upload, encoding, model inference, and delivery, where images and audio add significant encoding time that text does not, so each step needs its own time budget.</p>
   </div>
 </section>
 

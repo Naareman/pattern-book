@@ -121,7 +121,7 @@
   <div class="section-label"><span class="num">01</span>What It Is</div>
   <h2 id="what-heading">A thumb on the <em>probability scale</em>.</h2>
   <div class="what-card">
-    <p>After the model computes raw logit scores for every possible next token, you can apply a <strong style="color:var(--accent-hover)">logit bias</strong>: a signed number added to specific token IDs before the softmax that converts scores to probabilities. A positive bias raises a token's probability; a large negative bias (typically -100) effectively bans it. The API usually accepts a dictionary of token IDs to bias values. Common uses: forcing the model to answer only "yes" or "no" by zeroing everything else; preventing the model from ever producing a specific phrase; or nudging a classification task to use your preferred label strings.</p>
+    <p>A <strong style="color:var(--accent-hover)">logit bias</strong> is a signed number added to a specific token's score before sampling, raising its probability or banning it entirely, giving you direct control over which tokens can appear in the output.</p>
   </div>
 </section>
 

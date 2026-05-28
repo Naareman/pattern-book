@@ -228,7 +228,7 @@
   <div class="section-label"><span class="num">01</span>What It Is</div>
   <h2 id="what-heading">Explore paths, <em>pick the best</em>.</h2>
   <div class="what-card">
-    <p><strong style="color:var(--accent-hover)">Tree-of-Thoughts (ToT)</strong> extends Chain-of-Thought by treating reasoning as a search over a tree of partial solutions. At each step, the model generates several candidate next-thoughts, evaluates how promising each one looks, and continues only the most promising branches. Dead ends are pruned. The model can backtrack if a branch fails. This transforms reasoning from a single left-to-right trace into a deliberate search, which is essential for problems where early wrong choices cannot be corrected by later reasoning.</p>
+    <p><strong style="color:var(--accent-hover)">Tree-of-Thoughts</strong> treats reasoning as a search: the model branches into multiple candidate next-thoughts at each step, evaluates them, prunes dead ends, and backtracks, instead of following a single left-to-right chain.</p>
   </div>
 </section>
 

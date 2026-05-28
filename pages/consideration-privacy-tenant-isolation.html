@@ -251,7 +251,7 @@
   <div class="section-label"><span class="num">01</span>What is it?</div>
   <h2 id="what-heading">What <em>is it?</em></h2>
   <div class="prose-card">
-    <p><strong>Tenant isolation</strong> is the rule that every record, every chunk in the search index, and every memory snippet carries the tenant id it belongs to, and every read filters on that tenant id at the lowest level of the stack. The model never even sees a row from another tenant, because the search step rejected it first. Done right, leakage stops being a question of trust in the prompt or trust in the model: the wrong tenant's data simply was never on the table.</p>
+    <p>Tenant isolation stamps every record with its owner's ID and filters on that ID at the lowest level of the stack, so the model never even sees another tenant's data because the search step already rejected it.</p>
   </div>
 </section>
 

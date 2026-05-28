@@ -118,7 +118,7 @@
   <div class="section-label"><span class="num">01</span>What It Is</div>
   <h2 id="what-heading">Fix it <em>in code</em>, not in the prompt.</h2>
   <div class="what-card">
-    <p><strong style="color:var(--accent-hover)">Format coercion</strong> is a post-processing step that runs after the model responds and before the output is consumed. Instead of relying entirely on the model to produce the right format, a deterministic code layer cleans up common deviations: stripping markdown fences from a response asked for plain text, extracting a JSON object buried in prose, normalizing date strings, or trimming whitespace. It is the pragmatic complement to schema enforcement: you ask the model nicely, then fix what it gets slightly wrong. Coercion is not re-generation; it operates on the existing string without calling the model again.</p>
+    <p><strong style="color:var(--accent-hover)">Format coercion</strong> is a deterministic post-processing layer that cleans up common format deviations in the model's response before the output is consumed, without calling the model again.</p>
   </div>
 </section>
 

@@ -129,7 +129,7 @@
   <div class="section-label"><span class="num">01</span>What is it?</div>
   <h2 id="what-heading">Park the past, <em>only price the new word</em>.</h2>
   <div class="what-card">
-    <p>The <span class="define">KV-cache</span> (a small in-memory record of how every word the model has already read or written affects every other word) gets stored on the GPU. With it parked, generating the next word only needs to compare that one new word against the cache. Each extra word costs about the same; without the cache, each extra word would cost more than the last.</p>
+    <p>The <span class="define">KV-cache</span> stores the model's prior calculations on the GPU so each new word only needs to do a small increment of fresh work, keeping generation cost roughly flat instead of growing with every token.</p>
   </div>
 </section>
 

@@ -239,7 +239,7 @@
   <div class="section-label"><span class="num">01</span>What is it?</div>
   <h2 id="what-heading">What <em>is it?</em></h2>
   <div class="prose-card">
-    <p><strong>A cleaning step</strong> that runs in front of the model at request time. It scans whatever you are about to send (a chat message, a support ticket, an uploaded file) and replaces personal details with a tag like [NAME] or [EMAIL]. The model sees the scrubbed version. The tags can be swapped back in the final answer if the user expects to see their own name. The point is simple: the model gets the meaning, the personal details stay with you.</p>
+    <p>Runtime PII handling scans every message or file before it reaches the model and replaces personal details (names, emails, IDs) with tags, so the model gets the meaning but never the sensitive data.</p>
   </div>
 </section>
 

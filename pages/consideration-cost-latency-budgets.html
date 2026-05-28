@@ -136,7 +136,7 @@
   <div class="section-label"><span class="num">01</span>What It Is</div>
   <h2 id="what-heading">A budget, in <em>milliseconds</em>.</h2>
   <div class="what-card">
-    <p>A <strong style="color:var(--accent-hover)">latency budget</strong> is a number the user can live with (say, 2 seconds) split among the steps that lead to the answer: pull context, route the request, run the model, format the output. Each step gets a target. When one step blows its slice, the team knows where to look. The budget covers the slow days too, so the targets are usually set against the worst common case, not the average.</p>
+    <p>A latency budget splits a user-acceptable total wait time (say, 2 seconds) across each pipeline step, so when one step runs over, the team knows exactly where to look.</p>
   </div>
 </section>
 

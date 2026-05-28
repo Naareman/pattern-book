@@ -138,7 +138,7 @@
   <div class="section-label"><span class="num">01</span>What is it?</div>
   <h2 id="what-heading">A graceful <em>cut</em>, not a yank.</h2>
   <div class="what-card">
-    <p>A streaming call is more than a single network request: tokens are still being generated on a server, an open socket is forwarding them, and any tool calls in flight are doing real work. <strong style="color:var(--accent-hover)">Clean stopping</strong> means having a single move (a cancel signal) that tells every part to wind down in the right order: stop generating, close the connection, finish or roll back the tool call, save the partial answer for review, and tell the user exactly where things ended. Done well, the user feels they pressed stop and the system listened. Done badly, the model keeps generating in the background and you keep paying for tokens nobody will read.</p>
+    <p>Backpressure and cancellation is a single cancel signal that tells the whole pipeline to wind down in order: stop generating, close the connection, finish or roll back any in-flight tool calls, and save the partial answer, so the model does not keep generating tokens nobody will read.</p>
   </div>
 </section>
 

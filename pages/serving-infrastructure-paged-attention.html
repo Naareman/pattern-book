@@ -131,7 +131,7 @@
   <div class="section-label"><span class="num">01</span>What is it?</div>
   <h2 id="what-heading">Many small pages, <em>no wasted seats</em>.</h2>
   <div class="what-card">
-    <p><strong style="color:var(--accent-hover)">Paged attention</strong> chops each user's running memory into small fixed-size blocks and keeps a little table that says where each block lives. The GPU stops reserving big empty rooms "just in case" and starts filling every seat as people arrive.</p>
+    <p><strong style="color:var(--accent-hover)">Paged attention</strong> splits each user's in-flight memory into small fixed-size blocks mapped by a lookup table, so the GPU never reserves space it does not immediately need and fits far more users in parallel.</p>
   </div>
 </section>
 
