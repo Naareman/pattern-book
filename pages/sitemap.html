@@ -7,31 +7,33 @@
 :root{--bg:#FCFCFD;--surface:#FFFFFF;--text:#15171C;--soft:#565C68;--faint:#6B7280;--border:#E8EAEE;--border-strong:#D5D9E0;--accent:#7C5CF6;--accent-hover:#6D4DE6;--accent-soft:#F0ECFE;--shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);--radius:16px}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
-.wrap{max-width:920px;margin:0 auto;padding:40px 24px 60px}
+.wrap{max-width:980px;margin:0 auto;padding:40px 24px 60px}
 h1{font-family:'Fraunces',serif;font-weight:500;font-size:38px;letter-spacing:-.015em;margin-bottom:8px}
 .lede{color:var(--soft);font-size:16px;margin-bottom:32px}
 .section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 24px;margin-bottom:18px}
-.sec-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}
+.sec-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .sec-head h2{font-family:'Fraunces',serif;font-weight:500;font-size:20px;margin:0}
-.count{font-size:12px;color:var(--faint);background:var(--accent-soft);color:var(--accent-hover);border-radius:10px;padding:2px 8px;font-weight:600}
-.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px 16px}
+.count{font-size:12px;color:var(--accent-hover);background:var(--accent-soft);border-radius:10px;padding:2px 8px;font-weight:600}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:5px 18px}
 .list a{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--accent-hover);text-decoration:none;padding:3px 0;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .list a:hover{text-decoration:underline}
-.list span.dim{color:var(--faint);font-family:'JetBrains Mono',monospace;font-size:12.5px;padding:3px 0;display:block;white-space:nowrap}
 .back{display:inline-block;font-size:13px;color:var(--accent-hover);text-decoration:none;margin-bottom:20px}
 .back:hover{text-decoration:underline}
+.tally{color:var(--faint);font-size:13px;margin-top:20px}
 </style></head><body><div class="wrap">
 <a class="back" href="../index.html">← The Pattern Book</a>
 <h1>Sitemap</h1>
 <p class="lede">Every page on the site, grouped. Click any filename to open.</p>
-<div class="section"><div class="sec-head"><h2>Home + index</h2><span class="count">4</span></div><div class="list">
-<a href="index.html
+<div class="section"><div class="sec-head"><h2>Home + index pages</h2><span class="count">5</span></div><div class="list">
+<a href="../index.html
 builds.html
 considerations.html
-layers.html">index.html
+layers.html
+sitemap.html">../index.html
 builds.html
 considerations.html
-layers.html</a>
+layers.html
+sitemap.html</a>
 </div></div>
 <div class="section"><div class="sec-head"><h2>Layer hubs (10)</h2><span class="count">10</span></div><div class="list">
 <a href="layer-application-patterns.html
@@ -54,11 +56,9 @@ layer-stateless-retrieval.html
 layer-training-adaptation.html
 layer-user-experience.html</a>
 </div></div>
-<div class="section"><div class="sec-head"><h2>How-it-works pages</h2><span class="count">12</span></div><div class="list">
+<div class="section"><div class="sec-head"><h2>Layer · how-it-works pages</h2><span class="count">10</span></div><div class="list">
 <a href="application-patterns-how-it-works.html
 composition-how-it-works.html
-consideration-cost-how-it-works.html
-consideration-evaluation-how-it-works.html
 data-artifacts-how-it-works.html
 orchestration-how-it-works.html
 serving-infrastructure-how-it-works.html
@@ -68,8 +68,6 @@ stateless-retrieval-how-it-works.html
 training-adaptation-how-it-works.html
 user-experience-how-it-works.html">application-patterns-how-it-works.html
 composition-how-it-works.html
-consideration-cost-how-it-works.html
-consideration-evaluation-how-it-works.html
 data-artifacts-how-it-works.html
 orchestration-how-it-works.html
 serving-infrastructure-how-it-works.html
@@ -79,56 +77,7 @@ stateless-retrieval-how-it-works.html
 training-adaptation-how-it-works.html
 user-experience-how-it-works.html</a>
 </div></div>
-<div class="section"><div class="sec-head"><h2>Considerations</h2><span class="count">7</span></div><div class="list">
-<a href="consideration-cost.html
-consideration-evaluation.html
-consideration-multimodal.html
-consideration-observability.html
-consideration-privacy.html
-consideration-real-time.html
-consideration-safety.html">consideration-cost.html
-consideration-evaluation.html
-consideration-multimodal.html
-consideration-observability.html
-consideration-privacy.html
-consideration-real-time.html
-consideration-safety.html</a>
-</div></div>
-<div class="section"><div class="sec-head"><h2>Builds (recipes)</h2><span class="count">10</span></div><div class="list">
-<a href="build-browsing-agent.html
-build-coding-agent.html
-build-conversational-assistant.html
-build-customer-support-agent.html
-build-document-qa.html
-build-multi-agent-research-team.html
-build-reasoning-code-execution.html
-build-research-agent.html
-build-summarization-service.html
-build-voice-assistant.html">build-browsing-agent.html
-build-coding-agent.html
-build-conversational-assistant.html
-build-customer-support-agent.html
-build-document-qa.html
-build-multi-agent-research-team.html
-build-reasoning-code-execution.html
-build-research-agent.html
-build-summarization-service.html
-build-voice-assistant.html</a>
-</div></div>
-<div class="section"><div class="sec-head"><h2>Patterns (anchor)</h2><span class="count">6</span></div><div class="list">
-<a href="pattern-chain-of-thought.html
-pattern-few-shot.html
-pattern-reflection.html
-pattern-self-consistency.html
-pattern-structured-output.html
-pattern-zero-shot.html">pattern-chain-of-thought.html
-pattern-few-shot.html
-pattern-reflection.html
-pattern-self-consistency.html
-pattern-structured-output.html
-pattern-zero-shot.html</a>
-</div></div>
-<div class="section"><div class="sec-head"><h2>Single-Call guides (sub-axes)</h2><span class="count">4</span></div><div class="list">
+<div class="section"><div class="sec-head"><h2>Single-Call · sub-axis guides</h2><span class="count">4</span></div><div class="list">
 <a href="single-call-ask-it-well.html
 single-call-guide-its-thinking.html
 single-call-make-it-check-itself.html
@@ -137,7 +86,7 @@ single-call-guide-its-thinking.html
 single-call-make-it-check-itself.html
 single-call-shape-its-output.html</a>
 </div></div>
-<div class="section"><div class="sec-head"><h2>Single-Call leaves</h2><span class="count">27</span></div><div class="list">
+<div class="section"><div class="sec-head"><h2>Single-Call · leaves</h2><span class="count">27</span></div><div class="list">
 <a href="single-call-analogical-prompting.html
 single-call-beam-search.html
 single-call-chain-of-verification.html
@@ -192,14 +141,14 @@ single-call-streaming-validation.html
 single-call-temperature-sampling.html
 single-call-tree-of-thoughts.html</a>
 </div></div>
-<div class="section"><div class="sec-head"><h2>Orchestration guides</h2><span class="count">3</span></div><div class="list">
+<div class="section"><div class="sec-head"><h2>Orchestration · sub-axis guides</h2><span class="count">3</span></div><div class="list">
 <a href="orchestration-action.html
 orchestration-coordination.html
 orchestration-structure.html">orchestration-action.html
 orchestration-coordination.html
 orchestration-structure.html</a>
 </div></div>
-<div class="section"><div class="sec-head"><h2>Orchestration leaves</h2><span class="count">16</span></div><div class="list">
+<div class="section"><div class="sec-head"><h2>Orchestration · leaves</h2><span class="count">17</span></div><div class="list">
 <a href="orchestration-agent-identity.html
 orchestration-agent-to-agent-protocols.html
 orchestration-approval-gates.html
@@ -210,6 +159,7 @@ orchestration-external-action.html
 orchestration-hierarchical-planning.html
 orchestration-idempotency.html
 orchestration-iterative-loops.html
+orchestration-multi-step-transactions.html
 orchestration-parallel-fan-out.html
 orchestration-router-dispatcher.html
 orchestration-sequential-pipelines.html
@@ -225,6 +175,7 @@ orchestration-external-action.html
 orchestration-hierarchical-planning.html
 orchestration-idempotency.html
 orchestration-iterative-loops.html
+orchestration-multi-step-transactions.html
 orchestration-parallel-fan-out.html
 orchestration-router-dispatcher.html
 orchestration-sequential-pipelines.html
@@ -232,40 +183,427 @@ orchestration-shared-workspace.html
 orchestration-side-effect-sandboxing.html
 orchestration-single-call-patterns.html</a>
 </div></div>
-<div class="section"><div class="sec-head"><h2>Composition guides</h2><span class="count">3</span></div><div class="list">
+<div class="section"><div class="sec-head"><h2>Composition · sub-axis guides</h2><span class="count">3</span></div><div class="list">
 <a href="composition-combine.html
 composition-select.html
 composition-verify.html">composition-combine.html
 composition-select.html
 composition-verify.html</a>
 </div></div>
-<div class="section"><div class="sec-head"><h2>Composition leaves</h2><span class="count">5</span></div><div class="list">
+<div class="section"><div class="sec-head"><h2>Composition · leaves</h2><span class="count">8</span></div><div class="list">
 <a href="composition-cascading.html
 composition-confidence-based-routing.html
 composition-decomposition-recomposition.html
 composition-ensembling.html
-composition-specialist-routing.html">composition-cascading.html
+composition-generator-critic.html
+composition-output-filtering.html
+composition-specialist-routing.html
+composition-verification.html">composition-cascading.html
 composition-confidence-based-routing.html
 composition-decomposition-recomposition.html
 composition-ensembling.html
-composition-specialist-routing.html</a>
+composition-generator-critic.html
+composition-output-filtering.html
+composition-specialist-routing.html
+composition-verification.html</a>
 </div></div>
-<div class="section"><div class="sec-head"><h2>Data-Artifacts guides</h2><span class="count">2</span></div><div class="list">
+<div class="section"><div class="sec-head"><h2>Data-Artifacts · sub-axis guides</h2><span class="count">2</span></div><div class="list">
 <a href="data-artifacts-data.html
 data-artifacts-deployable.html">data-artifacts-data.html
 data-artifacts-deployable.html</a>
 </div></div>
-<div class="section"><div class="sec-head"><h2>Data-Artifacts leaves</h2><span class="count">6</span></div><div class="list">
-<a href="data-artifacts-cache-contents-lifecycle.html
+<div class="section"><div class="sec-head"><h2>Data-Artifacts · leaves</h2><span class="count">15</span></div><div class="list">
+<a href="data-artifacts-artifact-lineage.html
+data-artifacts-cache-contents-lifecycle.html
 data-artifacts-collection-sourcing.html
+data-artifacts-eval-suite-versioning.html
+data-artifacts-feedback-pipelines.html
 data-artifacts-labeling.html
+data-artifacts-model-versioning.html
 data-artifacts-pii-scrubbing.html
 data-artifacts-prompt-versioning.html
-data-artifacts-quality-dedup.html">data-artifacts-cache-contents-lifecycle.html
+data-artifacts-quality-dedup.html
+data-artifacts-retention.html
+data-artifacts-retrieval-index-versioning.html
+data-artifacts-rollback.html
+data-artifacts-synthetic-data.html
+data-artifacts-versioning-lineage.html">data-artifacts-artifact-lineage.html
+data-artifacts-cache-contents-lifecycle.html
 data-artifacts-collection-sourcing.html
+data-artifacts-eval-suite-versioning.html
+data-artifacts-feedback-pipelines.html
 data-artifacts-labeling.html
+data-artifacts-model-versioning.html
 data-artifacts-pii-scrubbing.html
 data-artifacts-prompt-versioning.html
-data-artifacts-quality-dedup.html</a>
+data-artifacts-quality-dedup.html
+data-artifacts-retention.html
+data-artifacts-retrieval-index-versioning.html
+data-artifacts-rollback.html
+data-artifacts-synthetic-data.html
+data-artifacts-versioning-lineage.html</a>
 </div></div>
+<div class="section"><div class="sec-head"><h2>Stateful Memory · cluster guides</h2><span class="count">2</span></div><div class="list">
+<a href="stateful-memory-managing.html
+stateful-memory-what-remembers.html">stateful-memory-managing.html
+stateful-memory-what-remembers.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Stateful Memory · leaves</h2><span class="count">7</span></div><div class="list">
+<a href="stateful-memory-consolidation.html
+stateful-memory-conversation-history.html
+stateful-memory-episodic.html
+stateful-memory-eviction.html
+stateful-memory-identity-continuity.html
+stateful-memory-retrieval-triggers.html
+stateful-memory-user-profile.html">stateful-memory-consolidation.html
+stateful-memory-conversation-history.html
+stateful-memory-episodic.html
+stateful-memory-eviction.html
+stateful-memory-identity-continuity.html
+stateful-memory-retrieval-triggers.html
+stateful-memory-user-profile.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Stateless Retrieval · cluster guides</h2><span class="count">3</span></div><div class="list">
+<a href="stateless-retrieval-feed.html
+stateless-retrieval-find.html
+stateless-retrieval-fresh.html">stateless-retrieval-feed.html
+stateless-retrieval-find.html
+stateless-retrieval-fresh.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Stateless Retrieval · leaves</h2><span class="count">8</span></div><div class="list">
+<a href="stateless-retrieval-caching.html
+stateless-retrieval-citations.html
+stateless-retrieval-context-assembly.html
+stateless-retrieval-document-prep.html
+stateless-retrieval-freshness.html
+stateless-retrieval-live-source.html
+stateless-retrieval-reranking.html
+stateless-retrieval-search.html">stateless-retrieval-caching.html
+stateless-retrieval-citations.html
+stateless-retrieval-context-assembly.html
+stateless-retrieval-document-prep.html
+stateless-retrieval-freshness.html
+stateless-retrieval-live-source.html
+stateless-retrieval-reranking.html
+stateless-retrieval-search.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Training & Adaptation · cluster guides</h2><span class="count">3</span></div><div class="list">
+<a href="training-adaptation-build-base.html
+training-adaptation-make-smaller.html
+training-adaptation-tune.html">training-adaptation-build-base.html
+training-adaptation-make-smaller.html
+training-adaptation-tune.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Training & Adaptation · leaves</h2><span class="count">9</span></div><div class="list">
+<a href="training-adaptation-continued-pretraining.html
+training-adaptation-distillation.html
+training-adaptation-eval-during-training.html
+training-adaptation-model-merging.html
+training-adaptation-peft.html
+training-adaptation-preference-optimization.html
+training-adaptation-pretraining.html
+training-adaptation-reasoning-training.html
+training-adaptation-supervised-finetuning.html">training-adaptation-continued-pretraining.html
+training-adaptation-distillation.html
+training-adaptation-eval-during-training.html
+training-adaptation-model-merging.html
+training-adaptation-peft.html
+training-adaptation-preference-optimization.html
+training-adaptation-pretraining.html
+training-adaptation-reasoning-training.html
+training-adaptation-supervised-finetuning.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Serving & Infrastructure · cluster guides</h2><span class="count">3</span></div><div class="list">
+<a href="serving-infrastructure-keep-it-up.html
+serving-infrastructure-run-fast.html
+serving-infrastructure-save-money.html">serving-infrastructure-keep-it-up.html
+serving-infrastructure-run-fast.html
+serving-infrastructure-save-money.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Serving & Infrastructure · leaves</h2><span class="count">12</span></div><div class="list">
+<a href="serving-infrastructure-batching.html
+serving-infrastructure-circuit-breakers.html
+serving-infrastructure-fallback-chains.html
+serving-infrastructure-kv-cache.html
+serving-infrastructure-load-balancing.html
+serving-infrastructure-model-selection.html
+serving-infrastructure-observability-hooks.html
+serving-infrastructure-paged-attention.html
+serving-infrastructure-quantization.html
+serving-infrastructure-response-caching.html
+serving-infrastructure-retries.html
+serving-infrastructure-speculative-decoding.html">serving-infrastructure-batching.html
+serving-infrastructure-circuit-breakers.html
+serving-infrastructure-fallback-chains.html
+serving-infrastructure-kv-cache.html
+serving-infrastructure-load-balancing.html
+serving-infrastructure-model-selection.html
+serving-infrastructure-observability-hooks.html
+serving-infrastructure-paged-attention.html
+serving-infrastructure-quantization.html
+serving-infrastructure-response-caching.html
+serving-infrastructure-retries.html
+serving-infrastructure-speculative-decoding.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>User Experience · cluster guides</h2><span class="count">3</span></div><div class="list">
+<a href="user-experience-how-answers.html
+user-experience-staying-control.html
+user-experience-where-meet.html">user-experience-how-answers.html
+user-experience-staying-control.html
+user-experience-where-meet.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>User Experience · leaves</h2><span class="count">11</span></div><div class="list">
+<a href="user-experience-approval.html
+user-experience-autonomy-dial.html
+user-experience-background-helper.html
+user-experience-camera.html
+user-experience-chat-window.html
+user-experience-clarifying.html
+user-experience-feedback.html
+user-experience-handoff.html
+user-experience-sidebar.html
+user-experience-streaming.html
+user-experience-voice.html">user-experience-approval.html
+user-experience-autonomy-dial.html
+user-experience-background-helper.html
+user-experience-camera.html
+user-experience-chat-window.html
+user-experience-clarifying.html
+user-experience-feedback.html
+user-experience-handoff.html
+user-experience-sidebar.html
+user-experience-streaming.html
+user-experience-voice.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Application Patterns · cluster guides</h2><span class="count">2</span></div><div class="list">
+<a href="application-patterns-make-new.html
+application-patterns-work-with.html">application-patterns-make-new.html
+application-patterns-work-with.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Application Patterns · leaves</h2><span class="count">6</span></div><div class="list">
+<a href="application-patterns-automation.html
+application-patterns-decision-recommendation.html
+application-patterns-extraction-classification.html
+application-patterns-generation.html
+application-patterns-retrieval-qa.html
+application-patterns-transformation.html">application-patterns-automation.html
+application-patterns-decision-recommendation.html
+application-patterns-extraction-classification.html
+application-patterns-generation.html
+application-patterns-retrieval-qa.html
+application-patterns-transformation.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Consideration hubs (7)</h2><span class="count">7</span></div><div class="list">
+<a href="consideration-cost.html
+consideration-evaluation.html
+consideration-multimodal.html
+consideration-observability.html
+consideration-privacy.html
+consideration-real-time.html
+consideration-safety.html">consideration-cost.html
+consideration-evaluation.html
+consideration-multimodal.html
+consideration-observability.html
+consideration-privacy.html
+consideration-real-time.html
+consideration-safety.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Consideration · how-it-works pages</h2><span class="count">7</span></div><div class="list">
+<a href="consideration-cost-how-it-works.html
+consideration-evaluation-how-it-works.html
+consideration-multimodal-how-it-works.html
+consideration-observability-how-it-works.html
+consideration-privacy-how-it-works.html
+consideration-real-time-how-it-works.html
+consideration-safety-how-it-works.html">consideration-cost-how-it-works.html
+consideration-evaluation-how-it-works.html
+consideration-multimodal-how-it-works.html
+consideration-observability-how-it-works.html
+consideration-privacy-how-it-works.html
+consideration-real-time-how-it-works.html
+consideration-safety-how-it-works.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Consideration · cluster guides</h2><span class="count">21</span></div><div class="list">
+<a href="consideration-cost-budget.html
+consideration-cost-hold.html
+consideration-cost-targets.html
+consideration-evaluation-check.html
+consideration-evaluation-decide.html
+consideration-evaluation-honest.html
+consideration-multimodal-input.html
+consideration-multimodal-measure.html
+consideration-multimodal-tied.html
+consideration-observability-learn.html
+consideration-observability-see.html
+consideration-observability-wrong.html
+consideration-privacy-apart.html
+consideration-privacy-private.html
+consideration-privacy-prove.html
+consideration-realtime-fast.html
+consideration-realtime-flowing.html
+consideration-realtime-interruptions.html
+consideration-safety-balance.html
+consideration-safety-break.html
+consideration-safety-off-limits.html">consideration-cost-budget.html
+consideration-cost-hold.html
+consideration-cost-targets.html
+consideration-evaluation-check.html
+consideration-evaluation-decide.html
+consideration-evaluation-honest.html
+consideration-multimodal-input.html
+consideration-multimodal-measure.html
+consideration-multimodal-tied.html
+consideration-observability-learn.html
+consideration-observability-see.html
+consideration-observability-wrong.html
+consideration-privacy-apart.html
+consideration-privacy-private.html
+consideration-privacy-prove.html
+consideration-realtime-fast.html
+consideration-realtime-flowing.html
+consideration-realtime-interruptions.html
+consideration-safety-balance.html
+consideration-safety-break.html
+consideration-safety-off-limits.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Consideration · discipline leaves</h2><span class="count">52</span></div><div class="list">
+<a href="consideration-cost-attribution.html
+consideration-cost-context-strategy.html
+consideration-cost-error-budgets.html
+consideration-cost-incident-response.html
+consideration-cost-latency-budgets.html
+consideration-cost-latency-quality.html
+consideration-cost-quality-tradeoff.html
+consideration-cost-slo-design.html
+consideration-eval-driven-development.html
+consideration-eval-faithfulness.html
+consideration-eval-hallucination-detection.html
+consideration-eval-methodology.html
+consideration-eval-prompt-lifecycle.html
+consideration-eval-regression.html
+consideration-eval-statistical-rigor.html
+consideration-eval-trajectory.html
+consideration-multimodal-cost-attribution.html
+consideration-multimodal-eval.html
+consideration-multimodal-fusion-strategy.html
+consideration-multimodal-grounding.html
+consideration-multimodal-handoff.html
+consideration-multimodal-latency.html
+consideration-multimodal-modality-selection.html
+consideration-multimodal-safety.html
+consideration-observability-attribution.html
+consideration-observability-causal-analysis.html
+consideration-observability-drift.html
+consideration-observability-postmortem.html
+consideration-observability-replay.html
+consideration-observability-tracing.html
+consideration-privacy-access-control.html
+consideration-privacy-audit.html
+consideration-privacy-compliance.html
+consideration-privacy-pii.html
+consideration-privacy-provenance.html
+consideration-privacy-residency.html
+consideration-privacy-tenant-isolation.html
+consideration-realtime-charging.html
+consideration-realtime-partial-answers.html
+consideration-realtime-stop-cleanly.html
+consideration-realtime-stream-quality.html
+consideration-realtime-stream-safety.html
+consideration-realtime-streaming.html
+consideration-realtime-ttfw.html
+consideration-realtime-voice-turn.html
+consideration-safety-dual-use.html
+consideration-safety-harms-ranking.html
+consideration-safety-jailbreaks.html
+consideration-safety-line.html
+consideration-safety-principles.html
+consideration-safety-red-teaming.html
+consideration-safety-refusal-helpfulness.html">consideration-cost-attribution.html
+consideration-cost-context-strategy.html
+consideration-cost-error-budgets.html
+consideration-cost-incident-response.html
+consideration-cost-latency-budgets.html
+consideration-cost-latency-quality.html
+consideration-cost-quality-tradeoff.html
+consideration-cost-slo-design.html
+consideration-eval-driven-development.html
+consideration-eval-faithfulness.html
+consideration-eval-hallucination-detection.html
+consideration-eval-methodology.html
+consideration-eval-prompt-lifecycle.html
+consideration-eval-regression.html
+consideration-eval-statistical-rigor.html
+consideration-eval-trajectory.html
+consideration-multimodal-cost-attribution.html
+consideration-multimodal-eval.html
+consideration-multimodal-fusion-strategy.html
+consideration-multimodal-grounding.html
+consideration-multimodal-handoff.html
+consideration-multimodal-latency.html
+consideration-multimodal-modality-selection.html
+consideration-multimodal-safety.html
+consideration-observability-attribution.html
+consideration-observability-causal-analysis.html
+consideration-observability-drift.html
+consideration-observability-postmortem.html
+consideration-observability-replay.html
+consideration-observability-tracing.html
+consideration-privacy-access-control.html
+consideration-privacy-audit.html
+consideration-privacy-compliance.html
+consideration-privacy-pii.html
+consideration-privacy-provenance.html
+consideration-privacy-residency.html
+consideration-privacy-tenant-isolation.html
+consideration-realtime-charging.html
+consideration-realtime-partial-answers.html
+consideration-realtime-stop-cleanly.html
+consideration-realtime-stream-quality.html
+consideration-realtime-stream-safety.html
+consideration-realtime-streaming.html
+consideration-realtime-ttfw.html
+consideration-realtime-voice-turn.html
+consideration-safety-dual-use.html
+consideration-safety-harms-ranking.html
+consideration-safety-jailbreaks.html
+consideration-safety-line.html
+consideration-safety-principles.html
+consideration-safety-red-teaming.html
+consideration-safety-refusal-helpfulness.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Anchor patterns</h2><span class="count">6</span></div><div class="list">
+<a href="pattern-chain-of-thought.html
+pattern-few-shot.html
+pattern-reflection.html
+pattern-self-consistency.html
+pattern-structured-output.html
+pattern-zero-shot.html">pattern-chain-of-thought.html
+pattern-few-shot.html
+pattern-reflection.html
+pattern-self-consistency.html
+pattern-structured-output.html
+pattern-zero-shot.html</a>
+</div></div>
+<div class="section"><div class="sec-head"><h2>Builds (recipes)</h2><span class="count">10</span></div><div class="list">
+<a href="build-browsing-agent.html
+build-coding-agent.html
+build-conversational-assistant.html
+build-customer-support-agent.html
+build-document-qa.html
+build-multi-agent-research-team.html
+build-reasoning-code-execution.html
+build-research-agent.html
+build-summarization-service.html
+build-voice-assistant.html">build-browsing-agent.html
+build-coding-agent.html
+build-conversational-assistant.html
+build-customer-support-agent.html
+build-document-qa.html
+build-multi-agent-research-team.html
+build-reasoning-code-execution.html
+build-research-agent.html
+build-summarization-service.html
+build-voice-assistant.html</a>
+</div></div>
+<div class="tally">Total HTML files in <code>pages/</code>: 275</div>
 </div></body></html>
