@@ -283,20 +283,17 @@
     font-size: 15px; line-height: 1.6; color: var(--soft);
   }
 
-  /* layer tags */
-  .layers-used {
-    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;
-  }
-  .layer-tag {
+  /* layer badges */
+  .layer-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .layer-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 12px; border: 1px solid var(--border);
-    border-radius: 20px; font-size: 13px; font-weight: 500;
-    color: var(--accent-hover); background: var(--accent-soft);
-    text-decoration: none;
-    transition: border-color 0.2s ease, background 0.2s ease;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
   }
-  .layer-tag:hover { border-color: var(--accent); background: var(--accent-soft); }
-  .layer-tag svg { width: 13px; height: 13px; }
+  .layer-badge:hover { border-color: var(--accent); background: #e4dcfe; }
+  .layer-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 
   /* back card */
   .back-link {
@@ -372,14 +369,12 @@
     <p>A voice assistant is a pipeline with three stages: your speech is converted to text, the <span style="color:var(--accent-hover);font-weight:500">AI works out a reply</span>, and that reply is converted back into spoken audio. None of it is clever individually; what makes it feel alive is how fast all three stages finish. Under about 800ms total, it feels like a real conversation. Above two seconds, it feels like waiting on hold.</p>
   </div>
 
-  <div class="layers-used" aria-label="Layers used in this build">
-    <a class="layer-tag" href="layer-single-call-control.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg>
-      Single-call control
+  <div class="layer-badges" aria-label="Layers used by this build">
+    <a class="layer-badge" href="layer-single-call-control.html">
+      <span class="dot" aria-hidden="true"></span>Single-call control
     </a>
-    <a class="layer-tag" href="layer-serving-infrastructure.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="6" rx="2"/><rect x="2" y="13" width="20" height="6" rx="2"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="16" r="1"/></svg>
-      Serving &amp; infrastructure (real-time)
+    <a class="layer-badge" href="layer-serving-infrastructure.html">
+      <span class="dot" aria-hidden="true"></span>Serving &amp; infrastructure
     </a>
   </div>
 </section>
@@ -495,7 +490,7 @@
       </div>
     </div>
 
-    <p class="example-note">This is why voice assistant infrastructure runs on dedicated, low-latency servers and why the AI model must stream its reply immediately, not wait for the full answer before handing it to the TTS stage. Every millisecond is felt.</p>
+    <p class="example-note">This is why voice assistant infrastructure runs on dedicated, low-latency servers and why the AI model must stream its reply immediately, not wait for the full answer before handing it to the text-to-speech stage. Every millisecond is felt.</p>
   </div>
 </section>
 
@@ -509,7 +504,7 @@
       <div class="scale-track"><span>low</span><span>high</span></div>
     </div>
     <div class="tradeoff-row">
-      <div class="tradeoff-label">Latency pressure</div>
+      <div class="tradeoff-label">Wait time</div>
       <div class="tradeoff-bars">
         <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
       </div>
@@ -533,7 +528,7 @@
       </div>
     </div>
     <div class="tradeoff-quote">
-      Latency pressure is the hardest constraint. Each of the three stages can fail independently (bad audio, hallucinated reply, robotic speech), so the error surface is wider than a text-only product. Reply quality is intentionally lower: spoken answers must be short or they take too long to say.
+      Wait time is the hardest constraint. Each of the three stages can fail independently (bad audio, hallucinated reply, robotic speech), so the error surface is wider than a text-only product. Reply quality is intentionally lower: spoken answers must be short or they take too long to say.
     </div>
   </div>
 </section>

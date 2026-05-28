@@ -125,29 +125,17 @@
     margin-top: 14px;
   }
 
-  /* layer pills under header */
-  .layer-pills {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 18px;
+  /* layer badges */
+  .layer-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .layer-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
   }
-  .layer-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--soft);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 4px 11px;
-    text-decoration: none;
-    transition: border-color .2s ease, color .2s ease, background .2s ease;
-  }
-  .layer-pill:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
-  .layer-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .layer-badge:hover { border-color: var(--accent); background: #e4dcfe; }
+  .layer-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 
   /* sections */
   section {
@@ -593,10 +581,9 @@
   </span>
   <h1 class="pattern-title">Document Q&amp;A</h1>
   <p class="explainer">Ask questions about your own files. The AI finds the relevant parts and answers using them, with citations.</p>
-  <div class="layer-pills" aria-label="Layers used">
-    <span style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);align-self:center;">Layers used:</span>
-    <a class="layer-pill" href="layer-stateless-retrieval.html"><span class="dot" aria-hidden="true"></span>Knowledge &amp; memory</a>
-    <a class="layer-pill" href="layer-data-artifacts.html"><span class="dot" aria-hidden="true"></span>Data &amp; artifacts</a>
+  <div class="layer-badges" aria-label="Layers used by this build">
+    <a class="layer-badge" href="layer-stateless-retrieval.html"><span class="dot" aria-hidden="true"></span>Stateless Retrieval</a>
+    <a class="layer-badge" href="layer-data-artifacts.html"><span class="dot" aria-hidden="true"></span>Data &amp; artifacts</a>
   </div>
 </header>
 
@@ -725,7 +712,7 @@
 <!-- 04 TRADEOFFS -->
 <section>
   <div class="section-label"><span class="num">04</span>Tradeoffs</div>
-  <h2>What you <em>give up</em>.</h2>
+  <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
     <div class="tradeoff-row">

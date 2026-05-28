@@ -75,24 +75,23 @@
   }
   .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
   .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
-  h1.page-title {
+  h1.pattern-title {
     font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
     line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
   }
   .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
-  /* layer pills under header */
-  .layer-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
-  .layer-pill {
+  /* layer badges */
+  .layer-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .layer-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 12px; font-weight: 600; letter-spacing: .03em;
-    color: var(--soft); background: var(--surface);
-    border: 1px solid var(--border-strong); border-radius: 20px; padding: 4px 11px;
-    text-decoration: none;
-    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
   }
-  .layer-pill:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
-  .layer-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .layer-badge:hover { border-color: var(--accent); background: #e4dcfe; }
+  .layer-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 
   /* sections */
   section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
@@ -267,7 +266,7 @@
 
   /* responsive */
   @media (max-width: 600px) {
-    h1.page-title { font-size: 30px; }
+    h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
     .example-grid { grid-template-columns: 1fr; }
@@ -300,11 +299,11 @@
       </svg>
     </span>Build
   </span>
-  <h1 class="page-title">Customer Support Agent</h1>
+  <h1 class="pattern-title">Customer Support Agent</h1>
   <p class="explainer">A real product: the agent reads your help guides, answers customer questions in plain language, and passes the hard ones to a human.</p>
-  <div class="layer-pills" aria-label="Layers used in this build">
-    <a class="layer-pill" href="layer-stateless-retrieval.html"><span class="dot" aria-hidden="true"></span>Knowledge &amp; Memory</a>
-    <a class="layer-pill" href="layer-application-patterns.html"><span class="dot" aria-hidden="true"></span>Application Patterns</a>
+  <div class="layer-badges" aria-label="Layers used by this build">
+    <a class="layer-badge" href="layer-stateless-retrieval.html"><span class="dot" aria-hidden="true"></span>Stateless Retrieval</a>
+    <a class="layer-badge" href="layer-application-patterns.html"><span class="dot" aria-hidden="true"></span>Application patterns</a>
   </div>
 </header>
 
@@ -313,7 +312,7 @@
   <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What <em>is</em> it?</h2>
   <div class="idea-card">
-    <p>A <span style="color:var(--accent-hover);font-weight:500">customer support agent</span> is an AI that knows your product through its help articles. When a customer asks a question, the agent finds the right article, pulls the relevant paragraph, and writes a plain-language reply. When the question is too complex or the agent is not sure, it stops and sends the conversation to a human. No guessing. No hallucinating policies it does not have.</p>
+    <p>A <span style="color:var(--accent-hover);font-weight:500">customer support agent</span> is an AI that knows your product through its help articles. When a customer asks a question, the agent finds the right article, pulls the relevant paragraph, and writes a plain-language reply. When the question is too complex or the agent is not sure, it stops and sends the conversation to a human.</p>
   </div>
 </section>
 
@@ -398,7 +397,7 @@
 
 <!-- 03 REAL EXAMPLE -->
 <section>
-  <div class="section-label"><span class="num">03</span>Real Example</div>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
   <h2>Where it <em>lives</em> today.</h2>
   <div class="example-grid">
     <div class="example-card">
@@ -431,7 +430,7 @@
 <!-- 04 TRADEOFFS -->
 <section>
   <div class="section-label"><span class="num">04</span>Tradeoffs</div>
-  <h2>What you <em>gain and give up</em>.</h2>
+  <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
     <div class="tradeoff-row">

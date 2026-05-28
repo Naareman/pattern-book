@@ -361,13 +361,13 @@
   </div>
   <div class="layer-badges" aria-label="Layers used by this build">
     <a class="layer-badge" href="layer-orchestration-agents.html">
-      <span class="dot" aria-hidden="true"></span>L5 Orchestration
+      <span class="dot" aria-hidden="true"></span>Orchestration &amp; agents
     </a>
     <a class="layer-badge" href="layer-stateless-retrieval.html">
-      <span class="dot" aria-hidden="true"></span>L3a Stateless Retrieval
+      <span class="dot" aria-hidden="true"></span>Stateless Retrieval
     </a>
     <a class="layer-badge" href="layer-composition.html">
-      <span class="dot" aria-hidden="true"></span>L2 Structural Composition
+      <span class="dot" aria-hidden="true"></span>Composition
     </a>
   </div>
 </section>
@@ -542,30 +542,30 @@
   <div class="patterns-card">
 
     <div class="pattern-row">
-      <span class="pattern-tag">L5 Coordination</span>
+      <span class="pattern-tag">Orchestration &amp; agents</span>
       <div class="pattern-desc">
-        <strong>Agent-to-agent protocols and shared workspace.</strong> The lead and workers communicate via a message-passing protocol (each task is a structured message) and write findings to a shared workspace the lead reads at merge time.
+        <strong>Agent-to-agent protocols and shared workspace.</strong> Workers report findings to a shared workspace the lead reads at merge time.
       </div>
     </div>
 
     <div class="pattern-row">
-      <span class="pattern-tag">L5 Shape</span>
+      <span class="pattern-tag">Orchestration &amp; agents</span>
       <div class="pattern-desc">
-        <strong>Parallel fan-out and hierarchical planning.</strong> The lead uses a Planner-Executor pattern: it writes the plan first, then fans all worker calls out in parallel, then waits for all to complete before the merge step.
+        <strong>Parallel fan-out and hierarchical planning.</strong> The lead writes the plan, fans all workers out at once, then waits for them all before merging.
       </div>
     </div>
 
     <div class="pattern-row">
-      <span class="pattern-tag">L3a Stateless Retrieval</span>
+      <span class="pattern-tag">Stateless Retrieval</span>
       <div class="pattern-desc">
-        <strong>Read-only retrieval per worker call.</strong> Each worker issues retrieval calls (web search, index lookup) that are read-only and stateless: they do not write anything to the world, so they file at L3a, not L5 Action.
+        <strong>Read-only retrieval per worker call.</strong> Each worker's searches are read-only: they change nothing in the world.
       </div>
     </div>
 
     <div class="pattern-row">
-      <span class="pattern-tag">L2 Combine</span>
+      <span class="pattern-tag">Composition</span>
       <div class="pattern-desc">
-        <strong>Decomposition and recomposition.</strong> The question is decomposed into sub-topics (one per worker), and the findings are recomposed by the lead into a single answer. This is the Decomposition and Recomposition sub-pattern of L2 Combine.
+        <strong>Decomposition and recomposition.</strong> The question splits into sub-topics, and the findings are recombined into one answer.
       </div>
     </div>
 
@@ -575,7 +575,7 @@
 <!-- 05 TRADEOFFS -->
 <section>
   <div class="section-label"><span class="num">05</span>Tradeoffs</div>
-  <h2>What you <em>pay</em>.</h2>
+  <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
     <div class="tradeoff-row">
@@ -603,7 +603,7 @@
       </div>
     </div>
     <div class="tradeoff-quote">
-      More agents mean more coverage and faster wall-clock time for broad questions, but every worker adds a separate AI call, so cost scales with team size. Coordination also adds overhead: the lead must write a good plan, workers must return structured findings, and merging N outputs can introduce inconsistency if the lead is not careful. For simple, single-topic questions a single Research Agent is cheaper and just as accurate.
+      More agents mean broader coverage and faster wall-clock time, but every worker is a separate AI call, so cost scales with team size.
     </div>
   </div>
 </section>

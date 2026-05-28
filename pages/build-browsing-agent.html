@@ -404,25 +404,25 @@
       <div class="distinction-col read">
         <div class="distinction-hed">Read Only</div>
         <div class="distinction-body">Loading a URL, reading page text, scraping a table. Nothing changes if you do it twice.</div>
-        <span class="distinction-tag">L3a: Stateless Retrieval</span>
+        <span class="distinction-tag">Stateless Retrieval</span>
       </div>
       <div class="distinction-col action">
         <div class="distinction-hed">Side-Effectful</div>
         <div class="distinction-body">Clicking a button, submitting a form, adding to a cart. Doing it twice may book twice.</div>
-        <span class="distinction-tag">L5: Orchestration Action</span>
+        <span class="distinction-tag">Orchestration &amp; agents</span>
       </div>
     </div>
   </div>
 
   <div class="layer-badges" aria-label="Layers used by this build">
     <a class="layer-badge" href="layer-orchestration-agents.html">
-      <span class="dot" aria-hidden="true"></span>L5: Orchestration
+      <span class="dot" aria-hidden="true"></span>Orchestration &amp; agents
     </a>
     <a class="layer-badge" href="layer-stateless-retrieval.html">
-      <span class="dot" aria-hidden="true"></span>L3a: Stateless Retrieval
+      <span class="dot" aria-hidden="true"></span>Stateless Retrieval
     </a>
     <a class="layer-badge" href="layer-single-call-control.html">
-      <span class="dot" aria-hidden="true"></span>L4: Single-Call Control
+      <span class="dot" aria-hidden="true"></span>Single-call control
     </a>
   </div>
 </section>
@@ -464,7 +464,7 @@
           </div>
           <span class="action-pill read-pill" id="pill1" aria-label="Action type: read only">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            L3a: read only (no state changed)
+            Read only (no state changed)
           </span>
         </div>
       </div>
@@ -490,7 +490,7 @@
           </div>
           <span class="action-pill click-pill" id="pill2" aria-label="Action type: side-effectful">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 9-14 9V3z"/></svg>
-            L5 Action: clicked Submit (state changed)
+            Action: clicked Submit (state changed)
           </span>
         </div>
       </div>
@@ -516,7 +516,7 @@
           </div>
           <span class="action-pill click-pill" id="pill3" aria-label="Action type: side-effectful">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 9-14 9V3z"/></svg>
-            L5 Action: clicked Select (side-effectful, needs guardrail before Pay)
+            Action: clicked Select (side-effectful, needs guardrail before Pay)
           </span>
         </div>
       </div>
@@ -553,60 +553,60 @@
   <div class="patterns-stage">
 
     <div class="pattern-group">
-      <div class="pattern-group-head">L5: Orchestration</div>
+      <div class="pattern-group-head">Orchestration &amp; agents</div>
       <div class="pattern-rows">
         <div class="pattern-row">
-          <span class="pattern-layer-tag">L5 Shape</span>
+          <span class="pattern-layer-tag">Loop</span>
           <div class="pattern-info">
             <div class="pattern-name">Iterative Loop</div>
-            <div class="pattern-desc">The agent repeats: read a page, decide, act. It loops until it reaches the goal or hits a stop condition. This is the backbone of any browsing agent.</div>
+            <div class="pattern-desc">Read a page, decide, act, repeat until the goal is met. The backbone of any browsing agent.</div>
           </div>
         </div>
         <div class="pattern-row">
-          <span class="pattern-layer-tag">L5 Action</span>
+          <span class="pattern-layer-tag">Action</span>
           <div class="pattern-info">
             <div class="pattern-name">External Action (clicks and submits)</div>
-            <div class="pattern-desc">Every click, form fill, or button press is an External Action: it changes state outside the agent. Unlike reading, clicking cannot safely be undone by retrying.</div>
+            <div class="pattern-desc">Every click or form submit changes state outside the agent, so it cannot be safely undone by retrying.</div>
           </div>
         </div>
         <div class="pattern-row">
-          <span class="pattern-layer-tag">L5 Action</span>
+          <span class="pattern-layer-tag">Action</span>
           <div class="pattern-info">
             <div class="pattern-name">Approval Gates</div>
-            <div class="pattern-desc">Before a high-stakes action such as "Confirm and Pay," a well-designed browsing agent pauses and asks for human approval. The agent provides the plan; a person authorises the irreversible step.</div>
+            <div class="pattern-desc">Before a high-stakes step like "Confirm and Pay," the agent pauses and waits for a person to authorise it.</div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="pattern-group">
-      <div class="pattern-group-head">L3a: Stateless Retrieval</div>
+      <div class="pattern-group-head">Stateless Retrieval</div>
       <div class="pattern-rows">
         <div class="pattern-row">
-          <span class="pattern-layer-tag">L3a</span>
+          <span class="pattern-layer-tag">Read only</span>
           <div class="pattern-info">
             <div class="pattern-name">Read-Only Page Reads (Scraping)</div>
-            <div class="pattern-desc">Loading a URL and reading the page text is L3a: the agent is retrieving external information without changing anything. A live web page is just an external knowledge source. Safe to repeat.</div>
+            <div class="pattern-desc">Loading a URL and reading its text changes nothing. A live page is just an external source, safe to repeat.</div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="pattern-group">
-      <div class="pattern-group-head">L4: Single-Call Control</div>
+      <div class="pattern-group-head">Single-call control</div>
       <div class="pattern-rows">
         <div class="pattern-row">
-          <span class="pattern-layer-tag">L4</span>
+          <span class="pattern-layer-tag">Per step</span>
           <div class="pattern-info">
             <div class="pattern-name">Reasoning Per Step</div>
-            <div class="pattern-desc">Each loop iteration involves a single call to the LLM (the AI model): "here is what I see on this page, what should I do next?" That one call decides the action. The prompt (the text you send the AI) is rebuilt fresh each loop.</div>
+            <div class="pattern-desc">Each loop is one model call: "here is the page and my goal, what is the next action?"</div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="rw-note" role="note">
-      <strong>The boundary that matters most:</strong> reading a page is L3a (read-only, safe to retry). Clicking or submitting is L5 Action (side-effectful, may change real-world state). A well-built browsing agent labels every planned action before executing it, so guardrails can block irreversible steps until a human approves.
+      <strong>The boundary that matters most:</strong> reading a page is read-only and safe to retry. Clicking or submitting changes real-world state. A well-built browsing agent labels every planned action so guardrails can block irreversible steps until a human approves.
     </div>
   </div>
 </section>
@@ -627,7 +627,7 @@
         </div>
         <div class="ex-body">
           <div class="ex-step">Step 1: Open a page</div>
-          <div class="ex-text">The agent receives a goal and loads the first URL. It reads the page text (L3a read-only). Nothing has changed in the world yet.</div>
+          <div class="ex-text">The agent receives a goal and loads the first URL. It reads the page text (read-only). Nothing has changed in the world yet.</div>
         </div>
       </div>
 
@@ -668,14 +668,14 @@
 <!-- 05 TRADEOFFS -->
 <section aria-labelledby="tradeoffs-heading">
   <div class="section-label"><span class="num">05</span>Tradeoffs</div>
-  <h2 id="tradeoffs-heading">What you <em>pay</em>.</h2>
+  <h2 id="tradeoffs-heading">The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale">
       <span class="spacer"></span>
       <div class="scale-track"><span>low</span><span>high</span></div>
     </div>
     <div class="tradeoff-row">
-      <div class="tradeoff-label">Latency</div>
+      <div class="tradeoff-label">Wait time</div>
       <div class="tradeoff-bars">
         <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
       </div>
@@ -699,7 +699,7 @@
       </div>
     </div>
     <div class="tradeoff-quote">
-      Browsing agents are slow: each loop involves a real page load plus an LLM call. They can get stuck if a page changes layout or requires a login the agent does not have. They need guardrails (approval gates, step limits) because side-effectful actions cannot be undone. The payoff is capability: they can operate on any website, with no API required.
+      Slow and fragile (every loop is a page load plus a model call), but they can operate on any website with no API required.
     </div>
   </div>
 </section>

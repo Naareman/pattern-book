@@ -431,17 +431,17 @@
   <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What <em>is</em> it?</h2>
   <div class="idea-card">
-    <p>Language models (LLMs, the AI models you send a prompt to: the text you type and send) are surprisingly bad at arithmetic and multi-step logic when they try to reason inside their own "head." PAL (Program-Aided Language model) sidesteps that weakness entirely. The model is asked to <strong style="color:var(--accent-hover)">write a small program</strong> that encodes the reasoning steps. A sandboxed interpreter then <strong style="color:var(--accent-hover)">runs it</strong>, and the correct, computed result is inserted directly into the final answer. No mental arithmetic. No silent slip on step seven.</p>
+    <p>Language models (LLMs, the AI models you send a prompt to: the text you type and send) are surprisingly bad at arithmetic and multi-step logic when they try to reason inside their own "head." PAL (Program-Aided Language model) sidesteps that weakness entirely. The model is asked to <strong style="color:var(--accent-hover)">write a small program</strong> that encodes the reasoning steps. A sandboxed interpreter then <strong style="color:var(--accent-hover)">runs it</strong>, and the correct, computed result is inserted directly into the final answer.</p>
   </div>
   <div class="layer-badges" aria-label="Layers used by this build">
     <a class="layer-badge" href="layer-single-call-control.html">
-      <span class="dot" aria-hidden="true"></span>L4: Single-Call Control
+      <span class="dot" aria-hidden="true"></span>Single-call control
     </a>
     <a class="layer-badge" href="layer-stateless-retrieval.html">
-      <span class="dot" aria-hidden="true"></span>L3a: Stateless Retrieval
+      <span class="dot" aria-hidden="true"></span>Stateless Retrieval
     </a>
     <a class="layer-badge" href="layer-orchestration-agents.html">
-      <span class="dot" aria-hidden="true"></span>L5: Orchestration
+      <span class="dot" aria-hidden="true"></span>Orchestration &amp; agents
     </a>
   </div>
 </section>
@@ -657,46 +657,46 @@ answer   = speed * hours
 <!-- 04 PATTERNS IT USES -->
 <section>
   <div class="section-label"><span class="num">04</span>Patterns It Uses</div>
-  <h2>Why this is a <em>Recipe</em>, not one pattern.</h2>
+  <h2>The <em>pieces</em> inside.</h2>
   <div class="patterns-card">
     <p class="patterns-intro">
-      A Recipe is a named composition of Part I patterns. PAL spans three layers: it cannot be filed in just one, so it is not a pattern. Here is what it assembles.
+      PAL stitches together three layers, which is why no single layer name covers it on its own.
     </p>
 
     <div class="pattern-row">
-      <a class="pattern-layer-tag" href="layer-single-call-control.html" aria-label="L4 Single-Call Control layer page">L4: Cognitive Strategy</a>
+      <a class="pattern-layer-tag" href="layer-single-call-control.html" aria-label="Single-call control layer page">Single-call control</a>
       <div class="pattern-info">
         <div class="pattern-name">Chain-of-Thought (externalized)</div>
-        <div class="pattern-desc">Instead of reasoning in free-form prose, the model externalizes every reasoning step as executable code lines. The code is the chain of thought.</div>
+        <div class="pattern-desc">Every reasoning step is written as a line of code, so the code itself is the chain of thought.</div>
       </div>
     </div>
 
     <div class="pattern-row">
-      <a class="pattern-layer-tag" href="layer-single-call-control.html" aria-label="L4 Single-Call Control layer page">L4: Input Shape</a>
+      <a class="pattern-layer-tag" href="layer-single-call-control.html" aria-label="Single-call control layer page">Single-call control</a>
       <div class="pattern-info">
         <div class="pattern-name">Few-Shot Framing</div>
-        <div class="pattern-desc">Two or three solved examples in the prompt teach the model what code style to generate. No separate fine-tuning needed.</div>
+        <div class="pattern-desc">A few solved examples in the prompt teach the model what code style to write, no fine-tuning needed.</div>
       </div>
     </div>
 
     <div class="pattern-row">
-      <a class="pattern-layer-tag" href="layer-stateless-retrieval.html" aria-label="L3a Stateless Retrieval layer page">L3a: Stateless Retrieval</a>
+      <a class="pattern-layer-tag" href="layer-stateless-retrieval.html" aria-label="Stateless Retrieval layer page">Stateless Retrieval</a>
       <div class="pattern-info">
         <div class="pattern-name">Sandboxed Pure-Functional Execution</div>
-        <div class="pattern-desc">Running the generated code is read-only and side-effect-free: no writes to disk, no network calls. That makes it L3a (the layer for read-only external information), not L5 Action (which covers state-changing operations). The taxonomy filing rule: "sandboxed pure-functional code execution is read-only."</div>
+        <div class="pattern-desc">Running the code changes nothing (no disk writes, no network), so it counts as read-only.</div>
       </div>
     </div>
 
     <div class="pattern-row">
-      <a class="pattern-layer-tag" href="layer-orchestration-agents.html" aria-label="L5 Orchestration layer page">L5: Shape</a>
+      <a class="pattern-layer-tag" href="layer-orchestration-agents.html" aria-label="Orchestration and agents layer page">Orchestration &amp; agents</a>
       <div class="pattern-info">
         <div class="pattern-name">Sequential Pipeline</div>
-        <div class="pattern-desc">Three steps in strict order: generate code, run it, compose final answer. This is the simplest orchestration shape: a linear pipeline where each step feeds the next.</div>
+        <div class="pattern-desc">Three steps in strict order: write code, run it, compose the final answer.</div>
       </div>
     </div>
 
     <div class="recipe-note">
-      <strong>Why it is a Recipe and not a single pattern:</strong> each of those three layers has a different axis. L4 is about what happens inside one model call. L3a is about how read-only external information enters a call. L5 is about how calls are organized across time. PAL crosses all three. A single-layer pattern cannot span axes. That is the defining test: if the thing cannot be filed in one layer, it is a Recipe.
+      <strong>Why no single layer name fits:</strong> writing the code happens inside one model call, running it is read-only retrieval, and chaining the steps is orchestration. PAL crosses all three, so it is best described by the combination, not by any one layer.
     </div>
 
     <!-- sequencing -->
@@ -714,7 +714,7 @@ answer   = speed * hours
 <!-- 05 TRADEOFFS -->
 <section>
   <div class="section-label"><span class="num">05</span>Tradeoffs</div>
-  <h2>What you <em>pay</em>.</h2>
+  <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
     <div class="tradeoff-row">
@@ -724,7 +724,7 @@ answer   = speed * hours
       </div>
     </div>
     <div class="tradeoff-row">
-      <div class="tradeoff-label">Latency</div>
+      <div class="tradeoff-label">Wait time</div>
       <div class="tradeoff-bars">
         <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
       </div>
@@ -742,9 +742,7 @@ answer   = speed * hours
       </div>
     </div>
     <div class="tradeoff-quote">
-      The accuracy gain is large for any problem that involves counting, arithmetic, or multi-step logic: work that a calculator handles perfectly but a model does inconsistently. The cost is two model calls (or one call plus a template pass) plus the overhead of running a sandboxed interpreter.
-      <br><br>
-      <strong style="color:var(--text)">The key tradeoff to know:</strong> the answer is only as correct as the code the model writes. If the model misunderstands the problem structure, it will write code that computes the wrong thing with perfect arithmetic. Code execution cannot fix a misread problem. Sandboxing is also non-negotiable: without it, the model could write code that reads files, makes network calls, or loops infinitely.
+      Big accuracy gains on anything math-like, at the cost of an extra step. But the answer is only as right as the code: a misread problem still computes the wrong thing perfectly.
     </div>
   </div>
 </section>

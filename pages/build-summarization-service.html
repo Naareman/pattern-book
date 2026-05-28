@@ -352,16 +352,16 @@
   </div>
   <div class="layer-badges" aria-label="Layers used by this build">
     <a class="layer-badge" href="layer-application-patterns.html">
-      <span class="dot" aria-hidden="true"></span>L6: Application Patterns (Transformation)
+      <span class="dot" aria-hidden="true"></span>Application patterns
     </a>
     <a class="layer-badge" href="layer-single-call-control.html">
-      <span class="dot" aria-hidden="true"></span>L4: Single-Call Control
+      <span class="dot" aria-hidden="true"></span>Single-call control
     </a>
     <a class="layer-badge" href="layer-composition.html">
-      <span class="dot" aria-hidden="true"></span>L2: Structural Composition
+      <span class="dot" aria-hidden="true"></span>Composition
     </a>
     <a class="layer-badge" href="consideration-cost.html">
-      <span class="dot" aria-hidden="true"></span>C5: Cost and Latency
+      <span class="dot" aria-hidden="true"></span>Cost &amp; latency
     </a>
   </div>
 </section>
@@ -411,7 +411,7 @@
               <div class="chunk-card" id="chunk-3">
                 <div class="chunk-num">Chunk 4</div>
                 <div class="chunk-text">Pages 22-28: Emissions by sector and country-level commitments.</div>
-                <div class="chunk-sum">Energy sector still 34% of emissions; 80 countries updated NDCs.</div>
+                <div class="chunk-sum">Energy sector still 34% of emissions; 80 countries updated their climate pledges.</div>
               </div>
               <div class="chunk-card" id="chunk-4">
                 <div class="chunk-num">Chunk 5</div>
@@ -539,31 +539,31 @@
   <h2>The <em>building blocks</em>.</h2>
   <div class="patterns-grid">
     <div class="pattern-row">
-      <div class="pattern-tag">L6</div>
+      <div class="pattern-tag">Application patterns</div>
       <div class="pattern-info">
-        <div class="pattern-name">Transformation (Application Patterns)</div>
-        <div class="pattern-desc">The output preserves the meaning of the input in a shorter form. That makes summarization a Transformation, not a generation of new content or a retrieval of existing facts.</div>
+        <div class="pattern-name">Transformation</div>
+        <div class="pattern-desc">The output keeps the meaning of the input in a shorter form, rather than inventing or looking up new facts.</div>
       </div>
     </div>
     <div class="pattern-row">
-      <div class="pattern-tag">L4</div>
+      <div class="pattern-tag">Single-call control</div>
       <div class="pattern-info">
-        <div class="pattern-name">Single-Call Control: Prompt and Output Shape</div>
-        <div class="pattern-desc">Each chunk call is shaped by a careful prompt (the text you send the AI): system role, explicit constraints ("2 sentences, no new claims"), and a structured output format. All of this happens inside one call, one chunk at a time.</div>
+        <div class="pattern-name">Prompt and Output Shape</div>
+        <div class="pattern-desc">Each chunk call is shaped by a clear instruction ("2 sentences, no new claims") inside one call.</div>
       </div>
     </div>
     <div class="pattern-row">
-      <div class="pattern-tag">L2</div>
+      <div class="pattern-tag">Composition</div>
       <div class="pattern-info">
-        <div class="pattern-name">Decomposition and Recomposition (Structural Composition)</div>
-        <div class="pattern-desc">The document is broken into parts (decomposition), each part is processed independently, and the outputs are fused into one answer (recomposition). This is the core L2 Combine mechanism for long documents.</div>
+        <div class="pattern-name">Decomposition and Recomposition</div>
+        <div class="pattern-desc">The document is split into parts, each part is summarized on its own, then the parts are fused into one answer.</div>
       </div>
     </div>
     <div class="pattern-row">
-      <div class="pattern-tag">C5</div>
+      <div class="pattern-tag">Cost &amp; latency</div>
       <div class="pattern-info">
-        <div class="pattern-name">Cost and Latency: Cost Grows with Length</div>
-        <div class="pattern-desc">Every chunk costs tokens. A 100-page document generates many more calls than a 10-page one. The parallel fan-out keeps latency low, but total token spend scales linearly with document length. Chunk size and summary length are the main cost levers.</div>
+        <div class="pattern-name">Cost Grows with Length</div>
+        <div class="pattern-desc">Every chunk costs tokens, so longer documents cost more. Chunk size and summary length are the main cost levers.</div>
       </div>
     </div>
   </div>
@@ -572,7 +572,7 @@
 <!-- 05 TRADEOFFS -->
 <section>
   <div class="section-label"><span class="num">05</span>Tradeoffs</div>
-  <h2>What you <em>give up</em>.</h2>
+  <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
     <div class="tradeoff-row">
@@ -600,7 +600,7 @@
       </div>
     </div>
     <div class="tradeoff-quote">
-      The central tension is faithfulness vs brevity. Prompting for shorter summaries saves tokens at each step, but risks dropping a clause that matters. Prompting for fuller coverage produces trustworthy chunk summaries, but the reduce step receives more text and produces a longer final output. There is no single right answer: tune to what the downstream reader actually needs. Cost grows with every additional page, so budget-conscious services often cap chunk summaries to 3 sentences regardless of chunk length.
+      The core tension is faithfulness versus brevity: shorter summaries save tokens but risk dropping a clause that matters.
     </div>
   </div>
 </section>

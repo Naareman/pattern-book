@@ -331,13 +331,13 @@
   </div>
   <div class="layer-badges" aria-label="Layers used by this build">
     <a class="layer-badge" href="layer-user-experience.html">
-      <span class="dot" aria-hidden="true"></span>L7: User Surface &amp; Agency
+      <span class="dot" aria-hidden="true"></span>User experience
     </a>
     <a class="layer-badge" href="layer-stateful-memory.html">
-      <span class="dot" aria-hidden="true"></span>L3b: Stateful Memory
+      <span class="dot" aria-hidden="true"></span>Stateful Memory
     </a>
     <a class="layer-badge" href="layer-single-call-control.html">
-      <span class="dot" aria-hidden="true"></span>L4: Single-Call Control
+      <span class="dot" aria-hidden="true"></span>Single-call control
     </a>
   </div>
 </section>
@@ -417,34 +417,34 @@
   <div class="patterns-grid">
 
     <div class="pattern-card">
-      <div class="pc-layer-tag">L7</div>
+      <div class="pc-layer-tag">User experience</div>
       <div class="pc-body">
         <div class="pc-name">Conversational Surface + Streaming</div>
-        <div class="pc-desc">The chat window itself is a <strong>conversational surface</strong> (User Surface &amp; Agency). Streaming means tokens arrive and render word by word as soon as the model generates them, making the wait feel shorter. Both are L7 UX mechanisms.</div>
+        <div class="pc-desc">The chat window itself, with words appearing as the model writes them so the wait feels shorter.</div>
       </div>
     </div>
 
     <div class="pattern-card">
-      <div class="pc-layer-tag">L3b</div>
+      <div class="pc-layer-tag">Stateful Memory</div>
       <div class="pc-body">
         <div class="pc-name">Conversation Memory (Rolling Window)</div>
-        <div class="pc-desc">The system appends every message to a running transcript and re-sends the full history with each new turn. This is <strong>conversation memory</strong> in Stateful Memory. When the transcript grows too long, older turns are either trimmed (rolling window) or compressed into a short summary to stay within the model's limit.</div>
+        <div class="pc-desc">Every message is kept in a running transcript and re-sent each turn, with older turns trimmed or summarized to fit.</div>
       </div>
     </div>
 
     <div class="pattern-card">
-      <div class="pc-layer-tag">L4</div>
+      <div class="pc-layer-tag">Single-call control</div>
       <div class="pc-body">
         <div class="pc-name">Prompt Shaping + Output Shaping</div>
-        <div class="pc-desc">A <strong>system prompt</strong> (the fixed instruction block that precedes every conversation) sets tone, persona, and refusal rules. On the output side, a <strong>stop sequence</strong> and optional <strong>format constraints</strong> keep replies concise. All of this happens inside one model call: Single-Call Control.</div>
+        <div class="pc-desc">A fixed instruction block sets tone and rules, and output limits keep replies concise, all inside one model call.</div>
       </div>
     </div>
 
     <div class="pc-safety">
       <div class="safety-icon" aria-hidden="true">&#9888;</div>
       <div class="pc-body">
-        <div class="pc-name" style="font-size:14px;margin-bottom:4px">Safety Note: C2 Safety, Alignment &amp; Refusal</div>
-        <div class="pc-desc">Even a general-purpose assistant needs <strong>refusal calibration</strong>: it must decline harmful requests without being so cautious it becomes unhelpful. The system prompt is the primary mechanism, but the C2 discipline covers how to reason about the tradeoff, write red-team tests, and audit refusal quality over time.</div>
+        <div class="pc-name" style="font-size:14px;margin-bottom:4px">Safety Note: Refusal calibration</div>
+        <div class="pc-desc">It must decline harmful requests without being so cautious it becomes unhelpful. The instruction block is the main lever.</div>
       </div>
     </div>
 
@@ -462,7 +462,7 @@
         <div class="seq-num" aria-hidden="true">1</div>
         <div class="seq-body">
           <div class="seq-step">User Types</div>
-          <div class="seq-text">The new message arrives. The system appends it to the <strong>conversation history</strong> stored in memory (L3b).</div>
+          <div class="seq-text">The new message arrives. The system appends it to the <strong>conversation history</strong> kept in memory.</div>
         </div>
       </div>
 
@@ -470,7 +470,7 @@
         <div class="seq-num" aria-hidden="true">2</div>
         <div class="seq-body">
           <div class="seq-step">Prompt Assembled</div>
-          <div class="seq-text">The full transcript is packed into a prompt (the text you send the AI) alongside the system-level instructions. This is <strong>context packing</strong> at L4 Input Shape. <span class="gloss">If the conversation is very long, older turns may be summarised first to save space.</span></div>
+          <div class="seq-text">The full transcript is packed into a prompt (the text you send the AI) alongside the system-level instructions. <span class="gloss">If the conversation is very long, older turns may be summarised first to save space.</span></div>
         </div>
       </div>
 
@@ -486,7 +486,7 @@
         <div class="seq-num" aria-hidden="true">4</div>
         <div class="seq-body">
           <div class="seq-step">Reply Streams</div>
-          <div class="seq-text">Tokens are forwarded to the UI as they arrive (L7 Streaming). The user sees words appearing before the full reply is done.</div>
+          <div class="seq-text">Tokens are forwarded to the screen as they arrive. The user sees words appearing before the full reply is done.</div>
         </div>
       </div>
 
@@ -505,7 +505,7 @@
 <!-- 05 TRADEOFFS -->
 <section>
   <div class="section-label"><span class="num">05</span>Tradeoffs</div>
-  <h2>What you <em>pay</em>.</h2>
+  <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>Low</span><span>High</span></div></div>
     <div class="tradeoff-row">

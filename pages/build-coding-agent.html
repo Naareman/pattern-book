@@ -94,17 +94,17 @@
   .idea-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
   .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
 
-  /* layers used chips */
-  .layers-used { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
-  .layer-chip {
+  /* layer badges */
+  .layer-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .layer-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 13px; font-weight: 500; color: var(--soft);
-    background: var(--bg-subtle); border: 1px solid var(--border);
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
     border-radius: 20px; padding: 5px 12px; text-decoration: none;
-    transition: border-color .18s ease, color .18s ease, background .18s ease;
+    transition: border-color .2s ease, background .2s ease;
   }
-  .layer-chip:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
-  .layer-chip .chip-label { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); margin-right: 2px; }
+  .layer-badge:hover { border-color: var(--accent); background: #e4dcfe; }
+  .layer-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 
   /* ========== DEMO STAGE ========== */
   .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
@@ -355,13 +355,12 @@
   <div class="idea-card">
     <p>A <span style="color:var(--accent-hover);font-weight:500">Coding Agent</span> is an AI that can read your files, edit code, and run tests, all on its own. You give it a task. It makes a plan, edits the right file, runs the code to see what happens, checks what broke, and fixes it. It keeps looping until everything passes. You watch. It works.</p>
   </div>
-  <div class="layers-used" aria-label="Layers this build uses">
-    <span style="font-size:13px;font-weight:500;color:var(--faint);align-self:center;">Built from:</span>
-    <a class="layer-chip" href="layer-orchestration-agents.html">
-      <span class="chip-label">Layer</span> Orchestration &amp; Agents
+  <div class="layer-badges" aria-label="Layers used by this build">
+    <a class="layer-badge" href="layer-orchestration-agents.html">
+      <span class="dot" aria-hidden="true"></span>Orchestration &amp; agents
     </a>
-    <a class="layer-chip" href="layer-single-call-control.html">
-      <span class="chip-label">Layer</span> Single-call Control
+    <a class="layer-badge" href="layer-single-call-control.html">
+      <span class="dot" aria-hidden="true"></span>Single-call control
     </a>
   </div>
 </section>
@@ -497,7 +496,7 @@
 <!-- 04 TRADEOFFS -->
 <section>
   <div class="section-label"><span class="num">04</span>Tradeoffs</div>
-  <h2>The <em>cost</em> of autonomy.</h2>
+  <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
     <div class="tradeoff-row">
