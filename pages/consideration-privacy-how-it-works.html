@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy, Security &amp; Governance &middot; How it works &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#C2554F; --error-soft:#FBECEB;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --redact:#15171C;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; white-space: nowrap;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px;
+    line-height: 1.5; color: var(--text);
+  }
+
+  /* 02 DEMO (ported verbatim from the original hub) */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+
+  .scan-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
+
+  .msg-box {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 18px 20px;
+    font-size: 16px; line-height: 1.75; color: var(--text);
+    font-family: 'Fraunces', serif; font-weight: 400;
+    position: relative; overflow: hidden;
+  }
+
+  /* scanner line that sweeps top to bottom */
+  .scanner-line {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--accent) 30%, var(--accent-hover) 70%, transparent 100%);
+    top: -4px; opacity: 0;
+    transition: top 0.6s linear, opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 2;
+    box-shadow: 0 0 10px 2px rgba(124,92,246,0.3);
+  }
+  .scanner-line.scanning { opacity: 1; }
+
+  /* each sensitive span */
+  .pii {
+    position: relative; border-radius: 3px;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+  .pii .pii-label {
+    position: absolute; bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent); color: #fff;
+    font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
+    letter-spacing: .05em; text-transform: uppercase;
+    padding: 3px 7px; border-radius: 4px;
+    white-space: nowrap; pointer-events: none;
+    opacity: 0; transition: opacity 0.2s ease;
+    z-index: 3;
+  }
+  .pii .pii-label::after {
+    content: ''; position: absolute; top: 100%; left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent; border-top-color: var(--accent);
+  }
+  /* highlighted: accent background, label visible */
+  .pii.highlight {
+    background: var(--accent-soft); color: var(--accent-hover);
+  }
+  .pii.highlight .pii-label { opacity: 1; }
+  /* redacted: black bar */
+  .pii.redacted {
+    background: var(--redact); color: var(--redact);
+    border-radius: 3px; cursor: default;
+    user-select: none;
+  }
+  .pii.redacted .pii-label { opacity: 0; }
+
+  /* status row below the message */
+  .scan-status {
+    margin-top: 14px; padding: 10px 14px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 500; color: var(--faint);
+    display: flex; align-items: center; gap: 10px;
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+  .scan-status.found {
+    background: #FFF7ED; border-color: #F59E0B; color: #B45309;
+  }
+  .scan-status.clean {
+    background: var(--success-soft); border-color: var(--success); color: var(--success);
+  }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--faint);
+    flex-shrink: 0; transition: background 0.3s ease;
+  }
+  .scan-status.found .status-dot { background: #F59E0B; }
+  .scan-status.clean .status-dot { background: var(--success); }
+
+  /* controls */
+  .board-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* 03 a real example: flow */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
+  .flow {
+    display: flex; flex-direction: column; gap: 0;
+  }
+  .flow-step {
+    display: flex; gap: 14px; align-items: flex-start; padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .flow-step:last-child { border-bottom: none; }
+  .flow-num {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent-hover);
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .flow-body { flex: 1; }
+  .flow-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .flow-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .tag {
+    display: inline-block; font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px; background: var(--bg-subtle); padding: 1px 5px;
+    border-radius: 3px; border: 1px solid var(--border); color: var(--text);
+  }
+
+  /* 04 tradeoffs */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 200px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 200px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources + footer */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  .sources a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+  .sources a:hover { border-bottom-color: var(--accent); }
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .idea-card { padding: 18px 16px; }
+    .idea-card p { font-size: 16px; }
+    .board-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+  }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; width: auto; }
+    .tradeoff-scale .spacer { display: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-privacy.html"><span aria-hidden="true">&larr;</span> Privacy, Security &amp; Governance</a>
+    <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><a href="consideration-privacy.html">Privacy, Security &amp; Governance</a><span class="sep">/</span><span class="here">How it works</span></nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="11" width="14" height="9" rx="2"/>
+        <path d="M8 11V8a4 4 0 0 1 8 0v3"/>
+      </svg>
+    </span>Consideration &middot; Privacy, Security &amp; Governance
+  </span>
+  <h1 class="pattern-title">Privacy, Security &amp; Governance</h1>
+  <p class="explainer">Personal details belong to people, not to models. Keep them private, separated, and traceable.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>People share private things when they talk to an AI: names, emails, phone numbers, IDs. The system finds those personal details and hides them before storing the message or sending it to the model, and one person's data never reaches another person's session.</p>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Watch a message get <em>scanned</em>.</h2>
+
+  <p class="demo-lede">A customer support message arrives. The system scans it and redacts every piece of personal information before it reaches the AI or the database. Tap Play to watch.</p>
+
+  <div class="scan-stage">
+    <div class="msg-box" id="msgBox" aria-live="polite" aria-label="Customer message with personal information">
+      <div class="scanner-line" id="scannerLine" aria-hidden="true"></div>
+      Hi, my name is <span class="pii" data-label="Name" id="pii0">Sarah Chen</span> and my account email is <span class="pii" data-label="Email" id="pii1">sarah.chen@email.com</span>. My phone is <span class="pii" data-label="Phone" id="pii2">+1 (555) 204-8831</span> and my ID number is <span class="pii" data-label="ID" id="pii3">SSN-472-90-1138</span>. Please help me reset my password.
+    </div>
+
+    <div class="scan-status" id="scanStatus" role="status">
+      <div class="status-dot" aria-hidden="true"></div>
+      <span id="scanStatusText">Ready. Tap Play to scan the message.</span>
+    </div>
+
+    <div class="board-controls">
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>How a <em>support tool</em> applies this.</h2>
+  <div class="example-stage">
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num" aria-hidden="true">1</div>
+        <div class="flow-body">
+          <div class="flow-title">User sends a message</div>
+          <div class="flow-desc">A customer types freely, often including their name, order number, or phone number without thinking.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num" aria-hidden="true">2</div>
+        <div class="flow-body">
+          <div class="flow-title">Personal-info scanner runs before anything else</div>
+          <div class="flow-desc">A pattern matcher finds names, emails, phone numbers, and government IDs. Each is replaced with a neutral tag like <span class="tag">[EMAIL]</span> before the text moves forward.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num" aria-hidden="true">3</div>
+        <div class="flow-body">
+          <div class="flow-title">Redacted message goes to the model</div>
+          <div class="flow-desc">The AI sees the topic and intent (password reset), but never the real personal details. It can answer helpfully without needing them.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num" aria-hidden="true">4</div>
+        <div class="flow-body">
+          <div class="flow-title">Original is stored only in a protected log</div>
+          <div class="flow-desc">If needed for audit, the unredacted version sits in an access-controlled store, not mixed in with training data or conversation history.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Engineering effort</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency added</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Missed detections</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Context lost to the model</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Missed detections are the real risk, not the latency. A scanner that lets one ID slip through is worse than one that runs a touch slower.
+    </div>
+  </div>
+</section>
+
+<!-- BACK LINK -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-privacy.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Privacy, Security &amp; Governance</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li><a href="https://gdpr-info.eu/" target="_blank" rel="noopener">General Data Protection Regulation (GDPR)</a>. <span class="note">EU regulation defining personal data and the obligation to protect it.</span></li>
+    <li>Lison et al. (2021). <em>Anonymisation Models for Text: State of the Art, Challenges and Future Directions.</em> <span class="note">ACL Anthology. Survey of NLP-based personal-info detection methods.</span></li>
+    <li><a href="https://cloud.google.com/sensitive-data-protection/docs/concepts-infotypes-reference" target="_blank" rel="noopener">Google Cloud Sensitive Data Protection: infoTypes reference.</a> <span class="note">Real-world list of detectable personal-info categories.</span></li>
+    <li><a href="https://arxiv.org/abs/2012.12348" target="_blank" rel="noopener">Carlini et al. (2021). <em>Extracting Training Data from Large Language Models.</em></a> <span class="note">Shows why private data must not enter training data in the first place.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ REDACTION DEMO ============
+// The scanner line sweeps top to bottom. As it crosses each personal-info span:
+//   1. the span gets highlighted (accent background + label popup)
+//   2. after a brief pause, it gets redacted (black bar)
+// Reset restores original text and removes all state.
+
+const msgBox = document.getElementById('msgBox');
+const scannerLine = document.getElementById('scannerLine');
+const scanStatus = document.getElementById('scanStatus');
+const scanStatusText = document.getElementById('scanStatusText');
+const playBtn = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+const piiSpans = Array.from(document.querySelectorAll('.pii'));
+const piiLabels = ['Name', 'Email', 'Phone', 'ID'];
+
+// inject label elements
+piiSpans.forEach((span, i) => {
+  span.setAttribute('data-label', piiLabels[i]);
+  const lbl = document.createElement('span');
+  lbl.className = 'pii-label';
+  lbl.textContent = piiLabels[i];
+  lbl.setAttribute('aria-hidden', 'true');
+  span.insertBefore(lbl, span.firstChild);
+});
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function setStatus(state, text) {
+  scanStatus.className = 'scan-status' + (state ? ' ' + state : '');
+  scanStatusText.textContent = text;
+}
+
+function resetDemo() {
+  // remove scanner
+  scannerLine.style.top = '-4px';
+  scannerLine.classList.remove('scanning');
+  // restore all spans
+  piiSpans.forEach(span => {
+    span.classList.remove('highlight', 'redacted');
+  });
+  setStatus('', 'Ready. Tap Play to scan the message.');
+  playBtn.disabled = false;
+  resetBtn.disabled = false;
+}
+
+async function runScan() {
+  playBtn.disabled = true;
+  resetBtn.disabled = true;
+
+  if (reduceMotion) {
+    // instant: highlight all, then redact all
+    piiSpans.forEach(s => s.classList.add('highlight'));
+    setStatus('found', `Found ${piiSpans.length} personal details: Name, Email, Phone, ID.`);
+    await sleep(5);
+    piiSpans.forEach(s => { s.classList.remove('highlight'); s.classList.add('redacted'); });
+    setStatus('clean', 'All personal details redacted. Safe to process.');
+    playBtn.disabled = false;
+    resetBtn.disabled = false;
+    return;
+  }
+
+  // 1. sweep scanner line top to bottom
+  const boxRect = msgBox.getBoundingClientRect();
+  const boxHeight = msgBox.offsetHeight;
+
+  setStatus('', 'Scanning...');
+  scannerLine.style.top = '-4px';
+  scannerLine.classList.add('scanning');
+
+  // get each span's vertical midpoint relative to msgBox
+  const spanMids = piiSpans.map(span => {
+    const r = span.getBoundingClientRect();
+    return r.top - boxRect.top + r.height / 2;
+  });
+
+  const SCAN_DURATION = 1600; // ms to cross the full box
+  const startTime = performance.now();
+  let highlighted = new Array(piiSpans.length).fill(false);
+
+  await new Promise(resolve => {
+    function frame(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / SCAN_DURATION, 1);
+      const lineY = progress * (boxHeight + 4);
+      scannerLine.style.top = lineY + 'px';
+
+      // highlight any span the line has crossed
+      piiSpans.forEach((span, i) => {
+        if (!highlighted[i] && lineY >= spanMids[i]) {
+          highlighted[i] = true;
+          span.classList.add('highlight');
+        }
+      });
+
+      if (progress < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        resolve();
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+
+  // 2. scanner done: show count
+  const found = highlighted.filter(Boolean).length;
+  setStatus('found', `Found ${found} personal detail${found !== 1 ? 's' : ''}: Name, Email, Phone, ID.`);
+  scannerLine.classList.remove('scanning');
+
+  await sleep(700);
+
+  // 3. redact each span one by one with a small stagger
+  for (let i = 0; i < piiSpans.length; i++) {
+    piiSpans[i].classList.remove('highlight');
+    piiSpans[i].classList.add('redacted');
+    await sleep(160);
+  }
+
+  await sleep(300);
+  setStatus('clean', 'All personal details redacted. Safe to process.');
+  playBtn.disabled = false;
+  resetBtn.disabled = false;
+}
+
+playBtn.addEventListener('click', () => {
+  // reset silently first if already run
+  piiSpans.forEach(s => s.classList.remove('highlight', 'redacted'));
+  scannerLine.style.top = '-4px';
+  scannerLine.classList.remove('scanning');
+  setStatus('', 'Scanning...');
+  runScan();
+});
+
+resetBtn.addEventListener('click', () => {
+  resetDemo();
+});
+</script>
+</body>
+</html>
