@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shared Workspace · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* Workspace diagram */
+  .ws-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .ws-header {
+    padding: 12px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border);
+    font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .ws-body {
+    padding: 22px; display: grid; grid-template-columns: 1fr 1.2fr 1fr;
+    gap: 14px; align-items: stretch;
+  }
+  .ws-col { display: flex; flex-direction: column; gap: 10px; }
+  .ws-col.center { align-items: center; justify-content: center; }
+  .agent-chip {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px; border-radius: 12px;
+    background: var(--surface); border: 1px solid var(--border-strong);
+    font-size: 13px; line-height: 1.35;
+    cursor: pointer; transition: border-color .2s, background .2s, transform .2s;
+    text-align: left;
+    font-family: 'Inter', sans-serif; color: var(--text);
+    width: 100%;
+  }
+  .agent-chip:hover, .agent-chip:focus-visible { border-color: var(--accent); background: var(--accent-soft); }
+  .agent-chip.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-hover); font-weight: 600; }
+  .agent-icon {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--accent-soft); color: var(--accent-hover);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .agent-chip.active .agent-icon { background: var(--accent); color: #fff; }
+  .ws-board {
+    width: 100%; min-height: 180px;
+    background: var(--bg-subtle); border: 1px dashed var(--border-strong); border-radius: 12px;
+    padding: 14px; display: flex; flex-direction: column; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--soft);
+  }
+  .ws-board .board-title {
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--faint); margin-bottom: 4px;
+  }
+  .note-line {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 10px; line-height: 1.5;
+  }
+  .note-line .who { color: var(--accent-hover); font-weight: 600; }
+  .ws-caption {
+    padding: 10px 18px; border-top: 1px solid var(--border); background: var(--bg-subtle);
+    font-size: 13px; color: var(--soft); line-height: 1.55;
+  }
+  .ws-caption strong { color: var(--text); }
+
+  .fits-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 720px) {
+    .ws-body { grid-template-columns: 1fr; }
+    .ws-col.center { order: 3; }
+    .ws-col:last-child { order: 2; }
+  }
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="orchestration-coordination.html"><span aria-hidden="true">&larr;</span> Coordinate agents</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-orchestration-agents.html">Orchestration &amp; Agents</a><span class="sep" aria-hidden="true">/</span><a href="orchestration-coordination.html">Coordinate agents</a><span class="sep" aria-hidden="true">/</span><span class="here">Shared Workspace</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Orchestration &amp; Agents &middot; Coordinate agents</span>
+  <h1 class="page-title">Shared Workspace</h1>
+  <p class="explainer">A common place agents can read from and write to, so each one builds on what the others have already done.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What It Is</div>
+  <h2 id="what-heading">One board, <em>many hands</em>.</h2>
+  <div class="what-card">
+    <p>A <strong style="color:var(--accent-hover)">shared workspace</strong> (sometimes called a blackboard) is one storage area that every agent in a team can see and update. Instead of agents sending each other long messages, they post their findings to a common board and pick up whatever others have posted there. The workspace can be a shared file, a database table, a vector store, or a project folder. It keeps everyone in sync without anyone having to know who else is on the team.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Tap an agent to see <em>what it adds</em>.</h2>
+  <div class="ws-card" role="region" aria-label="Shared workspace example">
+    <div class="ws-header">
+      <span>Research project: market scan for Acme</span>
+      <span style="color: var(--accent-hover); font-family: 'JetBrains Mono', monospace; font-size: 11px;">/workspace/acme/</span>
+    </div>
+    <div class="ws-body">
+      <div class="ws-col" role="tablist" aria-label="Pick an agent">
+        <button class="agent-chip active" role="tab" aria-selected="true" aria-controls="board" data-agent="researcher">
+          <span class="agent-icon" aria-hidden="true">R</span>
+          <span>Researcher<br><span style="font-size:11px;color:var(--faint);font-weight:400">gathers facts</span></span>
+        </button>
+        <button class="agent-chip" role="tab" aria-selected="false" aria-controls="board" data-agent="analyst">
+          <span class="agent-icon" aria-hidden="true">A</span>
+          <span>Analyst<br><span style="font-size:11px;color:var(--faint);font-weight:400">finds the pattern</span></span>
+        </button>
+        <button class="agent-chip" role="tab" aria-selected="false" aria-controls="board" data-agent="writer">
+          <span class="agent-icon" aria-hidden="true">W</span>
+          <span>Writer<br><span style="font-size:11px;color:var(--faint);font-weight:400">drafts the memo</span></span>
+        </button>
+      </div>
+      <div class="ws-col center">
+        <div class="ws-board" id="board" role="tabpanel">
+          <div class="board-title">Workspace contents</div>
+          <div class="note-line"><span class="who">researcher.md</span><br>15 competitor names, 3 pricing tables, 8 product pages</div>
+          <div class="note-line" data-show="analyst writer" style="display:none"><span class="who">analyst.md</span><br>3 themes: bundling, freemium, enterprise tier</div>
+          <div class="note-line" data-show="writer" style="display:none"><span class="who">draft_v1.md</span><br>2-page memo, 4 charts, draft recommendation</div>
+        </div>
+      </div>
+      <div class="ws-col">
+        <div style="font-size: 13px; color: var(--soft); line-height: 1.6; padding: 4px 0;" id="agent-explain">
+          <strong style="color: var(--text);">Researcher</strong> writes raw findings to the board. It does not need to know who reads them next.
+        </div>
+      </div>
+    </div>
+    <div class="ws-caption">
+      <strong>No direct messages.</strong> Each agent reads what is on the board and adds its own piece. The order can change, work can pause and resume, and a new agent can join later by reading what is already there.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it is</div>
+      <div class="fits-desc">A meeting place for agents, not a way of talking. It says where things live so anyone can pick them up. The talking format itself is a separate concern.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Sits next to</div>
+      <div class="fits-desc">Pairs well with an agent-to-agent protocol (how they talk), identity (who is allowed to write to which folder), and memory (what carries across sessions).</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Several agents work on the same project and you want each one to build on the others' output.</li>
+    <li>Work happens in stages, can pause, and may be picked up later by a different agent.</li>
+    <li>You need a single audit trail of what was written and by whom across the whole run.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="orchestration-coordination.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Coordinate agents</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Hayes-Roth, B. (1985). <em>A blackboard architecture for control.</em> Artificial Intelligence, 26(3). <span class="note">Origin of the blackboard pattern: multiple expert sources share one common workspace and react to each other's contributions.</span></li>
+    <li>Wu, Q. et al. (2023). <em>AutoGen: Enabling next-gen LLM applications via multi-agent conversation.</em> arXiv:2308.08155. <span class="note">Modern framework where multiple LLM agents share state and artifacts across roles.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  const chips = document.querySelectorAll('.agent-chip');
+  const lines = document.querySelectorAll('.note-line[data-show]');
+  const explain = document.getElementById('agent-explain');
+  const copy = {
+    researcher: '<strong style="color: var(--text);">Researcher</strong> writes raw findings to the board. It does not need to know who reads them next.',
+    analyst: '<strong style="color: var(--text);">Analyst</strong> reads the researcher\'s notes and posts a summary of the patterns it sees, again straight to the board.',
+    writer: '<strong style="color: var(--text);">Writer</strong> reads everything on the board and posts a finished draft beside it, ready for review.'
+  };
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      chips.forEach(function (c) { c.classList.remove('active'); c.setAttribute('aria-selected', 'false'); });
+      chip.classList.add('active');
+      chip.setAttribute('aria-selected', 'true');
+      const agent = chip.getAttribute('data-agent');
+      lines.forEach(function (l) {
+        const shows = l.getAttribute('data-show').split(' ');
+        l.style.display = shows.indexOf(agent) >= 0 ? 'block' : 'none';
+      });
+      explain.innerHTML = copy[agent];
+    });
+  });
+}());
+</script>
+</body>
+</html>

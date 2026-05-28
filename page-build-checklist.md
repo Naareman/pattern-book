@@ -9,11 +9,13 @@ The standing gate. Every page, and every agent that builds or edits a page, must
 ## 1. Matches the template
 - Every page at the same level as Single-Call Control (all layer hubs) must MATCH ITS DESIGN, not just its structure: same header, same "See it in action" pill, same flow legend, same stage cards, same spacing. Single-Call Control is THE reference for hubs; Chain-of-Thought is THE reference for section/tradeoff styling.
 - Layer hub shows the BREAKDOWN only: eyebrow pill -> title with a "See it in action ->" pill on the title row -> flow legend + caption -> stage cards directly. NO "01 Inside this layer" numbered label or serif heading before the cards.
+- Considerations follow the SAME 2-level model as layer hubs: the consideration hub is `consideration-<name>.html` (stage cards only), the demo + tradeoffs live on `consideration-<name>-how-it-works.html`. Reference pair: `layer-serving-infrastructure.html` + `serving-infrastructure-how-it-works.html`. Mirror their exact `.title-row` / `.how-pill` markup + CSS.
 - The interactive concept demo + tradeoffs live on a separate `<layer>-how-it-works.html` page, never on the hub.
 - Section titles use ONE canonical wording site-wide: `See It Work`, `A Real Example` (atomic pages: `An Example`), `When It Matters`, idea h2 `What is it?`, and the tradeoffs h2 is `The price you pay.` everywhere it is the Low->High cost meter (leave a genuine comparison section alone).
 - Tradeoff meter: every bar starts from the same left baseline (fixed 170px label column), monochrome accent, Low->High, stacks on mobile.
 - Cross-page consistency: a recurring element (section title, tradeoff meter, a block, a connector) must look and read IDENTICALLY on every page. Parallel agents drift, so always normalize back to the reference.
 - Logical order: order items the way a person actually does them; a "check / review / verify" step comes last. Do not follow raw taxonomy order if it reads illogically.
+- CSS hardening for stage cards (locked): grid `repeat(N, minmax(0, 1fr))`, `.stage-card { min-width: 0; height: 100%; }`, `.stages { align-items: stretch; }`, chip `white-space: normal; word-break: break-word; max-width: 100%;`. Without this, long chip names break the grid.
 
 ## 2. Links never lie
 - Link a thing ONLY if its target page actually exists. Not built yet = not clickable AND must not look clickable (no accent color, no underline, default cursor).
@@ -28,6 +30,7 @@ The standing gate. Every page, and every agent that builds or edits a page, must
 - Goal/intent first ("Want to X? -> Technique"), not abstract category lists.
 - No unexplained jargon or bare acronyms (RLHF, ReAct, zero/few-shot). Spell out and define on first use, or cut. If a beginner would ask "what's that?", it is not done.
 - Distinct labels: never reuse a sibling's word (e.g. a cluster "Shape the input" next to a stage "Shape its output").
+- Chip names on hub cards are PLAIN. Rewrite jargon discipline names from the taxonomy into homepage-reader English (e.g. "SLA/SLO Design" -> "Setting speed and uptime targets"; "Error Budgets & Graceful Degradation" -> "How much can break before you act"; "Cost-Quality Tradeoff" -> "Spending more for better answers"; "Context-Strategy Tradeoff" -> "Choosing what to pack into the prompt"). Keep the rename truthful; no invented disciplines.
 
 ## 4. Short + best representation
 - One-line intros. No explanatory paragraphs or prose walls. If a block is a wall, cut it or convert it to a visual (chips, small flow, before/after, tap-to-reveal).

@@ -6,20 +6,16 @@
 <title>Multimodal &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
     --border:#E8EAEE; --border-strong:#D5D9E0;
     --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
-    --radius:16px;
-    --bg-subtle:#F6F7F9; --radius-sm:11px;
-    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
-    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
-    --c-img:#E67E22; --c-img-soft:#FEF3E7;
-    --c-audio:#2ECC71; --c-audio-soft:#E8FAF2;
-    --c-text:#7C5CF6; --c-text-soft:#F0ECFE;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.10);
+    --radius:16px; --radius-sm:11px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-padding-top: 80px; }
@@ -31,14 +27,31 @@
     -webkit-font-smoothing: antialiased;
   }
   body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
 
-  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
   .skip-link:focus { top: 8px; }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 
-  /* TOP BAR */
+  /* top bar */
   .topbar {
     position: sticky; top: 0; z-index: 200;
     background: rgba(252,252,253,.86);
@@ -47,15 +60,15 @@
     border-bottom: 1px solid var(--border);
   }
   .topbar-inner {
-    max-width: 920px; margin: 0 auto; padding: 11px 24px;
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
   }
   .back {
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none;
-    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
-    background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease;
-    white-space: nowrap;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
   }
   .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
   .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -64,11 +77,8 @@
   .crumb .sep { margin: 0 7px; color: var(--border-strong); }
   .crumb .here { color: var(--soft); }
 
-  /* HEADER */
-  .header {
-    max-width: 920px; margin: 0 auto; padding: 40px 24px 8px;
-    scroll-margin-top: 80px;
-  }
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
   .eyebrow {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
@@ -78,307 +88,120 @@
   .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
   .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
   h1.pattern-title {
-    scroll-margin-top: 80px;
     font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
     line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
   }
-  .explainer {
-    color: var(--soft); font-size: 16px; line-height: 1.6;
-    max-width: 660px; margin-top: 14px;
-  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
-  /* SECTIONS */
+  /* title row + see-it-in-action pill */
+  .title-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:16px 0 0}
+  .title-row .pattern-title{margin:0;flex:1 1 auto;min-width:240px}
+  .how-pill{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--accent);border-radius:22px;padding:8px 15px;box-shadow:var(--shadow);transition:background .15s ease,transform .15s ease}
+  .how-pill:hover{background:#E3DBFD;transform:translateY(-1px)}
+  .how-pill .arr{display:inline-block;transition:transform .18s ease}
+  .how-pill:hover .arr{transform:translateX(3px)}
+  @media (prefers-reduced-motion:reduce){.how-pill,.how-pill .arr{transition:none}.how-pill:hover,.how-pill:hover .arr{transform:none}}
+  @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
+
+  /* flow legend (stage pills + arrows) */
+  .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
+  .flow-chip {
+    font-family: inherit; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; box-shadow: var(--shadow); padding: 7px 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--soft); white-space: nowrap;
+    letter-spacing: .01em; cursor: pointer;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .flow-chip:hover { color: var(--accent-hover); border-color: var(--border-strong); }
+  .flow-chip.lit { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); }
+  .flow-arrow { flex: none; color: var(--accent); font-size: 15px; line-height: 1; }
+  .flow-caption { text-align: center; color: var(--faint); font-size: 13px; line-height: 1.5; margin-top: 12px; }
+
+  /* sections */
   section {
     max-width: 920px; margin: 0 auto;
     padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px;
   }
-  .section-label {
-    font-size: 11px; font-weight: 600; letter-spacing: .07em;
-    text-transform: uppercase; color: var(--faint); margin-bottom: 9px;
-  }
-  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
   h2 {
     font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
     line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
   }
   h2 em { font-style: italic; color: var(--accent); }
 
-  /* IDEA CARD */
-  .idea-card {
+  /* ============ STAGE CARDS ============ */
+  .stages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 6px; align-items: stretch; }
+
+  .stage-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
+    scroll-margin-top: 80px;
+    transition: box-shadow .55s ease, border-color .55s ease;
+    display: flex; flex-direction: column;
+    min-width: 0; height: 100%;
   }
-  .idea-card p {
-    font-family: 'Fraunces', serif; font-weight: 400;
-    font-size: 18px; line-height: 1.55; color: var(--text);
+  .stage-card.glow {
+    box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42);
+    border-color: var(--accent);
+  }
+  @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
+
+  .stage-card.clickable {
+    cursor: pointer;
+    transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
+  @media (prefers-reduced-motion: reduce) {
+    .stage-card.clickable { transition: none; }
+    .stage-card.clickable:hover { transform: none; }
   }
 
-  /* DEMO */
-  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
-  .board-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  /* de-squeezed: icon + name share a full-width row of their own */
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; min-width: 0; }
+  .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
+  .stage-head .sico svg { width: 18px; height: 18px; display: block; }
+  .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
+
+  .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
+
+  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; }
+  .chip {
+    flex: none; display: inline-flex; align-items: center; gap: 3px;
+    padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
+    border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
 
-  /* Input picker */
-  .input-picker {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-    margin-bottom: 20px;
+  /* "see how" lives at the bottom of each card, pushed down by margin-top:auto */
+  .see-how {
+    display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--accent-hover);
+    transition: color .15s ease;
   }
-  .input-btn {
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-    padding: 16px 10px; border-radius: var(--radius-sm);
-    border: 2px solid var(--border); background: var(--bg-subtle);
-    cursor: pointer; transition: border-color .2s ease, background .2s ease, transform .18s ease, box-shadow .18s ease;
-    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: var(--soft);
-    position: relative; user-select: none;
-  }
-  .input-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
-  .input-btn .ib-icon { font-size: 26px; line-height: 1; }
-  .input-btn.active-img { border-color: var(--c-img); background: var(--c-img-soft); color: var(--c-img); }
-  .input-btn.active-audio { border-color: var(--c-audio); background: var(--c-audio-soft); color: var(--c-audio); }
-  .input-btn.active-text { border-color: var(--c-text); background: var(--c-text-soft); color: var(--c-text); }
-  .input-btn .ib-tag {
-    font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
-    padding: 2px 6px; border-radius: 20px; background: currentColor;
-    color: #fff; opacity: 0; transition: opacity .2s ease;
-    position: absolute; top: 6px; right: 6px;
-  }
-  .input-btn.active-img .ib-tag, .input-btn.active-audio .ib-tag, .input-btn.active-text .ib-tag { opacity: 1; }
-
-  /* Pipeline board */
-  .pipeline-board {
-    background: var(--bg-subtle); border: 1px solid var(--border-strong);
-    border-radius: var(--radius-sm); padding: 18px; min-height: 220px;
-    display: flex; flex-direction: column; gap: 14px;
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion: reduce) {
+    .see-how, .see-how .arr { transition: none; }
+    .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; }
   }
 
-  /* Raw input row */
-  .raw-row {
-    display: flex; align-items: center; gap: 12px;
-    opacity: 0; transform: translateY(6px);
-    transition: opacity .35s ease, transform .35s ease;
-  }
-  .raw-row.shown { opacity: 1; transform: translateY(0); }
-  .raw-label {
-    font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
-    flex: none; width: 64px; text-align: right;
-  }
-  .raw-label.img { color: var(--c-img); }
-  .raw-label.audio { color: var(--c-audio); }
-  .raw-label.txt { color: var(--c-text); }
-  .raw-content {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 8px 12px; flex: 1; font-size: 13px; color: var(--soft);
-    min-height: 40px;
-  }
-  .raw-icon { font-size: 20px; flex: none; }
-
-  /* Encoder arrow */
-  .encoder-row {
-    display: flex; align-items: center; gap: 10px;
-    opacity: 0; transform: translateY(4px);
-    transition: opacity .3s ease .12s, transform .3s ease .12s;
-  }
-  .encoder-row.shown { opacity: 1; transform: translateY(0); }
-  .enc-spacer { width: 64px; flex: none; }
-  .enc-arrow {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-    color: var(--faint);
-  }
-  .enc-arrow svg { width: 16px; height: 16px; flex: none; }
-
-  /* Token stream */
-  .token-stream-row {
-    display: flex; align-items: flex-start; gap: 12px;
-    opacity: 0; transform: translateY(6px);
-    transition: opacity .35s ease .24s, transform .35s ease .24s;
-  }
-  .token-stream-row.shown { opacity: 1; transform: translateY(0); }
-  .stream-label {
-    font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
-    color: var(--faint); flex: none; width: 64px; text-align: right;
-    padding-top: 6px;
-  }
-  .token-stream {
-    display: flex; flex-wrap: wrap; gap: 5px; flex: 1;
-    min-height: 36px;
-  }
-  .tok-chip {
-    display: inline-flex; align-items: center;
-    padding: 4px 9px; border-radius: 20px;
-    font-size: 12px; font-weight: 600; line-height: 1.2;
-    opacity: 0; transform: scale(0.8);
-    transition: opacity .22s ease, transform .22s ease, background .3s ease;
-  }
-  .tok-chip.in { opacity: 1; transform: scale(1); }
-  .tok-chip.img-tok { background: var(--c-img-soft); color: var(--c-img); border: 1px solid rgba(230,126,34,.25); }
-  .tok-chip.audio-tok { background: var(--c-audio-soft); color: #1a9c54; border: 1px solid rgba(46,204,113,.25); }
-  .tok-chip.text-tok { background: var(--c-text-soft); color: var(--c-text); border: 1px solid rgba(124,92,246,.25); }
-  .tok-chip.unified { background: var(--bg-subtle); color: var(--soft); border: 1px solid var(--border-strong); }
-  .tok-chip.writing { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,92,246,.15); }
-
-  /* Merge divider */
-  .merge-divider {
-    display: flex; align-items: center; gap: 10px;
-    opacity: 0; transform: translateY(4px);
-    transition: opacity .3s ease .3s, transform .3s ease .3s;
-  }
-  .merge-divider.shown { opacity: 1; transform: translateY(0); }
-  .merge-line { flex: 1; height: 1px; background: var(--border-strong); }
-  .merge-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); white-space: nowrap; }
-
-  /* Model reads row */
-  .model-row {
-    display: flex; align-items: flex-start; gap: 12px;
-    opacity: 0; transform: translateY(6px);
-    transition: opacity .35s ease .36s, transform .35s ease .36s;
-  }
-  .model-row.shown { opacity: 1; transform: translateY(0); }
-  .model-label {
-    font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
-    color: var(--accent-hover); flex: none; width: 64px; text-align: right; padding-top: 6px;
-  }
-  .model-stream { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; min-height: 36px; }
-
-  /* Insight */
-  .demo-insight {
-    margin-top: 6px; font-size: 13px; color: var(--faint); line-height: 1.5;
-    opacity: 0; transition: opacity .4s ease .45s;
-  }
-  .demo-insight.shown { opacity: 1; }
-
-  /* Controls */
-  .board-controls {
-    display: flex; gap: 10px; flex-wrap: wrap;
-    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
-  }
-  .diagram-btn {
-    padding: 10px 16px; border: 1px solid var(--border-strong);
-    background: var(--surface); border-radius: var(--radius-sm); cursor: pointer;
-    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text);
-    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
-  }
-  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
-  .diagram-btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
-  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-
-  /* SECTION 03: example */
-  .example-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
-  }
-  .example-tabs {
-    display: flex; border-bottom: 1px solid var(--border);
-  }
-  .ex-tab {
-    flex: 1; padding: 12px 10px; font-size: 13px; font-weight: 600;
-    color: var(--faint); background: transparent; border: none; cursor: pointer;
-    border-bottom: 2px solid transparent; transition: color .2s ease, border-color .2s ease;
-    font-family: 'Inter', sans-serif;
-  }
-  .ex-tab:hover { color: var(--soft); }
-  .ex-tab.active { color: var(--accent-hover); border-bottom-color: var(--accent); }
-  .example-body { padding: 20px 22px; }
-  .ex-panel { display: none; }
-  .ex-panel.active { display: block; }
-  .ex-scenario {
-    font-family: 'Fraunces', serif; font-size: 16px; line-height: 1.5;
-    color: var(--text); margin-bottom: 12px;
-  }
-  .ex-what {
-    font-size: 14px; line-height: 1.6; color: var(--soft);
-  }
-  .ex-what strong { color: var(--text); font-weight: 600; }
-
-  /* TRADEOFFS */
-  .tradeoffs-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
-  }
-  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
-  .tradeoff-row:last-of-type { margin-bottom: 0; }
-  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
-  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
-  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
-  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
-  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
-  .tradeoff-scale .spacer { width: 170px; flex: none; }
-  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
-  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
-
-  /* BACK LINK */
+  /* back link */
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
     padding: 14px 16px; background: var(--surface);
     border: 1px solid var(--border); border-radius: var(--radius);
     box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
-    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; cursor: pointer;
   }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
-  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s; }
   .back-link:hover .back-arrow { transform: translateX(-3px); }
   .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
   .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
 
-  /* WHAT THIS COVERS: guide-card style */
-  .guide {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
-  }
-  .scope-banner {
-    background: var(--accent-soft); border-bottom: 1px solid var(--border);
-    padding: 14px 22px; display: flex; align-items: flex-start; gap: 12px;
-  }
-  .scope-icon { font-size: 18px; flex: none; margin-top: 1px; }
-  .scope-text { font-size: 14px; line-height: 1.55; color: var(--text); }
-  .scope-text strong { font-weight: 700; color: var(--accent-hover); }
-  .scope-text .scope-skip { color: var(--soft); font-size: 13px; display: block; margin-top: 3px; }
-  .axis-line {
-    padding: 14px 22px 10px; border-bottom: 1px solid var(--border);
-    font-size: 13px; color: var(--soft); line-height: 1.55;
-  }
-  .axis-line strong { color: var(--text); font-weight: 600; }
-
-  /* cluster labels */
-  .cluster-head { padding: 16px 22px 8px; }
-  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
-  .cluster-label {
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .07em; color: var(--text); line-height: 1.3;
-  }
-  /* discipline rows: name on its own line, description below, indented under the cluster label */
-  .guide-row {
-    display: flex; flex-direction: column; gap: 3px;
-    padding: 13px 22px 13px 40px; border-top: 1px solid var(--border);
-  }
-  .cluster-head + .guide-row { border-top: none; }
-  .disc-name {
-    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
-    color: var(--text); line-height: 1.3;
-  }
-  .disc-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
-
-  .mechanism-note {
-    margin: 14px 22px 16px; padding: 12px 16px;
-    background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); font-size: 13px; color: var(--soft); line-height: 1.55;
-  }
-  .mechanism-note strong { color: var(--text); font-weight: 600; }
-
-  /* SOURCES */
-  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
-  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
-  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
-  .sources li em { font-style: italic; color: var(--text); }
-  .sources li .note { color: var(--faint); }
-  .sources li a { color: var(--accent-hover); font-weight: 500; }
-
-  /* FOOTER */
+  /* footer */
   footer {
     max-width: 920px; margin: 30px auto 48px;
     padding: 16px 24px 0; text-align: center;
@@ -387,22 +210,15 @@
   }
   footer strong { color: var(--soft); font-weight: 500; }
 
-  /* RESPONSIVE */
+  /* responsive */
+  @media (max-width: 720px) {
+    .stages { grid-template-columns: 1fr; gap: 14px; }
+  }
   @media (max-width: 560px) {
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .input-picker { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .input-btn { padding: 12px 6px; font-size: 12px; }
-    .input-btn .ib-icon { font-size: 22px; }
-    .raw-label, .stream-label, .model-label, .enc-spacer { width: 48px; }
-  }
-  @media (max-width: 480px) {
-    .tradeoff-row { flex-direction: column; align-items: stretch; }
-    .tradeoff-label { min-width: 0; }
-  }
-  @media (max-width: 420px) {
-    .board-controls { flex-direction: column; align-items: stretch; }
+    .flow-chip { font-size: 12px; padding: 6px 12px; }
   }
 </style>
 </head>
@@ -410,15 +226,11 @@
 <a class="skip-link" href="#main">Skip to content</a>
 
 <!-- TOP BAR -->
-<nav class="topbar" aria-label="Site navigation">
+<nav class="topbar">
   <div class="topbar-inner">
     <a class="back" href="considerations.html"><span aria-hidden="true">&larr;</span> Considerations</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a>
-      <span class="sep">/</span>
-      <a href="considerations.html">Considerations</a>
-      <span class="sep">/</span>
-      <span class="here">Multimodal</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Multimodal</span>
     </nav>
   </div>
 </nav>
@@ -432,234 +244,85 @@
         <circle cx="8.5" cy="10" r="1.6"/>
         <path d="M21 16l-5-4-9 7"/>
       </svg>
-    </span>
-    Consideration · Multimodal
+    </span>Consideration &middot; Multimodal
   </span>
-  <h1 class="pattern-title">Multimodal</h1>
-  <p class="explainer">How to reason about systems that handle images, audio, or video alongside text. Text-only systems can skip this consideration.</p>
+  <div class="title-row"><h1 class="pattern-title">Multimodal</h1><a class="how-pill" href="consideration-multimodal-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
+  <p class="explainer">Handling images, audio, or video alongside text without the answer drifting from what was actually shown.</p>
+
+  <div class="flow" aria-label="Jump to a part of multimodal">
+    <button type="button" class="flow-chip" data-target="card-choose">Choose how each input lands</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-ground">Keep the answer tied to what was sent</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-cost">Measure what it costs and how well it works</button>
+  </div>
+  <p class="flow-caption">Three jobs when more than just words come in.</p>
 </header>
 
-<!-- 01 · THE IDEA -->
+<!-- STAGE CARDS -->
 <section>
-  <div class="section-label"><span class="num">01</span>The Idea</div>
-  <h2>What <em>is</em> it?</h2>
-  <div class="idea-card">
-    <p>A <span style="color:var(--accent-hover);font-weight:600">multimodal model</span> can read more than one kind of input. Not just words, but also images, audio, and video. The trick is that everything, a photo, a spoken word, a block of text, gets converted into the same kind of unit before the model ever sees it. That unit is called a <span style="color:var(--accent-hover);font-weight:600">token</span> (a token is a small piece the AI works in: roughly a word, or a slice of an image or sound). One unified stream. One model.</p>
-  </div>
-</section>
+  <div class="stages">
 
-<!-- 02 · THE DEMO -->
-<section>
-  <div class="section-label"><span class="num">02</span>See It Work</div>
-  <h2>Everything <em>becomes</em> tokens.</h2>
-
-  <p class="demo-lede">Tap an input type below. Watch it get converted into tokens and merged into the stream the model reads.</p>
-
-  <div class="board-stage">
-    <!-- Input picker -->
-    <div class="input-picker" role="group" aria-label="Choose an input type">
-      <button class="input-btn" id="btn-img" aria-pressed="false" data-type="img">
-        <span class="ib-icon" aria-hidden="true">🖼️</span>
-        <span>Image</span>
-        <span class="ib-tag" aria-hidden="true">selected</span>
-      </button>
-      <button class="input-btn" id="btn-audio" aria-pressed="false" data-type="audio">
-        <span class="ib-icon" aria-hidden="true">🔊</span>
-        <span>Audio</span>
-        <span class="ib-tag" aria-hidden="true">selected</span>
-      </button>
-      <button class="input-btn" id="btn-text" aria-pressed="false" data-type="text">
-        <span class="ib-icon" aria-hidden="true">💬</span>
-        <span>Text</span>
-        <span class="ib-tag" aria-hidden="true">selected</span>
-      </button>
-    </div>
-
-    <!-- Pipeline board -->
-    <div class="pipeline-board" id="pipelineBoard" aria-live="polite" aria-label="Tokenization pipeline">
-
-      <!-- Step 1: raw input -->
-      <div class="raw-row" id="rawRow">
-        <span class="raw-label img" id="rawLabel">Input</span>
-        <div class="raw-content" id="rawContent">
-          <span class="raw-icon" id="rawIcon" aria-hidden="true"></span>
-          <span id="rawText" style="font-size:13.5px"></span>
-        </div>
+    <!-- CHOOSE HOW EACH INPUT LANDS -->
+    <section class="stage-card clickable" id="card-choose" aria-labelledby="g-choose">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 7h7"/><path d="M4 12h12"/><path d="M4 17h9"/><circle cx="18" cy="7" r="2"/><circle cx="20" cy="17" r="2"/>
+          </svg>
+        </span>
+        <h2 id="g-choose"><span class="stage-name">Choose how each input lands</span></h2>
       </div>
-
-      <!-- Step 2: encoder arrow -->
-      <div class="encoder-row" id="encoderRow">
-        <div class="enc-spacer"></div>
-        <div class="enc-arrow">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-          <span id="encoderLabel">Image encoder</span>
-          <span style="color:var(--faint);font-weight:400;font-size:11px">(patches → vectors)</span>
-        </div>
+      <p class="stage-lead">Decide how each picture, sound, or sentence reaches the model, and when to blend them.</p>
+      <div class="chips">
+        <span class="chip">Pick how to handle each input</span>
+        <span class="chip">Decide when to blend the inputs</span>
+        <span class="chip">Switch input types mid-conversation</span>
       </div>
+      <a class="see-how" href="consideration-multimodal-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
-      <!-- Step 3: per-type tokens -->
-      <div class="token-stream-row" id="tokenRow">
-        <span class="stream-label" id="tokenRowLabel">Tokens</span>
-        <div class="token-stream" id="tokenStream"></div>
+    <!-- KEEP THE ANSWER TIED TO WHAT WAS SENT -->
+    <section class="stage-card clickable" id="card-ground" aria-labelledby="g-ground">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="10" r="3"/><path d="M12 2C7 2 4 5.5 4 10c0 6 8 12 8 12s8-6 8-12c0-4.5-3-8-8-8z"/>
+          </svg>
+        </span>
+        <h2 id="g-ground"><span class="stage-name">Keep the answer tied to what was sent</span></h2>
       </div>
-
-      <!-- Merge divider -->
-      <div class="merge-divider" id="mergeDivider">
-        <div class="merge-line"></div>
-        <span class="merge-label">merged into one stream</span>
-        <div class="merge-line"></div>
+      <p class="stage-lead">Make sure the model talks about the real picture or sound, not something it invented.</p>
+      <div class="chips">
+        <span class="chip">Stay tied to what was actually shown or said</span>
+        <span class="chip">Catch harm in images and audio, not just text</span>
       </div>
+      <a class="see-how" href="consideration-multimodal-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
-      <!-- Step 4: unified tokens the model reads -->
-      <div class="model-row" id="modelRow">
-        <span class="model-label">Model</span>
-        <div class="model-stream" id="modelStream"></div>
+    <!-- MEASURE WHAT IT COSTS AND HOW WELL IT WORKS -->
+    <section class="stage-card clickable" id="card-cost" aria-labelledby="g-cost">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-7"/>
+          </svg>
+        </span>
+        <h2 id="g-cost"><span class="stage-name">Measure what it costs and how well it works</span></h2>
       </div>
-
-      <!-- insight line -->
-      <p class="demo-insight" id="demoInsight"></p>
-    </div>
-
-    <div class="board-controls">
-      <button class="diagram-btn primary" id="runBtn">&#9654; Play</button>
-      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
-    </div>
-  </div>
-</section>
-
-<!-- 03 · REAL EXAMPLE -->
-<section>
-  <div class="section-label"><span class="num">03</span>A Real Example</div>
-  <h2>In the <em>wild</em>.</h2>
-  <div class="example-stage">
-    <div class="example-tabs" role="tablist">
-      <button class="ex-tab active" role="tab" aria-selected="true" data-panel="p1">Visual Q&amp;A</button>
-      <button class="ex-tab" role="tab" aria-selected="false" data-panel="p2">Transcription</button>
-      <button class="ex-tab" role="tab" aria-selected="false" data-panel="p3">Video recap</button>
-    </div>
-    <div class="example-body">
-      <div class="ex-panel active" id="p1">
-        <p class="ex-scenario">"Here is a photo of a rash. Is it something I should see a doctor about?"</p>
-        <p class="ex-what">The model receives an image <strong>and</strong> a text question together. It encodes the photo into patch tokens, mixes them with the word tokens, and reasons across both at once to give a medically grounded answer.</p>
+      <p class="stage-lead">Score image and audio answers, and track the time and money each input adds.</p>
+      <div class="chips">
+        <span class="chip">Score image and audio answers, where text-matching fails</span>
+        <span class="chip">Budget for the extra wait each input adds</span>
+        <span class="chip">Track cost per input type</span>
       </div>
-      <div class="ex-panel" id="p2">
-        <p class="ex-scenario">"Transcribe this meeting recording and summarize the action items."</p>
-        <p class="ex-what">Audio frames are encoded into spectrogram tokens. The model reads those tokens alongside any text prompt, then writes the transcript and summary as a single pass, no separate speech-to-text step needed.</p>
-      </div>
-      <div class="ex-panel" id="p3">
-        <p class="ex-scenario">"Watch this 30-second product demo and write the key selling points."</p>
-        <p class="ex-what">Video is sampled into frames; each frame is encoded like an image. Those frame tokens are laid out in time order, so the model sees what changed and when, then writes a narrative across the full clip.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 04 · TRADEOFFS -->
-<section>
-  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
-  <h2>The <em>price</em> you pay.</h2>
-  <div class="tradeoffs-stage">
-    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Token cost</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Latency</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Model size</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Error modes</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-quote">
-      A high-res image can add thousands of tokens to a single request. Video multiplies that by the number of frames sampled. And misaligned encoders (trained separately) can cause the model to "hallucinate" objects that are not there. Multimodal is powerful, but every extra modality is extra cost, weight, and a new class of mistake.
-    </div>
-  </div>
-</section>
-
-<!-- 05 · WHAT THIS COVERS -->
-<section id="covers">
-  <div class="section-label"><span class="num">05</span>What This Covers</div>
-  <h2>The <em>disciplines</em> inside Multimodal.</h2>
-
-  <div class="guide">
-
-    <div class="covers-meta">
-      <div class="covers-meta-row"><strong>Applies to:</strong> only systems that handle images, audio, or video. Text-only systems can skip this.</div>
-    </div>
-
-    <!-- Cluster 1 -->
-    <div class="cluster-head">
-      <h3 class="cluster-label">Choosing and combining modalities</h3>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Modality selection</span>
-      <span class="disc-desc">Pick how to handle each input: read text out of an image first, or let the model see the image directly.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Cross-modal grounding</span>
-      <span class="disc-desc">Keep the model's answer tied to what it actually saw or heard, not a made-up version.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Fusion strategy</span>
-      <span class="disc-desc">Decide when to combine the different inputs: blend them from the start, or process each one separately and merge near the end.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Mixed-modality handoff</span>
-      <span class="disc-desc">Handle switches inside a conversation, like a spoken turn that should answer with a picture.</span>
-    </div>
-
-    <!-- Cluster 2 -->
-    <div class="cluster-head cluster-break">
-      <h3 class="cluster-label">Evaluating and costing them</h3>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Modality-specific eval</span>
-      <span class="disc-desc">Build tests for image or audio answers, where simple text-matching scores no longer work.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Latency budgets across modalities</span>
-      <span class="disc-desc">Plan for the extra time each input type adds before the model can even start.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Modality-specific safety and refusal</span>
-      <span class="disc-desc">Catch a harmful image, which needs different checks than catching harmful text.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Multimodal cost attribution</span>
-      <span class="disc-desc">Track cost per input type: images are priced differently from text, and video multiplies it by the number of frames.</span>
-    </div>
-
-    <!-- Mechanism note -->
-    <div class="mechanism-note">
-      <strong>Note on mechanisms vs. disciplines:</strong> The parts that convert images or audio into tokens, and the infrastructure that serves these requests, live in the layers. This page owns the discipline of reasoning across them, not the parts themselves.
-    </div>
+      <a class="see-how" href="consideration-multimodal-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
   </div>
 </section>
 
-<!-- BACK NAV -->
+<!-- BACK LINK -->
 <section style="padding-top: 20px; padding-bottom: 40px;">
   <a href="considerations.html" class="back-link">
     <div class="back-arrow">&larr;</div>
@@ -670,247 +333,72 @@
   </a>
 </section>
 
-<!-- SOURCES -->
-<div class="sources">
-  <div class="sources-title">Sources</div>
-  <ul>
-    <li>Alayrac et al. (2022). <em>Flamingo: a Visual Language Model for Few-Shot Learning.</em> <span class="note">DeepMind. Introduced cross-attention between vision and language tokens.</span></li>
-    <li>Radford et al. (2022). <em>Robust Speech Recognition via Large-Scale Weak Supervision (Whisper).</em> <span class="note">OpenAI. Spectrogram-to-token encoding for audio.</span></li>
-    <li>OpenAI (2023). <a href="https://openai.com/research/gpt-4v-system-card" target="_blank" rel="noopener">GPT-4V System Card.</a> <span class="note">Describes image tokenization via patch embeddings in a production model.</span></li>
-    <li>Google DeepMind (2023). <em>Gemini: A Family of Highly Capable Multimodal Models.</em> <span class="note">Native multimodal training across text, image, audio, and video from the start.</span></li>
-  </ul>
-</div>
-
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
 </footer>
 
 <script>
-// =============================================
-// DATA: what each modality looks like and becomes
-// =============================================
-const MODALITIES = {
-  img: {
-    btnClass: 'active-img',
-    rawLabelClass: 'img',
-    rawIcon: '🖼️',
-    rawText: 'A photo of a broken bicycle wheel.',
-    encoderLabel: 'Image encoder',
-    encoderSub: '(patches → vectors)',
-    tokenClass: 'img-tok',
-    tokenRowLabelText: 'Tokens',
-    tokens: ['[IMG/0]','[IMG/1]','[IMG/2]','[IMG/3]','[IMG/4]','[IMG/5]','[IMG/6]','[IMG/7]'],
-    insight: 'The image is sliced into patches. Each patch becomes one token. The model reads them left to right, just like words.',
-  },
-  audio: {
-    btnClass: 'active-audio',
-    rawLabelClass: 'audio',
-    rawIcon: '🔊',
-    rawText: '"Is the wheel fixable?"  (spoken aloud)',
-    encoderLabel: 'Audio encoder',
-    encoderSub: '(spectrogram → vectors)',
-    tokenClass: 'audio-tok',
-    tokenRowLabelText: 'Tokens',
-    tokens: ['[AUD/0]','[AUD/1]','[AUD/2]','[AUD/3]','[AUD/4]','[AUD/5]'],
-    insight: 'Audio frames are turned into a spectrogram and split into time-slice tokens. Same shape as the image tokens.',
-  },
-  text: {
-    btnClass: 'active-text',
-    rawLabelClass: 'txt',
-    rawIcon: '💬',
-    rawText: '"Is the wheel fixable?"  (typed)',
-    encoderLabel: 'Text tokeniser',
-    encoderSub: '(words → word-pieces)',
-    tokenClass: 'text-tok',
-    tokenRowLabelText: 'Tokens',
-    tokens: ['Is','the','wheel','fix','able','?'],
-    insight: 'Text is split into word-pieces (sub-words). Each piece is one token, the same kind the model was originally trained on.',
+// flow legend: scroll + glow on card click, one-time load sweep, card-door click guard
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var stages = ['card-choose','card-ground','card-cost'];
+  var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
+
+  function pillFor(cardId){
+    for(var i=0;i<pills.length;i++){ if(pills[i].getAttribute('data-target')===cardId) return pills[i]; }
+    return null;
   }
-};
 
-// The model sees all selected tokens merged in order: img first, then audio, then text
-const UNIFIED_TOKENS = [
-  {label:'[IMG/0]',cls:'img-tok'},{label:'[IMG/1]',cls:'img-tok'},{label:'[IMG/2]',cls:'img-tok'},
-  {label:'…',cls:'unified'},
-  {label:'[AUD/0]',cls:'audio-tok'},{label:'[AUD/1]',cls:'audio-tok'},
-  {label:'…',cls:'unified'},
-  {label:'Is',cls:'text-tok'},{label:'the',cls:'text-tok'},{label:'wheel',cls:'text-tok'},
-  {label:'fix',cls:'text-tok'},{label:'able',cls:'text-tok'},{label:'?',cls:'text-tok'},
-];
-
-// =============================================
-// STATE
-// =============================================
-let selectedType = null;
-let isRunning = false;
-let reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-// =============================================
-// ELEMENTS
-// =============================================
-const btnImg   = document.getElementById('btn-img');
-const btnAudio = document.getElementById('btn-audio');
-const btnText  = document.getElementById('btn-text');
-const runBtn   = document.getElementById('runBtn');
-const resetBtn = document.getElementById('resetBtn');
-
-const rawRow      = document.getElementById('rawRow');
-const rawLabel    = document.getElementById('rawLabel');
-const rawIcon     = document.getElementById('rawIcon');
-const rawText     = document.getElementById('rawText');
-const encoderRow  = document.getElementById('encoderRow');
-const encoderLabel = document.getElementById('encoderLabel');
-const encoderSub  = encoderRow.querySelector('span[style]');
-const tokenRow    = document.getElementById('tokenRow');
-const tokenRowLabel = document.getElementById('tokenRowLabel');
-const tokenStream  = document.getElementById('tokenStream');
-const mergeDivider = document.getElementById('mergeDivider');
-const modelRow    = document.getElementById('modelRow');
-const modelStream  = document.getElementById('modelStream');
-const demoInsight  = document.getElementById('demoInsight');
-
-// =============================================
-// HELPERS
-// =============================================
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-function clearPipeline() {
-  [rawRow, encoderRow, tokenRow, mergeDivider, modelRow].forEach(el => el.classList.remove('shown'));
-  tokenStream.innerHTML = '';
-  modelStream.innerHTML = '';
-  demoInsight.classList.remove('shown');
-  demoInsight.textContent = '';
-}
-
-function setSelected(type) {
-  selectedType = type;
-  [btnImg, btnAudio, btnText].forEach(b => {
-    const t = b.dataset.type;
-    b.className = 'input-btn' + (t === type ? ` ${MODALITIES[t].btnClass}` : '');
-    b.setAttribute('aria-pressed', t === type ? 'true' : 'false');
+  // nav buttons: smooth-scroll to the stage card + brief glow
+  pills.forEach(function(btn){
+    var target = btn.getAttribute('data-target');
+    var card = document.getElementById(target);
+    btn.addEventListener('click', function(){
+      if(!card) return;
+      card.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+      card.classList.add('glow');
+      window.setTimeout(function(){ card.classList.remove('glow'); }, 1200);
+    });
   });
-}
 
-async function addChip(container, label, cls, animate) {
-  const chip = document.createElement('span');
-  chip.className = `tok-chip ${cls}`;
-  chip.textContent = label;
-  container.appendChild(chip);
-  if (animate) {
-    chip.classList.add('writing');
-    await sleep(60);
-    chip.classList.add('in');
-    await sleep(260);
-    chip.classList.remove('writing');
-  } else {
-    chip.classList.add('in');
-  }
-}
-
-// =============================================
-// RUN ANIMATION
-// =============================================
-async function runDemo() {
-  if (!selectedType) return;
-  if (isRunning) return;
-  isRunning = true;
-  runBtn.disabled = true;
-
-  const M = MODALITIES[selectedType];
-  clearPipeline();
-
-  // Fill raw row content
-  rawLabel.className = `raw-label ${M.rawLabelClass}`;
-  rawIcon.textContent = M.rawIcon;
-  rawText.textContent = M.rawText;
-  encoderLabel.textContent = M.encoderLabel;
-  if (encoderSub) encoderSub.textContent = `(${M.encoderSub.replace(/[()]/g,'')})`;
-  tokenRowLabel.textContent = M.tokenRowLabelText;
-  demoInsight.textContent = M.insight;
-
-  if (reduceMotion) {
-    // Instant reveal
-    [rawRow, encoderRow, tokenRow, mergeDivider, modelRow].forEach(el => el.classList.add('shown'));
-    M.tokens.forEach(t => addChip(tokenStream, t, M.tokenClass, false));
-    UNIFIED_TOKENS.forEach(u => addChip(modelStream, u.label, u.cls, false));
-    demoInsight.classList.add('shown');
-    isRunning = false;
-    runBtn.disabled = false;
-    return;
+  // one-time load sweep: highlight each card in order, lighting the matching pill
+  if(!reduce){
+    var step = 0;
+    function tour(){
+      if(step > 0){
+        var prevCard = document.getElementById(stages[step-1]);
+        var prevPill = pillFor(stages[step-1]);
+        if(prevCard) prevCard.classList.remove('glow');
+        if(prevPill) prevPill.classList.remove('lit');
+      }
+      if(step >= stages.length) return;
+      var curCard = document.getElementById(stages[step]);
+      var curPill = pillFor(stages[step]);
+      if(curCard) curCard.classList.add('glow');
+      if(curPill) curPill.classList.add('lit');
+      step++;
+      window.setTimeout(tour, 900);
+    }
+    window.setTimeout(tour, 350);
   }
 
-  // Step 1: raw input appears
-  rawRow.classList.add('shown');
-  await sleep(420);
-
-  // Step 2: encoder arrow
-  encoderRow.classList.add('shown');
-  await sleep(500);
-
-  // Step 3: tokens appear one by one
-  tokenRow.classList.add('shown');
-  await sleep(200);
-  for (const tok of M.tokens) {
-    await addChip(tokenStream, tok, M.tokenClass, true);
-    await sleep(110);
-  }
-  await sleep(380);
-
-  // Step 4: merge divider + model stream (all unified tokens)
-  mergeDivider.classList.add('shown');
-  await sleep(320);
-  modelRow.classList.add('shown');
-  await sleep(160);
-  for (const u of UNIFIED_TOKENS) {
-    await addChip(modelStream, u.label, u.cls, true);
-    await sleep(70);
-  }
-  await sleep(300);
-
-  // Insight
-  demoInsight.classList.add('shown');
-
-  isRunning = false;
-  runBtn.disabled = false;
-}
-
-// =============================================
-// BUTTON WIRING
-// =============================================
-[btnImg, btnAudio, btnText].forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (isRunning) return;
-    const t = btn.dataset.type;
-    setSelected(t);
-    clearPipeline();
+  // each stage card is a door to the how-it-works page; chip clicks are ignored
+  var doors = {
+    'card-choose': 'consideration-multimodal-how-it-works.html',
+    'card-ground': 'consideration-multimodal-how-it-works.html',
+    'card-cost': 'consideration-multimodal-how-it-works.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('.chip')) return; // chip clicks never trigger the card door
+      if(e.target.closest('a')) return; // let real links handle their own clicks
+      window.location.href = doorHref;
+    });
   });
-});
-
-runBtn.addEventListener('click', () => { runDemo(); });
-
-resetBtn.addEventListener('click', () => {
-  if (isRunning) return;
-  clearPipeline();
-  selectedType = null;
-  [btnImg, btnAudio, btnText].forEach(b => {
-    b.className = 'input-btn';
-    b.setAttribute('aria-pressed', 'false');
-  });
-});
-
-// =============================================
-// EXAMPLE TABS
-// =============================================
-const tabs = document.querySelectorAll('.ex-tab');
-tabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
-    tab.classList.add('active');
-    tab.setAttribute('aria-selected','true');
-    document.querySelectorAll('.ex-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById(tab.dataset.panel).classList.add('active');
-  });
-});
+})();
 </script>
 </body>
 </html>

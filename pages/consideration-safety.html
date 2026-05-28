@@ -3,23 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Safety, Alignment & Refusal &middot; The Pattern Book</title>
+<title>Safety, Alignment &amp; Refusal &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
     --border:#E8EAEE; --border-strong:#D5D9E0;
     --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
-    --radius:16px;
-    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.10);
+    --radius:16px; --radius-sm:11px;
     --success:#0E9F6E; --success-soft:#E7F7F0;
-    --error:#C2554F; --error-soft:#FBECEB;
-    --warn:#B45309; --warn-soft:#FEF3C7;
-    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
-    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-padding-top: 80px; }
@@ -31,14 +28,31 @@
     -webkit-font-smoothing: antialiased;
   }
   body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
 
-  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
   .skip-link:focus { top: 8px; }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 
-  /* TOP BAR */
+  /* top bar */
   .topbar {
     position: sticky; top: 0; z-index: 200;
     background: rgba(252,252,253,.86);
@@ -47,15 +61,15 @@
     border-bottom: 1px solid var(--border);
   }
   .topbar-inner {
-    max-width: 920px; margin: 0 auto; padding: 11px 24px;
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
   }
   .back {
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none;
-    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
-    background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease;
-    white-space: nowrap;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
   }
   .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
   .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -64,8 +78,8 @@
   .crumb .sep { margin: 0 7px; color: var(--border-strong); }
   .crumb .here { color: var(--soft); }
 
-  /* HEADER */
-  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
   .eyebrow {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
@@ -77,280 +91,135 @@
   h1.pattern-title {
     font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
     line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
-    scroll-margin-top: 80px;
   }
   .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
-  /* SECTIONS */
+  /* title row + see-it-in-action pill */
+  .title-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:16px 0 0}
+  .title-row .pattern-title{margin:0;flex:1 1 auto;min-width:240px}
+  .how-pill{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--accent);border-radius:22px;padding:8px 15px;box-shadow:var(--shadow);transition:background .15s ease,transform .15s ease}
+  .how-pill:hover{background:#E3DBFD;transform:translateY(-1px)}
+  .how-pill .arr{display:inline-block;transition:transform .18s ease}
+  .how-pill:hover .arr{transform:translateX(3px)}
+  @media (prefers-reduced-motion:reduce){.how-pill,.how-pill .arr{transition:none}.how-pill:hover,.how-pill:hover .arr{transform:none}}
+  @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
+
+  /* flow legend (stage pills + arrows) */
+  .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
+  .flow-chip {
+    font-family: inherit; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; box-shadow: var(--shadow); padding: 7px 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--soft); white-space: nowrap;
+    letter-spacing: .01em; cursor: pointer;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .flow-chip:hover { color: var(--accent-hover); border-color: var(--border-strong); }
+  .flow-chip.lit { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); }
+  .flow-arrow { flex: none; color: var(--accent); font-size: 15px; line-height: 1; }
+  .flow-caption { text-align: center; color: var(--faint); font-size: 13px; line-height: 1.5; margin-top: 12px; }
+
+  /* sections */
   section {
-    max-width: 920px; margin: 0 auto; padding: 18px 24px 34px;
-    position: relative; scroll-margin-top: 80px;
+    max-width: 920px; margin: 0 auto;
+    padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px;
   }
-  .section-label {
-    font-size: 11px; font-weight: 600; letter-spacing: .07em;
-    text-transform: uppercase; color: var(--faint); margin-bottom: 9px;
-  }
-  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
   h2 {
     font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
     line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
   }
   h2 em { font-style: italic; color: var(--accent); }
 
-  /* 01 idea card */
-  .idea-card {
+  /* ============ STAGE CARDS ============ */
+  .stages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 6px; align-items: stretch; }
+
+  .stage-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
+    scroll-margin-top: 80px;
+    transition: box-shadow .55s ease, border-color .55s ease;
+    display: flex; flex-direction: column;
+    min-width: 0; height: 100%;
   }
-  .idea-card p {
-    font-family: 'Fraunces', serif; font-weight: 400;
-    font-size: 18px; line-height: 1.5; color: var(--text);
+  .stage-card.glow {
+    box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42);
+    border-color: var(--accent);
+  }
+  @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
+
+  .stage-card.clickable {
+    cursor: pointer;
+    transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
+  @media (prefers-reduced-motion: reduce) {
+    .stage-card.clickable { transition: none; }
+    .stage-card.clickable:hover { transform: none; }
   }
 
-  /* 02 GUARDRAIL DEMO */
-  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  /* de-squeezed: icon + name share a full-width row of their own */
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; min-width: 0; }
+  .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
+  .stage-head .sico svg { width: 18px; height: 18px; display: block; }
+  .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
 
-  .demo-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
-  }
+  .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* request selector */
-  .req-selector {
-    display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px;
-  }
-  .req-btn {
-    padding: 12px 16px; border-radius: var(--radius-sm); cursor: pointer;
-    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;
-    text-align: left; line-height: 1.4; border: 1.5px solid var(--border-strong);
-    background: var(--bg-subtle); color: var(--text);
-    transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
-  }
-  .req-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
-  .req-btn.selected-safe { border-color: var(--success); background: var(--success-soft); }
-  .req-btn.selected-harm { border-color: var(--error); background: var(--error-soft); }
-  .req-label { display: block; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 4px; color: var(--faint); }
-  .req-btn.selected-safe .req-label { color: var(--success); }
-  .req-btn.selected-harm .req-label { color: var(--error); }
-
-  /* pipeline visualization */
-  .pipeline {
-    background: var(--bg-subtle); border: 1px solid var(--border-strong);
-    border-radius: var(--radius-sm); padding: 18px; position: relative; overflow: hidden;
+  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; }
+  .chip {
+    flex: none; display: inline-flex; align-items: center; gap: 3px;
+    padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
+    border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
 
-  /* request token traveling through */
-  .pipe-row {
-    display: flex; align-items: center; gap: 0;
-    position: relative; height: 56px;
+  /* "see how" lives at the bottom of each card, pushed down by margin-top:auto */
+  .see-how {
+    display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--accent-hover);
+    transition: color .15s ease;
+  }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion: reduce) {
+    .see-how, .see-how .arr { transition: none; }
+    .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; }
   }
 
-  .pipe-node {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    flex-shrink: 0; z-index: 2;
-  }
-  .pipe-icon {
-    width: 44px; height: 44px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    border: 2px solid var(--border-strong); background: var(--surface);
-    transition: border-color .3s ease, background .3s ease, box-shadow .3s ease;
-  }
-  .pipe-icon svg { width: 20px; height: 20px; }
-  .pipe-icon.active-safe { border-color: var(--success); background: var(--success-soft); box-shadow: 0 0 0 4px rgba(14,159,110,.12); }
-  .pipe-icon.active-harm { border-color: var(--error); background: var(--error-soft); box-shadow: 0 0 0 4px rgba(194,85,79,.12); }
-  .pipe-icon.dim { opacity: .35; }
-
-  .pipe-connector {
-    flex: 1; height: 2px; background: var(--border-strong);
-    position: relative; overflow: hidden;
-    transition: background .3s ease;
-  }
-  .pipe-connector.flowing-safe { background: var(--success); }
-  .pipe-connector.flowing-harm { background: var(--error); }
-  .pipe-connector.blocked { background: var(--border); }
-
-  /* traveling dot */
-  .pipe-dot {
-    position: absolute; top: 50%; width: 10px; height: 10px;
-    border-radius: 50%; transform: translateY(-50%);
-    left: -10px;
-    transition: background .3s ease;
-  }
-  .pipe-dot.safe { background: var(--success); }
-  .pipe-dot.harm { background: var(--error); }
-
-  @keyframes travel { from { left: -10px; } to { left: 110%; } }
-  @keyframes block-pulse { 0%,100% { transform: translateY(-50%) scale(1); } 50% { transform: translateY(-50%) scale(1.5); opacity: 0; } }
-
-  .pipe-labels {
-    display: flex; align-items: flex-start; margin-top: 6px;
-    font-size: 11px; font-weight: 600; letter-spacing: .03em;
-    text-transform: uppercase; color: var(--faint);
-  }
-  .pipe-labels .nl { flex: 1; text-align: center; }
-  .pipe-labels .nc { flex: 0 0 44px; }
-
-  /* outcome banner */
-  .outcome-banner {
-    margin-top: 14px; padding: 14px 16px; border-radius: var(--radius-sm);
-    border: 1.5px solid var(--border); background: var(--bg-subtle);
-    display: flex; align-items: flex-start; gap: 12px;
-    min-height: 52px;
-    opacity: 0; transform: translateY(6px);
-    transition: opacity .35s ease, transform .35s ease, border-color .3s ease, background .3s ease;
-  }
-  .outcome-banner.shown { opacity: 1; transform: translateY(0); }
-  .outcome-banner.safe { border-color: var(--success); background: var(--success-soft); }
-  .outcome-banner.harm { border-color: var(--error); background: var(--error-soft); }
-  .outcome-icon { font-size: 20px; line-height: 1; flex-shrink: 0; margin-top: 1px; }
-  .outcome-text { font-size: 14px; line-height: 1.55; color: var(--soft); }
-  .outcome-text strong { color: var(--text); font-weight: 600; }
-
-  /* controls */
-  .demo-controls {
-    display: flex; gap: 10px; flex-wrap: wrap; padding-top: 16px; margin-top: 16px;
-    border-top: 1px solid var(--border);
-  }
-  .diagram-btn {
-    padding: 10px 16px; border: 1px solid var(--border-strong); background: var(--surface);
-    border-radius: var(--radius-sm); cursor: pointer; font-family: 'Inter', sans-serif;
-    font-size: 14px; font-weight: 600; color: var(--text);
-    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
-  }
-  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
-  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
-  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-
-  /* WHAT THIS COVERS: guide-card style */
-  .guide {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
-  }
-  .covers-meta {
-    display: flex; flex-direction: column; gap: 4px;
-    padding: 22px 22px 18px; border-bottom: 1px solid var(--border);
-  }
-  .covers-meta-row { font-size: 14px; color: var(--soft); line-height: 1.55; }
-  .covers-meta-row strong { color: var(--text); font-weight: 600; }
-  .covers-note {
-    margin: 0; padding: 14px 22px;
-    background: var(--accent-soft); border-top: 1px solid var(--border);
-    font-size: 13px; color: var(--soft); line-height: 1.55;
-  }
-  .covers-note strong { color: var(--text); font-weight: 600; }
-
-  /* cluster labels */
-  .cluster-head { padding: 16px 22px 8px; }
-  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
-  .cluster-label {
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .07em; color: var(--text); line-height: 1.3;
-  }
-  /* discipline rows: name on its own line, description below, indented under the cluster label */
-  .guide-row {
-    display: flex; flex-direction: column; gap: 3px;
-    padding: 13px 22px 13px 40px; border-top: 1px solid var(--border);
-  }
-  .cluster-head + .guide-row { border-top: none; }
-  .disc-name {
-    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
-    color: var(--text); line-height: 1.3;
-  }
-  .disc-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
-
-  /* 03 REAL EXAMPLE */
-  .example-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
-  }
-  .ex-instruction { font-size: 14px; color: var(--soft); margin-bottom: 16px; }
-  .ex-cases { display: flex; flex-direction: column; gap: 12px; }
-  .ex-case {
-    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-    padding: 14px 16px; cursor: pointer; background: var(--bg-subtle);
-    transition: border-color .18s ease, background .18s ease, box-shadow .18s ease;
-  }
-  .ex-case:hover { border-color: var(--accent); box-shadow: var(--shadow-sm); }
-  .ex-case-q { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 500; color: var(--text); line-height: 1.4; }
-  .ex-case-a {
-    font-size: 13.5px; color: var(--soft); line-height: 1.55;
-    max-height: 0; overflow: hidden; transition: max-height .3s ease, margin .25s ease;
-  }
-  .ex-case.open .ex-case-a { max-height: 200px; margin-top: 10px; }
-  .ex-case.blocked-case { border-color: var(--error); background: var(--error-soft); }
-  .ex-case.passed-case { border-color: var(--success); background: var(--success-soft); }
-  .ex-verdict {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 11px; font-weight: 700; letter-spacing: .04em;
-    text-transform: uppercase; margin-top: 8px;
-    opacity: 0; transition: opacity .2s ease;
-  }
-  .ex-case.open .ex-verdict { opacity: 1; }
-  .ex-case.blocked-case .ex-verdict { color: var(--error); }
-  .ex-case.passed-case .ex-verdict { color: var(--success); }
-
-  /* 04 TRADEOFFS */
-  .tradeoffs-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
-  }
-  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
-  .tradeoff-row:last-of-type { margin-bottom: 0; }
-  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
-  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
-  .tradeoff-bars .seg {
-    flex: 1; height: 22px; background: var(--bg-subtle);
-    border: 1px solid var(--border); border-radius: 5px;
-  }
-  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
-  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
-  .tradeoff-scale .spacer { width: 170px; flex: none; }
-  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
-  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
-
-  /* BACK LINK */
+  /* back link */
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
-    padding: 14px 16px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none;
-    color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-    cursor: pointer;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; cursor: pointer;
   }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
-  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s; }
   .back-link:hover .back-arrow { transform: translateX(-3px); }
   .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
   .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
 
-  /* SOURCES */
-  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
-  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
-  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
-  .sources li em { font-style: italic; color: var(--text); }
-  .sources li .note { color: var(--faint); }
-  .sources a { color: var(--accent-hover); }
-
-  /* FOOTER */
+  /* footer */
   footer {
-    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
-    text-align: center; border-top: 1px solid var(--border);
+    max-width: 920px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
     font-size: 12px; color: var(--faint); line-height: 1.8;
   }
   footer strong { color: var(--soft); font-weight: 500; }
 
-  /* RESPONSIVE */
+  /* responsive */
+  @media (max-width: 720px) {
+    .stages { grid-template-columns: 1fr; gap: 14px; }
+  }
   @media (max-width: 560px) {
     h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .idea-card { padding: 20px 18px; }
-    .pipe-labels .nl { font-size: 9px; }
-  }
-  @media (max-width: 480px) {
-    .demo-controls { flex-direction: column; align-items: stretch; }
-    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
-    .tradeoff-label { min-width: 0; }
+    .flow-chip { font-size: 12px; padding: 6px 12px; }
   }
 </style>
 </head>
@@ -374,256 +243,84 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>
       </svg>
-    </span>
-    Consideration &middot; Safety, Alignment &amp; Refusal
+    </span>Consideration &middot; Safety, Alignment &amp; Refusal
   </span>
-  <h1 class="pattern-title">Safety, Alignment &amp; Refusal</h1>
-  <p class="explainer">Keeping AI behavior within intended bounds: deciding what to refuse, how severely to score harm, and how to balance safety against helpfulness.</p>
+  <div class="title-row"><h1 class="pattern-title">Safety, Alignment &amp; Refusal</h1><a class="how-pill" href="consideration-safety-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
+  <p class="explainer">Stopping harmful answers without strangling the helpful ones.</p>
+
+  <div class="flow" aria-label="Jump to a part of safety">
+    <button type="button" class="flow-chip" data-target="card-decide">Decide what is off-limits</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-break">Try to break it first</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-balance">Balance safe with useful</button>
+  </div>
+  <p class="flow-caption">Three jobs that turn a vague wish for "safe AI" into rules a system can follow.</p>
 </header>
 
-<!-- 01 THE IDEA -->
+<!-- STAGE CARDS -->
 <section>
-  <div class="section-label"><span class="num">01</span>The Idea</div>
-  <h2>What <em>is</em> it?</h2>
-  <div class="idea-card">
-    <p>Every request to an AI passes through a filter called a <strong style="color:var(--accent-hover)">guardrail</strong>. It checks: is this harmful? If yes, refuse and stop. The model never even sees the bad request. A second guardrail does the same on the way out, catching anything the model should not have written. The goal is simple: dangerous requests get blocked, safe ones go through.</p>
-  </div>
-</section>
+  <div class="stages">
 
-<!-- 02 SEE IT WORK -->
-<section>
-  <div class="section-label"><span class="num">02</span>See It Work</div>
-  <h2>Watch a request pass through the <em>guardrail</em>.</h2>
-
-  <p class="demo-lede">Pick a request, then press Run to watch it travel through the pipeline.</p>
-
-  <div class="demo-stage">
-    <!-- request selector -->
-    <div class="req-selector" role="group" aria-label="Choose a request">
-      <button class="req-btn" data-type="safe" id="reqSafe" aria-pressed="false">
-        <span class="req-label">Safe request</span>
-        "What household items can I use to clean a stainless steel pan?"
-      </button>
-      <button class="req-btn" data-type="harm" id="reqHarm" aria-pressed="false">
-        <span class="req-label">Harmful request</span>
-        "Give me step-by-step instructions to make a dangerous gas at home."
-      </button>
-    </div>
-
-    <!-- pipeline -->
-    <div class="pipeline" aria-label="Guardrail pipeline visualization">
-      <div class="pipe-row" id="pipeRow">
-        <!-- User node -->
-        <div class="pipe-node">
-          <div class="pipe-icon" id="iconUser">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-            </svg>
-          </div>
-        </div>
-        <!-- connector 1 -->
-        <div class="pipe-connector" id="conn1"><div class="pipe-dot" id="dot1" aria-hidden="true"></div></div>
-        <!-- Input guardrail node -->
-        <div class="pipe-node">
-          <div class="pipe-icon" id="iconGuardIn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>
-            </svg>
-          </div>
-        </div>
-        <!-- connector 2 -->
-        <div class="pipe-connector" id="conn2"><div class="pipe-dot" id="dot2" aria-hidden="true"></div></div>
-        <!-- Model node -->
-        <div class="pipe-node">
-          <div class="pipe-icon" id="iconModel">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="3" y="8" width="18" height="8" rx="3"/><circle cx="8" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="16" cy="12" r="1.5"/>
-            </svg>
-          </div>
-        </div>
-        <!-- connector 3 -->
-        <div class="pipe-connector" id="conn3"><div class="pipe-dot" id="dot3" aria-hidden="true"></div></div>
-        <!-- Output guardrail node -->
-        <div class="pipe-node">
-          <div class="pipe-icon" id="iconGuardOut">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>
-            </svg>
-          </div>
-        </div>
-        <!-- connector 4 -->
-        <div class="pipe-connector" id="conn4"><div class="pipe-dot" id="dot4" aria-hidden="true"></div></div>
-        <!-- Response node -->
-        <div class="pipe-node">
-          <div class="pipe-icon" id="iconResponse">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-          </div>
-        </div>
+    <!-- DECIDE WHAT IS OFF-LIMITS -->
+    <section class="stage-card clickable" id="card-decide" aria-labelledby="g-decide">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>
+          </svg>
+        </span>
+        <h2 id="g-decide"><span class="stage-name">Decide what is off-limits</span></h2>
       </div>
-
-      <!-- labels -->
-      <div class="pipe-labels" aria-hidden="true">
-        <div class="nl" style="flex:0 0 44px">User</div>
-        <div class="nl">Input guardrail</div>
-        <div class="nl">Model</div>
-        <div class="nl">Output guardrail</div>
-        <div class="nl" style="flex:0 0 44px">Reply</div>
+      <p class="stage-lead">Write down what the AI must never help with, and how serious each harm is.</p>
+      <div class="chips">
+        <span class="chip">Where to draw the line</span>
+        <span class="chip">Name and rank the harms</span>
+        <span class="chip">Values, not just rules</span>
       </div>
+      <a class="see-how" href="consideration-safety-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
-      <!-- outcome -->
-      <div class="outcome-banner" id="outcomeBanner" aria-live="polite">
-        <div class="outcome-icon" id="outcomeIcon"></div>
-        <div class="outcome-text" id="outcomeText"></div>
+    <!-- TRY TO BREAK IT FIRST -->
+    <section class="stage-card clickable" id="card-break" aria-labelledby="g-break">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/>
+          </svg>
+        </span>
+        <h2 id="g-break"><span class="stage-name">Try to break it first</span></h2>
       </div>
-    </div>
+      <p class="stage-lead">Attack your own system the way a bad actor would, then fix what you find.</p>
+      <div class="chips">
+        <span class="chip">Attack your own system</span>
+        <span class="chip">Stand up to clever tricks</span>
+      </div>
+      <a class="see-how" href="consideration-safety-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
-    <!-- controls -->
-    <div class="demo-controls">
-      <button class="diagram-btn primary" id="runBtn" disabled>&#9654; Play</button>
-      <button class="diagram-btn" id="resetDemoBtn">&#8635; Reset</button>
-    </div>
-  </div>
-</section>
-
-<!-- 03 WHAT THIS COVERS -->
-<section>
-  <div class="section-label"><span class="num">03</span>What This Covers</div>
-  <h2>The <em>disciplines</em> inside Safety, Alignment &amp; Refusal.</h2>
-
-  <div class="guide">
-    <div class="covers-meta">
-      <div class="covers-meta-row"><strong>Applies to:</strong> every AI system.</div>
-    </div>
-
-    <!-- Cluster 1: Setting the bounds -->
-    <div class="cluster-head">
-      <h3 class="cluster-label">Setting the bounds</h3>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Refusal Calibration</span>
-      <span class="disc-desc">Concerns where the line sits between refusing and helping, and how often it lands in the wrong place.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Harm Taxonomies &amp; Severity Reasoning</span>
-      <span class="disc-desc">Concerns how harmful content is organized into named categories and scored by seriousness before a response decision is made.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Refusal-vs-Helpfulness Tradeoff</span>
-      <span class="disc-desc">Concerns how often safety measures block legitimate requests, and how to tune that balance without tightening or loosening everything at once.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Principle-Based Behavioral Evaluation</span>
-      <span class="disc-desc">Concerns whether the model's behavior matches a stated set of values across many scenarios, not just specific known-bad inputs.</span>
-    </div>
-
-    <!-- Cluster 2: Testing the bounds -->
-    <div class="cluster-head cluster-break">
-      <h3 class="cluster-label">Testing the bounds</h3>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Red-Teaming Methodology</span>
-      <span class="disc-desc">Concerns how to proactively attack your own system with adversarial prompts before bad actors do, then use what you find to close gaps.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Jailbreak-Resistance Frameworks</span>
-      <span class="disc-desc">Concerns how the system is designed so that clever rephrasing, role-play framings, or multi-step tricks cannot bypass the safety logic.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Dual-Use Review Processes</span>
-      <span class="disc-desc">Concerns content that is genuinely useful to most people but could enable harm for a few, and how to handle it consistently.</span>
-    </div>
-
-    <div class="covers-note">
-      <strong>Considerations are disciplines, not mechanisms.</strong> The parts that actually emit a refusal live in the layers: Single-Call Control shapes the output, and the User Surface shows the refusal message. When you want to build something, follow the cross-references.
-    </div>
+    <!-- BALANCE SAFE WITH USEFUL -->
+    <section class="stage-card clickable" id="card-balance" aria-labelledby="g-balance">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v18"/><path d="M5 8h14"/><path d="M3 14c2 2 4 2 6 0M15 14c2 2 4 2 6 0"/>
+          </svg>
+        </span>
+        <h2 id="g-balance"><span class="stage-name">Balance safe with useful</span></h2>
+      </div>
+      <p class="stage-lead">Tune how often you refuse so honest users still get real answers.</p>
+      <div class="chips">
+        <span class="chip">Tune the refusal dial</span>
+        <span class="chip">Useful but risky requests</span>
+      </div>
+      <a class="see-how" href="consideration-safety-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
   </div>
 </section>
 
-<!-- 04 REAL EXAMPLE -->
-<section>
-  <div class="section-label"><span class="num">04</span>A Real Example</div>
-  <h2>Where guardrails <em>actually</em> live.</h2>
-
-  <div class="example-stage">
-    <p class="ex-instruction">Tap each to see what happened and why.</p>
-    <div class="ex-cases">
-
-      <div class="ex-case" data-blocked="true" data-verdict="Blocked by input guardrail"
-           data-reason="The input guardrail matched this against a list of high-risk topics (weapons, synthesis instructions) and stopped it before the model processed a single word.">
-        <div class="ex-case-q">"How do I synthesize [dangerous chemical] at home?"</div>
-        <div class="ex-verdict"></div>
-        <div class="ex-case-a"></div>
-      </div>
-
-      <div class="ex-case" data-blocked="false" data-verdict="Passed both guardrails"
-           data-reason="The input guardrail saw a cooking question. The model answered. The output guardrail scanned the reply for harmful content and found none. The user gets the answer.">
-        <div class="ex-case-q">"What's a good substitute for butter in a banana bread recipe?"</div>
-        <div class="ex-verdict"></div>
-        <div class="ex-case-a"></div>
-      </div>
-
-      <div class="ex-case" data-blocked="true" data-verdict="Blocked by output guardrail"
-           data-reason="The input looked fine (a creative writing request). The model's draft included content that triggered the output guardrail. The draft is discarded; the user gets a refusal instead.">
-        <div class="ex-case-q">"Write a story where a character explains exactly how to pick a lock."</div>
-        <div class="ex-verdict"></div>
-        <div class="ex-case-a"></div>
-      </div>
-
-      <div class="ex-case" data-blocked="false" data-verdict="Passed both guardrails"
-           data-reason="A general knowledge question with no harmful specifics. The input guardrail sees nothing risky. The model explains the idea in plain terms. The output guardrail finds no harmful content. The user gets a clear answer.">
-        <div class="ex-case-q">"How do everyday painkillers like ibuprofen actually work in the body?"</div>
-        <div class="ex-verdict"></div>
-        <div class="ex-case-a"></div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- 05 TRADEOFFS -->
-<section>
-  <div class="section-label"><span class="num">05</span>Tradeoffs</div>
-  <h2>The <em>price</em> you pay.</h2>
-  <div class="tradeoffs-stage">
-    <div class="tradeoff-scale">
-      <span class="spacer"></span>
-      <div class="scale-track"><span>low</span><span>high</span></div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">False refusals</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Added latency</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Maintenance cost</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-quote">
-      Tighter guardrails catch more harm but also block more legitimate requests. Looser ones are more useful but let more through. There is no perfect setting: every deployment picks a point on this curve based on its risk tolerance. Guardrail rules also drift as language and misuse patterns change, so they need ongoing review.
-    </div>
-  </div>
-</section>
-
-<!-- BACK NAV -->
+<!-- BACK LINK -->
 <section style="padding-top: 20px; padding-bottom: 40px;">
   <a href="considerations.html" class="back-link">
     <div class="back-arrow">&larr;</div>
@@ -634,243 +331,72 @@
   </a>
 </section>
 
-<!-- SOURCES -->
-<div class="sources">
-  <div class="sources-title">Sources</div>
-  <ul>
-    <li>Anthropic (2023). <em>Claude's Constitution.</em> <span class="note">Describes layered safety principles and refusal policies applied to a production AI system.</span></li>
-    <li>Inan et al. (2023). <em><a href="https://arxiv.org/abs/2312.06674" target="_blank" rel="noopener">Llama Guard: LLM-based Input-Output Safeguard for Human-AI Conversations.</a></em> <span class="note">Meta AI. A published classifier-as-guardrail architecture.</span></li>
-    <li>Perez et al. (2022). <em><a href="https://arxiv.org/abs/2209.07858" target="_blank" rel="noopener">Red Teaming Language Models with Language Models.</a></em> <span class="note">DeepMind. How adversarial probing is used to find and fix safety gaps.</span></li>
-    <li>Gehman et al. (2020). <em><a href="https://arxiv.org/abs/2009.11462" target="_blank" rel="noopener">RealToxicityPrompts: Evaluating Neural Toxic Degeneration in Language Models.</a></em> <span class="note">Allen AI. The benchmark study that put output safety on the map.</span></li>
-  </ul>
-</div>
-
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
 </footer>
 
 <script>
-// ============ DEMO STATE ============
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// flow legend: scroll + glow on card click, one-time load sweep, card-door click guard
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var stages = ['card-decide','card-break','card-balance'];
+  var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
 
-let selectedType = null;   // 'safe' | 'harm' | null
-let isRunning = false;
-let hasRun = false;
-
-const reqSafeBtn = document.getElementById('reqSafe');
-const reqHarmBtn = document.getElementById('reqHarm');
-const runBtn = document.getElementById('runBtn');
-const resetDemoBtn = document.getElementById('resetDemoBtn');
-const outcomeBanner = document.getElementById('outcomeBanner');
-const outcomeIcon = document.getElementById('outcomeIcon');
-const outcomeText = document.getElementById('outcomeText');
-
-const nodes = {
-  user:     document.getElementById('iconUser'),
-  guardIn:  document.getElementById('iconGuardIn'),
-  model:    document.getElementById('iconModel'),
-  guardOut: document.getElementById('iconGuardOut'),
-  response: document.getElementById('iconResponse'),
-};
-const connectors = [
-  document.getElementById('conn1'),
-  document.getElementById('conn2'),
-  document.getElementById('conn3'),
-  document.getElementById('conn4'),
-];
-const dots = [
-  document.getElementById('dot1'),
-  document.getElementById('dot2'),
-  document.getElementById('dot3'),
-  document.getElementById('dot4'),
-];
-
-// ============ REQUEST SELECTION ============
-function selectRequest(type) {
-  if (isRunning) return;
-  resetDemo(false);
-  selectedType = type;
-  if (type === 'safe') {
-    reqSafeBtn.classList.add('selected-safe');
-    reqSafeBtn.setAttribute('aria-pressed', 'true');
-    reqHarmBtn.classList.remove('selected-safe', 'selected-harm');
-    reqHarmBtn.setAttribute('aria-pressed', 'false');
-  } else {
-    reqHarmBtn.classList.add('selected-harm');
-    reqHarmBtn.setAttribute('aria-pressed', 'true');
-    reqSafeBtn.classList.remove('selected-safe', 'selected-harm');
-    reqSafeBtn.setAttribute('aria-pressed', 'false');
-  }
-  runBtn.disabled = false;
-}
-
-reqSafeBtn.addEventListener('click', () => selectRequest('safe'));
-reqHarmBtn.addEventListener('click', () => selectRequest('harm'));
-
-// ============ PIPELINE ANIMATION ============
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-function setNodeState(node, state) {
-  // state: 'idle' | 'active-safe' | 'active-harm' | 'dim'
-  node.classList.remove('active-safe', 'active-harm', 'dim');
-  if (state !== 'idle') node.classList.add(state);
-}
-
-function animateDot(dot, connector, colorClass, durationMs) {
-  return new Promise(resolve => {
-    dot.className = 'pipe-dot ' + colorClass;
-    dot.style.animation = 'none';
-    dot.offsetWidth; // reflow
-    dot.style.animation = `travel ${durationMs}ms linear forwards`;
-    setTimeout(resolve, durationMs);
-  });
-}
-
-function setConnector(conn, state) {
-  conn.classList.remove('flowing-safe', 'flowing-harm', 'blocked');
-  if (state) conn.classList.add(state);
-}
-
-async function runDemo() {
-  if (isRunning || !selectedType) return;
-  isRunning = true;
-  runBtn.disabled = true;
-  reqSafeBtn.disabled = true;
-  reqHarmBtn.disabled = true;
-  hasRun = true;
-
-  const isSafe = selectedType === 'safe';
-  const colorClass = isSafe ? 'safe' : 'harm';
-  const flowClass = isSafe ? 'flowing-safe' : 'flowing-harm';
-  const travelMs = reduceMotion ? 1 : 420;
-  const pauseMs = reduceMotion ? 1 : 350;
-
-  // reset visual state first
-  resetPipelineVisuals();
-
-  // Step 1: User -> Input Guardrail
-  setNodeState(nodes.user, 'active-' + (isSafe ? 'safe' : 'harm'));
-  await sleep(pauseMs);
-  setConnector(connectors[0], flowClass);
-  await animateDot(dots[0], connectors[0], colorClass, travelMs);
-  setNodeState(nodes.user, 'idle');
-
-  // Step 2: Input Guardrail checks
-  setNodeState(nodes.guardIn, 'active-' + (isSafe ? 'safe' : 'harm'));
-  await sleep(pauseMs * 1.5);
-
-  if (!isSafe) {
-    // BLOCKED at input guardrail
-    setConnector(connectors[1], 'blocked');
-    setConnector(connectors[2], 'blocked');
-    setConnector(connectors[3], 'blocked');
-    setNodeState(nodes.model, 'dim');
-    setNodeState(nodes.guardOut, 'dim');
-    setNodeState(nodes.response, 'dim');
-    await sleep(pauseMs);
-    showOutcome(false, 'blocked-input');
-  } else {
-    // PASS through input guardrail
-    setConnector(connectors[1], flowClass);
-    await animateDot(dots[1], connectors[1], colorClass, travelMs);
-    setNodeState(nodes.guardIn, 'idle');
-
-    // Step 3: Model processes
-    setNodeState(nodes.model, 'active-safe');
-    await sleep(pauseMs * 2);
-    setNodeState(nodes.model, 'idle');
-
-    // Step 4: Output Guardrail
-    setConnector(connectors[2], flowClass);
-    await animateDot(dots[2], connectors[2], colorClass, travelMs);
-    setNodeState(nodes.guardOut, 'active-safe');
-    await sleep(pauseMs * 1.5);
-    setNodeState(nodes.guardOut, 'idle');
-
-    // Step 5: Response
-    setConnector(connectors[3], flowClass);
-    await animateDot(dots[3], connectors[3], colorClass, travelMs);
-    setNodeState(nodes.response, 'active-safe');
-    showOutcome(true, 'passed');
+  function pillFor(cardId){
+    for(var i=0;i<pills.length;i++){ if(pills[i].getAttribute('data-target')===cardId) return pills[i]; }
+    return null;
   }
 
-  isRunning = false;
-  runBtn.disabled = false;
-  reqSafeBtn.disabled = false;
-  reqHarmBtn.disabled = false;
-}
-
-function showOutcome(safe, reason) {
-  outcomeBanner.classList.remove('safe', 'harm');
-  if (safe) {
-    outcomeBanner.classList.add('safe');
-    outcomeIcon.textContent = '✓';
-    outcomeText.innerHTML = '<strong>Request passed.</strong> Both guardrails cleared it. The model\'s answer reaches the user.';
-  } else {
-    outcomeBanner.classList.add('harm');
-    outcomeIcon.textContent = '✕';
-    outcomeText.innerHTML = '<strong>Blocked before the model.</strong> The input guardrail flagged this as harmful. The model never processed it. The user gets a refusal.';
-  }
-  outcomeBanner.classList.add('shown');
-}
-
-function resetPipelineVisuals() {
-  Object.values(nodes).forEach(n => setNodeState(n, 'idle'));
-  connectors.forEach(c => setConnector(c, null));
-  dots.forEach(d => {
-    d.style.animation = 'none';
-    d.className = 'pipe-dot';
-  });
-  outcomeBanner.classList.remove('shown', 'safe', 'harm');
-}
-
-function resetDemo(clearSelection) {
-  if (isRunning) return;
-  resetPipelineVisuals();
-  if (clearSelection !== false) {
-    selectedType = null;
-    reqSafeBtn.classList.remove('selected-safe', 'selected-harm');
-    reqSafeBtn.setAttribute('aria-pressed', 'false');
-    reqHarmBtn.classList.remove('selected-safe', 'selected-harm');
-    reqHarmBtn.setAttribute('aria-pressed', 'false');
-    runBtn.disabled = true;
-  }
-  hasRun = false;
-}
-
-runBtn.addEventListener('click', runDemo);
-resetDemoBtn.addEventListener('click', () => resetDemo(true));
-
-// Reduced motion: instant run when user selects
-if (reduceMotion) {
-  [reqSafeBtn, reqHarmBtn].forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (selectedType) runDemo();
+  // nav buttons: smooth-scroll to the stage card + brief glow
+  pills.forEach(function(btn){
+    var target = btn.getAttribute('data-target');
+    var card = document.getElementById(target);
+    btn.addEventListener('click', function(){
+      if(!card) return;
+      card.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+      card.classList.add('glow');
+      window.setTimeout(function(){ card.classList.remove('glow'); }, 1200);
     });
   });
-}
 
-// ============ REAL EXAMPLE CASES (section 03) ============
-const exCases = document.querySelectorAll('.ex-case');
-exCases.forEach(c => {
-  c.addEventListener('click', () => {
-    if (c.classList.contains('open')) return;
-    const blocked = c.dataset.blocked === 'true';
-    c.classList.add('open');
-    c.classList.add(blocked ? 'blocked-case' : 'passed-case');
-    const verdict = c.querySelector('.ex-verdict');
-    verdict.textContent = (blocked ? '✕ ' : '✓ ') + c.dataset.verdict;
-    c.querySelector('.ex-case-a').textContent = c.dataset.reason;
-    c.setAttribute('aria-expanded', 'true');
+  // one-time load sweep: highlight each card in order, lighting the matching pill
+  if(!reduce){
+    var step = 0;
+    function tour(){
+      if(step > 0){
+        var prevCard = document.getElementById(stages[step-1]);
+        var prevPill = pillFor(stages[step-1]);
+        if(prevCard) prevCard.classList.remove('glow');
+        if(prevPill) prevPill.classList.remove('lit');
+      }
+      if(step >= stages.length) return;
+      var curCard = document.getElementById(stages[step]);
+      var curPill = pillFor(stages[step]);
+      if(curCard) curCard.classList.add('glow');
+      if(curPill) curPill.classList.add('lit');
+      step++;
+      window.setTimeout(tour, 900);
+    }
+    window.setTimeout(tour, 350);
+  }
+
+  // each stage card is a door to the how-it-works page; chip clicks are ignored
+  var doors = {
+    'card-decide': 'consideration-safety-how-it-works.html',
+    'card-break': 'consideration-safety-how-it-works.html',
+    'card-balance': 'consideration-safety-how-it-works.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('.chip')) return; // chip clicks never trigger the card door
+      if(e.target.closest('a')) return; // let real links handle their own clicks
+      window.location.href = doorHref;
+    });
   });
-  c.setAttribute('role', 'button');
-  c.setAttribute('tabindex', '0');
-  c.setAttribute('aria-expanded', 'false');
-  c.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); c.click(); }
-  });
-});
+})();
 </script>
-
 </body>
 </html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Step Transactions · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --ok:#0E9F6E; --bad:#D92D20;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* transaction toggle */
+  .tx-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .tx-header { display: flex; border-bottom: 1px solid var(--border); }
+  .tx-tab { flex: 1; padding: 13px 18px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: var(--bg-subtle); color: var(--faint); transition: background .15s, color .15s; text-align: center; font-family: 'Inter', sans-serif; }
+  .tx-tab:first-child { border-right: 1px solid var(--border); }
+  .tx-tab.active { background: var(--surface); color: var(--accent-hover); }
+  .tx-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .tx-panel { padding: 20px 24px; display: none; }
+  .tx-panel.active { display: block; }
+  .tx-headline { font-size: 13.5px; color: var(--soft); margin-bottom: 12px; line-height: 1.55; }
+  .tx-headline strong { color: var(--text); }
+  .tx-steps { display: flex; flex-direction: column; gap: 8px; }
+  .tx-step { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text); }
+  .tx-step .num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--faint); flex-shrink: 0; width: 20px; }
+  .tx-step .stat { margin-left: auto; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; }
+  .stat-ok { color: var(--ok); background: rgba(14,159,110,0.10); }
+  .stat-bad { color: var(--bad); background: rgba(217,45,32,0.10); }
+  .stat-undo { color: #B54708; background: rgba(181,71,8,0.10); }
+  .tx-result { margin-top: 14px; padding: 12px 14px; border-radius: var(--radius-sm); font-size: 13px; line-height: 1.55; }
+  .tx-result.bad { background: rgba(217,45,32,0.06); border: 1px solid rgba(217,45,32,0.25); color: var(--text); }
+  .tx-result.good { background: rgba(14,159,110,0.06); border: 1px solid rgba(14,159,110,0.25); color: var(--text); }
+  .tx-result strong { font-weight: 600; }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="orchestration-action.html"><span aria-hidden="true">&larr;</span> Act in the world</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-orchestration-agents.html">Orchestration &amp; Agents</a><span class="sep" aria-hidden="true">/</span><a href="orchestration-action.html">Act in the world</a><span class="sep" aria-hidden="true">/</span><span class="here">Multi-step transactions</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Orchestration &amp; Agents &middot; Act in the world</span>
+  <h1 class="page-title">Multi-Step Transactions</h1>
+  <p class="explainer">Treat a sequence of actions as one unit: either all of them happen, or none of them do. No half-finished orders, no orphan bookings.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">All or <em>nothing</em>.</h2>
+  <div class="what-card">
+    <p>A <strong style="color:var(--accent-hover)">multi-step transaction</strong> wraps several actions so they succeed together or fail together. If step 3 of 5 fails, the system unwinds steps 1 and 2 automatically. The agent doesn't have to manage the cleanup itself; the wrapper does it.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">A booking that <em>finishes or vanishes</em>.</h2>
+  <div class="tx-card" role="region" aria-label="Multi-step transaction example">
+    <div class="tx-header" role="tablist" aria-label="Pick which outcome to view">
+      <button class="tx-tab active" role="tab" aria-selected="true" aria-controls="panel-happy" id="tab-happy">Happy path</button>
+      <button class="tx-tab" role="tab" aria-selected="false" aria-controls="panel-fail" id="tab-fail">Step fails</button>
+    </div>
+    <div class="tx-panel active" id="panel-happy" role="tabpanel" aria-labelledby="tab-happy">
+      <div class="tx-headline"><strong>All four steps succeed.</strong> The transaction commits as one unit.</div>
+      <div class="tx-steps">
+        <div class="tx-step"><span class="num">1</span>Reserve seat<span class="stat stat-ok">ok</span></div>
+        <div class="tx-step"><span class="num">2</span>Hold hotel<span class="stat stat-ok">ok</span></div>
+        <div class="tx-step"><span class="num">3</span>Charge card<span class="stat stat-ok">ok</span></div>
+        <div class="tx-step"><span class="num">4</span>Send confirmation<span class="stat stat-ok">ok</span></div>
+      </div>
+      <div class="tx-result good"><strong>Result:</strong> trip booked, card charged, confirmation in inbox.</div>
+    </div>
+    <div class="tx-panel" id="panel-fail" role="tabpanel" aria-labelledby="tab-fail">
+      <div class="tx-headline"><strong>The card is declined at step 3.</strong> The transaction unwinds the earlier steps using their compensating actions.</div>
+      <div class="tx-steps">
+        <div class="tx-step"><span class="num">1</span>Reserve seat<span class="stat stat-undo">undone</span></div>
+        <div class="tx-step"><span class="num">2</span>Hold hotel<span class="stat stat-undo">released</span></div>
+        <div class="tx-step"><span class="num">3</span>Charge card<span class="stat stat-bad">failed</span></div>
+        <div class="tx-step"><span class="num">4</span>Send confirmation<span class="stat" style="background: var(--bg-subtle); color: var(--faint);">skipped</span></div>
+      </div>
+      <div class="tx-result bad"><strong>Result:</strong> the user sees a clean "could not book" message. No phantom hold, no orphan reservation.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">Where it <em>sits</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Builds on</div>
+      <div class="fits-desc">External action, idempotency, and compensating actions. The transaction is the wrapper that uses all three to give an all-or-nothing guarantee.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Not the same as</div>
+      <div class="fits-desc">A single database transaction. That works only inside one system. A multi-step transaction spans several services, so it has to undo with real-world actions.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Often called</div>
+      <div class="fits-desc">A saga, in distributed systems writing. The agent kicks it off, the saga coordinator does the work.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>A user-visible outcome depends on several actions, and a partial result would leave them confused or out of pocket.</li>
+    <li>The actions touch different systems (payments, inventory, messaging) that have no shared rollback of their own.</li>
+    <li>You need a written record of what happened, in order, so audits and incident reviews are easy.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="orchestration-action.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Act in the world</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Garcia-Molina &amp; Salem (1987). <em>Sagas.</em> ACM SIGMOD. <span class="note">The foundational paper: long-running transactions composed of sub-transactions with compensating actions.</span></li>
+    <li>Temporal Docs. <em>Workflows as durable, transactional execution.</em> <span class="note">Modern workflow engine that gives you transactional guarantees across services for agent-style work.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  const tabs = document.querySelectorAll('.tx-tab');
+  const panels = document.querySelectorAll('.tx-panel');
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+      panels.forEach(function (p) { p.classList.remove('active'); });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      panels[i].classList.add('active');
+    });
+  });
+}());
+</script>
+</body>
+</html>

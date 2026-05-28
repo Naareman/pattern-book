@@ -122,7 +122,12 @@
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
   .chat-cursor.hidden { display: none; }
 
-  /* wait overlay */
+  /* idle prompt (shown before Play is ever pressed, and after Reset) */
+  .idle-prompt { position: absolute; inset: 0; border-radius: var(--radius-sm); background: var(--bg-subtle); display: flex; align-items: center; justify-content: center; }
+  .idle-prompt.hidden { display: none; }
+  .idle-prompt-text { font-size: 14px; font-weight: 500; color: var(--faint); }
+
+  /* wait overlay (shown only while running) */
   .wait-overlay { position: absolute; inset: 0; border-radius: var(--radius-sm); background: var(--bg-subtle); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
   .wait-overlay.hidden { display: none; }
   .wait-spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
@@ -336,11 +341,16 @@
     </div>
 
     <!-- the simulated chat pane -->
-    <div class="chat-pane" id="chatPane" aria-live="polite" aria-atomic="false">
+    <div class="chat-pane" id="chatPane" aria-live="polite" aria-atomic="false" aria-busy="false">
       <div class="chat-label">AI Response</div>
 
-      <!-- spinner shown while waiting -->
-      <div class="wait-overlay" id="waitOverlay">
+      <!-- idle state: shown before Play is pressed and after Reset -->
+      <div class="idle-prompt" id="idlePrompt" aria-hidden="true">
+        <span class="idle-prompt-text">Press Play to start</span>
+      </div>
+
+      <!-- spinner shown only while running -->
+      <div class="wait-overlay hidden" id="waitOverlay">
         <div class="wait-spinner" aria-hidden="true"></div>
         <div class="wait-timer" id="waitTimer">0.0s</div>
         <div class="wait-label">generating, please wait&hellip;</div>
@@ -585,6 +595,7 @@ let timers = [];
 const btnWait   = document.getElementById('btnWait');
 const btnStream = document.getElementById('btnStream');
 const chatPane  = document.getElementById('chatPane');
+const idlePrompt  = document.getElementById('idlePrompt');
 const waitOverlay = document.getElementById('waitOverlay');
 const waitTimer   = document.getElementById('waitTimer');
 const chatBubble  = document.getElementById('chatBubble');
@@ -618,11 +629,12 @@ function clearTimers() { timers.forEach(clearTimeout); timers = []; }
 function doReset() {
   clearTimers();
   running = false;
-  // overlay
-  waitOverlay.classList.remove('hidden');
-  waitOverlay.querySelector('.wait-spinner').style.display = '';
-  waitOverlay.querySelector('.wait-label').style.display = '';
+  // idle prompt: visible; wait overlay: hidden
+  idlePrompt.classList.remove('hidden');
+  waitOverlay.classList.add('hidden');
   waitTimer.textContent = '0.0s';
+  // a11y: not busy
+  chatPane.setAttribute('aria-busy', 'false');
   // bubble
   chatBubble.style.display = 'none';
   chatText.textContent = '';
@@ -661,6 +673,10 @@ async function runWait() {
   running = true;
   playBtn.disabled = true;
   genBarWrap.classList.remove('hidden');
+  // transition from idle to running
+  idlePrompt.classList.add('hidden');
+  waitOverlay.classList.remove('hidden');
+  chatPane.setAttribute('aria-busy', 'true');
 
   const start = performance.now();
   const tick = 80; // ms between clock refreshes
@@ -692,6 +708,7 @@ async function runWait() {
   genPct.textContent = '100%';
   demoStatus.textContent = 'Full answer arrived after ' + (TOTAL_GEN_MS / 1000).toFixed(1) + 's';
   setFeel(3); // meh — it showed up, but you waited
+  chatPane.setAttribute('aria-busy', 'false');
   running = false;
   playBtn.disabled = false;
 }
@@ -701,6 +718,10 @@ async function runStream() {
   running = true;
   playBtn.disabled = true;
   genBarWrap.classList.remove('hidden');
+  // transition from idle to running
+  idlePrompt.classList.add('hidden');
+  waitOverlay.classList.remove('hidden');
+  chatPane.setAttribute('aria-busy', 'true');
 
   const start = performance.now();
   const tick = 80;
@@ -750,6 +771,7 @@ async function runStream() {
   genBarFill.style.width = '100%';
   genPct.textContent = '100%';
   demoStatus.textContent = 'Same total time (' + (TOTAL_GEN_MS / 1000).toFixed(1) + 's), felt instant.';
+  chatPane.setAttribute('aria-busy', 'false');
   running = false;
   playBtn.disabled = false;
 }

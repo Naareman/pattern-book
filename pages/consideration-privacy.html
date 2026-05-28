@@ -6,19 +6,17 @@
 <title>Privacy, Security &amp; Governance &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
     --border:#E8EAEE; --border-strong:#D5D9E0;
     --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
-    --radius:16px;
-    --bg-subtle:#F6F7F9; --radius-sm:11px;
-    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#C2554F; --error-soft:#FBECEB;
-    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
-    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
-    --redact:#15171C;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.10);
+    --radius:16px; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-padding-top: 80px; }
@@ -30,14 +28,31 @@
     -webkit-font-smoothing: antialiased;
   }
   body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
 
-  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
   .skip-link:focus { top: 8px; }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 
-  /* TOP BAR */
+  /* top bar */
   .topbar {
     position: sticky; top: 0; z-index: 200;
     background: rgba(252,252,253,.86);
@@ -46,16 +61,15 @@
     border-bottom: 1px solid var(--border);
   }
   .topbar-inner {
-    max-width: 920px; margin: 0 auto; padding: 11px 24px;
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
   }
   .back {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 13px; font-weight: 500; color: var(--text);
     text-decoration: none; padding: 5px 11px;
-    border: 1px solid var(--border-strong); border-radius: 20px;
-    background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease;
-    white-space: nowrap;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
   }
   .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
   .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -64,8 +78,8 @@
   .crumb .sep { margin: 0 7px; color: var(--border-strong); }
   .crumb .here { color: var(--soft); }
 
-  /* HEADER */
-  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
   .eyebrow {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
@@ -75,273 +89,137 @@
   .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
   .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
   h1.pattern-title {
-    scroll-margin-top: 80px;
-    font-family: 'Fraunces', serif; font-weight: 500;
-    font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
   }
-  .explainer {
-    color: var(--soft); font-size: 16px; line-height: 1.6;
-    max-width: 660px; margin-top: 14px;
-  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
-  /* SECTIONS */
+  /* title row + see-it-in-action pill */
+  .title-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:16px 0 0}
+  .title-row .pattern-title{margin:0;flex:1 1 auto;min-width:240px}
+  .how-pill{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--accent);border-radius:22px;padding:8px 15px;box-shadow:var(--shadow);transition:background .15s ease,transform .15s ease}
+  .how-pill:hover{background:#E3DBFD;transform:translateY(-1px)}
+  .how-pill .arr{display:inline-block;transition:transform .18s ease}
+  .how-pill:hover .arr{transform:translateX(3px)}
+  @media (prefers-reduced-motion:reduce){.how-pill,.how-pill .arr{transition:none}.how-pill:hover,.how-pill:hover .arr{transform:none}}
+  @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
+
+  /* flow legend (cluster pills + arrows) */
+  .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
+  .flow-chip {
+    font-family: inherit; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; box-shadow: var(--shadow); padding: 7px 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--soft); white-space: nowrap;
+    letter-spacing: .01em; cursor: pointer;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .flow-chip:hover { color: var(--accent-hover); border-color: var(--border-strong); }
+  .flow-chip.lit { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); }
+  .flow-arrow { flex: none; color: var(--accent); font-size: 15px; line-height: 1; }
+  .flow-caption { text-align: center; color: var(--faint); font-size: 13px; line-height: 1.5; margin-top: 12px; }
+
+  /* sections */
   section {
-    max-width: 920px; margin: 0 auto; padding: 18px 24px 34px;
-    position: relative; scroll-margin-top: 80px;
+    max-width: 920px; margin: 0 auto;
+    padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px;
   }
-  .section-label {
-    font-size: 11px; font-weight: 600; letter-spacing: .07em;
-    text-transform: uppercase; color: var(--faint); margin-bottom: 9px;
-  }
-  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
   h2 {
-    font-family: 'Fraunces', serif; font-weight: 500;
-    font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
+    line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
   }
   h2 em { font-style: italic; color: var(--accent); }
 
-  /* IDEA CARD */
-  .idea-card {
+  /* ============ STAGE CARDS ============ */
+  .stages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 6px; align-items: stretch; }
+
+  .stage-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
+    scroll-margin-top: 80px;
+    transition: box-shadow .55s ease, border-color .55s ease;
+    display: flex; flex-direction: column;
+    min-width: 0; height: 100%;
   }
-  .idea-card p {
-    font-family: 'Fraunces', serif; font-weight: 400;
-    font-size: 18px; line-height: 1.55; color: var(--text);
+  .stage-card.glow {
+    box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42);
+    border-color: var(--accent);
+  }
+  @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
+
+  .stage-card.clickable {
+    cursor: pointer;
+    transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
+  @media (prefers-reduced-motion: reduce) {
+    .stage-card.clickable { transition: none; }
+    .stage-card.clickable:hover { transform: none; }
   }
 
-  /* DEMO (Section 02) */
-  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  /* icon + name share a full-width row of their own */
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; min-width: 0; }
+  .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
+  .stage-head .sico svg { width: 18px; height: 18px; display: block; }
+  .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
 
-  .scan-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
+
+  /* wrapping chip grid: plain non-clickable chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; }
+  .chip {
+    flex: none; display: inline-flex; align-items: center; gap: 3px;
+    padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
+    border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
 
-  .msg-box {
-    background: var(--bg-subtle); border: 1px solid var(--border-strong);
-    border-radius: var(--radius-sm); padding: 18px 20px;
-    font-size: 16px; line-height: 1.75; color: var(--text);
-    font-family: 'Fraunces', serif; font-weight: 400;
-    position: relative; overflow: hidden;
+  /* "see how" at the bottom of each card */
+  .see-how {
+    display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--accent-hover);
+    transition: color .15s ease;
+  }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion: reduce) {
+    .see-how, .see-how .arr { transition: none; }
+    .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; }
   }
 
-  /* scanner line that sweeps top to bottom */
-  .scanner-line {
-    position: absolute; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent 0%, var(--accent) 30%, var(--accent-hover) 70%, transparent 100%);
-    top: -4px; opacity: 0;
-    transition: top 0.6s linear, opacity 0.2s ease;
-    pointer-events: none;
-    z-index: 2;
-    box-shadow: 0 0 10px 2px rgba(124,92,246,0.3);
-  }
-  .scanner-line.scanning { opacity: 1; }
-
-  /* each sensitive span */
-  .pii {
-    position: relative; border-radius: 3px;
-    transition: background 0.25s ease, color 0.25s ease;
-  }
-  .pii .pii-label {
-    position: absolute; bottom: calc(100% + 6px); left: 50%;
-    transform: translateX(-50%);
-    background: var(--accent); color: #fff;
-    font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
-    letter-spacing: .05em; text-transform: uppercase;
-    padding: 3px 7px; border-radius: 4px;
-    white-space: nowrap; pointer-events: none;
-    opacity: 0; transition: opacity 0.2s ease;
-    z-index: 3;
-  }
-  .pii .pii-label::after {
-    content: ''; position: absolute; top: 100%; left: 50%;
-    transform: translateX(-50%);
-    border: 5px solid transparent; border-top-color: var(--accent);
-  }
-  /* highlighted: accent background, label visible */
-  .pii.highlight {
-    background: var(--accent-soft); color: var(--accent-hover);
-  }
-  .pii.highlight .pii-label { opacity: 1; }
-  /* redacted: black bar */
-  .pii.redacted {
-    background: var(--redact); color: var(--redact);
-    border-radius: 3px; cursor: default;
-    user-select: none;
-  }
-  .pii.redacted .pii-label { opacity: 0; }
-
-  /* status row below the message */
-  .scan-status {
-    margin-top: 14px; padding: 10px 14px;
-    background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-size: 13px; font-weight: 500; color: var(--faint);
-    display: flex; align-items: center; gap: 10px;
-    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-  }
-  .scan-status.found {
-    background: #FFF7ED; border-color: #F59E0B; color: #B45309;
-  }
-  .scan-status.clean {
-    background: var(--success-soft); border-color: var(--success); color: var(--success);
-  }
-  .status-dot {
-    width: 8px; height: 8px; border-radius: 50%; background: var(--faint);
-    flex-shrink: 0; transition: background 0.3s ease;
-  }
-  .scan-status.found .status-dot { background: #F59E0B; }
-  .scan-status.clean .status-dot { background: var(--success); }
-
-  /* controls */
-  .board-controls {
-    display: flex; gap: 10px; flex-wrap: wrap;
-    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
-  }
-  .diagram-btn {
-    padding: 10px 16px; border: 1px solid var(--border-strong);
-    background: var(--surface); border-radius: var(--radius-sm);
-    cursor: pointer; font-family: 'Inter', sans-serif;
-    font-size: 14px; font-weight: 600; color: var(--text);
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
-  }
-  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
-  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
-  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-
-  /* Section 03: real example */
-  .example-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
-  }
-  .flow {
-    display: flex; flex-direction: column; gap: 0;
-  }
-  .flow-step {
-    display: flex; gap: 14px; align-items: flex-start; padding: 14px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .flow-step:last-child { border-bottom: none; }
-  .flow-num {
-    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
-    background: var(--accent-soft); color: var(--accent-hover);
-    font-size: 12px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    margin-top: 1px;
-  }
-  .flow-body { flex: 1; }
-  .flow-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
-  .flow-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
-
-  /* Section 04: tradeoffs */
-  .tradeoffs-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
-  }
-  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
-  .tradeoff-row:last-of-type { margin-bottom: 0; }
-  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
-  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
-  .tradeoff-bars .seg {
-    flex: 1; height: 22px; background: var(--bg-subtle);
-    border: 1px solid var(--border); border-radius: 5px;
-  }
-  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
-  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
-  .tradeoff-scale .spacer { width: 170px; flex: none; }
-  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
-  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
-
-  /* WHAT THIS COVERS: guide-card style */
-  .guide {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
-  }
-  .covers-meta {
-    padding: 18px 22px 14px;
-    border-bottom: 1px solid var(--border);
-  }
-  .covers-scope {
-    font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 4px;
-  }
-  .covers-scope-label {
-    font-weight: 600; color: var(--text);
-  }
-  .covers-note {
-    font-size: 13px; color: var(--faint); line-height: 1.6;
-    margin-top: 10px; padding: 10px 14px;
-    background: var(--bg-subtle); border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-  }
-  /* cluster labels */
-  .cluster-head { padding: 16px 22px 8px; }
-  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
-  .cluster-label {
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .07em; color: var(--text); line-height: 1.3;
-  }
-  /* discipline rows: name on its own line, description below, indented under the cluster label */
-  .guide-row {
-    display: flex; flex-direction: column; gap: 3px;
-    padding: 13px 22px 13px 40px; border-top: 1px solid var(--border);
-  }
-  .cluster-head + .guide-row { border-top: none; }
-  .disc-name {
-    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
-    color: var(--text); line-height: 1.3;
-  }
-  .disc-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
-
-  /* BACK LINK */
+  /* back link */
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
-    padding: 14px 16px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow-sm);
-    text-decoration: none; color: var(--text);
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; cursor: pointer;
   }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
-  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s; }
   .back-link:hover .back-arrow { transform: translateX(-3px); }
   .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
   .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
 
-  /* SOURCES */
-  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
-  .sources .sources-title {
-    font-size: 13px; font-weight: 500; color: var(--faint);
-    padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px;
-  }
-  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
-  .sources li em { font-style: italic; color: var(--text); }
-  .sources li a { color: var(--accent-hover); border-bottom: 1px solid var(--accent-soft); text-decoration: none; }
-  .sources li a:hover { border-bottom-color: var(--accent); }
-  .sources li .note { color: var(--faint); }
-
-  /* FOOTER */
+  /* footer */
   footer {
-    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
-    text-align: center; border-top: 1px solid var(--border);
+    max-width: 920px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
     font-size: 12px; color: var(--faint); line-height: 1.8;
   }
   footer strong { color: var(--soft); font-weight: 500; }
 
-  /* RESPONSIVE */
+  /* responsive */
+  @media (max-width: 720px) {
+    .stages { grid-template-columns: 1fr; gap: 14px; }
+  }
   @media (max-width: 560px) {
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .board-controls { flex-direction: column; align-items: stretch; }
-    .diagram-btn { flex: 1; }
-    .tradeoff-row { flex-direction: column; align-items: stretch; }
-    .tradeoff-label { min-width: 0; }
-  }
-  @media (max-width: 480px) {
-    .tradeoff-row { flex-direction: column; align-items: stretch; }
-    .tradeoff-label { min-width: 0; }
+    .flow-chip { font-size: 12px; padding: 6px 12px; }
   }
 </style>
 </head>
@@ -353,11 +231,7 @@
   <div class="topbar-inner">
     <a class="back" href="considerations.html"><span aria-hidden="true">&larr;</span> Considerations</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a>
-      <span class="sep">/</span>
-      <a href="considerations.html">Considerations</a>
-      <span class="sep">/</span>
-      <span class="here">Privacy, Security &amp; Governance</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Privacy, Security &amp; Governance</span>
     </nav>
   </div>
 </nav>
@@ -370,198 +244,85 @@
         <rect x="5" y="11" width="14" height="9" rx="2"/>
         <path d="M8 11V8a4 4 0 0 1 8 0v3"/>
       </svg>
-    </span>
-    Consideration &middot; Privacy, Security &amp; Governance
+    </span>Consideration &middot; Privacy, Security &amp; Governance
   </span>
-  <h1 class="pattern-title">Privacy, Security &amp; Governance</h1>
-  <p class="explainer">Personal details belong to people, not to models. How to protect data, users, and tenants across every part of a system that handles user, customer, or tenant data.</p>
+  <div class="title-row"><h1 class="pattern-title">Privacy, Security &amp; Governance</h1><a class="how-pill" href="consideration-privacy-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
+  <p class="explainer">Personal details belong to people, not to models. Keep them private, separated, and traceable.</p>
+
+  <div class="flow" aria-label="Jump to a part of privacy">
+    <button type="button" class="flow-chip" data-target="card-private">Keep personal data private</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-apart">Keep people apart</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-prove">Prove it later</button>
+  </div>
+  <p class="flow-caption">Three jobs that turn a vague duty of care into controls you can point to.</p>
 </header>
 
-<!-- 01 · THE IDEA -->
+<!-- STAGE CARDS -->
 <section>
-  <div class="section-label"><span class="num">01</span>The Idea</div>
-  <h2>What <em>is</em> it?</h2>
-  <div class="idea-card">
-    <p>When someone talks to an AI, they often share private things: their name, email, phone number, ID. Protecting that personal information (PII) means the system detects those personal details and hides them before storing the message or sending it to the model. One person's data never leaks to another person's session.</p>
-  </div>
-</section>
+  <div class="stages">
 
-<!-- 02 · DEMO -->
-<section>
-  <div class="section-label"><span class="num">02</span>See It Work</div>
-  <h2>Watch a message get <em>scanned</em>.</h2>
-
-  <p class="demo-lede">A customer support message arrives. The system scans it and redacts every piece of personal information before it reaches the AI or the database. Tap Play to watch.</p>
-
-  <div class="scan-stage">
-    <div class="msg-box" id="msgBox" aria-live="polite" aria-label="Customer message with personal information">
-      <div class="scanner-line" id="scannerLine" aria-hidden="true"></div>
-      Hi, my name is <span class="pii" data-label="Name" id="pii0">Sarah Chen</span> and my account email is <span class="pii" data-label="Email" id="pii1">sarah.chen@email.com</span>. My phone is <span class="pii" data-label="Phone" id="pii2">+1 (555) 204-8831</span> and my ID number is <span class="pii" data-label="ID" id="pii3">SSN-472-90-1138</span>. Please help me reset my password.
-    </div>
-
-    <div class="scan-status" id="scanStatus" role="status">
-      <div class="status-dot" aria-hidden="true"></div>
-      <span id="scanStatusText">Ready. Tap Play to scan the message.</span>
-    </div>
-
-    <div class="board-controls">
-      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
-      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
-    </div>
-  </div>
-</section>
-
-<!-- 03 · WHAT THIS COVERS -->
-<section>
-  <div class="section-label"><span class="num">03</span>What This Covers</div>
-  <h2>The <em>disciplines</em> inside Privacy, Security &amp; Governance.</h2>
-  <div class="guide">
-
-    <div class="covers-meta">
-      <div class="covers-scope">
-        <span class="covers-scope-label">Applies to:</span> every system that handles user, customer, or tenant data.
+    <!-- KEEP PERSONAL DATA PRIVATE -->
+    <section class="stage-card clickable" id="card-private" aria-labelledby="g-private">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="11" width="14" height="9" rx="2"/>
+            <path d="M8 11V8a4 4 0 0 1 8 0v3"/>
+          </svg>
+        </span>
+        <h2 id="g-private"><span class="stage-name">Keep personal data private</span></h2>
       </div>
-      <p class="covers-note">This page covers which controls to apply and why. The parts that detect and redact data at runtime live in the layers.</p>
-    </div>
-
-    <!-- Cluster 1 -->
-    <div class="cluster-head">
-      <h3 class="cluster-label">Protecting the data</h3>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Access Control</span>
-      <span class="disc-desc">Permission model for users, roles, and API keys.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Tenant Isolation Discipline</span>
-      <span class="disc-desc">One customer's data never reaches another's session.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Runtime PII-Handling</span>
-      <span class="disc-desc">Detects and redacts personal data before the model sees it.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Data Residency</span>
-      <span class="disc-desc">Data stays in its permitted geographic region.</span>
-    </div>
-
-    <!-- Cluster 2 -->
-    <div class="cluster-head cluster-break">
-      <h3 class="cluster-label">Proving and tracking it</h3>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Audit-Logging</span>
-      <span class="disc-desc">Immutable record of who accessed what and when.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Compliance Mapping (GDPR, HIPAA, SOC2)</span>
-      <span class="disc-desc">Translates legal obligations into concrete system controls.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Provenance &amp; Watermarking</span>
-      <span class="disc-desc">Marks AI-generated output for attribution and misuse detection.</span>
-    </div>
-
-  </div>
-</section>
-
-<!-- 04 · REAL EXAMPLE -->
-<section>
-  <div class="section-label"><span class="num">04</span>A Real Example</div>
-  <h2>How a <em>support tool</em> applies this.</h2>
-  <div class="example-stage">
-    <div class="flow">
-      <div class="flow-step">
-        <div class="flow-num" aria-hidden="true">1</div>
-        <div class="flow-body">
-          <div class="flow-title">User sends a message</div>
-          <div class="flow-desc">A customer types freely, often including their name, order number, or phone number without thinking.</div>
-        </div>
+      <p class="stage-lead">Hide the personal bits before they reach the model or the database.</p>
+      <div class="chips">
+        <span class="chip">Hide personal details before the AI sees them</span>
+        <span class="chip">Keep data in the right country</span>
       </div>
-      <div class="flow-step">
-        <div class="flow-num" aria-hidden="true">2</div>
-        <div class="flow-body">
-          <div class="flow-title">Personal Info (PII) Scanner Runs Before Anything Else</div>
-          <div class="flow-desc">A pattern-matcher finds names, emails, phone numbers, and government IDs. Each is replaced with a neutral tag like <code style="font-size:12px;background:var(--bg-subtle);padding:1px 5px;border-radius:3px;border:1px solid var(--border)">[EMAIL]</code> before the text moves forward.</div>
-        </div>
-      </div>
-      <div class="flow-step">
-        <div class="flow-num" aria-hidden="true">3</div>
-        <div class="flow-body">
-          <div class="flow-title">Redacted message goes to the model</div>
-          <div class="flow-desc">The AI sees the topic and intent (password reset), but never the real personal details. It can answer helpfully without needing them.</div>
-        </div>
-      </div>
-      <div class="flow-step">
-        <div class="flow-num" aria-hidden="true">4</div>
-        <div class="flow-body">
-          <div class="flow-title">Original is stored only in a protected log</div>
-          <div class="flow-desc">If needed for audit, the unredacted version sits in an access-controlled store, not mixed in with training data or conversation history.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+      <a class="see-how" href="consideration-privacy-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
-<!-- 05 · TRADEOFFS -->
-<section>
-  <div class="section-label"><span class="num">05</span>Tradeoffs</div>
-  <h2>The <em>price</em> you pay.</h2>
-  <div class="tradeoffs-stage">
-    <div class="tradeoff-scale">
-      <span class="spacer"></span>
-      <div class="scale-track"><span>low</span><span>high</span></div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Engineering effort</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div>
-        <div class="seg on"></div>
-        <div class="seg on"></div>
-        <div class="seg"></div>
-        <div class="seg"></div>
+    <!-- KEEP PEOPLE APART -->
+    <section class="stage-card clickable" id="card-apart" aria-labelledby="g-apart">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/>
+            <path d="M2 20c0-2.8 2.7-5 6-5s6 2.2 6 5"/>
+            <path d="M14 16c1.5-.7 3.2-1 4-1 3.3 0 6 2.2 6 5"/>
+            <path d="M12 4v16" stroke-dasharray="2 3"/>
+          </svg>
+        </span>
+        <h2 id="g-apart"><span class="stage-name">Keep people apart</span></h2>
       </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Latency added</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div>
-        <div class="seg"></div>
-        <div class="seg"></div>
-        <div class="seg"></div>
-        <div class="seg"></div>
+      <p class="stage-lead">Draw clean lines so one person's data never reaches another's screen.</p>
+      <div class="chips">
+        <span class="chip">One customer's data never reaches another</span>
+        <span class="chip">Decide who can see and do what</span>
       </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Missed detections</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div>
-        <div class="seg on"></div>
-        <div class="seg"></div>
-        <div class="seg"></div>
-        <div class="seg"></div>
+      <a class="see-how" href="consideration-privacy-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
+
+    <!-- PROVE IT LATER -->
+    <section class="stage-card clickable" id="card-prove" aria-labelledby="g-prove">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+            <path d="M14 3v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/>
+          </svg>
+        </span>
+        <h2 id="g-prove"><span class="stage-name">Prove it later</span></h2>
       </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Context lost to model</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div>
-        <div class="seg on"></div>
-        <div class="seg"></div>
-        <div class="seg"></div>
-        <div class="seg"></div>
+      <p class="stage-lead">Keep the receipts so you can answer who, what, when, and which rule.</p>
+      <div class="chips">
+        <span class="chip">Record who did what, when</span>
+        <span class="chip">Turn the law into checklist items</span>
+        <span class="chip">Mark AI-made output so you can trace it</span>
       </div>
-    </div>
-    <div class="tradeoff-quote">
-      Missed detections are the real risk, not the latency.
-    </div>
+      <a class="see-how" href="consideration-privacy-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
+
   </div>
 </section>
 
@@ -576,172 +337,72 @@
   </a>
 </section>
 
-<!-- SOURCES -->
-<div class="sources">
-  <div class="sources-title">Sources</div>
-  <ul>
-    <li>
-      <a href="https://gdpr-info.eu/" target="_blank" rel="noopener">General Data Protection Regulation (GDPR)</a>.
-      EU regulation defining personal data and the obligation to protect it.
-    </li>
-    <li>
-      Lison et al. (2021). <em>Anonymisation Models for Text: State of the Art, Challenges and Future Directions.</em>
-      <span class="note">ACL Anthology. Survey of NLP-based PII detection methods.</span>
-    </li>
-    <li>
-      <a href="https://cloud.google.com/sensitive-data-protection/docs/concepts-infotypes-reference" target="_blank" rel="noopener">Google Cloud Sensitive Data Protection: infoTypes reference.</a>
-      <span class="note">Real-world list of detectable PII categories.</span>
-    </li>
-    <li>
-      <a href="https://arxiv.org/abs/2012.12348" target="_blank" rel="noopener">Carlini et al. (2021). <em>Extracting Training Data from Large Language Models.</em></a>
-      <span class="note">Demonstrates why private data must not enter training data in the first place.</span>
-    </li>
-  </ul>
-</div>
-
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
 </footer>
 
 <script>
-// ============ REDACTION DEMO ============
-// The scanner line sweeps top to bottom. As it crosses each PII span:
-//   1. the span gets highlighted (accent background + label popup)
-//   2. after a brief pause, it gets redacted (black bar)
-// Reset restores original text and removes all state.
+// flow legend: scroll + glow on card click, one-time load sweep, card-door click guard
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var stages = ['card-private','card-apart','card-prove'];
+  var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
 
-const msgBox = document.getElementById('msgBox');
-const scannerLine = document.getElementById('scannerLine');
-const scanStatus = document.getElementById('scanStatus');
-const scanStatusText = document.getElementById('scanStatusText');
-const playBtn = document.getElementById('playBtn');
-const resetBtn = document.getElementById('resetBtn');
-
-const piiSpans = Array.from(document.querySelectorAll('.pii'));
-const piiLabels = ['Name', 'Email', 'Phone', 'ID'];
-
-// inject label elements
-piiSpans.forEach((span, i) => {
-  span.setAttribute('data-label', piiLabels[i]);
-  const lbl = document.createElement('span');
-  lbl.className = 'pii-label';
-  lbl.textContent = piiLabels[i];
-  lbl.setAttribute('aria-hidden', 'true');
-  span.insertBefore(lbl, span.firstChild);
-});
-
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-function setStatus(state, text) {
-  scanStatus.className = 'scan-status' + (state ? ' ' + state : '');
-  scanStatusText.textContent = text;
-}
-
-function resetDemo() {
-  // remove scanner
-  scannerLine.style.top = '-4px';
-  scannerLine.classList.remove('scanning');
-  // restore all spans
-  piiSpans.forEach(span => {
-    span.classList.remove('highlight', 'redacted');
-  });
-  setStatus('', 'Ready. Tap Play to scan the message.');
-  playBtn.disabled = false;
-  resetBtn.disabled = false;
-}
-
-async function runScan() {
-  playBtn.disabled = true;
-  resetBtn.disabled = true;
-
-  if (reduceMotion) {
-    // instant: highlight all, then redact all
-    piiSpans.forEach(s => s.classList.add('highlight'));
-    setStatus('found', `Found ${piiSpans.length} personal details: Name, Email, Phone, ID.`);
-    await sleep(5);
-    piiSpans.forEach(s => { s.classList.remove('highlight'); s.classList.add('redacted'); });
-    setStatus('clean', 'All personal details redacted. Safe to process.');
-    playBtn.disabled = false;
-    resetBtn.disabled = false;
-    return;
+  function pillFor(cardId){
+    for(var i=0;i<pills.length;i++){ if(pills[i].getAttribute('data-target')===cardId) return pills[i]; }
+    return null;
   }
 
-  // 1. sweep scanner line top to bottom
-  const boxRect = msgBox.getBoundingClientRect();
-  const boxHeight = msgBox.offsetHeight;
-
-  setStatus('', 'Scanning...');
-  scannerLine.style.top = '-4px';
-  scannerLine.classList.add('scanning');
-
-  // get each span's vertical midpoint relative to msgBox
-  const spanMids = piiSpans.map(span => {
-    const r = span.getBoundingClientRect();
-    return r.top - boxRect.top + r.height / 2;
+  // nav buttons: smooth-scroll to the stage card + brief glow
+  pills.forEach(function(btn){
+    var target = btn.getAttribute('data-target');
+    var card = document.getElementById(target);
+    btn.addEventListener('click', function(){
+      if(!card) return;
+      card.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+      card.classList.add('glow');
+      window.setTimeout(function(){ card.classList.remove('glow'); }, 1200);
+    });
   });
 
-  const SCAN_DURATION = 1600; // ms to cross the full box
-  const startTime = performance.now();
-  let highlighted = new Array(piiSpans.length).fill(false);
-
-  await new Promise(resolve => {
-    function frame(now) {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / SCAN_DURATION, 1);
-      const lineY = progress * (boxHeight + 4);
-      scannerLine.style.top = lineY + 'px';
-
-      // highlight any span the line has crossed
-      piiSpans.forEach((span, i) => {
-        if (!highlighted[i] && lineY >= spanMids[i]) {
-          highlighted[i] = true;
-          span.classList.add('highlight');
-        }
-      });
-
-      if (progress < 1) {
-        requestAnimationFrame(frame);
-      } else {
-        resolve();
+  // one-time load sweep: highlight each card in order, lighting the matching pill
+  if(!reduce){
+    var step = 0;
+    function tour(){
+      if(step > 0){
+        var prevCard = document.getElementById(stages[step-1]);
+        var prevPill = pillFor(stages[step-1]);
+        if(prevCard) prevCard.classList.remove('glow');
+        if(prevPill) prevPill.classList.remove('lit');
       }
+      if(step >= stages.length) return;
+      var curCard = document.getElementById(stages[step]);
+      var curPill = pillFor(stages[step]);
+      if(curCard) curCard.classList.add('glow');
+      if(curPill) curPill.classList.add('lit');
+      step++;
+      window.setTimeout(tour, 900);
     }
-    requestAnimationFrame(frame);
-  });
-
-  // 2. scanner done — show count
-  const found = highlighted.filter(Boolean).length;
-  setStatus('found', `Found ${found} personal detail${found !== 1 ? 's' : ''}: Name, Email, Phone, ID.`);
-  scannerLine.classList.remove('scanning');
-
-  await sleep(700);
-
-  // 3. redact each span one by one with a small stagger
-  for (let i = 0; i < piiSpans.length; i++) {
-    piiSpans[i].classList.remove('highlight');
-    piiSpans[i].classList.add('redacted');
-    await sleep(160);
+    window.setTimeout(tour, 350);
   }
 
-  await sleep(300);
-  setStatus('clean', 'All personal details redacted. Safe to process.');
-  playBtn.disabled = false;
-  resetBtn.disabled = false;
-}
-
-playBtn.addEventListener('click', () => {
-  // reset silently first if already run
-  piiSpans.forEach(s => s.classList.remove('highlight', 'redacted'));
-  scannerLine.style.top = '-4px';
-  scannerLine.classList.remove('scanning');
-  setStatus('', 'Scanning...');
-  runScan();
-});
-
-resetBtn.addEventListener('click', () => {
-  resetDemo();
-});
+  // each stage card is a door to the how-it-works page; chip clicks are ignored
+  var doors = {
+    'card-private': 'consideration-privacy-how-it-works.html',
+    'card-apart': 'consideration-privacy-how-it-works.html',
+    'card-prove': 'consideration-privacy-how-it-works.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('.chip')) return; // chip clicks never trigger the card door
+      if(e.target.closest('a')) return; // let real links handle their own clicks
+      window.location.href = doorHref;
+    });
+  });
+})();
 </script>
 </body>
 </html>

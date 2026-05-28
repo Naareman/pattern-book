@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capability Negotiation and Tool Discovery · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* Handshake demo */
+  .hs-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .hs-header {
+    padding: 12px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border);
+    font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .hs-step-tabs {
+    display: flex; border-bottom: 1px solid var(--border); background: #fff;
+  }
+  .hs-step {
+    flex: 1; padding: 12px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+    border: none; background: none; color: var(--faint);
+    border-bottom: 2px solid transparent; transition: color .2s, border-color .2s, background .2s;
+    font-family: 'Inter', sans-serif; text-align: left; line-height: 1.3;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .hs-step .num {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--faint);
+  }
+  .hs-step.active { color: var(--accent-hover); border-bottom-color: var(--accent); background: var(--accent-soft); }
+  .hs-step.active .num { color: var(--accent-hover); }
+  .hs-step:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  .hs-panel { padding: 20px 22px; display: none; }
+  .hs-panel.active { display: block; }
+  .hs-flow {
+    display: flex; align-items: center; gap: 14px; justify-content: center;
+    font-size: 12px; color: var(--faint); font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 12px; flex-wrap: wrap;
+  }
+  .hs-actor {
+    background: var(--accent-soft); color: var(--accent-hover);
+    border: 1px solid rgba(124,92,246,0.2); border-radius: 8px;
+    padding: 4px 10px; font-weight: 600;
+  }
+  .hs-arrow { color: var(--accent); font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; }
+  .hs-msg {
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.6;
+    color: var(--soft); background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    white-space: pre; overflow-x: auto;
+  }
+  .hs-msg .k { color: var(--accent-hover); }
+  .hs-msg .s { color: #0E9F6E; }
+  .hs-msg .c { color: var(--faint); font-style: italic; }
+  .hs-explain { font-size: 13px; color: var(--soft); line-height: 1.6; margin-top: 12px; }
+  .hs-explain strong { color: var(--text); }
+
+  .fits-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .hs-msg { font-size: 11.5px; }
+    .hs-step-tabs { flex-direction: column; }
+    .hs-step { border-bottom: 1px solid var(--border); border-left: 2px solid transparent; }
+    .hs-step.active { border-bottom-color: var(--border); border-left-color: var(--accent); }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="orchestration-coordination.html"><span aria-hidden="true">&larr;</span> Coordinate agents</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-orchestration-agents.html">Orchestration &amp; Agents</a><span class="sep" aria-hidden="true">/</span><a href="orchestration-coordination.html">Coordinate agents</a><span class="sep" aria-hidden="true">/</span><span class="here">Capability Negotiation</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Orchestration &amp; Agents &middot; Coordinate agents</span>
+  <h1 class="page-title">Capability Negotiation and Tool Discovery</h1>
+  <p class="explainer">Agents and tools announce what they can do at runtime. The caller asks, the other side replies with a menu, and the caller picks from what is on offer.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What It Is</div>
+  <h2 id="what-heading">Ask first, <em>then call</em>.</h2>
+  <div class="what-card">
+    <p><strong style="color:var(--accent-hover)">Capability negotiation</strong> is a short conversation up front: the caller asks the other side what it can do; the other side returns a list of tools, with names, inputs, and a short description. The caller then picks from that menu. Nothing is hard-coded: a new tool can be added on the server and the caller will see it on the next connection without any code change.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Tap a step in the <em>handshake</em>.</h2>
+  <div class="hs-card" role="region" aria-label="Capability negotiation handshake">
+    <div class="hs-header">
+      <span>Agent connects to a new tool server</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-hover)">3 steps</span>
+    </div>
+    <div class="hs-step-tabs" role="tablist" aria-label="Handshake steps">
+      <button class="hs-step active" role="tab" aria-selected="true" aria-controls="hs-1" id="tab-hs-1">
+        <span class="num">Step 1</span>
+        <span>Ask what's available</span>
+      </button>
+      <button class="hs-step" role="tab" aria-selected="false" aria-controls="hs-2" id="tab-hs-2">
+        <span class="num">Step 2</span>
+        <span>Receive the menu</span>
+      </button>
+      <button class="hs-step" role="tab" aria-selected="false" aria-controls="hs-3" id="tab-hs-3">
+        <span class="num">Step 3</span>
+        <span>Call a chosen tool</span>
+      </button>
+    </div>
+
+    <div class="hs-panel active" id="hs-1" role="tabpanel" aria-labelledby="tab-hs-1">
+      <div class="hs-flow">
+        <span class="hs-actor">Agent</span>
+        <span class="hs-arrow">&rarr;</span>
+        <span class="hs-actor">Tool server</span>
+      </div>
+      <div class="hs-msg">{
+  <span class="k">"method"</span>: <span class="s">"tools/list"</span>
+}</div>
+      <p class="hs-explain"><strong>The agent does not assume.</strong> It asks the server what tools exist right now. This same call works against any server that speaks the protocol.</p>
+    </div>
+
+    <div class="hs-panel" id="hs-2" role="tabpanel" aria-labelledby="tab-hs-2">
+      <div class="hs-flow">
+        <span class="hs-actor">Tool server</span>
+        <span class="hs-arrow">&rarr;</span>
+        <span class="hs-actor">Agent</span>
+      </div>
+      <div class="hs-msg">{
+  <span class="k">"tools"</span>: [
+    {
+      <span class="k">"name"</span>: <span class="s">"search_docs"</span>,
+      <span class="k">"description"</span>: <span class="s">"Full-text search the help center"</span>,
+      <span class="k">"input"</span>: { <span class="k">"query"</span>: <span class="s">"string"</span> }
+    },
+    {
+      <span class="k">"name"</span>: <span class="s">"create_ticket"</span>,
+      <span class="k">"description"</span>: <span class="s">"Open a new support ticket"</span>,
+      <span class="k">"input"</span>: { <span class="k">"title"</span>: <span class="s">"string"</span>, <span class="k">"body"</span>: <span class="s">"string"</span> }
+    }
+  ]
+}</div>
+      <p class="hs-explain"><strong>The server replies with a menu.</strong> Each tool has a name, a short description, and the shape of its inputs. The agent now knows what is on offer (and can read the descriptions back to the model to decide which one fits the user's request).</p>
+    </div>
+
+    <div class="hs-panel" id="hs-3" role="tabpanel" aria-labelledby="tab-hs-3">
+      <div class="hs-flow">
+        <span class="hs-actor">Agent</span>
+        <span class="hs-arrow">&rarr;</span>
+        <span class="hs-actor">Tool server</span>
+      </div>
+      <div class="hs-msg">{
+  <span class="k">"method"</span>: <span class="s">"tools/call"</span>,
+  <span class="k">"params"</span>: {
+    <span class="k">"name"</span>: <span class="s">"search_docs"</span>,
+    <span class="k">"arguments"</span>: { <span class="k">"query"</span>: <span class="s">"reset password"</span> }
+  }
+}</div>
+      <p class="hs-explain"><strong>The agent picks from the menu.</strong> Tomorrow the server might list a new tool ("escalate_to_human"); the agent will see it on the next handshake and can use it straight away, without a deploy.</p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it covers</div>
+      <div class="fits-desc">The short menu exchange at the start of a connection: who offers what, with which inputs. After that, the actual tool calls happen as normal.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Sits next to</div>
+      <div class="fits-desc">Rides on top of an agent-to-agent protocol (how messages are shaped), checked by identity (which tools this caller may see), and often paired with a shared workspace (where results land).</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>The set of available tools changes over time and you want agents to pick up new ones without a code change.</li>
+    <li>You build agents that should work with tools from many teams or vendors.</li>
+    <li>You want the tool descriptions themselves to guide the model toward the right choice for the user's request.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="orchestration-coordination.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Coordinate agents</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Anthropic (2024). <em>Model Context Protocol: tools/list and tools/call methods.</em> <span class="note">Defines the runtime listing of tools as a first-class part of the protocol, so any client can discover any server's tools.</span></li>
+    <li>OpenAI (2023). <em>Function calling and tool descriptions.</em> <span class="note">Establishes the pattern of giving the model a JSON description of each tool so it can choose among them.</span></li>
+    <li>Google (2025). <em>Agent2Agent: Agent Card discovery.</em> <span class="note">Each agent publishes an Agent Card listing its skills, so peer agents can discover and route work to it.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  const tabs = document.querySelectorAll('.hs-step');
+  const panels = document.querySelectorAll('.hs-panel');
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+      panels.forEach(function (p) { p.classList.remove('active'); });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      panels[i].classList.add('active');
+    });
+  });
+}());
+</script>
+</body>
+</html>

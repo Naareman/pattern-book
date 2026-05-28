@@ -6,19 +6,17 @@
 <title>Evaluation &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
     --border:#E8EAEE; --border-strong:#D5D9E0;
     --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
-    --radius:16px;
-    --bg-subtle:#F6F7F9; --radius-sm:11px;
-    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#C2554F; --error-soft:#FBECEB;
-    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
-    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
-    --warn:#B45309; --warn-soft:#FEF3C7;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.10);
+    --radius:16px; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-padding-top: 80px; }
@@ -30,14 +28,31 @@
     -webkit-font-smoothing: antialiased;
   }
   body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
 
-  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
   .skip-link:focus { top: 8px; }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 
-  /* TOP BAR */
+  /* top bar */
   .topbar {
     position: sticky; top: 0; z-index: 200;
     background: rgba(252,252,253,.86);
@@ -51,10 +66,10 @@
   }
   .back {
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none;
-    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
-    background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease;
-    white-space: nowrap;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
   }
   .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
   .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -63,13 +78,13 @@
   .crumb .sep { margin: 0 7px; color: var(--border-strong); }
   .crumb .here { color: var(--soft); }
 
-  /* HEADER */
-  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
   .eyebrow {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-    color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border);
-    border-radius: 20px; padding: 5px 12px;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
   }
   .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
   .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
@@ -79,221 +94,132 @@
   }
   .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
-  /* SECTIONS */
-  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
-  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
-  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
-  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  /* title row + see-it-in-action pill */
+  .title-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:16px 0 0}
+  .title-row .pattern-title{margin:0;flex:1 1 auto;min-width:240px}
+  .how-pill{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--accent);border-radius:22px;padding:8px 15px;box-shadow:var(--shadow);transition:background .15s ease,transform .15s ease}
+  .how-pill:hover{background:#E3DBFD;transform:translateY(-1px)}
+  .how-pill .arr{display:inline-block;transition:transform .18s ease}
+  .how-pill:hover .arr{transform:translateX(3px)}
+  @media (prefers-reduced-motion:reduce){.how-pill,.how-pill .arr{transition:none}.how-pill:hover,.how-pill:hover .arr{transform:none}}
+  @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
+
+  /* flow legend (stage pills + arrows) */
+  .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
+  .flow-chip {
+    font-family: inherit; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; box-shadow: var(--shadow); padding: 7px 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--soft); white-space: nowrap;
+    letter-spacing: .01em; cursor: pointer;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .flow-chip:hover { color: var(--accent-hover); border-color: var(--border-strong); }
+  .flow-chip.lit { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); }
+  .flow-arrow { flex: none; color: var(--accent); font-size: 15px; line-height: 1; }
+  .flow-caption { text-align: center; color: var(--faint); font-size: 13px; line-height: 1.5; margin-top: 12px; }
+
+  /* sections */
+  section {
+    max-width: 920px; margin: 0 auto;
+    padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px;
+  }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
+    line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
+  }
   h2 em { font-style: italic; color: var(--accent); }
 
-  /* 01 IDEA CARD */
-  .idea-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    box-shadow: var(--shadow); padding: 26px 28px;
-  }
-  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.5; color: var(--text); }
+  /* ============ STAGE CARDS ============ */
+  .stages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 6px; align-items: stretch; }
 
-  /* 02 DEMO */
-  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
-
-  .eval-stage {
+  .stage-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
+    scroll-margin-top: 80px;
+    transition: box-shadow .55s ease, border-color .55s ease;
+    display: flex; flex-direction: column;
+    min-width: 0; height: 100%;
+  }
+  .stage-card.glow {
+    box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42);
+    border-color: var(--accent);
+  }
+  @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
+
+  .stage-card.clickable {
+    cursor: pointer;
+    transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
+  @media (prefers-reduced-motion: reduce) {
+    .stage-card.clickable { transition: none; }
+    .stage-card.clickable:hover { transform: none; }
   }
 
-  /* score counter */
-  .score-bar {
-    display: flex; align-items: center; gap: 14px; margin-bottom: 18px;
-    padding-bottom: 16px; border-bottom: 1px solid var(--border);
-  }
-  .score-label { font-size: 13px; font-weight: 600; color: var(--faint); white-space: nowrap; }
-  .score-track {
-    flex: 1; height: 10px; background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: 10px; overflow: hidden;
-  }
-  .score-fill {
-    height: 100%; width: 0%; background: var(--accent); border-radius: 10px;
-    transition: width 0.5s cubic-bezier(.22,1,.36,1), background 0.4s ease;
-  }
-  .score-num {
-    font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px;
-    color: var(--text); min-width: 44px; text-align: right;
-    transition: color 0.3s ease;
+  /* de-squeezed: icon + name share a full-width row of their own */
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; min-width: 0; }
+  .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
+  .stage-head .sico svg { width: 18px; height: 18px; display: block; }
+  .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
+
+  .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
+
+  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; }
+  .chip {
+    flex: none; display: inline-flex; align-items: center; gap: 3px;
+    padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
+    border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
 
-  /* answer cards */
-  .answer-stack { display: flex; flex-direction: column; gap: 11px; }
-  .answer-card {
-    background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm);
-    padding: 14px 16px; cursor: pointer;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
-    box-shadow: var(--shadow-sm);
-    position: relative; overflow: hidden;
+  /* "see how" lives at the bottom of each card, pushed down by margin-top:auto */
+  .see-how {
+    display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--accent-hover);
+    transition: color .15s ease;
   }
-  .answer-card:not(.checked):hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
-  .answer-card.checked { cursor: default; }
-  .answer-card .q-label { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
-  .answer-card .q-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; line-height: 1.35; color: var(--text); margin-bottom: 10px; }
-  .answer-card .ai-answer {
-    font-size: 14px; line-height: 1.5; color: var(--soft);
-    padding: 10px 12px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; margin-bottom: 8px;
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion: reduce) {
+    .see-how, .see-how .arr { transition: none; }
+    .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; }
   }
-  .answer-card .ai-answer .conf {
-    display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .03em;
-    text-transform: uppercase; color: var(--warn); background: var(--warn-soft);
-    border-radius: 4px; padding: 1px 5px; margin-left: 6px; vertical-align: middle;
-  }
-  .answer-card .tap-hint {
-    font-size: 12px; font-weight: 500; color: var(--accent-hover);
-    display: flex; align-items: center; gap: 5px;
-  }
-  .answer-card .tap-hint svg { width: 13px; height: 13px; flex-shrink: 0; }
-  /* verdict reveal */
-  .verdict-row {
-    display: flex; align-items: flex-start; gap: 10px; margin-top: 10px;
-    max-height: 0; overflow: hidden;
-    transition: max-height 0.4s ease, margin 0.3s ease, opacity 0.35s ease;
-    opacity: 0;
-  }
-  .answer-card.checked .verdict-row { max-height: 120px; opacity: 1; }
-  .verdict-badge {
-    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700; margin-top: 1px;
-  }
-  .verdict-badge.pass { background: var(--success-soft); color: var(--success); }
-  .verdict-badge.fail { background: var(--error-soft); color: var(--error); }
-  .verdict-text { font-size: 13px; line-height: 1.5; color: var(--soft); }
-  .verdict-text strong { font-weight: 600; color: var(--text); }
-  /* card state colors */
-  .answer-card.pass { background: var(--success-soft); border-color: var(--success); }
-  .answer-card.fail { background: var(--error-soft); border-color: var(--error); }
-  .answer-card.fail .q-label { color: var(--error); }
-  .answer-card.pass .q-label { color: var(--success); }
 
-  /* status line below cards */
-  .eval-status {
-    margin-top: 16px; padding: 11px 14px; text-align: center;
-    font-size: 13px; font-weight: 500; color: var(--faint);
-    border: 1px solid var(--border); border-radius: var(--radius-sm);
-    transition: all 0.35s ease;
-  }
-  .eval-status.done { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); font-weight: 600; }
-
-  /* controls */
-  .board-controls {
-    display: flex; gap: 10px; flex-wrap: wrap;
-    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
-  }
-  .diagram-btn {
-    padding: 10px 16px; border: 1px solid var(--border-strong); background: var(--surface);
-    border-radius: var(--radius-sm); cursor: pointer; font-family: 'Inter', sans-serif;
-    font-size: 14px; font-weight: 600; color: var(--text);
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
-  }
-  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
-  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
-  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-
-  /* 03 REAL EXAMPLE */
-  .example-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    box-shadow: var(--shadow); padding: 22px 24px;
-  }
-  .example-card p { font-size: 15px; line-height: 1.65; color: var(--soft); }
-  .example-card p + p { margin-top: 10px; }
-  .example-card p strong { color: var(--text); font-weight: 600; }
-  .method-list { list-style: none; display: flex; flex-direction: column; gap: 13px; margin-top: 16px; }
-  .method-item { display: flex; gap: 12px; align-items: flex-start; }
-  .method-dot {
-    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
-    background: var(--accent-soft); border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700; color: var(--accent-hover); margin-top: 1px;
-  }
-  .method-body { flex: 1; }
-  .method-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
-  .method-desc { font-size: 14px; color: var(--soft); line-height: 1.5; }
-
-  /* 04 WHAT THIS COVERS: guide-card style */
-  .covers-meta {
-    font-size: 13px; font-weight: 600; color: var(--faint);
-    text-transform: uppercase; letter-spacing: .05em;
-    margin-bottom: 14px;
-  }
-  .covers-meta span { color: var(--text); font-weight: 500; text-transform: none; letter-spacing: 0; }
-
-  /* surface card matches the layer guide aesthetic */
-  .guide {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
-  }
-  /* cluster labels */
-  .cluster-head { padding: 16px 22px 8px; }
-  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
-  .cluster-label {
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: .07em; color: var(--text); line-height: 1.3;
-  }
-  /* discipline rows: name on its own line, description below, indented under the cluster label */
-  .guide-row {
-    display: flex; flex-direction: column; gap: 3px;
-    padding: 13px 22px 13px 40px; border-top: 1px solid var(--border);
-  }
-  .cluster-head + .guide-row { border-top: none; }
-  .disc-name {
-    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
-    color: var(--text); line-height: 1.3;
-  }
-  .disc-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
-
-  /* note stripe */
-  .covers-note {
-    margin: 0; padding: 14px 22px;
-    background: var(--accent-soft); border-top: 1px solid var(--border);
-    font-size: 13px; color: var(--soft); line-height: 1.55;
-  }
-  .covers-note strong { color: var(--text); font-weight: 600; }
-
-  /* BACK LINK */
+  /* back link */
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
-    padding: 14px 16px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none;
-    color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-    cursor: pointer;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; cursor: pointer;
   }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
-  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s; }
   .back-link:hover .back-arrow { transform: translateX(-3px); }
   .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
   .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
 
-  /* SOURCES */
-  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
-  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
-  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
-  .sources li em { font-style: italic; color: var(--text); }
-  .sources li .note { color: var(--faint); }
-  .sources a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
-  .sources a:hover { border-bottom-color: var(--accent); }
-
-  /* FOOTER */
-  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  /* footer */
+  footer {
+    max-width: 920px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
   footer strong { color: var(--soft); font-weight: 500; }
 
-  /* RESPONSIVE */
+  /* responsive */
+  @media (max-width: 720px) {
+    .stages { grid-template-columns: 1fr; gap: 14px; }
+  }
   @media (max-width: 560px) {
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .idea-card { padding: 18px 16px; }
-    .idea-card p { font-size: 16px; }
-    .board-controls { flex-direction: column; align-items: stretch; }
-    .diagram-btn { flex: 1; }
+    .flow-chip { font-size: 12px; padding: 6px 12px; }
   }
 </style>
 </head>
@@ -319,224 +245,83 @@
       </svg>
     </span>Consideration &middot; Evaluation
   </span>
-  <h1 class="pattern-title">Evaluation</h1>
+  <div class="title-row"><h1 class="pattern-title">Evaluation</h1><a class="how-pill" href="consideration-evaluation-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
   <p class="explainer">Checking that the AI is actually right, not just sounding certain.</p>
+
+  <div class="flow" aria-label="Jump to a part of evaluation">
+    <button type="button" class="flow-chip" data-target="card-define">Decide what right means</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-check">Check the answers</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-keep">Keep it honest over time</button>
+  </div>
+  <p class="flow-caption">Three jobs that turn a hunch about quality into a number you can trust.</p>
 </header>
 
-<!-- 01 THE IDEA -->
+<!-- STAGE CARDS -->
 <section>
-  <div class="section-label"><span class="num">01</span>The Idea</div>
-  <h2>What <em>is</em> it?</h2>
-  <div class="idea-card">
-    <p>An AI can say the wrong thing in a very confident voice. <span style="color:var(--accent-hover);font-weight:500">Evaluation</span> is the practice of testing it on questions where you already know the correct answer, then counting how often it gets them right. Without it, you are trusting the AI's tone instead of its accuracy.</p>
-  </div>
-</section>
+  <div class="stages">
 
-<!-- 02 SEE IT WORK -->
-<section>
-  <div class="section-label"><span class="num">02</span>See It Work</div>
-  <h2>An AI being <em>checked</em>.</h2>
-
-  <p class="demo-lede">Tap each answer to check it against the known-correct answer. Watch the score update.</p>
-
-  <div class="eval-stage">
-    <!-- score counter -->
-    <div class="score-bar" aria-live="polite" aria-atomic="true">
-      <span class="score-label">Score</span>
-      <div class="score-track" role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0" id="scoreTrack">
-        <div class="score-fill" id="scoreFill"></div>
+    <!-- DECIDE WHAT RIGHT MEANS -->
+    <section class="stage-card clickable" id="card-define" aria-labelledby="g-define">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+          </svg>
+        </span>
+        <h2 id="g-define"><span class="stage-name">Decide what right means</span></h2>
       </div>
-      <span class="score-num" id="scoreNum">0 / 4</span>
-    </div>
-
-    <!-- answer cards -->
-    <div class="answer-stack" id="answerStack">
-
-      <div class="answer-card" data-verdict="pass"
-        data-known="Water boils at 100 °C at sea level."
-        data-ai="Water boils at 100 degrees Celsius at standard atmospheric pressure."
-        data-why="Same fact, different phrasing. The meaning matches the known answer exactly.">
-        <div class="q-label">Question 1</div>
-        <div class="q-text">At what temperature does water boil?</div>
-        <div class="ai-answer">
-          AI says: "Water boils at 100 degrees Celsius at standard atmospheric pressure."
-        </div>
-        <div class="tap-hint" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M6 14c0 2.5 1.5 6 6 6s6-4 6-6v-2.5"/></svg>
-          Tap to check
-        </div>
-        <div class="verdict-row" aria-live="polite">
-          <div class="verdict-badge pass" aria-hidden="true">&#10003;</div>
-          <div class="verdict-text"><strong>Pass.</strong> <span id="why0"></span></div>
-        </div>
+      <p class="stage-lead">Pin down the bar before you start counting.</p>
+      <div class="chips">
+        <span class="chip">Eval methodology</span>
+        <span class="chip">Faithfulness and groundedness</span>
       </div>
+      <a class="see-how" href="consideration-evaluation-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
-      <div class="answer-card" data-verdict="fail"
-        data-known="The French Revolution began in 1789."
-        data-ai="The French Revolution began in 1799."
-        data-why='Wrong by 10 years. The AI sounds certain, but the known answer is 1789. Confidence is not a substitute for correctness.'>
-        <div class="q-label">Question 2</div>
-        <div class="q-text">When did the French Revolution begin?</div>
-        <div class="ai-answer">
-          AI says: "The French Revolution began in 1799." <span class="conf">confident</span>
-        </div>
-        <div class="tap-hint" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M6 14c0 2.5 1.5 6 6 6s6-4 6-6v-2.5"/></svg>
-          Tap to check
-        </div>
-        <div class="verdict-row" aria-live="polite">
-          <div class="verdict-badge fail" aria-hidden="true">&#10007;</div>
-          <div class="verdict-text"><strong>Fail.</strong> <span id="why1"></span></div>
-        </div>
+    <!-- CHECK THE ANSWERS -->
+    <section class="stage-card clickable" id="card-check" aria-labelledby="g-check">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+          </svg>
+        </span>
+        <h2 id="g-check"><span class="stage-name">Check the answers</span></h2>
       </div>
-
-      <div class="answer-card" data-verdict="fail"
-        data-known="Python uses indentation to define code blocks."
-        data-ai="Python uses curly braces to define code blocks, just like JavaScript."
-        data-why="Incorrect. Python uses indentation, not curly braces. A confident but wrong answer like this could mislead a beginner.">
-        <div class="q-label">Question 3</div>
-        <div class="q-text">How does Python define code blocks?</div>
-        <div class="ai-answer">
-          AI says: "Python uses curly braces to define code blocks, just like JavaScript." <span class="conf">confident</span>
-        </div>
-        <div class="tap-hint" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M6 14c0 2.5 1.5 6 6 6s6-4 6-6v-2.5"/></svg>
-          Tap to check
-        </div>
-        <div class="verdict-row" aria-live="polite">
-          <div class="verdict-badge fail" aria-hidden="true">&#10007;</div>
-          <div class="verdict-text"><strong>Fail.</strong> <span id="why2"></span></div>
-        </div>
+      <p class="stage-lead">Look at what came out and the path it took to get there.</p>
+      <div class="chips">
+        <span class="chip">Agent trajectory evaluation</span>
+        <span class="chip">Statistical rigor</span>
+        <span class="chip">Hallucination detection</span>
       </div>
+      <a class="see-how" href="consideration-evaluation-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
-      <div class="answer-card" data-verdict="pass"
-        data-known="The speed of light is approximately 299,792 km/s."
-        data-ai="The speed of light is approximately 300,000 km/s."
-        data-why="Close enough. The known answer is 299,792 km/s. A rounding difference this small is acceptable for general knowledge questions.">
-        <div class="q-label">Question 4</div>
-        <div class="q-text">What is the speed of light?</div>
-        <div class="ai-answer">
-          AI says: "The speed of light is approximately 300,000 km/s."
-        </div>
-        <div class="tap-hint" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M6 14c0 2.5 1.5 6 6 6s6-4 6-6v-2.5"/></svg>
-          Tap to check
-        </div>
-        <div class="verdict-row" aria-live="polite">
-          <div class="verdict-badge pass" aria-hidden="true">&#10003;</div>
-          <div class="verdict-text"><strong>Pass.</strong> <span id="why3"></span></div>
-        </div>
+    <!-- KEEP IT HONEST OVER TIME -->
+    <section class="stage-card clickable" id="card-keep" aria-labelledby="g-keep">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><path d="M3 21v-5h5"/>
+          </svg>
+        </span>
+        <h2 id="g-keep"><span class="stage-name">Keep it honest over time</span></h2>
       </div>
-
-    </div>
-
-    <div class="eval-status" id="evalStatus" aria-live="polite">0 / 4 checked</div>
-
-    <div class="board-controls">
-      <button class="diagram-btn primary" id="runAllBtn">&#9654; Play</button>
-      <button class="diagram-btn" id="resetEvalBtn">&#8635; Reset</button>
-    </div>
-  </div>
-</section>
-
-<!-- 03 HOW WE MEASURE -->
-<section>
-  <div class="section-label"><span class="num">03</span>How We Measure</div>
-  <h2>Four ways to <em>catch</em> a wrong answer.</h2>
-  <div class="example-card">
-    <p>Real evaluation combines several methods. Each covers something the others miss.</p>
-    <ul class="method-list">
-      <li class="method-item">
-        <div class="method-dot">A</div>
-        <div class="method-body">
-          <div class="method-name">Test set with known answers</div>
-          <div class="method-desc">A fixed set of questions where the right answer is already written down. Run the AI through them, count how many it gets right. This is the baseline.</div>
-        </div>
-      </li>
-      <li class="method-item">
-        <div class="method-dot">B</div>
-        <div class="method-body">
-          <div class="method-name">Scoring functions</div>
-          <div class="method-desc">Code that checks answers automatically: exact match, substring match, or a numeric score like BLEU for translation. Fast, cheap, consistent.</div>
-        </div>
-      </li>
-      <li class="method-item">
-        <div class="method-dot">C</div>
-        <div class="method-body">
-          <div class="method-name">Human review</div>
-          <div class="method-desc">A person reads a sample of answers and rates them. Catches subtle errors that code misses, like a technically correct but misleading phrasing. Slow and expensive, so used on a sample, not everything.</div>
-        </div>
-      </li>
-      <li class="method-item">
-        <div class="method-dot">D</div>
-        <div class="method-body">
-          <div class="method-name">LLM (large language model) as judge</div>
-          <div class="method-desc">A second AI reads the answer and rates it against the known-correct answer. Scales better than human review and catches more nuance than code. It can still be fooled by confident-sounding errors, so it works best alongside a test set.</div>
-        </div>
-      </li>
-    </ul>
-  </div>
-</section>
-
-<!-- 04 WHAT THIS COVERS -->
-<section>
-  <div class="section-label"><span class="num">04</span>What This Covers</div>
-  <h2>The <em>disciplines</em> inside Evaluation.</h2>
-
-  <p class="covers-meta">Applies to: <span>every AI system</span></p>
-
-  <div class="guide">
-
-    <!-- Cluster 1 -->
-    <div class="cluster-head">
-      <h3 class="cluster-label">How you measure</h3>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Eval Methodology</span>      <span class="disc-desc">The overall framework: benchmarks, golden test sets, human eval, and rubrics. Decides what "right" means before you count anything.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Agent Trajectory Evaluation</span>      <span class="disc-desc">Judges not just the final answer but every step the agent took to get there. A correct result via a broken path is still a problem.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Statistical Rigor</span>      <span class="disc-desc">Making sure results are real, not noise. Covers sample sizes, confidence intervals, and avoiding lucky-run bias.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Faithfulness and Groundedness Evaluation</span>      <span class="disc-desc">Checking that answers follow from the documents or facts provided, not from something invented.</span>
-    </div>
-
-    <!-- Cluster 2 -->
-    <div class="cluster-head cluster-break">
-      <h3 class="cluster-label">How you keep quality up</h3>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Regression Testing</span>      <span class="disc-desc">Running the same eval suite after every change to confirm nothing that worked before has broken. The safety net for iterative work.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Eval-Driven Development</span>      <span class="disc-desc">Writing the eval before writing the system, so "done" has a concrete, measurable definition from the start.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Prompt Lifecycle Thinking</span>      <span class="disc-desc">Treating prompts as versioned artifacts with their own eval coverage, so a prompt change triggers a re-run, not just a re-read.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Hallucination Detection Methodology</span>      <span class="disc-desc">The framework for finding made-up claims. The building blocks that do the work (claim extraction, verifier scoring, citation grounding) live in the layers.</span>
-    </div>
-
-    <div class="covers-note">
-      <strong>Considerations are disciplines, not mechanisms.</strong> The reasoning framework lives here. The actual building blocks live in the layers. When you want to build something, follow the cross-references.
-    </div>
+      <p class="stage-lead">Re-run the checks every time something changes.</p>
+      <div class="chips">
+        <span class="chip">Regression testing</span>
+        <span class="chip">Eval-driven development</span>
+        <span class="chip">Prompt lifecycle thinking</span>
+      </div>
+      <a class="see-how" href="consideration-evaluation-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
   </div>
 </section>
 
-<!-- BACK NAV -->
+<!-- BACK LINK -->
 <section style="padding-top: 20px; padding-bottom: 40px;">
   <a href="considerations.html" class="back-link">
     <div class="back-arrow">&larr;</div>
@@ -547,135 +332,72 @@
   </a>
 </section>
 
-<!-- SOURCES -->
-<div class="sources">
-  <div class="sources-title">Sources</div>
-  <ul>
-    <li>Zheng et al. (2023). <em>Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena.</em> <span class="note">Introduced and validated the LLM-as-judge evaluation approach.</span></li>
-    <li>Guo et al. (2017). <em>A Survey on Evaluation of NLP Systems.</em> <span class="note">Overview of automatic metrics versus human evaluation for language tasks.</span></li>
-    <li><a href="https://huggingface.co/docs/evaluate/index" target="_blank" rel="noopener">Hugging Face Evaluate library</a>. <span class="note">Practical open-source toolkit for running evaluations: BLEU, ROUGE, exact match, and more.</span></li>
-    <li>OpenAI. <a href="https://platform.openai.com/docs/guides/evals" target="_blank" rel="noopener">Evals framework documentation.</a> <span class="note">Real-world example of a test-set-based evaluation system built for production LLMs.</span></li>
-  </ul>
-</div>
-
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
 </footer>
 
 <script>
-// ============ EVALUATION DEMO ============
-const cards = document.querySelectorAll('.answer-card');
-const scoreFill = document.getElementById('scoreFill');
-const scoreNum = document.getElementById('scoreNum');
-const scoreTrack = document.getElementById('scoreTrack');
-const evalStatus = document.getElementById('evalStatus');
-const runAllBtn = document.getElementById('runAllBtn');
-const resetEvalBtn = document.getElementById('resetEvalBtn');
+// flow legend: scroll + glow on card click, one-time load sweep, card-door click guard
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var stages = ['card-define','card-check','card-keep'];
+  var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
 
-const whySpans = [
-  document.getElementById('why0'),
-  document.getElementById('why1'),
-  document.getElementById('why2'),
-  document.getElementById('why3'),
-];
-
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-let passed = 0;
-let checked = 0;
-
-function updateScore() {
-  const total = cards.length;
-  const pct = (passed / total) * 100;
-  scoreFill.style.width = pct + '%';
-  scoreNum.textContent = passed + ' / ' + total;
-  scoreTrack.setAttribute('aria-valuenow', passed);
-
-  // color the fill: green when all pass, red-ish when fails accumulate
-  if (passed === total) {
-    scoreFill.style.background = 'var(--success)';
-  } else if (passed === 0 && checked > 0) {
-    scoreFill.style.background = 'var(--error)';
-  } else {
-    scoreFill.style.background = 'var(--accent)';
+  function pillFor(cardId){
+    for(var i=0;i<pills.length;i++){ if(pills[i].getAttribute('data-target')===cardId) return pills[i]; }
+    return null;
   }
 
-  if (checked === total) {
-    const failCount = total - passed;
-    if (failCount === 0) {
-      evalStatus.textContent = 'All 4 correct. Perfect score. A real eval set has hundreds of questions.';
-    } else {
-      evalStatus.textContent = failCount + ' of 4 caught wrong. That’s why you test before you ship.';
-    }
-    evalStatus.classList.add('done');
-  } else {
-    evalStatus.textContent = checked + ' / ' + total + ' checked';
-    evalStatus.classList.remove('done');
-  }
-}
-
-function revealCard(card, i, animate) {
-  if (card.classList.contains('checked')) return;
-  const verdict = card.dataset.verdict;
-  const why = card.dataset.why;
-
-  card.classList.add('checked', verdict);
-  whySpans[i].textContent = why;
-
-  // hide the tap hint
-  const hint = card.querySelector('.tap-hint');
-  if (hint) hint.style.display = 'none';
-
-  checked++;
-  if (verdict === 'pass') passed++;
-  updateScore();
-}
-
-// tap to check individual cards
-cards.forEach((card, i) => {
-  card.addEventListener('click', () => revealCard(card, i, true));
-  card.setAttribute('role', 'button');
-  card.setAttribute('tabindex', '0');
-  card.setAttribute('aria-label', 'Check answer for question ' + (i + 1));
-  card.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-      e.preventDefault();
-      revealCard(card, i, true);
-    }
+  // nav buttons: smooth-scroll to the stage card + brief glow
+  pills.forEach(function(btn){
+    var target = btn.getAttribute('data-target');
+    var card = document.getElementById(target);
+    btn.addEventListener('click', function(){
+      if(!card) return;
+      card.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+      card.classList.add('glow');
+      window.setTimeout(function(){ card.classList.remove('glow'); }, 1200);
+    });
   });
-});
 
-// run all: reveal cards one by one with a stagger
-runAllBtn.addEventListener('click', async () => {
-  runAllBtn.disabled = true;
-  for (let i = 0; i < cards.length; i++) {
-    revealCard(cards[i], i, true);
-    if (!reduceMotion) await sleep(480);
+  // one-time load sweep: highlight each card in order, lighting the matching pill
+  if(!reduce){
+    var step = 0;
+    function tour(){
+      if(step > 0){
+        var prevCard = document.getElementById(stages[step-1]);
+        var prevPill = pillFor(stages[step-1]);
+        if(prevCard) prevCard.classList.remove('glow');
+        if(prevPill) prevPill.classList.remove('lit');
+      }
+      if(step >= stages.length) return;
+      var curCard = document.getElementById(stages[step]);
+      var curPill = pillFor(stages[step]);
+      if(curCard) curCard.classList.add('glow');
+      if(curPill) curPill.classList.add('lit');
+      step++;
+      window.setTimeout(tour, 900);
+    }
+    window.setTimeout(tour, 350);
   }
-  runAllBtn.disabled = false;
-});
 
-// reset
-resetEvalBtn.addEventListener('click', () => {
-  cards.forEach((card, i) => {
-    card.classList.remove('checked', 'pass', 'fail');
-    whySpans[i].textContent = '';
-    const hint = card.querySelector('.tap-hint');
-    if (hint) hint.style.display = '';
+  // each stage card is a door to the how-it-works page; chip clicks are ignored
+  var doors = {
+    'card-define': 'consideration-evaluation-how-it-works.html',
+    'card-check': 'consideration-evaluation-how-it-works.html',
+    'card-keep': 'consideration-evaluation-how-it-works.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('.chip')) return; // chip clicks never trigger the card door
+      if(e.target.closest('a')) return; // let real links handle their own clicks
+      window.location.href = doorHref;
+    });
   });
-  passed = 0;
-  checked = 0;
-  scoreFill.style.width = '0%';
-  scoreFill.style.background = 'var(--accent)';
-  scoreNum.textContent = '0 / 4';
-  scoreTrack.setAttribute('aria-valuenow', 0);
-  evalStatus.textContent = '0 / 4 checked';
-  evalStatus.classList.remove('done');
-  runAllBtn.disabled = false;
-});
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+})();
 </script>
-
 </body>
 </html>
