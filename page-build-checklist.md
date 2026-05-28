@@ -16,7 +16,7 @@ The standing gate. Every page, and every agent that builds or edits a page, must
 - Cross-page consistency: a recurring element (section title, tradeoff meter, a block, a connector) must look and read IDENTICALLY on every page. Parallel agents drift, so always normalize back to the reference.
 - Logical order: order items the way a person actually does them; a "check / review / verify" step comes last. Do not follow raw taxonomy order if it reads illogically.
 - CSS hardening for stage cards (locked): grid `repeat(N, minmax(0, 1fr))`, `.stage-card { min-width: 0; height: 100%; }`, `.stages { align-items: stretch; }`, chip `white-space: normal; word-break: break-word; max-width: 100%;`. Without this, long chip names break the grid.
-- Stage card shape (locked): small icon + cluster TITLE on its own full-width row + ONE short one-line lead under the title (keep it tight, never two lines; Single-Call's leads are the bar) + the chips + "see how ->" pushed to the bottom.
+- Stage card shape (locked): small icon + cluster TITLE on its own full-width row + ONE short single-clause lead under the title (Single-Call's leads are the bar for tightness; rewrite the lead if it ever wraps to 3+ lines on a card) + the chips + "see how ->" pushed to the bottom.
 
 ## 2. Links never lie
 - Link a thing ONLY if its target page actually exists. Not built yet = not clickable AND must not look clickable (no accent color, no underline, default cursor).

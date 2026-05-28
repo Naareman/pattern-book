@@ -98,7 +98,7 @@
   /* wrapping chip grid: each technique is just its name */
   .chips{display:flex;flex-wrap:wrap;gap:7px}
   /* technique name chips */
-  .chip{flex:none;display:inline-flex;align-items:center;gap:3px;padding:6px 11px;border-radius:20px;font-size:13px;font-weight:500;line-height:1.2;white-space:nowrap}
+  .chip{flex:none;display:inline-flex;align-items:center;gap:3px;padding:6px 11px;border-radius:20px;font-size:13px;font-weight:500;line-height:1.2;white-space:normal;word-break:break-word;max-width:100%}
   /* quiet (non-anchor) chip */
   .chip{border:1px solid var(--border);color:var(--soft);background:transparent;cursor:default}
   /* anchor (link) chip */
@@ -111,11 +111,13 @@
   .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
   .foot strong{color:var(--soft);font-weight:500}
 
+  @media(max-width:720px){
+    .stages{grid-template-columns:1fr;gap:14px}
+  }
   @media(max-width:560px){
     .title{font-size:30px}
     .explainer{font-size:15px}
     .flow-chip{font-size:12px;padding:6px 12px}
-    .stages{grid-template-columns:1fr;gap:14px}
   }
 </style>
 </head>

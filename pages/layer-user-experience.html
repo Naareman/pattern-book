@@ -130,15 +130,14 @@
   h2 em { font-style: italic; color: var(--accent); }
 
   /* ============ STAGE CARDS ============ */
-  .stages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 6px; }
+  .stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 6px; align-items: stretch; }
 
   .stage-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
     scroll-margin-top: 80px;
     transition: box-shadow .55s ease, border-color .55s ease;
-    display: flex; flex-direction: column;
-    min-width: 0;
+    display: flex; flex-direction: column; height: 100%;
   }
   .stage-card.glow {
     box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42);
@@ -158,7 +157,7 @@
   }
 
   /* de-squeezed: icon + name share a full-width row of their own */
-  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; min-width: 0; }
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; }
   .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
   .stage-head .sico svg { width: 18px; height: 18px; display: block; }
   .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
@@ -166,7 +165,7 @@
   .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
   /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
-  .chips { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
   .chip {
     flex: none; display: inline-flex; align-items: center; gap: 3px;
     padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500;

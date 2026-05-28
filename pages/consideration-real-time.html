@@ -6,18 +6,17 @@
 <title>Real-time / Streaming &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
     --border:#E8EAEE; --border-strong:#D5D9E0;
     --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
-    --radius:16px;
-    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.10);
+    --radius:16px; --radius-sm:11px;
     --success:#0E9F6E; --success-soft:#E7F7F0;
-    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
-    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-padding-top: 80px; }
@@ -29,14 +28,31 @@
     -webkit-font-smoothing: antialiased;
   }
   body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
 
-  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
   .skip-link:focus { top: 8px; }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 
-  /* TOP BAR */
+  /* top bar */
   .topbar {
     position: sticky; top: 0; z-index: 200;
     background: rgba(252,252,253,.86);
@@ -44,8 +60,17 @@
     -webkit-backdrop-filter: saturate(180%) blur(10px);
     border-bottom: 1px solid var(--border);
   }
-  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none; padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap; }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
+  }
   .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
   .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .crumb a { color: var(--faint); text-decoration: none; }
@@ -53,232 +78,148 @@
   .crumb .sep { margin: 0 7px; color: var(--border-strong); }
   .crumb .here { color: var(--soft); }
 
-  /* HEADER */
-  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
-  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
   .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
   .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
-  h1.page-title { scroll-margin-top: 80px; font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
   .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
-  /* SECTIONS */
-  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
-  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
-  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
-  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  /* title row + see-it-in-action pill */
+  .title-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:16px 0 0}
+  .title-row .pattern-title{margin:0;flex:1 1 auto;min-width:240px}
+  .how-pill{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--accent);border-radius:22px;padding:8px 15px;box-shadow:var(--shadow);transition:background .15s ease,transform .15s ease}
+  .how-pill:hover{background:#E3DBFD;transform:translateY(-1px)}
+  .how-pill .arr{display:inline-block;transition:transform .18s ease}
+  .how-pill:hover .arr{transform:translateX(3px)}
+  @media (prefers-reduced-motion:reduce){.how-pill,.how-pill .arr{transition:none}.how-pill:hover,.how-pill:hover .arr{transform:none}}
+  @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
+
+  /* flow legend (stage pills + arrows) */
+  .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
+  .flow-chip {
+    font-family: inherit; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; box-shadow: var(--shadow); padding: 7px 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--soft); white-space: nowrap;
+    letter-spacing: .01em; cursor: pointer;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .flow-chip:hover { color: var(--accent-hover); border-color: var(--border-strong); }
+  .flow-chip.lit { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); }
+  .flow-arrow { flex: none; color: var(--accent); font-size: 15px; line-height: 1; }
+  .flow-caption { text-align: center; color: var(--faint); font-size: 13px; line-height: 1.5; margin-top: 12px; }
+
+  /* sections */
+  section {
+    max-width: 920px; margin: 0 auto;
+    padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px;
+  }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
+    line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
+  }
   h2 em { font-style: italic; color: var(--accent); }
 
-  /* SCOPE BANNER */
-  .scope-banner {
-    background: var(--accent-soft);
-    border: 1.5px solid var(--accent);
-    border-radius: var(--radius-sm);
-    padding: 16px 20px;
-    margin-bottom: 20px;
+  /* ============ STAGE CARDS ============ */
+  .stages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 6px; align-items: stretch; }
+
+  .stage-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
+    scroll-margin-top: 80px;
+    transition: box-shadow .55s ease, border-color .55s ease;
+    display: flex; flex-direction: column;
+    min-width: 0; height: 100%;
   }
-  .scope-banner .scope-tag {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .07em;
-    text-transform: uppercase;
-    color: var(--accent-hover);
-    margin-bottom: 8px;
+  .stage-card.glow {
+    box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42);
+    border-color: var(--accent);
   }
-  .scope-banner .scope-line {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.5;
-    margin-bottom: 8px;
+  @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
+
+  .stage-card.clickable {
+    cursor: pointer;
+    transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
   }
-  .scope-banner .scope-axis {
-    font-size: 14px;
-    color: var(--soft);
-    line-height: 1.55;
-    font-style: italic;
+  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
+  @media (prefers-reduced-motion: reduce) {
+    .stage-card.clickable { transition: none; }
+    .stage-card.clickable:hover { transform: none; }
   }
 
-  /* 01 IDEA CARD */
-  .idea-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
-  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
-  .idea-card p + p { margin-top: 14px; }
+  /* de-squeezed: icon + name share a full-width row of their own */
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; min-width: 0; }
+  .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
+  .stage-head .sico svg { width: 18px; height: 18px; display: block; }
+  .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
 
-  /* 02 DEMO */
-  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
-  .demo-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* mode toggle */
-  .mode-toggle { display: flex; gap: 0; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; padding: 3px; margin-bottom: 20px; width: fit-content; }
-  .mode-btn { padding: 7px 16px; border-radius: 8px; border: none; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: var(--soft); background: transparent; cursor: pointer; transition: background .2s ease, color .2s ease, box-shadow .2s ease; white-space: nowrap; }
-  .mode-btn.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); font-weight: 600; }
-
-  /* the chat bubble */
-  .chat-pane { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-subtle); padding: 16px; min-height: 120px; position: relative; }
-  .chat-label { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--faint); margin-bottom: 10px; }
-  .chat-bubble { background: var(--surface); border: 1px solid var(--border); border-radius: 12px 12px 12px 4px; padding: 14px 16px; max-width: 88%; position: relative; }
-  .chat-text { font-size: 15px; line-height: 1.7; color: var(--text); min-height: 22px; word-break: break-word; }
-  .chat-cursor { display: inline-block; width: 2px; height: 1.1em; background: var(--accent); border-radius: 1px; vertical-align: text-bottom; margin-left: 2px; animation: blink 1s step-end infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-  .chat-cursor.hidden { display: none; }
-
-  /* idle prompt (shown before Play is ever pressed, and after Reset) */
-  .idle-prompt { position: absolute; inset: 0; border-radius: var(--radius-sm); background: var(--bg-subtle); display: flex; align-items: center; justify-content: center; }
-  .idle-prompt.hidden { display: none; }
-  .idle-prompt-text { font-size: 14px; font-weight: 500; color: var(--faint); }
-
-  /* wait overlay (shown only while running) */
-  .wait-overlay { position: absolute; inset: 0; border-radius: var(--radius-sm); background: var(--bg-subtle); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
-  .wait-overlay.hidden { display: none; }
-  .wait-spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .wait-label { font-size: 13px; font-weight: 500; color: var(--soft); }
-  .wait-timer { font-size: 22px; font-weight: 600; font-family: 'Fraunces', serif; color: var(--text); letter-spacing: -0.02em; }
-
-  /* TTFT badge */
-  .ttft-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; padding: 6px 12px; background: var(--success-soft); border: 1px solid var(--success); border-radius: 20px; font-size: 13px; font-weight: 600; color: var(--success); opacity: 0; transition: opacity .3s ease; }
-  .ttft-badge.shown { opacity: 1; }
-  .ttft-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
-
-  /* progress bar at bottom of chat pane */
-  .gen-bar-wrap { margin-top: 12px; }
-  .gen-bar-label { font-size: 12px; color: var(--faint); margin-bottom: 5px; display: flex; justify-content: space-between; }
-  .gen-bar-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
-  .gen-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; width: 0%; transition: width 0.18s linear; }
-  .gen-bar-wrap.hidden { display: none; }
-
-  /* feel meter */
-  .feel-row { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
-  .feel-label { font-size: 13px; color: var(--soft); min-width: 72px; }
-  .feel-pips { display: flex; gap: 5px; }
-  .pip { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-subtle); transition: background .25s ease, border-color .25s ease; }
-  .pip.on { background: var(--accent); border-color: var(--accent); }
-  .pip.half { background: #A892F2; border-color: #A892F2; }
-  .feel-desc { font-size: 13px; color: var(--soft); }
-
-  /* controls */
-  .demo-controls { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border); }
-  .diagram-btn { padding: 10px 16px; border: 1px solid var(--border-strong); background: var(--surface); border-radius: var(--radius-sm); cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease; }
-  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
-  .diagram-btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
-  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-  .demo-status { font-size: 13px; color: var(--faint); align-self: center; }
-
-  /* 03 WHEN IT MATTERS */
-  .examples-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
-  .example-row { display: flex; gap: 14px; align-items: flex-start; padding: 13px 0; border-bottom: 1px solid var(--border); }
-  .example-row:last-child { border-bottom: none; padding-bottom: 0; }
-  .example-row:first-child { padding-top: 0; }
-  .ex-icon { flex: none; width: 34px; height: 34px; border-radius: 9px; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; }
-  .ex-icon svg { width: 17px; height: 17px; color: var(--accent); }
-  .ex-body { flex: 1; }
-  .ex-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
-  .ex-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
-  .ex-tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border-radius: 20px; padding: 2px 8px; margin-top: 6px; }
-
-  /* 04 TRADEOFFS */
-  .tradeoffs-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
-  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
-  .tradeoff-row:last-of-type { margin-bottom: 0; }
-  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
-  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
-  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
-  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
-  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
-  .tradeoff-scale .spacer { width: 170px; flex: none; }
-  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
-  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
-
-  /* WHAT THIS COVERS: guide-card style */
-  .guide {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-  }
-  .covers-note {
-    padding: 16px 22px;
-    font-size: 14px;
-    font-style: italic;
-    color: var(--soft);
-    line-height: 1.55;
-    border-bottom: 1px solid var(--border);
-  }
-  .covers-note strong { color: var(--text); font-style: normal; }
-  /* cluster labels */
-  .cluster-head { padding: 16px 22px 8px; }
-  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
-  .cluster-label {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .07em;
-    color: var(--text);
-    line-height: 1.3;
-  }
-  /* discipline rows: name on its own line, description below, indented under the cluster label */
-  .guide-row {
-    display: flex; flex-direction: column; gap: 3px;
-    padding: 13px 22px 13px 40px;
-    border-top: 1px solid var(--border);
-  }
-  .cluster-head + .guide-row { border-top: none; }
-  .disc-name {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 15px;
-    color: var(--text);
-    line-height: 1.3;
-  }
-  .disc-desc {
-    font-size: 14px;
-    color: var(--soft);
-    line-height: 1.55;
-  }
-  .covers-map-note {
-    padding: 14px 22px 16px;
-    border-top: 1px solid var(--border);
-    font-size: 13px;
-    color: var(--faint);
-    line-height: 1.55;
+  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; }
+  .chip {
+    flex: none; display: inline-flex; align-items: center; gap: 3px;
+    padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
+    border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
 
-  /* BACK LINK */
-  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; cursor: pointer; }
+  /* "see how" lives at the bottom of each card, pushed down by margin-top:auto */
+  .see-how {
+    display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--accent-hover);
+    transition: color .15s ease;
+  }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion: reduce) {
+    .see-how, .see-how .arr { transition: none; }
+    .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; }
+  }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; cursor: pointer;
+  }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
-  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s; }
   .back-link:hover .back-arrow { transform: translateX(-3px); }
   .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
   .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
 
-  /* SOURCES */
-  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
-  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
-  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
-  .sources li em { font-style: italic; color: var(--text); }
-  .sources li .note { color: var(--faint); }
-  .sources li a { color: var(--accent-hover); border-bottom: 1px solid var(--accent-soft); text-decoration: none; }
-  .sources li a:hover { border-bottom-color: var(--accent); }
-
-  /* FOOTER */
-  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  /* footer */
+  footer {
+    max-width: 920px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
   footer strong { color: var(--soft); font-weight: 500; }
 
+  /* responsive */
+  @media (max-width: 720px) {
+    .stages { grid-template-columns: 1fr; gap: 14px; }
+  }
   @media (max-width: 560px) {
-    h1.page-title { font-size: 30px; }
+    h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
-    .tradeoff-label { min-width: 0; }
-    .demo-controls { flex-direction: column; align-items: stretch; }
-    .diagram-btn { flex: 1; }
-  }
-  @media (max-width: 480px) {
-    .tradeoff-row { flex-direction: column; align-items: stretch; }
-    .tradeoff-label { min-width: 0; }
+    .flow-chip { font-size: 12px; padding: 6px 12px; }
   }
 </style>
 </head>
@@ -304,240 +245,84 @@
       </svg>
     </span>Consideration &middot; Real-time / Streaming
   </span>
-  <h1 class="page-title">Real-time / Streaming</h1>
-  <p class="explainer">The disciplines for building systems where the gap before the first word matters far more than total generation time.</p>
+  <div class="title-row"><h1 class="pattern-title">Real-time / Streaming</h1><a class="how-pill" href="consideration-real-time-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
+  <p class="explainer">Making the wait before the first word disappear, when the whole point is that the user is watching.</p>
+
+  <div class="flow" aria-label="Jump to a part of real-time and streaming">
+    <button type="button" class="flow-chip" data-target="card-first">Get the first word out fast</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-flow">Keep the words flowing</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-cut">Handle interruptions</button>
+  </div>
+  <p class="flow-caption">Three jobs that turn a wait into a conversation.</p>
 </header>
 
-<!-- CONDITIONAL SCOPE -->
-<section style="padding-bottom: 8px;">
-  <div class="scope-banner">
-    <div class="scope-tag">Conditional Scope</div>
-    <div class="scope-line">Applies to: only systems with sub-second, word-by-word output (streaming chat, voice, live transcription). Systems that wait for the full answer can skip it.</div>
-    <div class="scope-axis">Here, the wait before the first word, and a steady flow of output, matter more than the total time.</div>
-  </div>
-</section>
-
-<!-- 01 THE IDEA -->
+<!-- STAGE CARDS -->
 <section>
-  <div class="section-label"><span class="num">01</span>The Idea</div>
-  <h2>What does <em>real-time</em> mean?</h2>
-  <div class="idea-card">
-    <p>A token (a token is a small piece the AI works in: roughly a word, or a slice of an image or sound) is the basic unit of generation. When you send a prompt (the text you send the AI), it generates every token before sending a response. The wait from "I sent the message" to "I saw the first word" is called TTFT (time to first word). It is the number that determines whether an AI feels instant or sluggish.</p>
-    <p>One technique changes everything: streaming, which sends each token as it is generated instead of waiting for the full answer. The total time is the same. The felt wait drops to almost nothing. This page is a discipline for reasoning about all the decisions that change once you commit to streaming output.</p>
+  <div class="stages">
+
+    <!-- GET THE FIRST WORD OUT FAST -->
+    <section class="stage-card clickable" id="card-first" aria-labelledby="g-first">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </span>
+        <h2 id="g-first"><span class="stage-name">Get the first word out fast</span></h2>
+      </div>
+      <p class="stage-lead">The wait before anything appears is the wait people remember.</p>
+      <div class="chips">
+        <span class="chip">Time to first word</span>
+        <span class="chip">Streaming as a strategy</span>
+      </div>
+      <a class="see-how" href="consideration-real-time-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
+
+    <!-- KEEP THE WORDS FLOWING -->
+    <section class="stage-card clickable" id="card-flow" aria-labelledby="g-flow">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12h4l3-8 4 16 3-8h4"/>
+          </svg>
+        </span>
+        <h2 id="g-flow"><span class="stage-name">Keep the words flowing</span></h2>
+      </div>
+      <p class="stage-lead">Once words are coming out, check them and stop cleanly if something is wrong.</p>
+      <div class="chips">
+        <span class="chip">Checking quality as it streams</span>
+        <span class="chip">Catching harm mid-stream</span>
+        <span class="chip">Checking partial answers</span>
+        <span class="chip">Stopping cleanly mid-stream</span>
+        <span class="chip">Charging for partial answers</span>
+      </div>
+      <a class="see-how" href="consideration-real-time-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
+
+    <!-- HANDLE INTERRUPTIONS -->
+    <section class="stage-card clickable" id="card-cut" aria-labelledby="g-cut">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 18v3"/><line x1="4" y1="20" x2="20" y2="4"/>
+          </svg>
+        </span>
+        <h2 id="g-cut"><span class="stage-name">Handle interruptions</span></h2>
+      </div>
+      <p class="stage-lead">In voice, the user will cut in. The system has to stop talking and listen.</p>
+      <div class="chips">
+        <span class="chip">Voice turn-taking</span>
+        <span class="chip">Interrupting mid-answer</span>
+      </div>
+      <a class="see-how" href="consideration-real-time-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
+
   </div>
 </section>
 
-<!-- 02 SEE IT WORK -->
-<section>
-  <div class="section-label"><span class="num">02</span>See It Work</div>
-  <h2>Wait vs. <em>stream</em>.</h2>
-  <p class="demo-lede">The same answer, at the same speed. Toggle the mode and press Play to feel the difference.</p>
-
-  <div class="demo-stage">
-    <!-- mode selector -->
-    <div class="mode-toggle" role="group" aria-label="Response mode">
-      <button class="mode-btn active" id="btnWait" aria-pressed="true">Wait for the full answer</button>
-      <button class="mode-btn" id="btnStream" aria-pressed="false">Stream word by word</button>
-    </div>
-
-    <!-- the simulated chat pane -->
-    <div class="chat-pane" id="chatPane" aria-live="polite" aria-atomic="false" aria-busy="false">
-      <div class="chat-label">AI Response</div>
-
-      <!-- idle state: shown before Play is pressed and after Reset -->
-      <div class="idle-prompt" id="idlePrompt" aria-hidden="true">
-        <span class="idle-prompt-text">Press Play to start</span>
-      </div>
-
-      <!-- spinner shown only while running -->
-      <div class="wait-overlay hidden" id="waitOverlay">
-        <div class="wait-spinner" aria-hidden="true"></div>
-        <div class="wait-timer" id="waitTimer">0.0s</div>
-        <div class="wait-label">generating, please wait&hellip;</div>
-      </div>
-
-      <!-- the actual bubble, hidden until first token arrives -->
-      <div class="chat-bubble" id="chatBubble" style="display:none;">
-        <div class="chat-text" id="chatText"></div>
-        <span class="chat-cursor hidden" id="chatCursor" aria-hidden="true"></span>
-      </div>
-    </div>
-
-    <!-- TTFT badge, appears the moment first token lands in stream mode -->
-    <div class="ttft-badge" id="ttftBadge" aria-live="polite">
-      <span class="dot" aria-hidden="true"></span>
-      <span id="ttftText">First word in 0.0s</span>
-    </div>
-
-    <!-- progress bar, shown during generation -->
-    <div class="gen-bar-wrap hidden" id="genBarWrap">
-      <div class="gen-bar-label"><span>Generating</span><span id="genPct">0%</span></div>
-      <div class="gen-bar-track"><div class="gen-bar-fill" id="genBarFill"></div></div>
-    </div>
-
-    <!-- perceived feel meter -->
-    <div class="feel-row">
-      <div class="feel-label">Feels like</div>
-      <div class="feel-pips" aria-hidden="true">
-        <div class="pip" id="pip0"></div>
-        <div class="pip" id="pip1"></div>
-        <div class="pip" id="pip2"></div>
-        <div class="pip" id="pip3"></div>
-        <div class="pip" id="pip4"></div>
-      </div>
-      <div class="feel-desc" id="feelDesc">press Play to start</div>
-    </div>
-
-    <div class="demo-controls">
-      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
-      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
-      <span class="demo-status" id="demoStatus"></span>
-    </div>
-  </div>
-</section>
-
-<!-- 03 WHAT THIS COVERS -->
-<section>
-  <div class="section-label"><span class="num">03</span>What This Covers</div>
-  <h2>The <em>disciplines</em> inside Real-time / Streaming.</h2>
-  <div class="guide" role="region" aria-label="Disciplines in Real-time and Streaming">
-
-    <div class="covers-note">
-      <strong>This is a discipline, not a mechanism.</strong> The part that makes words appear progressively on screen lives in the User Surface layer. This page owns the thinking frameworks that apply once you commit to streaming.
-    </div>
-
-    <!-- CLUSTER 1 -->
-    <div class="cluster-head">
-      <h3 class="cluster-label">Streaming the output</h3>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Streaming Output Discipline</span>
-      <span class="disc-desc">Decide when streaming is worth the effort and when waiting for the full answer is fine.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Time-to-First-Word Frameworks</span>
-      <span class="disc-desc">Measure the wait before the first word, and set a target for each product (voice is tighter than chat).</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Continuous Context for Voice</span>
-      <span class="disc-desc">Handle taking turns and interruptions, so the conversation stays coherent when the user cuts in.</span>
-    </div>
-
-    <!-- CLUSTER 2 -->
-    <div class="cluster-head cluster-break">
-      <h3 class="cluster-label">Doing it safely and cheaply</h3>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Streaming Eval</span>
-      <span class="disc-desc">Check answer quality as it streams, not only once the full response is done.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Streaming Safety</span>
-      <span class="disc-desc">Catch harmful content in a partial answer, and stop the stream cleanly when needed.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Streaming Validation</span>
-      <span class="disc-desc">Check structured output as it arrives, since a half-finished answer can look broken mid-stream.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Backpressure and Cancellation</span>
-      <span class="disc-desc">Pause or stop a stream when the user leaves or cannot keep up, instead of wasting work.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Streaming Cost Attribution</span>
-      <span class="disc-desc">Charge fairly for a stream that was cut short, since partial answers still cost real work.</span>
-    </div>
-
-    <div class="covers-map-note">All of these are disciplines for reasoning and deciding. The parts they rely on each have a home in the layers.</div>
-  </div>
-</section>
-
-<!-- 04 WHEN IT MATTERS -->
-<section>
-  <div class="section-label"><span class="num">04</span>A Real Example</div>
-  <h2>Where <em>every millisecond</em> counts.</h2>
-  <div class="examples-stage">
-    <div class="example-row">
-      <div class="ex-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 1 3 3v4a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10a7 7 0 0 1-14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-      </div>
-      <div class="ex-body">
-        <div class="ex-title">Voice Assistants</div>
-        <div class="ex-desc">People expect a spoken reply to start within about 500ms. A two-second pause breaks the illusion of conversation entirely. Streaming audio lets the AI speak the first sentence while still generating the rest. Barge-in handling (the user speaking while the AI is mid-sentence) must interrupt generation cleanly.</div>
-        <span class="ex-tag">TTFT Critical</span>
-      </div>
-    </div>
-    <div class="example-row">
-      <div class="ex-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8L2 7h20l-6-4z"/></svg>
-      </div>
-      <div class="ex-body">
-        <div class="ex-title">AI Code Editors (Autocomplete)</div>
-        <div class="ex-desc">Suggestions that arrive in under 100ms feel like the editor is reading your mind. Suggestions that arrive after a second feel like an interruption. Speed here is the product. Streaming validation is critical because partial code suggestions must still parse.</div>
-        <span class="ex-tag">Sub-100ms Target</span>
-      </div>
-    </div>
-    <div class="example-row">
-      <div class="ex-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h7"/><path d="M15 16l2 2 4-4"/></svg>
-      </div>
-      <div class="ex-body">
-        <div class="ex-title">Live Transcription</div>
-        <div class="ex-desc">Captions must appear within one word of the speaker. Latency above 2-3 seconds makes them useless for deaf viewers. Backpressure handling matters here: if the network drops, the system needs to catch up without losing words or doubling them.</div>
-        <span class="ex-tag">Continuous Output</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 05 TRADEOFFS -->
-<section>
-  <div class="section-label"><span class="num">05</span>Tradeoffs</div>
-  <h2>The <em>price</em> you pay.</h2>
-  <div class="tradeoffs-stage">
-    <div class="tradeoff-scale">
-      <span class="spacer"></span>
-      <div class="scale-track"><span>Low</span><span>High</span></div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Infrastructure cost</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Complexity added</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Safety difficulty</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Answer quality</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-quote">
-      Faster hardware and more replicas cost real money. Streaming requires clients to handle partial responses, cancellation signals, and mid-stream errors. Safety filters that rely on reading the complete response must be redesigned. The one thing streaming does not cost: answer quality. The model generates the same tokens either way. Speed and correctness are separate knobs.
-    </div>
-  </div>
-</section>
-
-<!-- BACK NAV -->
+<!-- BACK LINK -->
 <section style="padding-top: 20px; padding-bottom: 40px;">
   <a href="considerations.html" class="back-link">
     <div class="back-arrow">&larr;</div>
@@ -548,251 +333,72 @@
   </a>
 </section>
 
-<!-- SOURCES -->
-<div class="sources">
-  <div class="sources-title">Sources</div>
-  <ul>
-    <li>Anthropic. <em>Streaming Messages.</em> <span class="note"><a href="https://docs.anthropic.com/en/api/messages-streaming" target="_blank" rel="noopener">docs.anthropic.com</a>. Official streaming API reference.</span></li>
-    <li>Google. <em>Streaming responses in the Gemini API.</em> <span class="note"><a href="https://ai.google.dev/gemini-api/docs/text-generation#streaming" target="_blank" rel="noopener">ai.google.dev</a>. Explains why TTFT matters for perceived performance.</span></li>
-    <li>Nielsen Norman Group. <em>Response Times: The 3 Important Limits.</em> <span class="note"><a href="https://www.nngroup.com/articles/response-times-3-important-limits/" target="_blank" rel="noopener">nngroup.com</a>. 0.1s feels instant, 1s loses flow, 10s loses attention.</span></li>
-    <li>Sardana et al. (2024). <em>Beyond Throughput: Time-to-First-Token in LLM Serving.</em> <span class="note">MLSys workshop paper analysing TTFT as the primary user-perceived latency metric.</span></li>
-  </ul>
-</div>
-
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
 </footer>
 
 <script>
-// ============================================================
-// DEMO: Wait vs. Stream
-// Same 28-word answer, same simulated generation speed.
-// In Wait mode: spinner until all tokens ready, then full text appears.
-// In Stream mode: first token shows at TTFT_MS, rest trickles in word by word.
-// ============================================================
+// flow legend: scroll + glow on card click, one-time load sweep, card-door click guard
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var stages = ['card-first','card-flow','card-cut'];
+  var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
 
-const ANSWER_WORDS = [
-  'The', 'Nile', 'is', 'the', 'longest', 'river', 'in', 'the', 'world,',
-  'stretching', 'about', '6,650', 'kilometres', 'through', 'northeastern',
-  'Africa,', 'flowing', 'north', 'from', 'its', 'source', 'in', 'Burundi',
-  'to', 'the', 'Mediterranean', 'Sea.'
-];
-const QUESTION_TEXT = "What is the longest river in the world?";
+  function pillFor(cardId){
+    for(var i=0;i<pills.length;i++){ if(pills[i].getAttribute('data-target')===cardId) return pills[i]; }
+    return null;
+  }
 
-// Simulated timings (ms)
-const TTFT_MS = 800;          // time before first token appears in stream mode
-const WORD_INTERVAL_MS = 130; // ms between each word in stream mode
-const TOTAL_GEN_MS = TTFT_MS + ANSWER_WORDS.length * WORD_INTERVAL_MS; // same total in both modes
-
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-// State
-let mode = 'wait'; // 'wait' | 'stream'
-let running = false;
-let timers = [];
-
-// Elements
-const btnWait   = document.getElementById('btnWait');
-const btnStream = document.getElementById('btnStream');
-const chatPane  = document.getElementById('chatPane');
-const idlePrompt  = document.getElementById('idlePrompt');
-const waitOverlay = document.getElementById('waitOverlay');
-const waitTimer   = document.getElementById('waitTimer');
-const chatBubble  = document.getElementById('chatBubble');
-const chatText    = document.getElementById('chatText');
-const chatCursor  = document.getElementById('chatCursor');
-const ttftBadge   = document.getElementById('ttftBadge');
-const ttftText    = document.getElementById('ttftText');
-const genBarWrap  = document.getElementById('genBarWrap');
-const genBarFill  = document.getElementById('genBarFill');
-const genPct      = document.getElementById('genPct');
-const feelDesc    = document.getElementById('feelDesc');
-const playBtn     = document.getElementById('playBtn');
-const resetBtn    = document.getElementById('resetBtn');
-const demoStatus  = document.getElementById('demoStatus');
-const pips        = [0,1,2,3,4].map(i => document.getElementById('pip' + i));
-
-function setMode(m) {
-  if (running) return;
-  mode = m;
-  btnWait.classList.toggle('active', m === 'wait');
-  btnStream.classList.toggle('active', m === 'stream');
-  btnWait.setAttribute('aria-pressed', m === 'wait');
-  btnStream.setAttribute('aria-pressed', m === 'stream');
-  doReset();
-}
-btnWait.addEventListener('click', () => setMode('wait'));
-btnStream.addEventListener('click', () => setMode('stream'));
-
-function clearTimers() { timers.forEach(clearTimeout); timers = []; }
-
-function doReset() {
-  clearTimers();
-  running = false;
-  // idle prompt: visible; wait overlay: hidden
-  idlePrompt.classList.remove('hidden');
-  waitOverlay.classList.add('hidden');
-  waitTimer.textContent = '0.0s';
-  // a11y: not busy
-  chatPane.setAttribute('aria-busy', 'false');
-  // bubble
-  chatBubble.style.display = 'none';
-  chatText.textContent = '';
-  chatCursor.classList.add('hidden');
-  // ttft badge
-  ttftBadge.classList.remove('shown');
-  // gen bar
-  genBarFill.style.width = '0%';
-  genPct.textContent = '0%';
-  genBarWrap.classList.add('hidden');
-  // feel
-  pips.forEach(p => { p.classList.remove('on', 'half'); });
-  feelDesc.textContent = 'press Play to start';
-  // buttons
-  playBtn.disabled = false;
-  demoStatus.textContent = '';
-}
-
-function setFeel(level) {
-  // level 0 = waiting (all grey), 1-2 = impatient, 3-4 = ok, 5 = instant
-  pips.forEach((p, i) => {
-    p.classList.remove('on', 'half');
-    if (i < level) p.classList.add('on');
+  // nav buttons: smooth-scroll to the stage card + brief glow
+  pills.forEach(function(btn){
+    var target = btn.getAttribute('data-target');
+    var card = document.getElementById(target);
+    btn.addEventListener('click', function(){
+      if(!card) return;
+      card.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+      card.classList.add('glow');
+      window.setTimeout(function(){ card.classList.remove('glow'); }, 1200);
+    });
   });
-  if (level <= 1)      feelDesc.textContent = 'impatient: where is it?';
-  else if (level <= 2) feelDesc.textContent = 'slow: something is happening...';
-  else if (level <= 3) feelDesc.textContent = 'ok: it is coming';
-  else if (level <= 4) feelDesc.textContent = 'good: reading already';
-  else                 feelDesc.textContent = 'instant: feels like talking';
-}
 
-function sleep(ms) { return new Promise(r => { const t = setTimeout(r, ms); timers.push(t); }); }
-
-async function runWait() {
-  // Show spinner + counting clock for the full generation time, then dump all text at once.
-  running = true;
-  playBtn.disabled = true;
-  genBarWrap.classList.remove('hidden');
-  // transition from idle to running
-  idlePrompt.classList.add('hidden');
-  waitOverlay.classList.remove('hidden');
-  chatPane.setAttribute('aria-busy', 'true');
-
-  const start = performance.now();
-  const tick = 80; // ms between clock refreshes
-
-  setFeel(0);
-
-  // update clock + feel meter while waiting
-  let elapsed = 0;
-  while (elapsed < TOTAL_GEN_MS) {
-    if (reduceMotion) break;
-    await sleep(tick);
-    elapsed = performance.now() - start;
-    const secs = Math.min(elapsed / 1000, TOTAL_GEN_MS / 1000);
-    waitTimer.textContent = secs.toFixed(1) + 's';
-    const pct = Math.min(elapsed / TOTAL_GEN_MS, 1);
-    genBarFill.style.width = (pct * 100).toFixed(1) + '%';
-    genPct.textContent = Math.round(pct * 100) + '%';
-    // feel meter climbs grudgingly — never past 2 in wait mode
-    if (pct < 0.4) setFeel(0);
-    else if (pct < 0.8) setFeel(1);
-    else setFeel(2);
-  }
-
-  // all done — hide overlay, show full text
-  waitOverlay.classList.add('hidden');
-  chatBubble.style.display = '';
-  chatText.textContent = ANSWER_WORDS.join(' ');
-  genBarFill.style.width = '100%';
-  genPct.textContent = '100%';
-  demoStatus.textContent = 'Full answer arrived after ' + (TOTAL_GEN_MS / 1000).toFixed(1) + 's';
-  setFeel(3); // meh — it showed up, but you waited
-  chatPane.setAttribute('aria-busy', 'false');
-  running = false;
-  playBtn.disabled = false;
-}
-
-async function runStream() {
-  // Spinner for TTFT_MS, then first word pops in immediately, rest trickle.
-  running = true;
-  playBtn.disabled = true;
-  genBarWrap.classList.remove('hidden');
-  // transition from idle to running
-  idlePrompt.classList.add('hidden');
-  waitOverlay.classList.remove('hidden');
-  chatPane.setAttribute('aria-busy', 'true');
-
-  const start = performance.now();
-  const tick = 80;
-
-  setFeel(0);
-
-  // count up to TTFT
-  let elapsed = 0;
-  while (elapsed < TTFT_MS) {
-    if (reduceMotion) break;
-    await sleep(tick);
-    elapsed = performance.now() - start;
-    const secs = Math.min(elapsed / 1000, TTFT_MS / 1000);
-    waitTimer.textContent = secs.toFixed(1) + 's';
-    const pct = elapsed / TOTAL_GEN_MS;
-    genBarFill.style.width = (pct * 100).toFixed(1) + '%';
-    genPct.textContent = Math.round(pct * 100) + '%';
-    setFeel(1);
-  }
-
-  // first token: hide overlay, show bubble, badge pops
-  waitOverlay.classList.add('hidden');
-  chatBubble.style.display = '';
-  chatText.textContent = '';
-  chatCursor.classList.remove('hidden');
-
-  const ttftSecs = ((performance.now() - start) / 1000).toFixed(1);
-  ttftText.textContent = 'First word in ' + ttftSecs + 's';
-  ttftBadge.classList.add('shown');
-  setFeel(4);
-
-  // stream words
-  for (let i = 0; i < ANSWER_WORDS.length; i++) {
-    if (reduceMotion) {
-      chatText.textContent = ANSWER_WORDS.slice(0, i + 1).join(' ');
-    } else {
-      await sleep(WORD_INTERVAL_MS);
-      chatText.textContent = ANSWER_WORDS.slice(0, i + 1).join(' ');
+  // one-time load sweep: highlight each card in order, lighting the matching pill
+  if(!reduce){
+    var step = 0;
+    function tour(){
+      if(step > 0){
+        var prevCard = document.getElementById(stages[step-1]);
+        var prevPill = pillFor(stages[step-1]);
+        if(prevCard) prevCard.classList.remove('glow');
+        if(prevPill) prevPill.classList.remove('lit');
+      }
+      if(step >= stages.length) return;
+      var curCard = document.getElementById(stages[step]);
+      var curPill = pillFor(stages[step]);
+      if(curCard) curCard.classList.add('glow');
+      if(curPill) curPill.classList.add('lit');
+      step++;
+      window.setTimeout(tour, 900);
     }
-    const pct = (TTFT_MS + (i + 1) * WORD_INTERVAL_MS) / TOTAL_GEN_MS;
-    genBarFill.style.width = (Math.min(pct, 1) * 100).toFixed(1) + '%';
-    genPct.textContent = Math.round(Math.min(pct, 1) * 100) + '%';
-    setFeel(5);
+    window.setTimeout(tour, 350);
   }
 
-  chatCursor.classList.add('hidden');
-  genBarFill.style.width = '100%';
-  genPct.textContent = '100%';
-  demoStatus.textContent = 'Same total time (' + (TOTAL_GEN_MS / 1000).toFixed(1) + 's), felt instant.';
-  chatPane.setAttribute('aria-busy', 'false');
-  running = false;
-  playBtn.disabled = false;
-}
-
-playBtn.addEventListener('click', () => {
-  if (running) return;
-  doReset();
-  // brief delay so reset is visible before play starts
-  const t = setTimeout(() => {
-    if (mode === 'wait') runWait();
-    else runStream();
-  }, reduceMotion ? 0 : 120);
-  timers.push(t);
-});
-
-resetBtn.addEventListener('click', () => {
-  if (!running) doReset();
-});
-
-// initial state
-doReset();
+  // each stage card is a door to the how-it-works page; chip clicks are ignored
+  var doors = {
+    'card-first': 'consideration-real-time-how-it-works.html',
+    'card-flow': 'consideration-real-time-how-it-works.html',
+    'card-cut': 'consideration-real-time-how-it-works.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('.chip')) return; // chip clicks never trigger the card door
+      if(e.target.closest('a')) return; // let real links handle their own clicks
+      window.location.href = doorHref;
+    });
+  });
+})();
 </script>
 </body>
 </html>
