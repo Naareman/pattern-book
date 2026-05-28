@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artifact-Lineage Tracking · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 760px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none; padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 760px; margin: 0 auto; padding: 44px 24px 10px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 600px; margin-top: 14px; }
+
+  section { max-width: 760px; margin: 0 auto; padding: 20px 24px 36px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .prose-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 26px; }
+  .prose-card p { font-size: 16px; line-height: 1.7; color: var(--soft); }
+  .prose-card strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* example: pinned bundle card */
+  .example-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 22px; }
+  .ex-lede { font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 16px; }
+
+  .bundle {
+    border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden;
+  }
+  .bundle-head {
+    padding: 12px 16px; background: var(--accent-soft);
+    border-bottom: 1px solid var(--accent);
+  }
+  .bundle-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-hover); font-weight: 700; }
+  .bundle-name { font-size: 14px; font-weight: 600; color: var(--text); margin-top: 2px; }
+  .bundle-rows { display: flex; flex-direction: column; }
+  .b-row {
+    display: flex; gap: 14px; align-items: center;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background .18s;
+  }
+  .b-row:last-child { border-bottom: none; }
+  .b-row:hover { background: var(--bg-subtle); }
+  .b-row.active { background: var(--accent-soft); }
+  .b-icon {
+    flex-shrink: 0; width: 28px; height: 28px; border-radius: 6px;
+    background: var(--bg-subtle); color: var(--accent-hover);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700;
+    border: 1px solid var(--border-strong);
+  }
+  .b-row.active .b-icon { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .b-body { flex: 1; min-width: 0; }
+  .b-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .b-pin { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--faint); margin-top: 1px; }
+
+  .b-detail {
+    margin-top: 14px; padding: 14px 16px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px; color: var(--soft); line-height: 1.6;
+    min-height: 70px;
+  }
+  .b-detail strong { color: var(--text); font-weight: 600; }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; font-size: 15px; line-height: 1.65; color: var(--soft); }
+  .fits-card strong { color: var(--text); font-weight: 600; }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 16px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 24px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 760px; margin: 0 auto; padding: 0 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 10px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 760px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-data-artifacts.html">Data &amp; Artifact Lifecycle</a><span class="sep">/</span><a href="data-artifacts-deployable.html">The versioned files</a><span class="sep">/</span><span class="here">Artifact-lineage tracking</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Data &amp; Artifact Lifecycle &rsaquo; The versioned files</span>
+  <h1 class="page-title">Artifact-lineage tracking</h1>
+  <p class="explainer">Pin a model, a prompt, an index, and an eval suite together as one named bundle so anyone can rebuild that exact state later.</p>
+</header>
+
+<section aria-labelledby="h-what">
+  <div class="section-label"><span class="num">01</span>The idea</div>
+  <h2 id="h-what">What <em>is it?</em></h2>
+  <div class="prose-card">
+    <p>A production system is never one file: it is a model, a prompt, a search index, and an eval suite all working together. <strong>Artifact-lineage tracking</strong> records which exact version of each was running at any moment, as one bundle with one name. If you ever need to rebuild what the system looked like on a given day, the bundle is the recipe.</p>
+  </div>
+</section>
+
+<section aria-labelledby="h-example">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="h-example">One release, <em>four pins</em>.</h2>
+  <div class="example-stage">
+    <p class="ex-lede">A release tag bundles every artifact together. Tap any row to see what is pinned.</p>
+
+    <div class="bundle">
+      <div class="bundle-head">
+        <div class="bundle-tag">release@2026-05-27</div>
+        <div class="bundle-name">support-bot, production</div>
+      </div>
+      <div class="bundle-rows" id="bRows">
+        <div class="b-row active" data-k="model">
+          <div class="b-icon">M</div>
+          <div class="b-body">
+            <div class="b-name">Model</div>
+            <div class="b-pin">support-bot@v8</div>
+          </div>
+        </div>
+        <div class="b-row" data-k="prompt">
+          <div class="b-icon">P</div>
+          <div class="b-body">
+            <div class="b-name">Prompt</div>
+            <div class="b-pin">prompt@v23</div>
+          </div>
+        </div>
+        <div class="b-row" data-k="index">
+          <div class="b-icon">I</div>
+          <div class="b-body">
+            <div class="b-name">Search index</div>
+            <div class="b-pin">index@v13</div>
+          </div>
+        </div>
+        <div class="b-row" data-k="evals">
+          <div class="b-icon">E</div>
+          <div class="b-body">
+            <div class="b-name">Eval suite</div>
+            <div class="b-pin">eval-suite@v4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="b-detail" id="bDetail" aria-live="polite">
+      <strong>support-bot@v8:</strong> trained on corpus@v3 plus the latest feedback rows. Without pinning the model, a rebuild a year from now would have no idea which trained file was actually live today.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h-fits">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="h-fits">Where it sits in <em>the flow</em>.</h2>
+  <div class="fits-card">
+    Each version page on its own (model, prompt, index, eval suite) saves one artifact. Lineage tracking ties them together as one bundle so the whole system's state at a moment in time has a single name.
+  </div>
+</section>
+
+<section aria-labelledby="h-when">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="h-when">When to <em>care about it</em>.</h2>
+  <ul class="matters-list">
+    <li>An incident review asks: "what exactly was running when this broke?"</li>
+    <li>You need to reproduce a result months later for a customer, an auditor, or a paper.</li>
+    <li>Several teams ship parts of the same system and you need one place that says which versions go together.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 12px; padding-bottom: 44px;">
+  <a href="data-artifacts-deployable.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div>
+      <div class="back-hint">Back to</div>
+      <div class="back-name">The versioned files</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Pineau et al. (2021). <em>Improving Reproducibility in Machine Learning Research.</em> JMLR. <span class="note">The ML reproducibility checklist: every artifact a result depends on must be recorded together.</span></li>
+    <li>Mitchell et al. (2019). <em>Model Cards for Model Reporting.</em> FAT*. <span class="note">A standard format for what to record about each deployed model, including its pinned dependencies.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var copy = {
+    model:  '<strong>support-bot@v8:</strong> trained on corpus@v3 plus the latest feedback rows. Without pinning the model, a rebuild a year from now would have no idea which trained file was actually live today.',
+    prompt: '<strong>prompt@v23:</strong> the system prompt that ships with the model. A different prompt version on the same model gives different answers, so it has to be pinned too.',
+    index:  '<strong>index@v13:</strong> the search index that the bot looks things up in. Built today with the latest documents. If it changes, the same question can pull different passages.',
+    evals:  '<strong>eval-suite@v4:</strong> the test set that scored this release at 0.74. Pinning it means a future re-test is measured by the same ruler that gave that score.'
+  };
+  var rows = document.querySelectorAll('.b-row');
+  var detail = document.getElementById('bDetail');
+  function pick(k) {
+    rows.forEach(function (r) { r.classList.toggle('active', r.getAttribute('data-k') === k); });
+    detail.innerHTML = copy[k];
+  }
+  rows.forEach(function (r) {
+    r.addEventListener('click', function () { pick(r.getAttribute('data-k')); });
+    r.setAttribute('tabindex', '0');
+    r.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(r.getAttribute('data-k')); }
+    });
+  });
+}());
+</script>
+</body>
+</html>

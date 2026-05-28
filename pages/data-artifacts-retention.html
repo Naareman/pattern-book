@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retention and Deletion Policies · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 760px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none; padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 760px; margin: 0 auto; padding: 44px 24px 10px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 600px; margin-top: 14px; }
+
+  section { max-width: 760px; margin: 0 auto; padding: 20px 24px 36px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .prose-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 26px; }
+  .prose-card p { font-size: 16px; line-height: 1.7; color: var(--soft); }
+  .prose-card strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* example: tap a bucket to see its rule */
+  .example-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 22px; }
+  .ex-lede { font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 16px; }
+
+  .bucket-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  }
+  .bucket {
+    padding: 14px 12px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    background: var(--surface); cursor: pointer; text-align: center;
+    font-family: 'Inter', sans-serif; transition: border-color .18s, background .18s, transform .15s;
+  }
+  .bucket:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+  .bucket.active { border-color: var(--accent); background: var(--accent-soft); }
+  .bucket-icon { font-size: 20px; color: var(--accent); margin-bottom: 4px; font-family: 'Fraunces', serif; }
+  .bucket-name { font-size: 13px; font-weight: 600; color: var(--text); }
+
+  .rule-card {
+    margin-top: 14px; padding: 16px 18px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); min-height: 110px;
+  }
+  .rule-keep { font-size: 12px; font-weight: 700; color: var(--accent-hover); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px; }
+  .rule-len {
+    font-family: 'Fraunces', serif; font-size: 22px; color: var(--text); margin-bottom: 8px;
+  }
+  .rule-why { font-size: 13.5px; color: var(--soft); line-height: 1.6; }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; font-size: 15px; line-height: 1.65; color: var(--soft); }
+  .fits-card strong { color: var(--text); font-weight: 600; }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 16px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 24px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 760px; margin: 0 auto; padding: 0 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 10px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 760px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .bucket-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-data-artifacts.html">Data &amp; Artifact Lifecycle</a><span class="sep">/</span><a href="data-artifacts-data.html">The data</a><span class="sep">/</span><span class="here">Retention and deletion policies</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Data &amp; Artifact Lifecycle &rsaquo; The data</span>
+  <h1 class="page-title">Retention and deletion policies</h1>
+  <p class="explainer">Setting rules for how long each kind of data is kept and when it must be deleted.</p>
+</header>
+
+<section aria-labelledby="h-what">
+  <div class="section-label"><span class="num">01</span>The idea</div>
+  <h2 id="h-what">What <em>is it?</em></h2>
+  <div class="prose-card">
+    <p>Data does not get to live forever. <strong>Retention rules</strong> set how long each kind of data is kept, and <strong>deletion rules</strong> say what triggers it being wiped (a date, a user request, a project ending). Writing those rules down once, then enforcing them automatically, is what keeps a system honest, lean, and compliant.</p>
+  </div>
+</section>
+
+<section aria-labelledby="h-example">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="h-example">Three buckets, <em>three rules</em>.</h2>
+  <div class="example-stage">
+    <p class="ex-lede">A support team holds different kinds of data. Tap a bucket to see its retention rule.</p>
+
+    <div class="bucket-grid" role="tablist">
+      <button class="bucket active" data-key="raw" role="tab" aria-selected="true">
+        <div class="bucket-icon" aria-hidden="true">&#9783;</div>
+        <div class="bucket-name">Raw chat logs</div>
+      </button>
+      <button class="bucket" data-key="train" role="tab" aria-selected="false">
+        <div class="bucket-icon" aria-hidden="true">&#9737;</div>
+        <div class="bucket-name">Training set</div>
+      </button>
+      <button class="bucket" data-key="aud" role="tab" aria-selected="false">
+        <div class="bucket-icon" aria-hidden="true">&#9776;</div>
+        <div class="bucket-name">Audit log</div>
+      </button>
+    </div>
+
+    <div class="rule-card" id="ruleCard" aria-live="polite">
+      <div class="rule-keep">Keep for</div>
+      <div class="rule-len" id="ruleLen">30 days</div>
+      <div class="rule-why" id="ruleWhy">Long enough to debug a recent issue, short enough that an old conversation cannot leak years later. After 30 days, an automated job wipes the row.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h-fits">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="h-fits">Where it sits in <em>the flow</em>.</h2>
+  <div class="fits-card">
+    Retention rules apply to every piece of data the system keeps: raw inputs, cleaned sets, model outputs, logs. They run as scheduled jobs in the background, deleting on their own so no one has to remember.
+  </div>
+</section>
+
+<section aria-labelledby="h-when">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="h-when">When to <em>care about it</em>.</h2>
+  <ul class="matters-list">
+    <li>You hold personal data and rules like GDPR give people the right to be forgotten.</li>
+    <li>Storage costs are creeping up because nothing is ever deleted.</li>
+    <li>A breach risk grows with every extra day of old data you do not need.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 12px; padding-bottom: 44px;">
+  <a href="data-artifacts-data.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div>
+      <div class="back-hint">Back to</div>
+      <div class="back-name">The data</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>European Parliament (2016). <em>General Data Protection Regulation (GDPR), Article 17: Right to erasure.</em> <span class="note">The legal basis for many retention and deletion rules in Europe.</span></li>
+    <li>NIST (2020). <em>Special Publication 800-88 Rev. 1: Guidelines for Media Sanitization.</em> <span class="note">The standard reference for how to delete data so it really cannot be recovered.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var copy = {
+    raw:   { len: '30 days',       why: 'Long enough to debug a recent issue, short enough that an old conversation cannot leak years later. After 30 days, an automated job wipes the row.' },
+    train: { len: '2 years',       why: 'Training sets are kept while the model that uses them is live. When a new dataset replaces the old one, the previous version is archived and then deleted on schedule.' },
+    aud:   { len: '7 years',       why: 'Audit logs (who did what, when) must stick around for legal reviews. They are kept long, but with personal fields stripped out so the record stays useful without holding identities.' }
+  };
+  var btns = document.querySelectorAll('.bucket');
+  var len = document.getElementById('ruleLen');
+  var why = document.getElementById('ruleWhy');
+  function pick(key) {
+    btns.forEach(function (b) {
+      var on = b.getAttribute('data-key') === key;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', String(on));
+    });
+    len.textContent = copy[key].len;
+    why.textContent = copy[key].why;
+  }
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () { pick(b.getAttribute('data-key')); });
+    b.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(b.getAttribute('data-key')); }
+    });
+  });
+}());
+</script>
+</body>
+</html>

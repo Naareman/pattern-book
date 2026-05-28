@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback Data Pipelines · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --green:#0E9F6E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 760px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none; padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 760px; margin: 0 auto; padding: 44px 24px 10px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 600px; margin-top: 14px; }
+
+  section { max-width: 760px; margin: 0 auto; padding: 20px 24px 36px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .prose-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 26px; }
+  .prose-card p { font-size: 16px; line-height: 1.7; color: var(--soft); }
+  .prose-card strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* example: 4-step flow with progress */
+  .example-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 22px; }
+  .ex-lede { font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 16px; }
+
+  .flow {
+    display: flex; flex-direction: column; gap: 0;
+    border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden;
+  }
+  .step {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 14px 16px; border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    transition: background .25s ease;
+  }
+  .step:last-child { border-bottom: none; }
+  .step.lit { background: var(--accent-soft); }
+  .step-num {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--bg-subtle); color: var(--faint);
+    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .25s ease, color .25s ease;
+  }
+  .step.lit .step-num { background: var(--accent); color: #fff; }
+  .step-body { flex: 1; min-width: 0; }
+  .step-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .step-note { font-size: 13px; color: var(--soft); line-height: 1.5; }
+
+  .ex-controls { display: flex; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+  .play-btn {
+    padding: 9px 18px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong); background: var(--surface);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: border-color .18s, color .18s, background .18s, transform .15s;
+  }
+  .play-btn:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); transform: translateY(-1px); }
+  .play-btn.done { border-color: var(--green); color: var(--green); background: #E7F7F0; }
+  .ex-state { font-size: 13px; color: var(--soft); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; font-size: 15px; line-height: 1.65; color: var(--soft); }
+  .fits-card strong { color: var(--text); font-weight: 600; }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 16px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 24px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 760px; margin: 0 auto; padding: 0 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 10px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 760px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-data-artifacts.html">Data &amp; Artifact Lifecycle</a><span class="sep">/</span><a href="data-artifacts-data.html">The data</a><span class="sep">/</span><span class="here">Feedback data pipelines</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Data &amp; Artifact Lifecycle &rsaquo; The data</span>
+  <h1 class="page-title">Feedback data pipelines</h1>
+  <p class="explainer">Catching the thumbs-up, thumbs-down, and edits users leave behind, and turning them into clean examples the system can learn from.</p>
+</header>
+
+<section aria-labelledby="h-what">
+  <div class="section-label"><span class="num">01</span>The idea</div>
+  <h2 id="h-what">What <em>is it?</em></h2>
+  <div class="prose-card">
+    <p>Every day, users tell the system what worked: they thumb up an answer, edit a draft, ignore a bad suggestion. <strong>Feedback pipelines</strong> are the plumbing that catches those signals, cleans them, joins them to the original request, and writes them back as new training or evaluation examples. Without this plumbing, every user lesson is lost.</p>
+  </div>
+</section>
+
+<section aria-labelledby="h-example">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="h-example">A thumbs-down becomes <em>a training row</em>.</h2>
+  <div class="example-stage">
+    <p class="ex-lede">A user rates an answer. Tap play to follow the signal through the pipeline.</p>
+
+    <div class="flow" id="flow">
+      <div class="step" data-i="0">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Capture</div>
+          <div class="step-note">User taps a thumbs-down on the bot reply. The click is logged with the request and reply IDs.</div>
+        </div>
+      </div>
+      <div class="step" data-i="1">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Join</div>
+          <div class="step-note">The signal is matched to the full conversation: the question, the bot reply, the model version that produced it.</div>
+        </div>
+      </div>
+      <div class="step" data-i="2">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Clean</div>
+          <div class="step-note">Personal details are stripped. Spam and accidental taps are filtered out so they do not poison the dataset.</div>
+        </div>
+      </div>
+      <div class="step" data-i="3">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Store</div>
+          <div class="step-note">A row is written to the feedback dataset, ready for the next training run or evaluation review.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ex-controls">
+      <button class="play-btn" id="playBtn">Play the flow</button>
+      <span class="ex-state" id="state" aria-live="polite">Ready.</span>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h-fits">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="h-fits">Where it sits in <em>the flow</em>.</h2>
+  <div class="fits-card">
+    A feedback pipeline runs on its own schedule, listening to live traffic. Its output is just another dataset, which then gets cleaned, labeled, and used for training or evaluation like any other data source.
+  </div>
+</section>
+
+<section aria-labelledby="h-when">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="h-when">When to <em>care about it</em>.</h2>
+  <ul class="matters-list">
+    <li>You have real users on a live product and want the system to get better from how they use it.</li>
+    <li>The cheapest, freshest training signal is sitting in your own logs and you are not catching it.</li>
+    <li>Quality reviewers need a steady stream of real failures to study, not made-up cases.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 12px; padding-bottom: 44px;">
+  <a href="data-artifacts-data.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div>
+      <div class="back-hint">Back to</div>
+      <div class="back-name">The data</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Ouyang et al. (2022). <em>Training language models to follow instructions with human feedback.</em> NeurIPS. <span class="note">The widely-cited write-up of how user-style preference data is captured and used for training.</span></li>
+    <li>Joachims (2002). <em>Optimizing Search Engines using Clickthrough Data.</em> KDD. <span class="note">A classic on turning real user signals into training data without manual labels.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var steps = document.querySelectorAll('.step');
+  var btn = document.getElementById('playBtn');
+  var state = document.getElementById('state');
+  var labels = ['Captured.', 'Joined to conversation.', 'Cleaned.', 'Written to dataset.'];
+  var playing = false;
+
+  function play() {
+    if (playing) return;
+    playing = true;
+    steps.forEach(function (s) { s.classList.remove('lit'); });
+    state.textContent = 'Running...';
+    btn.disabled = true;
+    steps.forEach(function (s, i) {
+      setTimeout(function () {
+        s.classList.add('lit');
+        state.textContent = labels[i];
+        if (i === steps.length - 1) {
+          setTimeout(function () {
+            btn.textContent = 'Replay';
+            btn.classList.add('done');
+            btn.disabled = false;
+            playing = false;
+          }, 400);
+        }
+      }, 350 + i * 700);
+    });
+  }
+  btn.addEventListener('click', play);
+  btn.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); play(); }
+  });
+}());
+</script>
+</body>
+</html>

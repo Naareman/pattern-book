@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rollback and Roll-Forward · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --green:#0E9F6E; --green-soft:#E7F7F0;
+    --red:#D92D20; --red-soft:#FDECEC;
+    --amber:#B45309; --amber-soft:#FEF6E7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 760px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none; padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 760px; margin: 0 auto; padding: 44px 24px 10px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 600px; margin-top: 14px; }
+
+  section { max-width: 760px; margin: 0 auto; padding: 20px 24px 36px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .prose-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 26px; }
+  .prose-card p { font-size: 16px; line-height: 1.7; color: var(--soft); }
+  .prose-card strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* example: three-state timeline ship -> break -> recover */
+  .example-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 22px; }
+  .ex-lede { font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 16px; }
+
+  .timeline {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .tl-row {
+    display: flex; gap: 14px; align-items: stretch;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 14px; background: var(--surface);
+  }
+  .tl-time {
+    flex-shrink: 0; font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--faint); font-weight: 600;
+    width: 70px; padding-top: 2px;
+  }
+  .tl-body { flex: 1; min-width: 0; }
+  .tl-state {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 20px; margin-bottom: 5px;
+  }
+  .state-ship  { background: var(--accent-soft); color: var(--accent-hover); }
+  .state-break { background: var(--red-soft);    color: var(--red); }
+  .state-back  { background: var(--green-soft);  color: var(--green); }
+  .state-fwd   { background: var(--amber-soft);  color: var(--amber); }
+  .tl-text { font-size: 13.5px; color: var(--text); line-height: 1.5; }
+  .tl-note { font-size: 12.5px; color: var(--soft); margin-top: 3px; line-height: 1.5; }
+
+  .choice-row {
+    display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap;
+  }
+  .choice-btn {
+    padding: 9px 16px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong); background: var(--surface);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 13px; font-weight: 600; color: var(--text);
+    transition: border-color .18s, color .18s, background .18s, transform .15s;
+    flex: 1; min-width: 130px;
+  }
+  .choice-btn:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); transform: translateY(-1px); }
+  .choice-btn.picked { border-color: var(--accent); color: #fff; background: var(--accent); }
+
+  .recovery-row {
+    margin-top: 8px;
+    opacity: 0; max-height: 0; overflow: hidden;
+    transition: opacity .3s, max-height .3s;
+  }
+  .recovery-row.show { opacity: 1; max-height: 200px; }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; font-size: 15px; line-height: 1.65; color: var(--soft); }
+  .fits-card strong { color: var(--text); font-weight: 600; }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 16px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 24px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 760px; margin: 0 auto; padding: 0 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 10px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 760px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .tl-row { flex-direction: column; gap: 4px; }
+    .tl-time { width: auto; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-data-artifacts.html">Data &amp; Artifact Lifecycle</a><span class="sep">/</span><a href="data-artifacts-deployable.html">The versioned files</a><span class="sep">/</span><span class="here">Rollback and roll-forward</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Data &amp; Artifact Lifecycle &rsaquo; The versioned files</span>
+  <h1 class="page-title">Rollback and roll-forward</h1>
+  <p class="explainer">When a release breaks, go back to the last good version (rollback), or fix forward with a new version (roll-forward).</p>
+</header>
+
+<section aria-labelledby="h-what">
+  <div class="section-label"><span class="num">01</span>The idea</div>
+  <h2 id="h-what">What <em>is it?</em></h2>
+  <div class="prose-card">
+    <p>Releases will go wrong. <strong>Rollback</strong> means flipping the live version back to the previous one in seconds. <strong>Roll-forward</strong> means leaving the broken release in place while you ship a small fix on top. Knowing in advance which one to do, and being able to do either quickly, is what turns a bad release into a small bump instead of a long outage.</p>
+  </div>
+</section>
+
+<section aria-labelledby="h-example">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="h-example">A break, <em>two ways to recover</em>.</h2>
+  <div class="example-stage">
+    <p class="ex-lede">v8 went live and broke. Pick a recovery path.</p>
+
+    <div class="timeline">
+      <div class="tl-row">
+        <div class="tl-time">09:00</div>
+        <div class="tl-body">
+          <div class="tl-state state-ship">ship</div>
+          <div class="tl-text">support-bot@v8 deployed to production.</div>
+        </div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-time">09:14</div>
+        <div class="tl-body">
+          <div class="tl-state state-break">break</div>
+          <div class="tl-text">Eval score drops. Users get malformed replies.</div>
+          <div class="tl-note">The team has minutes, not hours, to decide.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="choice-row" role="group" aria-label="Recovery options">
+      <button class="choice-btn" data-c="back">Roll back to v7</button>
+      <button class="choice-btn" data-c="fwd">Roll forward to v8.1</button>
+    </div>
+
+    <div class="recovery-row" id="recovery" aria-live="polite">
+      <div class="tl-row" id="recBox">
+        <div class="tl-time" id="recTime">09:15</div>
+        <div class="tl-body">
+          <div class="tl-state state-back" id="recState">rollback</div>
+          <div class="tl-text" id="recText">v7 is live again. Service restored in about a minute. v8 stays in the registry for later investigation.</div>
+          <div class="tl-note" id="recNote">Pick this when the break is bad and you do not yet know the cause. Fast, safe, no new code.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h-fits">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="h-fits">Where it sits in <em>the flow</em>.</h2>
+  <div class="fits-card">
+    Rollback and roll-forward only work if every other version page has done its job: the registry has the old versions saved, the bundle pins say which version belongs with which, and the deploy system can flip the pointer or ship a tiny new build.
+  </div>
+</section>
+
+<section aria-labelledby="h-when">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="h-when">When to <em>care about it</em>.</h2>
+  <ul class="matters-list">
+    <li>The system is in front of real users and minutes of bad answers really hurt.</li>
+    <li>You ship often, so something will eventually go wrong and the recovery muscle has to be ready.</li>
+    <li>You need a clear rule for when to roll back versus when to fix forward, so no one freezes in the moment.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 12px; padding-bottom: 44px;">
+  <a href="data-artifacts-deployable.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div>
+      <div class="back-hint">Back to</div>
+      <div class="back-name">The versioned files</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Humble &amp; Farley (2010). <em>Continuous Delivery.</em> Addison-Wesley. <span class="note">Defines the standard practice of treating rollback as a first-class deploy path, not an exception.</span></li>
+    <li>Beyer et al. (2016). <em>Site Reliability Engineering.</em> O'Reilly. <span class="note">Google's playbook on choosing between rollback and roll-forward under pressure.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var rec = {
+    back: {
+      time: '09:15', state: 'rollback', stateCls: 'tl-state state-back',
+      text: 'v7 is live again. Service restored in about a minute. v8 stays in the registry for later investigation.',
+      note: 'Pick this when the break is bad and you do not yet know the cause. Fast, safe, no new code.'
+    },
+    fwd: {
+      time: '09:42', state: 'roll forward', stateCls: 'tl-state state-fwd',
+      text: 'A small fix ships as support-bot@v8.1. Production moves forward to the patched version.',
+      note: 'Pick this when the bug is small and known, and v7 cannot serve the new feature users already saw.'
+    }
+  };
+  var btns = document.querySelectorAll('.choice-btn');
+  var box  = document.getElementById('recovery');
+  var rTime = document.getElementById('recTime');
+  var rState = document.getElementById('recState');
+  var rText = document.getElementById('recText');
+  var rNote = document.getElementById('recNote');
+
+  function pick(k) {
+    btns.forEach(function (b) { b.classList.toggle('picked', b.getAttribute('data-c') === k); });
+    var r = rec[k];
+    rTime.textContent = r.time;
+    rState.className = r.stateCls;
+    rState.textContent = r.state;
+    rText.textContent = r.text;
+    rNote.textContent = r.note;
+    box.classList.add('show');
+  }
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () { pick(b.getAttribute('data-c')); });
+    b.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(b.getAttribute('data-c')); }
+    });
+  });
+}());
+</script>
+</body>
+</html>

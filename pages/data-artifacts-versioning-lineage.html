@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Versioning and Lineage · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 760px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none; padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 760px; margin: 0 auto; padding: 44px 24px 10px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 600px; margin-top: 14px; }
+
+  section { max-width: 760px; margin: 0 auto; padding: 20px 24px 36px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .prose-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 26px; }
+  .prose-card p { font-size: 16px; line-height: 1.7; color: var(--soft); }
+  .prose-card strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* example: lineage flow with tap nodes */
+  .example-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 22px; }
+  .ex-lede { font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 16px; }
+
+  .lineage {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .lin-row {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .lin-node {
+    flex: 1; padding: 12px 14px;
+    border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    background: var(--surface); cursor: pointer; text-align: left;
+    font-family: 'Inter', sans-serif; transition: border-color .18s, background .18s, transform .15s;
+  }
+  .lin-node:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+  .lin-node.active { border-color: var(--accent); background: var(--accent-soft); }
+  .lin-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .lin-meta { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--faint); margin-top: 3px; }
+  .lin-arrow { font-size: 18px; color: var(--accent); flex-shrink: 0; }
+
+  .lin-detail {
+    margin-top: 14px; padding: 14px 16px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px; color: var(--soft); line-height: 1.6;
+    min-height: 70px;
+  }
+  .lin-detail strong { color: var(--text); font-weight: 600; }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; font-size: 15px; line-height: 1.65; color: var(--soft); }
+  .fits-card strong { color: var(--text); font-weight: 600; }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 16px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 24px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 760px; margin: 0 auto; padding: 0 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 10px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 760px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .lin-row { flex-direction: column; align-items: stretch; gap: 6px; }
+    .lin-arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-data-artifacts.html">Data &amp; Artifact Lifecycle</a><span class="sep">/</span><a href="data-artifacts-data.html">The data</a><span class="sep">/</span><span class="here">Versioning and lineage</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Data &amp; Artifact Lifecycle &rsaquo; The data</span>
+  <h1 class="page-title">Versioning and lineage</h1>
+  <p class="explainer">Saving each version of a dataset and the chain of steps that produced it, so any result can be traced back.</p>
+</header>
+
+<section aria-labelledby="h-what">
+  <div class="section-label"><span class="num">01</span>The idea</div>
+  <h2 id="h-what">What <em>is it?</em></h2>
+  <div class="prose-card">
+    <p>A dataset changes over time: new rows arrive, bad ones are dropped, labels are fixed. <strong>Versioning</strong> saves a snapshot with a tag every time it changes. <strong>Lineage</strong> is the breadcrumb trail behind each row: which source it came from, which cleaning step it passed through, which model used it.</p>
+  </div>
+</section>
+
+<section aria-labelledby="h-example">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="h-example">Trace a row <em>back to its source</em>.</h2>
+  <div class="example-stage">
+    <p class="ex-lede">A reviewer flagged one bad answer from the model. Tap any step to walk the chain.</p>
+
+    <div class="lineage" role="tablist">
+      <div class="lin-row">
+        <button class="lin-node active" data-step="raw" role="tab" aria-selected="true">
+          <div class="lin-name">Raw web pull</div>
+          <div class="lin-meta">crawl-2026-04-01</div>
+        </button>
+        <span class="lin-arrow" aria-hidden="true">&rarr;</span>
+        <button class="lin-node" data-step="clean" role="tab" aria-selected="false">
+          <div class="lin-name">Cleaned dataset</div>
+          <div class="lin-meta">corpus@v3</div>
+        </button>
+      </div>
+      <div class="lin-row">
+        <span class="lin-arrow" aria-hidden="true" style="margin-left:50%;">&darr;</span>
+      </div>
+      <div class="lin-row">
+        <button class="lin-node" data-step="train" role="tab" aria-selected="false">
+          <div class="lin-name">Training run</div>
+          <div class="lin-meta">run-4821</div>
+        </button>
+        <span class="lin-arrow" aria-hidden="true">&rarr;</span>
+        <button class="lin-node" data-step="model" role="tab" aria-selected="false">
+          <div class="lin-name">Model in production</div>
+          <div class="lin-meta">support-bot@v8</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="lin-detail" id="linDetail" aria-live="polite">
+      <strong>Raw web pull:</strong> 84,000 pages downloaded on 1 April 2026. Each page kept its source URL, fetch date, and a hash of the original bytes. This is where the bad row first entered the system.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h-fits">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="h-fits">Where it sits in <em>the flow</em>.</h2>
+  <div class="fits-card">
+    Versioning and lineage are not a separate step. They run alongside every other step (collection, cleaning, labeling, training) recording who did what and when, so any later question can be answered without guessing.
+  </div>
+</section>
+
+<section aria-labelledby="h-when">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="h-when">When to <em>care about it</em>.</h2>
+  <ul class="matters-list">
+    <li>Something broke in production and you need to know which dataset version caused it.</li>
+    <li>A regulator or a customer asks where a particular answer came from.</li>
+    <li>More than one team trains models from the same data and needs a shared, dated reference.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 12px; padding-bottom: 44px;">
+  <a href="data-artifacts-data.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div>
+      <div class="back-hint">Back to</div>
+      <div class="back-name">The data</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Schelter et al. (2018). <em>Automatically Tracking Metadata and Provenance of Machine Learning Experiments.</em> NeurIPS ML Systems Workshop. <span class="note">A foundational write-up of lineage capture across the ML lifecycle.</span></li>
+    <li>Sculley et al. (2015). <em>Hidden Technical Debt in Machine Learning Systems.</em> NeurIPS. <span class="note">Argues that data dependencies, if not versioned, are one of the worst sources of long-term system rot.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var copy = {
+    raw:   '<strong>Raw web pull:</strong> 84,000 pages downloaded on 1 April 2026. Each page kept its source URL, fetch date, and a hash of the original bytes. This is where the bad row first entered the system.',
+    clean: '<strong>Cleaned dataset (corpus@v3):</strong> after junk removal and deduplication, 51,200 rows remained. Each row carries a link back to its raw source row, so any row can be traced upstream.',
+    train: '<strong>Training run (run-4821):</strong> used corpus@v3, ran on 12 April 2026, took 9 hours. The run record pins the exact dataset version, the code commit, and the model settings used.',
+    model: '<strong>Model in production (support-bot@v8):</strong> deployed 14 April 2026. Its lineage points to run-4821, which points to corpus@v3, which points to the original web pull. One bad answer can be walked all the way back.'
+  };
+  var nodes = document.querySelectorAll('.lin-node');
+  var detail = document.getElementById('linDetail');
+  function pick(step) {
+    nodes.forEach(function (n) {
+      var on = n.getAttribute('data-step') === step;
+      n.classList.toggle('active', on);
+      n.setAttribute('aria-selected', String(on));
+    });
+    detail.innerHTML = copy[step];
+  }
+  nodes.forEach(function (n) {
+    n.addEventListener('click', function () { pick(n.getAttribute('data-step')); });
+    n.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(n.getAttribute('data-step')); }
+    });
+  });
+}());
+</script>
+</body>
+</html>
