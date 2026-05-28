@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stopping cleanly mid-stream &middot; The Pattern Book</title>
+<title>Backpressure &amp; cancellation &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -123,14 +123,14 @@
   <div class="topbar-inner">
     <a class="back" href="consideration-realtime-flowing.html"><span aria-hidden="true">&larr;</span> Keep the words flowing</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-real-time.html">Real-time / Streaming</a><span class="sep" aria-hidden="true">/</span><a href="consideration-realtime-flowing.html">Keep the words flowing</a><span class="sep" aria-hidden="true">/</span><span class="here">Stopping cleanly mid-stream</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-real-time.html">Real-time / Streaming</a><span class="sep" aria-hidden="true">/</span><a href="consideration-realtime-flowing.html">Keep the words flowing</a><span class="sep" aria-hidden="true">/</span><span class="here">Backpressure &amp; cancellation</span>
     </nav>
   </div>
 </nav>
 
 <header class="header" id="main">
   <span class="eyebrow">Real-time / Streaming &middot; Keep the words flowing</span>
-  <h1 class="page-title">Stopping cleanly mid-stream</h1>
+  <h1 class="page-title">Backpressure &amp; cancellation</h1>
   <p class="explainer">When the user hits cancel or a check fails, close down the work in a way that releases compute, logs the partial reply, and shows the user a tidy result.</p>
 </header>
 
