@@ -433,7 +433,7 @@
         <path d="M21 16l-5-4-9 7"/>
       </svg>
     </span>
-    C6 · Consideration
+    Consideration · Multimodal
   </span>
   <h1 class="pattern-title">Multimodal</h1>
   <p class="explainer">How to reason about systems that handle images, audio, or video alongside text. Text-only systems can skip this consideration.</p>
@@ -593,22 +593,12 @@
 <!-- 05 · WHAT THIS COVERS -->
 <section id="covers">
   <div class="section-label"><span class="num">05</span>What This Covers</div>
-  <h2>The <em>disciplines</em> inside C6.</h2>
+  <h2>The <em>disciplines</em> inside Multimodal.</h2>
 
   <div class="guide">
 
-    <!-- Conditional scope banner -->
-    <div class="scope-banner">
-      <span class="scope-icon" aria-hidden="true">&#9888;&#xFE0E;</span>
-      <div class="scope-text">
-        <strong>Applies to: only systems that handle images, audio, or video.</strong>
-        <span class="scope-skip">Text-only systems can skip this consideration entirely.</span>
-      </div>
-    </div>
-
-    <!-- Axis line -->
-    <div class="axis-line">
-      <strong>Axis:</strong> how to reason about systems that span text, vision, audio, or mixed modalities.
+    <div class="covers-meta">
+      <div class="covers-meta-row"><strong>Applies to:</strong> only systems that handle images, audio, or video. Text-only systems can skip this.</div>
     </div>
 
     <!-- Cluster 1 -->
@@ -618,22 +608,22 @@
 
     <div class="guide-row">
       <span class="disc-name">Modality selection</span>
-      <span class="disc-desc">Pick which modality to use for a task: OCR-then-reason versus native vision, speech-to-text versus end-to-end audio.</span>
+      <span class="disc-desc">Pick how to handle each input: read text out of an image first, or let the model see the image directly.</span>
     </div>
 
     <div class="guide-row">
       <span class="disc-name">Cross-modal grounding</span>
-      <span class="disc-desc">Keep the model's output faithfully tied to what it saw or heard, not a hallucinated version of it. See C1.</span>
+      <span class="disc-desc">Keep the model's answer tied to what it actually saw or heard, not a made-up version.</span>
     </div>
 
     <div class="guide-row">
       <span class="disc-name">Fusion strategy</span>
-      <span class="disc-desc">Decide when to combine signals: early fusion (shared encoder from the start) versus late fusion (separate encoders merged before the final layer). See L1.</span>
+      <span class="disc-desc">Decide when to combine the different inputs: blend them from the start, or process each one separately and merge near the end.</span>
     </div>
 
     <div class="guide-row">
       <span class="disc-name">Mixed-modality handoff</span>
-      <span class="disc-desc">Reason about transitions between modalities inside a conversation: when a voice turn should switch to a visual, or when a vision input should trigger an audio response. Mechanism in L7.</span>
+      <span class="disc-desc">Handle switches inside a conversation, like a spoken turn that should answer with a picture.</span>
     </div>
 
     <!-- Cluster 2 -->
@@ -643,27 +633,27 @@
 
     <div class="guide-row">
       <span class="disc-name">Modality-specific eval</span>
-      <span class="disc-desc">Design benchmarks and rubrics for non-text outputs where standard metrics like BLEU or exact match break down. See C1.</span>
+      <span class="disc-desc">Build tests for image or audio answers, where simple text-matching scores no longer work.</span>
     </div>
 
     <div class="guide-row">
       <span class="disc-name">Latency budgets across modalities</span>
-      <span class="disc-desc">Allocate response-time budgets when vision, audio, and text encoders each add processing time before the model can begin. See C5, L0.</span>
+      <span class="disc-desc">Plan for the extra time each input type adds before the model can even start.</span>
     </div>
 
     <div class="guide-row">
       <span class="disc-name">Modality-specific safety and refusal</span>
-      <span class="disc-desc">Calibrate refusal policies per modality: a harmful image prompt requires different detection logic than a harmful text prompt. See C2.</span>
+      <span class="disc-desc">Catch a harmful image, which needs different checks than catching harmful text.</span>
     </div>
 
     <div class="guide-row">
       <span class="disc-name">Multimodal cost attribution</span>
-      <span class="disc-desc">Track and attribute cost per modality: image tokens are priced differently from text tokens, and video multiplies image cost by frame count. See C5.</span>
+      <span class="disc-desc">Track cost per input type: images are priced differently from text, and video multiplies it by the number of frames.</span>
     </div>
 
     <!-- Mechanism note -->
     <div class="mechanism-note">
-      <strong>Note on mechanisms vs. disciplines:</strong> The encoders that convert images or audio into tokens are mechanisms that live in <strong>L1 (Model Training and Adaptation)</strong>. The infrastructure that serves multimodal requests at runtime lives in <strong>L0 (Serving Infrastructure)</strong>. C6 owns the <em>discipline</em> of reasoning across those mechanisms, not the mechanisms themselves.
+      <strong>Note on mechanisms vs. disciplines:</strong> The parts that convert images or audio into tokens, and the infrastructure that serves these requests, live in the layers. This page owns the discipline of reasoning across them, not the parts themselves.
     </div>
 
   </div>

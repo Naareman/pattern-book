@@ -333,7 +333,7 @@
 <header class="header" id="main">
   <span class="eyebrow">
     <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/></svg></span>
-    C4 &middot; Consideration
+    Consideration &middot; Observability &amp; Debuggability
   </span>
   <h1 class="page-title">Observability &amp; Debuggability</h1>
   <p class="explainer">Being able to see what the AI did and why, like a flight recorder for every answer.</p>
@@ -342,7 +342,7 @@
 <!-- 01 · THE IDEA -->
 <section>
   <div class="section-label"><span class="num">01</span>The Idea</div>
-  <h2>What <em>Is</em> It?</h2>
+  <h2>What <em>is</em> it?</h2>
   <div class="idea-card">
     <p>When an AI answers a question, it does many things: it searches, it thinks, it calls tools, it waits for results. <span style="color:var(--accent-hover);font-weight:500">Observability</span> means recording all of that, step by step, so you can look back and see exactly what happened and how long each part took. Without it, when something breaks or goes slow, you are flying blind.</p>
   </div>
@@ -459,7 +459,7 @@
 <!-- 03 · WHEN IT MATTERS -->
 <section>
   <div class="section-label"><span class="num">03</span>A Real Example</div>
-  <h2>When It <em>Saves</em> You.</h2>
+  <h2>When it <em>saves</em> you.</h2>
   <div class="example-card">
     <p>A legal AI assistant starts giving one wrong citation in every twenty answers. Users complain. Without observability, the team has no idea which step failed: was the retrieval returning the wrong documents? Did the model hallucinate? Was a saved result from days ago being served instead of a fresh one?</p>
     <p>With traces (the saved steps for each request), they pull the failing request IDs and see in minutes: the retrieval step was pulling documents from an old index that had not been updated. A single config fix. <strong>Without the trace, they would have spent a week guessing.</strong></p>
@@ -469,7 +469,7 @@
 <!-- 04 · TRADEOFFS -->
 <section>
   <div class="section-label"><span class="num">04</span>Tradeoffs</div>
-  <h2>The <em>Cost</em> of Skipping It.</h2>
+  <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale">
       <span class="spacer"></span>
@@ -508,12 +508,11 @@
 <!-- 05 · WHAT THIS COVERS -->
 <section>
   <div class="section-label"><span class="num">05</span>What This Covers</div>
-  <h2>Inside <em>C4</em>.</h2>
+  <h2>The <em>disciplines</em> inside Observability &amp; Debuggability.</h2>
   <div class="guide">
     <div class="covers-meta">
       <div class="covers-meta-row"><strong>Applies to:</strong> every system in production.</div>
-      <div class="covers-meta-row"><strong>Axis:</strong> how to explain what the system did after the fact.</div>
-      <p class="covers-note">Observability &amp; Debuggability is a discipline, not a mechanism. The hooks that actually emit traces (the raw recordings) belong to Serving Infrastructure (L0). This crosscut is the thinking framework for what to record, how to read it, and how to act on it.</p>
+      <p class="covers-note">Observability &amp; Debuggability is a discipline, not a mechanism. The hooks that actually emit traces (the raw recordings) live in the Serving Infrastructure layer. This page is the thinking framework for what to record, how to read it, and how to act on it.</p>
     </div>
 
     <!-- Cluster 1: See what happened -->

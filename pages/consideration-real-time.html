@@ -297,7 +297,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/>
       </svg>
-    </span>C7 &middot; Consideration
+    </span>Consideration &middot; Real-time / Streaming
   </span>
   <h1 class="page-title">Real-time / Streaming</h1>
   <p class="explainer">The disciplines for building systems where the gap before the first word matters far more than total generation time.</p>
@@ -307,8 +307,8 @@
 <section style="padding-bottom: 8px;">
   <div class="scope-banner">
     <div class="scope-tag">Conditional Scope</div>
-    <div class="scope-line">Applies to: only systems with sub-second, incremental output (streaming chat, voice, live transcription). Batch systems can skip it.</div>
-    <div class="scope-axis">Axis: reasoning where TTFT (time to first word, meaning the delay from sending your message to seeing the AI's first word appear) and continuous output matter more than total throughput.</div>
+    <div class="scope-line">Applies to: only systems with sub-second, word-by-word output (streaming chat, voice, live transcription). Systems that wait for the full answer can skip it.</div>
+    <div class="scope-axis">Here, the wait before the first word, and a steady flow of output, matter more than the total time.</div>
   </div>
 </section>
 
@@ -318,7 +318,7 @@
   <h2>What does <em>real-time</em> mean?</h2>
   <div class="idea-card">
     <p>A token (a token is a small piece the AI works in: roughly a word, or a slice of an image or sound) is the basic unit of generation. When you send a prompt (the text you send the AI), it generates every token before sending a response. The wait from "I sent the message" to "I saw the first word" is called TTFT (time to first word). It is the number that determines whether an AI feels instant or sluggish.</p>
-    <p>One technique changes everything: streaming, which sends each token as it is generated instead of waiting for the full answer. The total time is the same. The felt wait drops to almost nothing. This crosscut is a discipline for reasoning about all the decisions that change once you commit to streaming output.</p>
+    <p>One technique changes everything: streaming, which sends each token as it is generated instead of waiting for the full answer. The total time is the same. The felt wait drops to almost nothing. This page is a discipline for reasoning about all the decisions that change once you commit to streaming output.</p>
   </div>
 </section>
 
@@ -389,11 +389,11 @@
 <!-- 03 WHAT THIS COVERS -->
 <section>
   <div class="section-label"><span class="num">03</span>What This Covers</div>
-  <h2>Eight <em>disciplines</em> in this crosscut.</h2>
-  <div class="guide" role="region" aria-label="Disciplines in this crosscut">
+  <h2>The <em>disciplines</em> inside Real-time / Streaming.</h2>
+  <div class="guide" role="region" aria-label="Disciplines in Real-time and Streaming">
 
     <div class="covers-note">
-      <strong>This is a discipline crosscut, not a mechanism layer.</strong> The streaming UX mechanism (the actual UI behavior of tokens appearing progressively) lives in L7 User Surface. C7 owns the thinking frameworks that apply once you commit to streaming.
+      <strong>This is a discipline, not a mechanism.</strong> The part that makes words appear progressively on screen lives in the User Surface layer. This page owns the thinking frameworks that apply once you commit to streaming.
     </div>
 
     <!-- CLUSTER 1 -->
@@ -403,17 +403,17 @@
 
     <div class="guide-row">
       <span class="disc-name">Streaming Output Discipline</span>
-      <span class="disc-desc">How to decide when streaming is worth the engineering cost and when batch is fine. Includes rules for chunking output so each partial response is still useful to a reader. UX mechanism for the user lives in L7 User Surface (Streaming and Progressive Disclosure).</span>
+      <span class="disc-desc">Decide when streaming is worth the effort and when waiting for the full answer is fine.</span>
     </div>
 
     <div class="guide-row">
-      <span class="disc-name">Time-to-First-Token Frameworks</span>
-      <span class="disc-desc">TTFT is the primary number users feel. Covers how to measure it, how to set targets per product type (voice is tighter than chat), and which infrastructure levers move it. Cross-ref C5 Cost, Latency and Reliability for latency budget design.</span>
+      <span class="disc-name">Time-to-First-Word Frameworks</span>
+      <span class="disc-desc">Measure the wait before the first word, and set a target for each product (voice is tighter than chat).</span>
     </div>
 
     <div class="guide-row">
       <span class="disc-name">Continuous Context for Voice</span>
-      <span class="disc-desc">Voice adds turn-taking, interruption, and barge-in on top of streaming. Covers the state machine for managing these transitions and keeping context coherent across interrupted turns. Voice surface mechanism lives in L7 User Surface.</span>
+      <span class="disc-desc">Handle taking turns and interruptions, so the conversation stays coherent when the user cuts in.</span>
     </div>
 
     <!-- CLUSTER 2 -->
@@ -423,30 +423,30 @@
 
     <div class="guide-row">
       <span class="disc-name">Streaming Eval</span>
-      <span class="disc-desc">Standard evals wait for a full response. Streaming eval measures quality at intermediate checkpoints: coherence mid-sentence, drift detection, and whether the final answer matches where it started. Cross-ref C1 Evaluation for general eval methodology.</span>
+      <span class="disc-desc">Check answer quality as it streams, not only once the full response is done.</span>
     </div>
 
     <div class="guide-row">
       <span class="disc-name">Streaming Safety</span>
-      <span class="disc-desc">A filter that reads the complete response cannot work with streaming. Covers real-time harm detection on partial outputs: sliding-window classifiers, early-exit rules, and interrupting a stream without confusing the user. Cross-ref C2 Safety, Alignment and Refusal for harm taxonomy and refusal calibration.</span>
+      <span class="disc-desc">Catch harmful content in a partial answer, and stop the stream cleanly when needed.</span>
     </div>
 
     <div class="guide-row">
       <span class="disc-name">Streaming Validation</span>
-      <span class="disc-desc">Partial tokens may be syntactically invalid mid-stream when output must be structured. Covers incremental schema checking, buffering strategies, and surfacing validation errors without waiting for the full response. Cross-ref L4 Output Shape for the schema enforcement mechanism itself.</span>
+      <span class="disc-desc">Check structured output as it arrives, since a half-finished answer can look broken mid-stream.</span>
     </div>
 
     <div class="guide-row">
       <span class="disc-name">Backpressure and Cancellation</span>
-      <span class="disc-desc">When a client cannot consume tokens as fast as the model produces them, or the user navigates away, the system needs a clean path to pause or abort. Covers propagating cancellation upstream and avoiding wasted compute on abandoned streams.</span>
+      <span class="disc-desc">Pause or stop a stream when the user leaves or cannot keep up, instead of wasting work.</span>
     </div>
 
     <div class="guide-row">
       <span class="disc-name">Streaming Cost Attribution</span>
-      <span class="disc-desc">A cancelled stream still consumed prefill compute, and partial responses still count as output tokens. Covers how to attribute cost to users or features when the full response was never delivered. Cross-ref C5 Cost, Latency and Reliability for general cost attribution frameworks.</span>
+      <span class="disc-desc">Charge fairly for a stream that was cut short, since partial answers still cost real work.</span>
     </div>
 
-    <div class="covers-map-note">All eight are disciplines for reasoning and decision-making. The mechanisms they reference (schema enforcement, output filtering, streaming UI) each have a home in the layer taxonomy.</div>
+    <div class="covers-map-note">All of these are disciplines for reasoning and deciding. The parts they rely on each have a home in the layers.</div>
   </div>
 </section>
 
@@ -491,7 +491,7 @@
 <!-- 05 TRADEOFFS -->
 <section>
   <div class="section-label"><span class="num">05</span>Tradeoffs</div>
-  <h2>What you give up for <em>speed</em>.</h2>
+  <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale">
       <span class="spacer"></span>

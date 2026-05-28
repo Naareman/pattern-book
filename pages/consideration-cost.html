@@ -319,75 +319,11 @@
         <circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-1.7 2.5-1.7s2.5.6 2.5 1.9c0 2.6-5 1.4-5 4 0 1.3 1.1 2 2.5 2s2.5-.5 2.5-1.7"/>
       </svg>
     </span>
-    C5 &middot; Consideration
+    Consideration &middot; Cost, Latency &amp; Reliability
   </span>
   <h1 class="page-title">Cost, Latency &amp; Reliability</h1>
   <p class="explainer">A discipline for every system that has a budget, a speed target, or an uptime promise. How you charge AI work to a budget, how fast it must respond, and what happens when something goes wrong.</p>
 </header>
-
-<!-- 00 WHAT THIS COVERS -->
-<section>
-  <div class="section-label"><span class="num">00</span>What This Covers</div>
-  <h2>The <em>disciplines</em> inside this crosscut.</h2>
-  <div class="guide">
-
-    <p class="covers-scope"><strong>Applies to:</strong> every system with cost, latency, or reliability constraints.</p>
-
-    <!-- Cluster 1: Managing cost -->
-    <div class="cluster-head">
-      <h3 class="cluster-label">Managing cost</h3>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Cost Attribution</span>
-      <span class="disc-desc">Working out which part of the system (prompt, model call, retrieval step) is responsible for which fraction of the bill.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Cost-Quality Tradeoff</span>
-      <span class="disc-desc">Deciding when spending more on a bigger model or longer context actually improves the answer enough to be worth it.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Context-Strategy Tradeoff</span>
-      <span class="disc-desc">Choosing between RAG (find relevant chunks and inject them), long-context (put the whole document in the window), or a hybrid. Each carries a different cost, latency, and recall profile. See also: L3a Stateless Retrieval.</span>
-    </div>
-
-    <!-- Cluster 2: Managing speed and reliability -->
-    <div class="cluster-head cluster-break">
-      <h3 class="cluster-label">Managing speed and reliability</h3>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Latency Budgets</span>
-      <span class="disc-desc">Splitting the total time a user is willing to wait across all the steps in the pipeline: retrieval, model call, post-processing. Covers perceived latency, actual latency, and tail latency.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Latency-Quality Tradeoff</span>
-      <span class="disc-desc">Understanding what quality you give up when you cut response time: fewer reasoning steps, smaller model, truncated context.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">SLA/SLO Design</span>
-      <span class="disc-desc">Setting the service-level agreements (SLAs: contracts with users) and service-level objectives (SLOs: internal targets) that cost and latency decisions must satisfy.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Error Budgets &amp; Graceful Degradation</span>
-      <span class="disc-desc">Deciding how much failure is acceptable before triggering a response, and what the system does when it hits that limit: fall back to a cached answer, use a cheaper model, or surface an honest error.</span>
-    </div>
-
-    <div class="guide-row">
-      <span class="disc-name">Incident Response</span>
-      <span class="disc-desc">The playbook for what to do when cost spikes, latency blows out, or the model goes down: who gets paged, what gets throttled, how you roll back.</span>
-    </div>
-
-    <p class="covers-note">
-      <strong>This is a discipline, not a mechanism.</strong> The runtime mechanism that picks a cheaper model on the fly lives in <strong>L0 Serving Infrastructure</strong> (cost/latency-optimized model selection at runtime). This crosscut owns the frameworks for deciding when and why to make those choices.
-    </p>
-  </div>
-</section>
 
 <!-- 01 THE IDEA -->
 <section>
@@ -540,7 +476,7 @@
 <!-- 04 TRADEOFFS -->
 <section>
   <div class="section-label"><span class="num">04</span>Tradeoffs</div>
-  <h2>What you <em>give up</em>.</h2>
+  <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>Low</span><span>High</span></div></div>
     <div class="tradeoff-row">
@@ -564,6 +500,70 @@
     <div class="tradeoff-quote">
       Shorter prompts risk losing important context. Smaller models may miss nuance on hard questions. Response caching only helps when queries repeat, and cached answers can go stale. None of these is free. The skill is knowing when the savings outweigh the loss.
     </div>
+  </div>
+</section>
+
+<!-- 05 WHAT THIS COVERS -->
+<section>
+  <div class="section-label"><span class="num">05</span>What This Covers</div>
+  <h2>The <em>disciplines</em> inside Cost, Latency &amp; Reliability.</h2>
+  <div class="guide">
+
+    <p class="covers-scope"><strong>Applies to:</strong> every system with cost, latency, or reliability constraints.</p>
+
+    <!-- Cluster 1: Managing cost -->
+    <div class="cluster-head">
+      <h3 class="cluster-label">Managing cost</h3>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Cost Attribution</span>
+      <span class="disc-desc">Working out which part of the system (prompt, model call, retrieval step) is responsible for which fraction of the bill.</span>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Cost-Quality Tradeoff</span>
+      <span class="disc-desc">Deciding when spending more on a bigger model or longer context actually improves the answer enough to be worth it.</span>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Context-Strategy Tradeoff</span>
+      <span class="disc-desc">Choosing between RAG (find relevant chunks and inject them), long-context (put the whole document in the window), or a hybrid. Each carries a different cost, latency, and recall profile.</span>
+    </div>
+
+    <!-- Cluster 2: Managing speed and reliability -->
+    <div class="cluster-head cluster-break">
+      <h3 class="cluster-label">Managing speed and reliability</h3>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Latency Budgets</span>
+      <span class="disc-desc">Splitting the total time a user is willing to wait across all the steps in the pipeline: retrieval, model call, post-processing. Covers perceived latency, actual latency, and tail latency.</span>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Latency-Quality Tradeoff</span>
+      <span class="disc-desc">Understanding what quality you give up when you cut response time: fewer reasoning steps, smaller model, truncated context.</span>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">SLA/SLO Design</span>
+      <span class="disc-desc">Setting the service-level agreements (SLAs: contracts with users) and service-level objectives (SLOs: internal targets) that cost and latency decisions must satisfy.</span>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Error Budgets &amp; Graceful Degradation</span>
+      <span class="disc-desc">Deciding how much failure is acceptable before triggering a response, and what the system does when it hits that limit: fall back to a cached answer, use a cheaper model, or surface an honest error.</span>
+    </div>
+
+    <div class="guide-row">
+      <span class="disc-name">Incident Response</span>
+      <span class="disc-desc">The playbook for what to do when cost spikes, latency blows out, or the model goes down: who gets paged, what gets throttled, how you roll back.</span>
+    </div>
+
+    <p class="covers-note">
+      <strong>This is a discipline, not a mechanism.</strong> The part that picks a cheaper model on the fly lives in the Serving Infrastructure layer. This page owns the frameworks for deciding when and why to make those choices.
+    </p>
   </div>
 </section>
 
