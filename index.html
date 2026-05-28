@@ -153,11 +153,122 @@
   .foot strong{color:var(--soft);font-weight:500}
 
   @media(max-width:720px){
+    /* ---- canvas + top grid: stack all 3 pillars vertically ---- */
     .canvas{width:100%}
-    .top{grid-template-columns:1fr}
-    .produces{flex-direction:row;padding:10px 0}
-    .builds{width:100%}
-    .across{width:100%}
+    .top{
+      display:flex;
+      flex-direction:column;
+      gap:0;
+    }
+
+    /* ---- box-head: let subtitle wrap on its own line so it gets full width ---- */
+    .box-head{align-items:stretch}
+    .head-link{
+      flex-wrap:wrap;
+      align-items:center;
+      gap:4px 8px;
+      min-height:48px; /* tap target */
+      padding:11px 12px;
+    }
+    /* subtitle drops below the name on its own row */
+    .head-link .what{
+      flex-basis:100%;
+      margin-top:2px;
+      font-size:12px;
+      line-height:1.4;
+      white-space:normal;
+    }
+    /* step bubble stays left, name + arrow stay together */
+    .head-link .step{margin-right:0}
+    .head-link .open{margin-left:auto;padding-left:4px}
+
+    /* play button: keep right of name row, min tap size */
+    .head-play{
+      min-height:44px;
+      min-width:80px;
+      margin:0 8px;
+      padding:6px 10px;
+      font-size:10.5px;
+    }
+
+    /* ---- Layers: remove the side-by-side axis panel ---- */
+    .layers .body{
+      display:block; /* drop the 2-column grid */
+    }
+    .axis{
+      /* rotate to a thin horizontal bar at the bottom of the layer list */
+      flex-direction:row;
+      align-items:center;
+      justify-content:space-between;
+      border-left:none;
+      border-top:1px solid var(--border);
+      padding:10px 14px;
+    }
+    .axis .rail{
+      flex:1;
+      min-height:auto;
+      height:4px;
+      width:auto;
+      min-width:40px;
+      margin:0 10px;
+      transform-origin:left center;
+    }
+    /* hide the upward arrow on the horizontal rail (it points left, looks odd) */
+    .axis .rail::after{display:none}
+    .axis .cap{font-size:10px;line-height:1.2;text-align:center;min-width:60px}
+
+    /* ---- "produces" connector between Layers and Builds ---- */
+    .produces{
+      flex-direction:row;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      padding:10px 16px;
+      color:var(--faint);
+      font-size:12px;
+    }
+    .flow-x{width:28px}
+
+    /* ---- "applies to every layer" across bracket: hide on mobile ---- */
+    /* The bracket spans Layers width minus the Builds column (calc(100%-394px))
+       which collapses to nearly zero on phone. Hide it; the heading already
+       communicates "applies to every layer" via the Considerations box title. */
+    .across{display:none}
+
+    /* ---- Builds: full-width when stacked ---- */
+    .builds{width:100%;align-self:auto}
+
+    /* ---- Considerations chips: wrap cleanly ---- */
+    .concerns .items{
+      gap:7px;
+      padding:12px;
+      justify-content:flex-start;
+    }
+    .concerns .item{
+      padding:9px 14px;
+      min-height:40px;
+    }
+
+    /* ---- General items: comfortable tap targets ---- */
+    .item{
+      min-height:44px;
+      padding:10px 11px;
+    }
+    .items{padding:6px}
+
+    /* ---- Tour bar: wrap aux controls if screen is narrow ---- */
+    .tour-bar{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+    }
+    .tour-aux{margin-left:0}
+
+    /* ---- Prevent any horizontal overflow ---- */
+    .wrap{padding:0 14px}
+    .box{overflow:hidden}
   }
 </style>
 </head>
