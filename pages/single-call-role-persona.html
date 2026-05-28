@@ -153,6 +153,18 @@
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
     font-size: 15px; line-height: 1.7; color: var(--soft);
   }
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
 
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
@@ -234,32 +246,28 @@
 
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home layer</div>
-      <div class="fits-desc">Input Shape sub-axis. Role / Persona is text you add to the prompt before the task; it shapes the input to the model call, so it lives here.</div>
+      <div class="fits-label">What it shapes</div>
+      <div class="fits-desc">A role line is just text you add to the prompt before the task, so it shapes the input. It all happens inside one model call: no extra training, no second model.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L&minus;1</div>
-      <div class="fits-label">Cross-reference</div>
-      <div class="fits-desc">The persona line usually lives in the system prompt, which is a Deployable Artifact. Versioning and rollback of that artifact are L&minus;1 concerns.</div>
-    </div>
-    <div class="fits-divider" role="separator"></div>
-    <div class="filing-note">
-      <strong>Filing rule:</strong> Everything here happens inside one model call. No second call, no fine-tuning, no separate model. That is what makes it L4 Input Shape rather than L1 (fine-tuning) or L2 (a separate verifier call).
+      <div class="fits-label">Then what</div>
+      <div class="fits-desc">The role line usually lives in your saved system prompt. Keeping track of its versions and rolling it back are a separate, later job.</div>
     </div>
   </div>
 </section>
 
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
-  <div class="matters-card">
-    Anyone shipping a product where tone consistency matters: a legal tool that must sound authoritative, a kids' app that must stay friendly, a code review bot that must be blunt. A role line is also the first thing to try when raw zero-shot answers feel off but fine-tuning is not yet justified.
-  </div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Tone has to stay consistent: a legal tool that sounds authoritative, a kids' app that stays friendly, a code reviewer that is blunt.</li>
+    <li>Plain answers feel a little off and you want a quick fix.</li>
+    <li>It is the first thing to try before investing in anything heavier like training a custom model.</li>
+  </ul>
 </section>
 
 <section style="padding-top: 20px; padding-bottom: 40px;">

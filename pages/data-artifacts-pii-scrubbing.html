@@ -185,6 +185,18 @@
     font-size: 15px; line-height: 1.7; color: var(--soft);
   }
   .matters-card strong { color: var(--text); font-weight: 600; }
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
 
   /* back link */
   .back-link {
@@ -240,22 +252,22 @@
   <div class="topbar-inner">
     <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layer-data-artifacts.html">Data &amp; Artifact Lifecycle</a><span class="sep">/</span><span class="here">PII Scrubbing &amp; Redaction</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-data-artifacts.html">Data &amp; Artifact Lifecycle</a><span class="sep">/</span><span class="here">PII Scrubbing &amp; Redaction</span>
     </nav>
   </div>
 </nav>
 
 <!-- HEADER -->
 <header class="header" id="main">
-  <span class="eyebrow">L&minus;1 &middot; Data</span>
+  <span class="eyebrow">Data &amp; Artifact Lifecycle</span>
   <h1 class="page-title">PII Scrubbing &amp; Redaction</h1>
   <p class="explainer">Removing personally identifiable information from datasets before they are stored or used for training or retrieval.</p>
 </header>
 
 <!-- 01 WHAT IT IS -->
 <section>
-  <div class="section-label"><span class="num">01</span>What It Is</div>
-  <h2>The <em>idea</em>.</h2>
+  <div class="section-label"><span class="num">01</span>What it is</div>
+  <h2>What <em>is it?</em></h2>
   <div class="prose-card">
     <p><strong>PII scrubbing</strong> (removing personal information, meaning names, email addresses, phone numbers, national IDs, and similar private details) is the process of stripping or masking those values from a dataset before the data is stored in a training corpus or a retrieval index. The goal is to ensure that no individual's private details leak into model weights or surface in generated answers. Scrubbing runs as a data-preparation step: the raw records come in, a pipeline detects the sensitive fields, and the output is a clean version where PII is replaced by a generic token or a synthetic stand-in.</p>
   </div>
@@ -263,7 +275,7 @@
 
 <!-- 02 AN EXAMPLE -->
 <section>
-  <div class="section-label"><span class="num">02</span>An Example</div>
+  <div class="section-label"><span class="num">02</span>An example</div>
   <h2>Before and <em>after</em>.</h2>
   <div class="example-stage">
     <p class="ex-lede">A support-ticket dataset is being prepared for fine-tuning. Each ticket contains free-form text from real customers. Tap to redact.</p>
@@ -289,41 +301,37 @@
 
 <!-- 03 WHERE IT FITS -->
 <section>
-  <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2>Taxonomy <em>placement</em>.</h2>
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2>How it relates to <em>nearby ideas</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-dot" aria-hidden="true"></div>
       <div class="fits-text">
-        <strong>Sub-axis:</strong> L&minus;1 Data. PII scrubbing is a dataset preparation step that happens before data enters a training job or a retrieval index. That is the defining axis: the lifecycle stage of the artifact that feeds the system.
+        <strong>When it happens:</strong> scrubbing is a data-prep step. It runs on the raw data before that data is used to train a model or build a search index.
       </div>
     </div>
     <div class="fits-row">
       <div class="fits-dot" aria-hidden="true"></div>
       <div class="fits-text">
-        <strong>Filing rule:</strong> data consumed by training or retrieval belongs in L&minus;1 Data. PII scrubbing acts on that data before it is consumed, so it files here. The runtime reading of an already-scrubbed index is an L0 concern.
-      </div>
-    </div>
-    <div class="fits-row">
-      <div class="fits-dot" aria-hidden="true"></div>
-      <div class="fits-text">
-        <strong>Cross-reference:</strong> the discipline of deciding access rules, audit logging, and compliance obligations around personal data belongs in <a href="consideration-privacy.html">C3 Privacy, Security &amp; Governance</a> (specifically its "Runtime PII-handling" category). L&minus;1 owns the scrubbing mechanism on the dataset side; C3 owns the policy and runtime discipline.
+        <strong>Pairs with:</strong> deciding who can see personal data, logging access, and meeting legal rules is a separate, ongoing job. That side lives under <a href="consideration-privacy.html">Privacy, security and governance</a>. Scrubbing is the cleaning step on the data itself; privacy governance is the policy around it.
       </div>
     </div>
 
     <div class="filing-box">
-      <strong>Quick test:</strong> does it happen to the raw data before storage or training? PII scrubbing files in L&minus;1 Data. Does it happen to a live request or response at inference time? That is C3 Runtime PII-handling.
+      <strong>Quick test:</strong> does it clean the raw data before it is stored or used for training? That is scrubbing. Does it act on a live request or reply while the system is running? That is runtime privacy handling, a different job.
     </div>
   </div>
 </section>
 
 <!-- 04 WHEN IT MATTERS -->
 <section>
-  <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2>Who needs <em>this</em>.</h2>
-  <div class="matters-card">
-    <p>Anyone who trains on or retrieves from data about real people. That includes customer support logs, medical notes, HR records, user-generated content, and web-scraped text. Compliance frameworks (GDPR, HIPAA, and others) often legally require it before training or indexing. Even without a regulatory mandate, scrubbing prevents a model from memorising and reproducing a real person's email address or phone number in its outputs.</p>
-  </div>
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2>When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>You train on or look things up in data about real people: support logs, medical notes, HR records, user posts, scraped web text.</li>
+    <li>Rules like GDPR or HIPAA often require it by law before you train or index.</li>
+    <li>Even without a legal rule, it stops the model from memorising and repeating someone's real email or phone number.</li>
+  </ul>
 </section>
 
 <!-- BACK NAV -->

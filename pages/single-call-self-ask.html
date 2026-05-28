@@ -169,6 +169,18 @@
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
     font-size: 15px; line-height: 1.7; color: var(--soft);
   }
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
 
   /* back link */
   .back-link {
@@ -272,35 +284,26 @@
 <!-- 03 WHERE IT FITS -->
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
   <div class="fits-card">
 
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home layer</div>
-      <div class="fits-desc">Self-Verification sub-axis of Single-Call Control. All sub-questions and intermediate answers live inside one model call. The model verifies its own understanding by resolving each dependency before committing to a final answer.</div>
+      <div class="fits-label">What it does</div>
+      <div class="fits-desc">All the sub-questions and their answers happen inside one model call. The model checks its own understanding by resolving each piece before it commits to a final answer.</div>
     </div>
 
     <div class="fits-divider" role="separator"></div>
 
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
       <div class="fits-label">Compare to</div>
-      <div class="fits-desc">Least-to-Most prompting (Cognitive Strategy) also decomposes a hard question into smaller ones, but focuses on scaffold difficulty, not self-checking. Self-Ask's defining feature is the explicit follow-up question format used as a verification loop.</div>
+      <div class="fits-desc">Least-to-Most prompting also breaks a hard question into smaller ones, but it focuses on building up from easy to hard. Self-Ask's signature move is the explicit follow-up question used as a self-check.</div>
     </div>
 
     <div class="fits-divider" role="separator"></div>
 
     <div class="fits-row">
-      <div class="fits-layer">L2</div>
       <div class="fits-label">Not this</div>
-      <div class="fits-desc">If each sub-question triggers a separate retrieval or model call, that is L5 Shape (iterative loop) or L3a (retrieval), not L4. Self-Ask stays in L4 when every step is resolved within the single generation.</div>
-    </div>
-
-    <div class="fits-divider" role="separator"></div>
-
-    <div class="filing-note">
-      <strong>Filing rule:</strong> Self-checking inside one call to one model = L4 Self-Verification. A separate verifier call or a different model = L2 Verify.
+      <div class="fits-desc">If each sub-question kicks off a real web search or a fresh model call, that is a multi-step agent or retrieval setup, not Self-Ask. Self-Ask keeps every step inside the one answer.</div>
     </div>
   </div>
 </section>
@@ -308,10 +311,12 @@
 <!-- 04 WHEN IT MATTERS -->
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
-  <div class="matters-card">
-    Most useful for multi-hop questions where a single leap from question to answer skips over intermediate facts the model may get wrong. Knowledge-intensive tasks (history, geography, law, science) benefit most. It also makes the reasoning auditable: the chain of follow-up questions is visible, so reviewers can pinpoint exactly where the model's knowledge broke down.
-  </div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Questions that need several facts chained together, where one big leap would skip a step.</li>
+    <li>Knowledge-heavy tasks like history, geography, law, and science.</li>
+    <li>When you need the reasoning to be auditable: the follow-up questions show exactly where it went wrong.</li>
+  </ul>
 </section>
 
 <!-- BACK NAV -->

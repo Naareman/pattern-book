@@ -152,6 +152,18 @@
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
     font-size: 15px; line-height: 1.7; color: var(--soft);
   }
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
 
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
@@ -197,7 +209,7 @@
   <div class="topbar-inner">
     <a class="back" href="single-call-guide-its-thinking.html"><span aria-hidden="true">&larr;</span> Guide its thinking</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep" aria-hidden="true">/</span><a href="single-call-guide-its-thinking.html">Guide its thinking</a><span class="sep" aria-hidden="true">/</span><span class="here">Plan-and-Solve</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep" aria-hidden="true">/</span><a href="single-call-guide-its-thinking.html">Guide its thinking</a><span class="sep" aria-hidden="true">/</span><span class="here">Plan-and-Solve</span>
     </nav>
   </div>
 </nav>
@@ -245,32 +257,28 @@ List the steps you will take.</div>
 
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home</div>
-      <div class="fits-desc">Single-Call Control, Cognitive Strategy sub-axis. It is in-prompt: the plan instruction is authored as text the model follows, not a search procedure over multiple generations.</div>
+      <div class="fits-label">What it shapes</div>
+      <div class="fits-desc">The "make a plan first" instruction is just text in your prompt. The model follows it inside one call, with no extra search or extra steps behind the scenes.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Neighbor</div>
-      <div class="fits-desc">Chain-of-Thought is the anchor pattern for step-by-step reasoning. Plan-and-Solve is distinct because the plan is explicit and separated from execution, rather than woven into a single flowing trace.</div>
-    </div>
-    <div class="fits-divider" role="separator"></div>
-    <div class="filing-note">
-      <strong>Filing rule:</strong> Cognitive Strategy covers techniques that shape how the model reasons inside a single call. Plan-and-Solve qualifies because the planning instruction is part of the prompt, not a multi-call orchestration step.
+      <div class="fits-label">Compare to</div>
+      <div class="fits-desc">Chain-of-Thought is the classic "think step by step" approach. Plan-and-Solve is different because the plan is written out first and kept separate from doing the work.</div>
     </div>
   </div>
 </section>
 
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
-  <div class="matters-card">
-    Reach for Plan-and-Solve when your task involves several sequential calculations or decisions and you see the model skipping steps or making arithmetic errors mid-response. It is especially useful when you cannot run Chain-of-Thought examples (few-shot) because your tasks vary too much to template.
-  </div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>The task has several steps in a row and the model keeps skipping some.</li>
+    <li>You see arithmetic or logic errors creeping in mid-answer.</li>
+    <li>Your tasks vary too much to write worked examples for, so a plan instruction is simpler.</li>
+  </ul>
 </section>
 
 <section style="padding-top: 20px; padding-bottom: 40px;">

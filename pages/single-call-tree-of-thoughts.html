@@ -155,6 +155,18 @@
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
     font-size: 15px; line-height: 1.7; color: var(--soft);
   }
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
 
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
@@ -201,7 +213,7 @@
   <div class="topbar-inner">
     <a class="back" href="single-call-guide-its-thinking.html"><span aria-hidden="true">&larr;</span> Guide its thinking</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep" aria-hidden="true">/</span><a href="single-call-guide-its-thinking.html">Guide its thinking</a><span class="sep" aria-hidden="true">/</span><span class="here">Tree-of-Thoughts</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep" aria-hidden="true">/</span><a href="single-call-guide-its-thinking.html">Guide its thinking</a><span class="sep" aria-hidden="true">/</span><span class="here">Tree-of-Thoughts</span>
     </nav>
   </div>
 </nav>
@@ -258,32 +270,28 @@
 
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home</div>
-      <div class="fits-desc">Single-Call Control, Cognitive Strategy sub-axis, in-decoding tier. The tree search operates over generated token sequences, not over prompt text. The branching and evaluation are part of the generation procedure.</div>
+      <div class="fits-label">What it does</div>
+      <div class="fits-desc">It is a search over many tries, not a single instruction in the prompt. Cost grows with how wide and deep the tree gets, which is the main thing to weigh.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Neighbor</div>
-      <div class="fits-desc">Chain-of-Thought produces one linear trace. Tree-of-Thoughts generates and evaluates multiple traces, keeping the tree alive rather than committing to one path. Self-Consistency samples many traces and votes, but does not prune mid-reasoning.</div>
-    </div>
-    <div class="fits-divider" role="separator"></div>
-    <div class="filing-note">
-      <strong>Filing rule:</strong> In-decoding Cognitive Strategy. ToT is a search procedure over model generations, not a prompt instruction. Its cost scales with tree width and depth, which is the key tradeoff vs. simpler strategies.
+      <div class="fits-label">Compare to</div>
+      <div class="fits-desc">Chain-of-Thought writes one line of reasoning. Tree-of-Thoughts explores several and drops the weak ones as it goes. Self-Consistency runs many separate attempts and votes, but never prunes partway through.</div>
     </div>
   </div>
 </section>
 
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
-  <div class="matters-card">
-    Tree-of-Thoughts is worth the extra inference cost only when: (1) the problem requires deliberate exploration (puzzles, proofs, planning), (2) early mistakes cannot be undone by reasoning forward, and (3) you can afford multiple generation calls. For most language tasks, CoT or Plan-and-Solve will suffice at lower cost.
-  </div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Problems that need real exploration: puzzles, proofs, planning.</li>
+    <li>Early wrong turns cannot be fixed by just reasoning forward.</li>
+    <li>You can afford the extra cost of many tries. For most tasks, simpler step-by-step reasoning is cheaper and enough.</li>
+  </ul>
 </section>
 
 <section style="padding-top: 20px; padding-bottom: 40px;">

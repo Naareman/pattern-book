@@ -108,6 +108,28 @@
   }
   .prose strong, .key-term { color: var(--accent-hover); font-weight: 600; }
 
+  /* when it matters list */
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 0 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 10px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
   /* divider */
   .divider { border: none; border-top: 1px solid var(--border); max-width: 920px; margin: 0 auto; }
 
@@ -235,15 +257,15 @@
 
 <!-- HEADER -->
 <header class="header" id="main">
-  <span class="eyebrow">L&minus;1 &middot; Deployable Artifacts</span>
+  <span class="eyebrow">Data &amp; Artifact Lifecycle</span>
   <h1 class="page-title">Cache-Contents Lifecycle</h1>
   <p class="explainer">Managing what goes into a cache and when it is refreshed or thrown out.</p>
 </header>
 
 <!-- 01 WHAT IT IS -->
 <section aria-labelledby="h-what">
-  <div class="section-label"><span class="num">01</span>What It Is</div>
-  <h2 id="h-what">The <em>concept</em></h2>
+  <div class="section-label"><span class="num">01</span>What it is</div>
+  <h2 id="h-what">What <em>is it?</em></h2>
   <p class="prose">
     A cache stores answers or retrieved results so the system can skip re-running expensive work. But cached content does not manage itself.
     <span class="key-term">Cache-contents lifecycle</span> is the set of rules that govern four things: how entries get <strong>populated</strong> (written into the cache in the first place), when they are declared <strong>stale</strong> (the source has changed, so the cached answer is no longer trustworthy), how they are <strong>evicted</strong> (removed, whether by expiry, size pressure, or an explicit invalidation signal), and how the <strong>cache schema</strong> evolves when the shape of a cached entry changes across deployments without silently corrupting old entries still in the store.
@@ -255,7 +277,7 @@
 
 <!-- 02 AN EXAMPLE -->
 <section aria-labelledby="h-example">
-  <div class="section-label"><span class="num">02</span>An Example</div>
+  <div class="section-label"><span class="num">02</span>An example</div>
   <h2 id="h-example">A cached answer goes <em>stale</em></h2>
 
   <p class="prose" style="margin-bottom: 20px;">
@@ -325,32 +347,32 @@
 
 <!-- 03 WHERE IT FITS -->
 <section aria-labelledby="h-fits">
-  <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="h-fits">The <em>L&minus;1 / L0</em> split</h2>
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="h-fits">Two sides of <em>caching</em></h2>
 
   <p class="prose" style="margin-bottom: 18px;">
-    "Caching" has two homes in the taxonomy. The key is the axis each layer slices on.
+    Caching is really two jobs. This page is about one of them; the other is a separate job done while the system is running.
   </p>
 
   <div class="split-card">
     <div class="split-half this-page">
-      <div class="split-label here">This page (L&minus;1)</div>
+      <div class="split-label here">This page</div>
       <div class="split-name">Cache-Contents Lifecycle</div>
       <div class="split-desc">
-        The artifact side. What is stored, when it is written, when it expires, what invalidates it, and how the schema of stored entries evolves. This is a <strong>management</strong> concern: you are governing the contents of the cache as a deployable artifact.
+        Managing what is stored: when an entry is written, when it expires, what wipes it out, and how its shape can change over time without breaking old entries. This is about looking after the cache contents.
       </div>
     </div>
     <div class="split-half">
-      <div class="split-label there">Neighbor (L0)</div>
-      <div class="split-name">Cache Check &amp; Substitution</div>
+      <div class="split-label there">The other job</div>
+      <div class="split-name">Checking the cache at run time</div>
       <div class="split-desc">
-        The runtime side. At request time, the serving layer checks whether a valid cached result exists and, if so, returns it instead of calling the model. This is an <strong>infrastructure</strong> concern: operating on the model call as a black box.
+        When a request comes in, the system asks "do we already have a good answer saved?" and, if so, returns it instead of calling the model. This is about how the live system uses the cache.
       </div>
     </div>
   </div>
 
   <div class="split-rule">
-    <strong>Filing rule:</strong> if the question is "does this entry exist and is it still valid right now?" that is L0 (runtime decision). If the question is "what goes into the cache, how long does it live, and what does its shape look like?" that is L−1 (artifact lifecycle). Both exist for every caching system; looking one up in two places is the cost of axis-pure taxonomy.
+    <strong>Quick test:</strong> "Does this saved answer exist and is it still good right now?" is the run-time check. "What goes into the cache, how long does it last, and what does it look like?" is this page. Every caching system needs both.
   </div>
 </section>
 
@@ -358,11 +380,13 @@
 
 <!-- 04 WHEN IT MATTERS -->
 <section aria-labelledby="h-when">
-  <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="h-when">Who needs <em>this</em></h2>
-  <p class="prose">
-    Any system that caches generated answers, retrieved passages, or rendered prompts against a corpus that can change. The risk is not speed, it is correctness: a cache with no invalidation rules will confidently serve stale answers long after the source of truth has moved. The cost compounds whenever a cached entry references a schema field that a newer version of the code no longer writes, or a reader assumes a field that older entries do not have. Cache-contents lifecycle rules are the difference between a cache that is an asset and one that is a liability.
-  </p>
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="h-when">When to <em>reach for it</em></h2>
+  <ul class="matters-list">
+    <li>You cache generated answers, retrieved passages, or built prompts against a source that can change.</li>
+    <li>The real risk is wrong answers, not slowness: with no rules to wipe stale entries, the cache keeps serving the old answer after the truth has moved on.</li>
+    <li>The shape of a cached entry changes between releases, and old entries must not crash the new code.</li>
+  </ul>
 </section>
 
 <!-- BACK CARD -->
@@ -375,6 +399,15 @@
     </div>
   </a>
 </section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Fielding &amp; Reschke (2014). <em>Hypertext Transfer Protocol (HTTP/1.1): Caching.</em> RFC 7234. <span class="note">The standard model for cache freshness, expiry, and invalidation that most caching systems build on.</span></li>
+    <li>Nishtala et al. (2013). <em>Scaling Memcache at Facebook.</em> USENIX NSDI. <span class="note">A real-world account of cache invalidation, staleness, and consistency at scale.</span></li>
+  </ul>
+</div>
 
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.

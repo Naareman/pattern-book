@@ -140,6 +140,18 @@
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
     font-size: 15px; line-height: 1.7; color: var(--soft);
   }
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
 
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
@@ -220,32 +232,28 @@
 
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home layer</div>
-      <div class="fits-desc">Input Shape sub-axis. Negative constraints are text added to the prompt, shaping the input to the model call. No second call is required.</div>
+      <div class="fits-label">What it shapes</div>
+      <div class="fits-desc">The "don't do X" rules are just text you add to the prompt, so they shape the input. One model call does the whole job.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Neighbor</div>
-      <div class="fits-desc">Output Shape sub-axis handles structural constraints on format (JSON schema, word count). Negative Prompting addresses behavioral constraints on content.</div>
-    </div>
-    <div class="fits-divider" role="separator"></div>
-    <div class="filing-note">
-      <strong>Filing rule:</strong> A constraint added to the prompt text before the single model call is L4 Input Shape. A separate model pass that rejects non-compliant output would be L2 Verify.
+      <div class="fits-label">Compare to</div>
+      <div class="fits-desc">Rules about format (give me JSON, stay under 50 words) control how the answer looks. Negative prompting controls what the answer is allowed to say.</div>
     </div>
   </div>
 </section>
 
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
-  <div class="matters-card">
-    Any high-stakes application where common model tendencies are harmful in context: medical tools that must not diagnose, legal tools that must not give advice, children's products that must avoid adult content. Also useful in style-constrained writing (no cliches, no passive voice) and in code generation (no deprecated APIs, no global variables).
-  </div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>High-stakes tools that must avoid a tempting wrong move: medical tools that must not diagnose, legal tools that must not give advice.</li>
+    <li>Products for sensitive audiences, like children's apps that must avoid adult content.</li>
+    <li>Style and code rules: no cliches, no passive voice, no outdated functions.</li>
+  </ul>
 </section>
 
 <section style="padding-top: 20px; padding-bottom: 40px;">

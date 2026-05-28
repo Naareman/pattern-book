@@ -78,6 +78,9 @@
   .filing-note strong { color: var(--text); }
 
   .matters-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; font-size: 15px; line-height: 1.7; color: var(--soft); }
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 
   .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
@@ -127,7 +130,7 @@
       <span class="temp-value-badge" id="tempVal" aria-live="polite">0.2</span>
     </div>
     <div class="temp-slider-wrap">
-      <input type="range" class="temp-slider" id="tempSlider" min="0" max="10" step="1" value="2" aria-label="Temperature value from 0 to 1" aria-valuetext="0.2">
+      <input type="range" class="temp-slider" id="tempSlider" min="0" max="10" step="1" value="2" aria-label="Temperature, from 0.0 (predictable) to 1.0 (adventurous)" aria-valuetext="0.2">
       <div class="temp-ticks" aria-hidden="true">
         <span class="temp-tick">0.0</span>
         <span class="temp-tick">0.5</span>
@@ -149,32 +152,28 @@
 
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home layer</div>
-      <div class="fits-desc">Output Shape &amp; Decoding sub-axis. Temperature is a call-time decoding parameter that shapes token selection inside a single model call.</div>
+      <div class="fits-label">What it shapes</div>
+      <div class="fits-desc">It is a setting you pass with the call that controls how the model picks each word as it writes. One number, one call.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Neighbors</div>
-      <div class="fits-desc">Beam Search also operates at decoding time, but explores multiple sequences simultaneously rather than picking one token at a time. Logit Biasing nudges specific token probabilities before the same sampling step temperature controls.</div>
-    </div>
-    <div class="fits-divider" role="separator"></div>
-    <div class="filing-note">
-      <strong>Filing rule:</strong> Operates inside one call to one model, shaping how tokens are selected during decoding. That places it in L4 Output Shape &amp; Decoding.
+      <div class="fits-label">Compare to</div>
+      <div class="fits-desc">Beam search also works as the answer is written, but it keeps several candidate sentences going at once. Logit biasing nudges specific words up or down before this same word-picking step.</div>
     </div>
   </div>
 </section>
 
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
-  <div class="matters-card">
-    Two opposite use cases. For deterministic tasks (data extraction, classification, structured output) keep temperature near 0 so the model consistently picks its top answer. For creative tasks (copywriting, brainstorming, story generation) raise it to get variation across runs. Getting this one number wrong is one of the most common causes of either boring responses or unreliable structured output.
-  </div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Predictable tasks (data extraction, classification, structured output): keep it near 0 so the model picks its top answer every time.</li>
+    <li>Creative tasks (copywriting, brainstorming, stories): raise it for fresh variation each run.</li>
+    <li>Getting this one number wrong is a top cause of either dull answers or shaky structured output.</li>
+  </ul>
 </section>
 
 <section style="padding-top: 20px; padding-bottom: 40px;">

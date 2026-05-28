@@ -138,9 +138,10 @@
 
   .stage-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
     scroll-margin-top: 80px;
     transition: box-shadow .55s ease, border-color .55s ease;
+    display: flex; flex-direction: column;
   }
   .stage-card.glow {
     box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42);
@@ -159,15 +160,16 @@
     .stage-card.clickable:hover { transform: none; }
   }
 
-  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 4px; }
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; }
   .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
   .stage-head .sico svg { width: 18px; height: 18px; display: block; }
   .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
   a.stage-name { transition: color .15s ease; }
   a.stage-name:hover { color: var(--accent-hover); }
 
+  /* "see how" lives at the bottom of each card, pushed down by margin-top:auto */
   .see-how {
-    display: inline-flex; align-items: center; gap: 3px; margin-left: auto;
+    display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 12px;
     font-size: 12.5px; font-weight: 600; color: var(--accent-hover);
     transition: color .15s ease;
   }
@@ -283,7 +285,6 @@
           </svg>
         </span>
         <h2 id="g-structure"><a class="stage-name" href="orchestration-structure.html">Structure the steps</a></h2>
-        <a class="see-how" href="orchestration-structure.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
       </div>
       <p class="stage-lead">How calls are ordered.</p>
       <div class="chips">
@@ -295,6 +296,7 @@
         <span class="chip">Hierarchical planning</span>
         <span class="chip">Conditional branching</span>
       </div>
+      <a class="see-how" href="orchestration-structure.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
     <section class="stage-card clickable" id="card-action" aria-labelledby="g-action">
@@ -305,7 +307,6 @@
           </svg>
         </span>
         <h2 id="g-action"><a class="stage-name" href="orchestration-action.html">Act in the world</a></h2>
-        <a class="see-how" href="orchestration-action.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
       </div>
       <p class="stage-lead">Changing things outside the model.</p>
       <div class="chips">
@@ -316,6 +317,7 @@
         <span class="chip">Side-effect sandboxing</span>
         <span class="chip">Multi-step transactions</span>
       </div>
+      <a class="see-how" href="orchestration-action.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
     <section class="stage-card clickable" id="card-coordinate" aria-labelledby="g-coordinate">
@@ -327,7 +329,6 @@
           </svg>
         </span>
         <h2 id="g-coordinate"><a class="stage-name" href="orchestration-coordination.html">Coordinate agents</a></h2>
-        <a class="see-how" href="orchestration-coordination.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
       </div>
       <p class="stage-lead">Many agents working together.</p>
       <div class="chips">
@@ -336,6 +337,7 @@
         <span class="chip">Agent identity and auth</span>
         <span class="chip">Capability negotiation and tool discovery</span>
       </div>
+      <a class="see-how" href="orchestration-coordination.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
   </div>

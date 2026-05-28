@@ -33,6 +33,7 @@ The standing gate. Every page, and every agent that builds or edits a page, must
 - One-line intros. No explanatory paragraphs or prose walls. If a block is a wall, cut it or convert it to a visual (chips, small flow, before/after, tap-to-reveal).
 - One representation per idea. MECE, no redundancy across sections.
 - Always ask: is a list the best way to show this, or would a small visual / before-after / tap interaction land better?
+- Can this be visual? Show, don't tell: add a small icon, diagram, or before/after, and make it interactive (a tap/toggle) wherever that carries the idea better than a sentence. Ask it on every block.
 - Strong lead copy: if an intro line or title reads flat or weak, rewrite it stronger or remove it. No filler openers.
 - No duplication: do not repeat what already lives on the homepage or in another section. Link to it or cut it.
 

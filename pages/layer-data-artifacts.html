@@ -156,7 +156,7 @@
   /* ============ STAGE CARDS (L4 pattern) ============ */
   .stages { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 6px; }
 
-  .stage-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; scroll-margin-top: 80px; transition: box-shadow .55s ease, border-color .55s ease; }
+  .stage-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; scroll-margin-top: 80px; transition: box-shadow .55s ease, border-color .55s ease; display: flex; flex-direction: column; }
   .stage-card.glow { box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42); border-color: var(--accent); }
   @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
 
@@ -165,13 +165,14 @@
   .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
   @media (prefers-reduced-motion: reduce) { .stage-card.clickable { transition: none; } .stage-card.clickable:hover { transform: none; } }
 
-  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 4px; }
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; }
   .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
   .stage-head .sico svg { width: 18px; height: 18px; display: block; }
   .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
   a.stage-name { transition: color .15s ease; }
   a.stage-name:hover { color: var(--accent-hover); }
-  .see-how { display: inline-flex; align-items: center; gap: 3px; margin-left: auto; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
+  /* "see how" lives at the bottom of each card, pushed down by margin-top:auto */
+  .see-how { display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 12px; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
   .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
   .see-how .arr { display: inline-block; transition: transform .18s ease; }
   .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
@@ -448,7 +449,6 @@
           </svg>
         </span>
         <h2 id="g-data"><a class="stage-name" href="data-artifacts-data.html">The data</a></h2>
-        <a class="see-how" href="data-artifacts-data.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
       </div>
       <p class="stage-lead">The datasets it learns from and looks things up in.</p>
       <div class="chips">
@@ -461,6 +461,7 @@
         <span class="chip">Retention and deletion policies</span>
         <span class="chip">Feedback data pipelines</span>
       </div>
+      <a class="see-how" href="data-artifacts-data.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
     <section class="stage-card clickable" id="card-deployable" aria-labelledby="g-deployable">
@@ -471,7 +472,6 @@
           </svg>
         </span>
         <h2 id="g-deployable"><a class="stage-name" href="data-artifacts-deployable.html">The versioned files</a></h2>
-        <a class="see-how" href="data-artifacts-deployable.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
       </div>
       <p class="stage-lead">Prompts, models, indexes as releasable artifacts.</p>
       <div class="chips">
@@ -483,6 +483,7 @@
         <span class="chip">Artifact-lineage tracking</span>
         <span class="chip">Rollback and roll-forward</span>
       </div>
+      <a class="see-how" href="data-artifacts-deployable.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
   </div>

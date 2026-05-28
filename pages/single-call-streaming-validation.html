@@ -81,6 +81,9 @@
   .filing-note strong { color: var(--text); }
 
   .matters-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; font-size: 15px; line-height: 1.7; color: var(--soft); }
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 
   .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
@@ -141,38 +144,33 @@
 
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home layer</div>
-      <div class="fits-desc">Output Shape &amp; Decoding sub-axis. Validation happens against the output of a single call, incrementally during decoding. It is not a second model call or a separate verifier.</div>
+      <div class="fits-label">What it does</div>
+      <div class="fits-desc">It checks the answer as it streams out, piece by piece, from one model call. There is no second model and no extra checker involved.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">C7</div>
-      <div class="fits-label">Cross-reference</div>
-      <div class="fits-desc">The Real-time / Streaming crosscut (C7) explicitly names "streaming validation (partial JSON)" as a cross-reference to L4 Output Shape. The streaming discipline lives in C7; the mechanism lives here.</div>
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">It is the practical tool behind live, streaming experiences where the reply appears word by word. The look-and-feel goal lives with that experience; the actual check lives here.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L2</div>
-      <div class="fits-label">Cross-reference</div>
-      <div class="fits-desc">A second model that checks the full completed response is L2 Verify. Streaming validation is purely within the single call, on the model's own output as it arrives.</div>
-    </div>
-    <div class="fits-divider" role="separator"></div>
-    <div class="filing-note">
-      <strong>Filing rule:</strong> One call, one model, validation applied to its output during decoding. Firmly L4 Output Shape &amp; Decoding.
+      <div class="fits-label">Not this</div>
+      <div class="fits-desc">Having a separate model review the finished answer is a verify step. Streaming validation stays inside the one call, checking the output as it arrives.</div>
     </div>
   </div>
 </section>
 
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
-  <div class="matters-card">
-    Teams building real-time UIs where users see responses as they stream, and anyone producing structured output at volume. Catching a malformed JSON object at token 40 saves paying for tokens 41 through 400 and spares the user a confusing error at the end of an otherwise complete-looking response. Critical for safety-gated systems where the stream must be cut if content crosses a policy line mid-generation.
-  </div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Live interfaces where users watch the reply appear word by word.</li>
+    <li>Structured output at volume: spotting a broken result early saves paying for the rest of it.</li>
+    <li>Safety-gated systems where the stream must be cut the moment content crosses a line.</li>
+  </ul>
 </section>
 
 <section style="padding-top: 20px; padding-bottom: 40px;">

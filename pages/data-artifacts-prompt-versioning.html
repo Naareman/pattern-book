@@ -188,6 +188,8 @@
   }
   .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
   .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-desc a { color: var(--accent-hover); text-decoration: none; font-weight: 500; }
+  .fits-desc a:hover { text-decoration: underline; }
   .fits-divider { height: 1px; background: var(--border); }
   .filing-note {
     padding: 12px 16px; background: var(--bg-subtle);
@@ -201,6 +203,18 @@
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
     font-size: 15px; line-height: 1.7; color: var(--soft);
+  }
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
   }
 
   /* back link */
@@ -260,15 +274,15 @@
 
 <!-- HEADER -->
 <header class="header" id="main">
-  <span class="eyebrow">L&minus;1 &middot; Deployable Artifacts</span>
+  <span class="eyebrow">Data &amp; Artifact Lifecycle</span>
   <h1 class="page-title">Prompt Versioning</h1>
   <p class="explainer">Treat the instructions you send the AI like code: save every version, track what changed, and roll back instantly when a new version breaks things.</p>
 </header>
 
 <!-- 01 WHAT IT IS -->
 <section aria-labelledby="what-heading">
-  <div class="section-label"><span class="num">01</span>What It Is</div>
-  <h2 id="what-heading">The short <em>version</em>.</h2>
+  <div class="section-label"><span class="num">01</span>What it is</div>
+  <h2 id="what-heading">What <em>is it?</em></h2>
   <div class="what-card">
     <p>A <strong style="color:var(--accent-hover)">prompt registry</strong> stores every draft of your system prompt with a version tag, a timestamp, and a change note. Teams deploy a specific pinned version to production rather than editing the live prompt in place. When a new version regresses quality (worse answers, a broken format, missed edge cases), the registry makes recovery a one-step operation: pin back to the last known-good version and the system is restored immediately, with no code deploy needed.</p>
   </div>
@@ -276,7 +290,7 @@
 
 <!-- 02 AN EXAMPLE -->
 <section aria-labelledby="example-heading">
-  <div class="section-label"><span class="num">02</span>An Example</div>
+  <div class="section-label"><span class="num">02</span>An example</div>
   <h2 id="example-heading">Shipping <em>v8</em>, rolling back to <em>v7</em>.</h2>
 
   <div class="version-list" role="region" aria-label="Prompt version history with rollback">
@@ -336,47 +350,40 @@
 
 <!-- 03 WHERE IT FITS -->
 <section aria-labelledby="fits-heading">
-  <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
   <div class="fits-card">
 
     <div class="fits-row">
-      <div class="fits-layer">L&minus;1</div>
-      <div class="fits-label">Home layer</div>
-      <div class="fits-desc">Deployable Artifacts sub-axis. The prompt is a config that defines runtime behavior, so its lifecycle (creation, pinning, rollback) lives here.</div>
+      <div class="fits-label">What it manages</div>
+      <div class="fits-desc">A prompt is a saved file that shapes how the system behaves. This pattern is about its whole life: writing it, picking which version is live, and rolling back.</div>
     </div>
 
     <div class="fits-divider" role="separator"></div>
 
     <div class="fits-row">
-      <div class="fits-layer">L0</div>
-      <div class="fits-label">Cross-reference</div>
-      <div class="fits-desc">The serving infrastructure reads the pinned prompt version at call time. The runtime consumption lives in L0; the lifecycle of the artifact itself lives here in L&minus;1.</div>
+      <div class="fits-label">At run time</div>
+      <div class="fits-desc">When a request comes in, the system reads whichever prompt version is currently live. That reading at run time is a separate concern from keeping the version history.</div>
     </div>
 
     <div class="fits-divider" role="separator"></div>
 
     <div class="fits-row">
-      <div class="fits-layer">C1</div>
-      <div class="fits-label">Cross-reference</div>
-      <div class="fits-desc">The evals that catch regressions across versions are a C1 (Evaluation) discipline. Prompt lifecycle thinking is also called out in C1 alongside the versioning mechanism here.</div>
-    </div>
-
-    <div class="fits-divider" role="separator"></div>
-
-    <div class="filing-note">
-      <strong>Filing rule:</strong> A config that defines runtime behavior belongs in L&minus;1 Deployable Artifacts. The runtime reads it (L0 consumption); the artifact's creation, versioning, and rollback stay here.
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">The tests that catch a bad new version belong with <a href="consideration-evaluation.html">evaluation</a>. Versioning is how you save and swap prompts; evaluation is how you know which version is good.</div>
     </div>
   </div>
 </section>
 
 <!-- 04 WHEN IT MATTERS -->
 <section aria-labelledby="matters-heading">
-  <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
-  <div class="matters-card">
-    Any team that edits prompts in production. Once you have more than one person touching the system prompt, or you ship prompt changes faster than once a week, an unversioned prompt becomes a liability: you cannot tell what changed, when, or why quality shifted. Registries and pinning turn prompt management from a source of invisible risk into a controlled release process.
-  </div>
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Any team that edits prompts in production.</li>
+    <li>More than one person touches the system prompt, so you need to see what changed and when.</li>
+    <li>You ship prompt changes often and want a quick, code-free way to undo a bad one.</li>
+  </ul>
 </section>
 
 <!-- BACK NAV -->

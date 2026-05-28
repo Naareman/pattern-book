@@ -39,6 +39,13 @@
   .tour-link .tri{font-size:9px;margin-right:3px}
   .tour-link:hover{text-decoration:underline}
   .tour-hint{color:var(--faint);font-size:13px}
+  /* secondary tour controls: Restart + Stop -- hidden until tour is active */
+  .tour-aux{display:none;align-items:center;gap:6px;margin-left:10px}
+  body.touring .tour-aux{display:inline-flex}
+  .tour-aux-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:var(--accent-hover);background:none;border:1px solid var(--border-strong);border-radius:20px;padding:4px 10px;cursor:pointer;font-family:'Inter';white-space:nowrap;transition:background .14s ease,border-color .14s ease,color .14s ease}
+  .tour-aux-btn:hover{background:var(--accent-soft);border-color:var(--accent)}
+  .tour-aux-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:20px}
+  .tour-aux-ico{font-size:11px;line-height:1}
 
   .stage{padding:24px 0 34px}
   .tour-bar{text-align:center;margin:0 0 16px}
@@ -167,7 +174,7 @@
     </header>
 
     <div class="stage" id="main" role="main">
-      <div class="tour-bar"><button class="tour-link" id="tourBtn" type="button"><span class="tri" aria-hidden="true">▶</span> Take the 60-second tour</button><div class="tour-dots" id="tourDots" aria-hidden="true"><i></i><i></i><i></i></div></div>
+      <div class="tour-bar"><button class="tour-link" id="tourBtn" type="button"><span class="tri" aria-hidden="true">▶</span> Take the 60-second tour</button><span class="tour-aux" id="tourAux" aria-hidden="true"><button class="tour-aux-btn" id="tourRestart" type="button" aria-label="Restart tour"><span class="tour-aux-ico" aria-hidden="true">↺</span> Restart</button><button class="tour-aux-btn" id="tourStop" type="button" aria-label="Stop tour"><span class="tour-aux-ico" aria-hidden="true">✕</span> Stop</button></span><div class="tour-dots" id="tourDots" aria-hidden="true"><i></i><i></i><i></i></div></div>
       <div class="canvas">
         <div class="top">
           <div class="box layers">
@@ -305,8 +312,10 @@
     requestAnimationFrame(()=> requestAnimationFrame(()=> document.body.classList.remove('snapping')));
   }
 
+  const tourAux = document.getElementById('tourAux');
+  function setTourAuxVisible(on){ tourAux.setAttribute('aria-hidden', on ? 'false' : 'true'); }
   function isTour(b){ return b && b.dataset.play === 'tour'; }
-  function endDemo(clearViz){ clearTimers(); document.body.classList.remove('demoing','touring'); hideBoxCaps(); setTourPhase(0); if(clearViz) resetVisual(); if(activeBtn) activeBtn.innerHTML = activeBtn.dataset.cta; demoState='idle'; activeBtn=null; steps=[]; elapsed=0; }
+  function endDemo(clearViz){ clearTimers(); document.body.classList.remove('demoing','touring'); hideBoxCaps(); setTourPhase(0); if(clearViz) resetVisual(); if(activeBtn) activeBtn.innerHTML = activeBtn.dataset.cta; demoState='idle'; activeBtn=null; steps=[]; elapsed=0; setTourAuxVisible(false); }
   function pauseDemo(){ elapsed += performance.now()-startedAt; clearTimers(); demoState='paused'; if(activeBtn) activeBtn.innerHTML = isTour(activeBtn) ? '<span class="tri" aria-hidden="true">▶</span>Resume tour' : '<span class="tri" aria-hidden="true">▶</span> Resume'; }
   function resumeDemo(){ demoState='playing'; if(activeBtn) activeBtn.innerHTML = isTour(activeBtn) ? '<span class="tri" aria-hidden="true">❚❚</span>Pause tour' : '<span class="tri" aria-hidden="true">❚❚</span> Pause'; schedule(); }
 
@@ -382,7 +391,7 @@
     resetVisual();
     document.body.classList.add('demoing');
     activeBtn=btn; demoState='playing'; elapsed=0;
-    if(isTour(btn)){ document.body.classList.add('touring'); } else { document.body.classList.remove('touring'); setTourPhase(0); }
+    if(isTour(btn)){ document.body.classList.add('touring'); setTourAuxVisible(true); } else { document.body.classList.remove('touring'); setTourPhase(0); setTourAuxVisible(false); }
     btn.innerHTML = isTour(btn) ? '<span class="tri" aria-hidden="true">❚❚</span>Pause tour' : '<span class="tri" aria-hidden="true">❚❚</span> Pause';
     steps = buildSteps(kind);
     schedule();
@@ -394,6 +403,14 @@
       if(activeBtn===b){ if(demoState==='playing') pauseDemo(); else if(demoState==='paused') resumeDemo(); return; }
       startDemo(b, b.dataset.play);
     });
+  });
+  // tour secondary controls: Restart (from step 1) and Stop (return to idle)
+  document.getElementById('tourRestart').addEventListener('click',()=>{
+    // works from both playing and paused states: startDemo resets elapsed and rebuilds steps
+    startDemo(tourBtn, 'tour');
+  });
+  document.getElementById('tourStop').addEventListener('click',()=>{
+    endDemo(true);
   });
   // click a concern chip -> its criticality (toggle); stops any running demo first
   concernItems.forEach(c=>{
