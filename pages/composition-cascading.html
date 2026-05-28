@@ -180,12 +180,12 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">Pairs with</div>
-      <div class="fits-desc">Needs a quality check at each step. That check can be a confidence score, a judge model, or a simple rule (output format valid, length acceptable).</div>
+      <div class="fits-desc"><strong>A quality check at each step.</strong> That check can be a confidence score, a judge model, or a simple rule (output format valid, length acceptable).</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Compare to</div>
-      <div class="fits-desc">Confidence-based routing decides up front which model to call. Cascading runs the cheap one, then escalates if the result is weak.</div>
+      <div class="fits-desc"><strong>Confidence-based routing</strong> decides up front which model to call. Cascading runs the cheap one, then escalates if the result is weak.</div>
     </div>
   </div>
 </section>
@@ -194,9 +194,9 @@
   <div class="section-label"><span class="num">04</span>When it matters</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <ul class="matters-list">
-    <li>Most queries are easy and a small model handles them fine.</li>
-    <li>Cost per call adds up at scale and you want to spend the big model only where it earns it.</li>
-    <li>A clear pass/fail check exists for the cheap answer (schema valid, confidence above 0.8, judge says yes).</li>
+    <li><strong>Most queries are easy</strong> and a small model handles them fine.</li>
+    <li><strong>Cost per call adds up at scale</strong> and you want to spend the big model only where it earns it.</li>
+    <li><strong>A clear pass/fail check exists</strong> for the cheap answer (schema valid, confidence above 0.8, judge says yes).</li>
   </ul>
 </section>
 

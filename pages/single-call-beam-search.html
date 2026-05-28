@@ -188,17 +188,17 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">Home</div>
-      <div class="fits-desc">A way of shaping the output as the model writes it. The search runs inside one call to one model and decides which wording comes back.</div>
+      <div class="fits-desc"><strong>A way of shaping the output as the model writes it.</strong> The search runs inside one call to one model and decides which wording comes back.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Neighbor</div>
-      <div class="fits-desc">Self-Consistency also produces several answers from one model and picks a winner. The difference: beam search tracks an overall score; self-consistency samples at random and takes the most common answer.</div>
+      <div class="fits-desc"><strong>Self-Consistency</strong> also produces several answers from one model and picks a winner. The difference: beam search tracks an overall score; self-consistency samples at random and takes the most common answer.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Not this</div>
-      <div class="fits-desc">Once different models or different prompts generate the candidates and the results are merged, you have left a single call and moved to a different layer (combining outputs).</div>
+      <div class="fits-desc">Once <strong>different models or different prompts generate the candidates</strong> and the results are merged, you have left a single call and moved to a different layer (combining outputs).</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="filing-note">
@@ -212,9 +212,9 @@
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <div class="matters-card">
     <ul class="matters-list">
-      <li>Best for short, structured outputs where getting the whole phrase right matters: translation, speech-to-text, math expressions.</li>
-      <li>Skip it for long or creative writing: it tends to produce repetitive, "safe" text, where sampling with some randomness reads better.</li>
-      <li>The extra compute means it is rarely the default on big hosted models, but it is common in open-model serving tools.</li>
+      <li><strong>Best for short, structured outputs</strong> where getting the whole phrase right matters: translation, speech-to-text, math expressions.</li>
+      <li><strong>Skip it for long or creative writing:</strong> it tends to produce repetitive, "safe" text, where sampling with some randomness reads better.</li>
+      <li><strong>The extra compute means it is rarely the default</strong> on big hosted models, but it is common in open-model serving tools.</li>
     </ul>
   </div>
 </section>

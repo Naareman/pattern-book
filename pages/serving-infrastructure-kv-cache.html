@@ -171,17 +171,17 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">Common uses</div>
-      <div class="fits-desc">Inside the serving engine. Every modern chat or completion API uses it under the hood for the answer it is generating right now.</div>
+      <div class="fits-desc"><strong>Inside the serving engine.</strong> Every modern chat or completion API uses it under the hood for the answer it is generating right now.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Lives next to</div>
-      <div class="fits-desc">Smart memory layout. The cache can get huge, so the layer below decides how its pages are arranged in GPU memory.</div>
+      <div class="fits-desc"><strong>Smart memory layout.</strong> The cache can get huge, so the layer below decides how its pages are arranged in GPU memory.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Different from</div>
-      <div class="fits-desc">A stored-answers cache. That kind reuses whole replies across users. This one reuses the model's own intermediate work as it writes a single reply.</div>
+      <div class="fits-desc"><strong>A stored-answers cache.</strong> That kind reuses whole replies across users. This one reuses the model's own intermediate work as it writes a single reply.</div>
     </div>
   </div>
 </section>
@@ -190,9 +190,9 @@
   <div class="section-label"><span class="num">04</span>When it matters</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <ul class="matters-list">
-    <li>Long answers, long prompts, or long chats: cost grows gently with length instead of exploding.</li>
-    <li>Streaming chat: the user sees each word appear at a steady pace because each step does the same small amount of work.</li>
-    <li>You share a long system prompt across many calls: the prompt's cache can be reused across users (prompt caching).</li>
+    <li><strong>Long answers, long prompts, or long chats:</strong> cost grows gently with length instead of exploding.</li>
+    <li><strong>Streaming chat:</strong> the user sees each word appear at a steady pace because each step does the same small amount of work.</li>
+    <li><strong>You share a long system prompt across many calls:</strong> the prompt's cache can be reused across users (prompt caching).</li>
   </ul>
 </section>
 

@@ -166,17 +166,17 @@ data["year"] = int(data["year"])  # "2024" &#8594; 2024</div>
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">Home</div>
-      <div class="fits-desc">A way of shaping the output, applied after the answer comes back. It is your own code tidying up the reply from one model call, not a second model call.</div>
+      <div class="fits-desc"><strong>A way of shaping the output,</strong> applied after the answer comes back. It is your own code tidying up the reply from one model call, not a second model call.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Neighbor</div>
-      <div class="fits-desc">Schema Enforcement stops the problem before it happens; Format Coercion cleans it up after. In practice you use both: enforce the shape where you can, fix the odd case that slips through.</div>
+      <div class="fits-desc"><strong>Schema Enforcement</strong> stops the problem before it happens; Format Coercion cleans it up after. In practice you use both: enforce the shape where you can, fix the odd case that slips through.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Not this</div>
-      <div class="fits-desc">If the fix needs another model call (asking the model to reformat itself), that is a different layer, and a retry loop is another one again. Plain code cleanup stays here.</div>
+      <div class="fits-desc">If <strong>the fix needs another model call</strong> (asking the model to reformat itself), that is a different layer, and a retry loop is another one again. Plain code cleanup stays here.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="filing-note">
@@ -190,9 +190,9 @@ data["year"] = int(data["year"])  # "2024" &#8594; 2024</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <div class="matters-card">
     <ul class="matters-list">
-      <li>You use someone else's model and cannot control how it generates text.</li>
-      <li>The model sometimes wraps JSON in markdown, uses curly quotes, or returns numbers as text.</li>
-      <li>You want to shrug off these small slip-ups without the delay or cost of a retry or a second call.</li>
+      <li><strong>You use someone else's model</strong> and cannot control how it generates text.</li>
+      <li><strong>The model sometimes wraps JSON in markdown,</strong> uses curly quotes, or returns numbers as text.</li>
+      <li><strong>You want to shrug off these small slip-ups</strong> without the delay or cost of a retry or a second call.</li>
     </ul>
   </div>
 </section>

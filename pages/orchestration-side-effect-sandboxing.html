@@ -160,17 +160,17 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">Common uses</div>
-      <div class="fits-desc">Letting an agent execute code, open files, or browse the web without risking your real environment.</div>
+      <div class="fits-desc"><strong>Letting an agent execute code, open files, or browse the web</strong> without risking your real environment.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Different from</div>
-      <div class="fits-desc">An approval gate. A gate stops the action and asks a person. A sandbox lets the action run, but in a place where mistakes cannot escape.</div>
+      <div class="fits-desc"><strong>An approval gate.</strong> A gate stops the action and asks a person. A sandbox lets the action run, but in a place where mistakes cannot escape.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Stacks with</div>
-      <div class="fits-desc">Combine with idempotency and rollback for actions that <em>do</em> need to reach the outside world: the sandbox handles the dangerous middle, the other patterns handle the safe-to-retry edges.</div>
+      <div class="fits-desc">Combine with <strong>idempotency and rollback</strong> for actions that <em>do</em> need to reach the outside world: the sandbox handles the dangerous middle, the other patterns handle the safe-to-retry edges.</div>
     </div>
   </div>
 </section>
@@ -179,9 +179,9 @@
   <div class="section-label"><span class="num">04</span>When It Matters</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <ul class="matters-list">
-    <li>The agent runs code it wrote itself, where you cannot fully predict what it will do.</li>
-    <li>The agent handles untrusted input (uploaded files, web pages, user-supplied prompts) that could carry hidden instructions.</li>
-    <li>You need a hard ceiling on damage from a buggy or hijacked agent: nothing inside the sandbox can reach what you care about.</li>
+    <li><strong>The agent runs code it wrote itself,</strong> where you cannot fully predict what it will do.</li>
+    <li><strong>The agent handles untrusted input</strong> (uploaded files, web pages, user-supplied prompts) that could carry hidden instructions.</li>
+    <li><strong>You need a hard ceiling on damage</strong> from a buggy or hijacked agent: nothing inside the sandbox can reach what you care about.</li>
   </ul>
 </section>
 

@@ -288,13 +288,13 @@ WHERE tenant_id = <span class="v" id="qTenant">'acme'</span>
     <div class="fits-row">
       <div class="fits-dot" aria-hidden="true"></div>
       <div class="fits-text">
-        <strong>What it covers:</strong> the wall between customers. A single shared model is fine: a single shared data path is the bug. Isolation lives at the data and search layer, under every model call.
+        <strong>What it covers:</strong> <strong>the wall between customers.</strong> A single shared model is fine: a single shared data path is the bug. Isolation lives at the data and search layer, under every model call.
       </div>
     </div>
     <div class="fits-row">
       <div class="fits-dot" aria-hidden="true"></div>
       <div class="fits-text">
-        <strong>Sits next to:</strong> deciding what one user inside a customer can do is the next step in (access control). Isolation puts each customer in a sealed lane. Access control sets the rules inside that lane.
+        <strong>Sits next to:</strong> <strong>deciding what one user inside a customer can do</strong> is the next step in (access control). Isolation puts each customer in a sealed lane. Access control sets the rules inside that lane.
       </div>
     </div>
     <div class="filing-box">
@@ -307,9 +307,9 @@ WHERE tenant_id = <span class="v" id="qTenant">'acme'</span>
   <div class="section-label"><span class="num">04</span>When it matters</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <ul class="matters-list">
-    <li>Several customers share one running app: a B2B SaaS, a multi-tenant agent, or a hosted assistant.</li>
-    <li>You use a shared search index or memory store across customers to save cost.</li>
-    <li>A leak across customers would be a deal-ending event: medical, legal, financial, defense.</li>
+    <li><strong>Several customers share one running app:</strong> a B2B SaaS, a multi-tenant agent, or a hosted assistant.</li>
+    <li><strong>You use a shared search index or memory store across customers</strong> to save cost.</li>
+    <li><strong>A leak across customers would be a deal-ending event:</strong> medical, legal, financial, defense.</li>
   </ul>
 </section>
 

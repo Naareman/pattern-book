@@ -171,17 +171,17 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">Pairs with</div>
-      <div class="fits-desc">External action. Idempotency is what makes those actions safe to retry without doubling the effect.</div>
+      <div class="fits-desc"><strong>External action.</strong> Idempotency is what makes those actions safe to retry without doubling the effect.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Two parts</div>
-      <div class="fits-desc">The key (a unique tag on each attempt so the server recognizes a repeat) and the verification step (asking after the fact whether it really worked).</div>
+      <div class="fits-desc"><strong>The key (a unique tag on each attempt)</strong> so the server recognizes a repeat, and the verification step (asking after the fact whether it really worked).</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Not the same as</div>
-      <div class="fits-desc">Rollback. Idempotency stops an action from happening twice. Rollback undoes one that did happen.</div>
+      <div class="fits-desc"><strong>Rollback.</strong> Idempotency stops an action from happening twice. Rollback undoes one that did happen.</div>
     </div>
   </div>
 </section>
@@ -190,9 +190,9 @@
   <div class="section-label"><span class="num">04</span>When It Matters</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <ul class="matters-list">
-    <li>Any tool the agent will retry on failure, especially payments, messages, and bookings.</li>
-    <li>Long-running actions where the response can get lost but the work still completes on the other side.</li>
-    <li>Anywhere the tool's reply might lie, like an HTTP 500 that came back after the write succeeded.</li>
+    <li><strong>Any tool the agent will retry on failure,</strong> especially payments, messages, and bookings.</li>
+    <li><strong>Long-running actions</strong> where the response can get lost but the work still completes on the other side.</li>
+    <li><strong>Anywhere the tool's reply might lie,</strong> like an HTTP 500 that came back after the write succeeded.</li>
   </ul>
 </section>
 

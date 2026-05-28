@@ -162,17 +162,17 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">Pairs with</div>
-      <div class="fits-desc">An idempotency key. Retries are only safe if the same call done twice does the same thing once. For payments and bookings, that means a key that the server recognizes as a repeat.</div>
+      <div class="fits-desc"><strong>An idempotency key.</strong> Retries are only safe if the same call done twice does the same thing once. For payments and bookings, that means a key that the server recognizes as a repeat.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Pairs with</div>
-      <div class="fits-desc">A circuit breaker. The breaker stops retries from piling on a service that has already given up.</div>
+      <div class="fits-desc"><strong>A circuit breaker.</strong> The breaker stops retries from piling on a service that has already given up.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Three knobs</div>
-      <div class="fits-desc">How long to wait (backoff), how much randomness to add (jitter), and how many tries before you give up (max attempts). Wrong values turn retries from a safety net into the cause of the next outage.</div>
+      <div class="fits-desc"><strong>How long to wait (backoff), how much randomness to add (jitter), and how many tries before you give up (max attempts).</strong> Wrong values turn retries from a safety net into the cause of the next outage.</div>
     </div>
   </div>
 </section>
@@ -181,9 +181,9 @@
   <div class="section-label"><span class="num">04</span>When It Matters</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <ul class="matters-list">
-    <li>The failure is likely temporary: a brief network blip, a rate-limit window closing, a model server warming up after a deploy.</li>
-    <li>The call is safe to repeat, either because it only reads data or because it carries an idempotency key.</li>
-    <li>Many clients can fail at once, so a flat "retry now" would stack into a stampede that hurts the recovering service more than the first failure did.</li>
+    <li><strong>The failure is likely temporary:</strong> a brief network blip, a rate-limit window closing, a model server warming up after a deploy.</li>
+    <li><strong>The call is safe to repeat,</strong> either because it only reads data or because it carries an idempotency key.</li>
+    <li><strong>Many clients can fail at once,</strong> so a flat "retry now" would stack into a stampede that hurts the recovering service more than the first failure did.</li>
   </ul>
 </section>
 

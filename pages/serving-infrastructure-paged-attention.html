@@ -176,17 +176,17 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">Common uses</div>
-      <div class="fits-desc">Built into open serving engines (vLLM made it famous), now standard in production stacks. It is the memory side of how many users one GPU can serve.</div>
+      <div class="fits-desc"><strong>Built into open serving engines</strong> (vLLM made it famous), now standard in production stacks. It is the memory side of how many users one GPU can serve.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Pairs with</div>
-      <div class="fits-desc">Answering many at once. Modern batching mixes users of very different lengths in one pass; the paged layout is what makes that practical.</div>
+      <div class="fits-desc"><strong>Answering many at once.</strong> Modern batching mixes users of very different lengths in one pass; the paged layout is what makes that practical.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Different from</div>
-      <div class="fits-desc">Slimming the model. That makes the model itself smaller. This rearranges where each user's running memory lives.</div>
+      <div class="fits-desc"><strong>Slimming the model.</strong> That makes the model itself smaller. This rearranges where each user's running memory lives.</div>
     </div>
   </div>
 </section>
@@ -195,9 +195,9 @@
   <div class="section-label"><span class="num">04</span>When it matters</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <ul class="matters-list">
-    <li>Many users with very different reply lengths share the same model.</li>
-    <li>You see "out of memory" errors long before the GPU is really full.</li>
-    <li>Cost per user is your bottleneck and you want to squeeze more of them onto the same hardware.</li>
+    <li><strong>Many users with very different reply lengths</strong> share the same model.</li>
+    <li><strong>You see "out of memory" errors</strong> long before the GPU is really full.</li>
+    <li><strong>Cost per user is your bottleneck</strong> and you want to squeeze more of them onto the same hardware.</li>
   </ul>
 </section>
 

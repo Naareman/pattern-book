@@ -166,17 +166,17 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">Pairs with</div>
-      <div class="fits-desc">Running the same model on more than one machine. The balancer only makes sense once you have copies for it to choose between.</div>
+      <div class="fits-desc"><strong>Running the same model on more than one machine.</strong> The balancer only makes sense once you have copies for it to choose between.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Two flavors</div>
-      <div class="fits-desc">Pick the next copy in a simple turn order (round robin), or pick the copy with the fewest jobs in flight (least loaded). The second is kinder to long-running model calls.</div>
+      <div class="fits-desc"><strong>Pick the next copy in a simple turn order (round robin),</strong> or pick the copy with the fewest jobs in flight (least loaded). The second is kinder to long-running model calls.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Not the same as</div>
-      <div class="fits-desc">Routing to a backup model. Load balancing chooses between equal copies; a fallback chain switches to a different model when the first one fails.</div>
+      <div class="fits-desc"><strong>Routing to a backup model.</strong> Load balancing chooses between equal copies; a fallback chain switches to a different model when the first one fails.</div>
     </div>
   </div>
 </section>
@@ -185,9 +185,9 @@
   <div class="section-label"><span class="num">04</span>When It Matters</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <ul class="matters-list">
-    <li>Traffic spikes by time of day or with a launch, and a single copy of the model would buckle under the peak.</li>
-    <li>You need to take a machine down for an upgrade and keep serving users from the other copies in the meantime.</li>
-    <li>Model calls take seconds, so a copy that gets a hard request stays busy for a while; the balancer steers the next user to a freer copy.</li>
+    <li><strong>Traffic spikes by time of day or with a launch,</strong> and a single copy of the model would buckle under the peak.</li>
+    <li><strong>You need to take a machine down for an upgrade</strong> and keep serving users from the other copies in the meantime.</li>
+    <li><strong>Model calls take seconds,</strong> so a copy that gets a hard request stays busy for a while; the balancer steers the next user to a freer copy.</li>
   </ul>
 </section>
 

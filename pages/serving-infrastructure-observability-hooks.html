@@ -165,17 +165,17 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">What it shapes</div>
-      <div class="fits-desc">Nothing about the answer itself. It only emits the data so someone (or another system) can see what happened: timing, cost, which step did what.</div>
+      <div class="fits-desc"><strong>Nothing about the answer itself.</strong> It only emits the data so someone (or another system) can see what happened: timing, cost, which step did what.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Feeds into</div>
-      <div class="fits-desc">Cost tracking, latency reviews, and incident debugging. The numbers are also what the "pick the cheapest model" decision relies on later, since you cannot pick well without knowing what each tier actually costs and how often it suffices.</div>
+      <div class="fits-desc"><strong>Cost tracking, latency reviews, and incident debugging.</strong> The numbers are also what the "pick the cheapest model" decision relies on later, since you cannot pick well without knowing what each tier actually costs and how often it suffices.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Mechanism vs discipline</div>
-      <div class="fits-desc">The hooks (the code that emits the records) live here in the runtime. Tracing as a way of thinking (what to log, how to look at it, when to alert) is a separate crosscut concern.</div>
+      <div class="fits-desc"><strong>The hooks (the code that emits the records) live here in the runtime.</strong> Tracing as a way of thinking (what to log, how to look at it, when to alert) is a separate crosscut concern.</div>
     </div>
   </div>
 </section>
@@ -184,10 +184,10 @@
   <div class="section-label"><span class="num">04</span>When It Matters</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <ul class="matters-list">
-    <li>The system is in production and surprises start happening: a slow call, a spike in spend, a wrong answer you cannot reproduce.</li>
-    <li>Calls have many steps (retrieval, tools, multiple models) and "the AI was slow" is not enough to debug.</li>
-    <li>Cost is climbing and you cannot say which feature or which prompt is driving it.</li>
-    <li>You want to set budgets and alerts, which need real numbers from real traffic, not estimates.</li>
+    <li><strong>The system is in production and surprises start happening:</strong> a slow call, a spike in spend, a wrong answer you cannot reproduce.</li>
+    <li><strong>Calls have many steps (retrieval, tools, multiple models)</strong> and "the AI was slow" is not enough to debug.</li>
+    <li><strong>Cost is climbing</strong> and you cannot say which feature or which prompt is driving it.</li>
+    <li><strong>You want to set budgets and alerts,</strong> which need real numbers from real traffic, not estimates.</li>
   </ul>
 </section>
 

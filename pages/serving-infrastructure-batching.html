@@ -160,17 +160,17 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">Common uses</div>
-      <div class="fits-desc">The job of the serving layer of an inference engine like vLLM or TGI: collect incoming requests for a few milliseconds, then run them as a group.</div>
+      <div class="fits-desc"><strong>The serving layer of an inference engine</strong> like vLLM or TGI: collect incoming requests for a few milliseconds, then run them as a group.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Sits next to</div>
-      <div class="fits-desc">Smart memory layout. Modern batching mixes requests of different lengths in the same pass; the memory pattern is what lets that work cleanly.</div>
+      <div class="fits-desc"><strong>Smart memory layout.</strong> Modern batching mixes requests of different lengths in the same pass; the memory pattern is what lets that work cleanly.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Different from</div>
-      <div class="fits-desc">Caching. Caching skips repeated work entirely; batching still runs the work, just for many people at once.</div>
+      <div class="fits-desc"><strong>Caching.</strong> Caching skips repeated work entirely; batching still runs the work, just for many people at once.</div>
     </div>
   </div>
 </section>
@@ -179,9 +179,9 @@
   <div class="section-label"><span class="num">04</span>When it matters</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <ul class="matters-list">
-    <li>Many users hit the same model at the same time and a small wait per request is acceptable.</li>
-    <li>The GPU is sitting idle on a single small request, then crawling under a sudden burst.</li>
-    <li>You are paying for capacity by the hour and want each machine to serve as many people as it can.</li>
+    <li><strong>Many users hit the same model at the same time</strong> and a small wait per request is acceptable.</li>
+    <li><strong>The GPU is sitting idle on a single small request,</strong> then crawling under a sudden burst.</li>
+    <li><strong>You are paying for capacity by the hour</strong> and want each machine to serve as many people as it can.</li>
   </ul>
 </section>
 

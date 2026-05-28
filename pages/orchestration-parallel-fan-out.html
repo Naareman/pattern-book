@@ -156,12 +156,12 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">Sits next to</div>
-      <div class="fits-desc">Sequential pipelines. A pipeline is "one after another"; fan-out is "all at once." Many real systems mix the two: a pipeline whose middle step fans out, then collects.</div>
+      <div class="fits-desc"><strong>Sequential pipelines.</strong> A pipeline is "one after another"; fan-out is "all at once." Many real systems mix the two: a pipeline whose middle step fans out, then collects.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Not the same as</div>
-      <div class="fits-desc">Several agents talking to each other. Fan-out runs independent calls in parallel. If they need to coordinate or pass messages, that is a different pattern.</div>
+      <div class="fits-desc"><strong>Several agents talking to each other.</strong> Fan-out runs independent calls in parallel. If they need to coordinate or pass messages, that is a different pattern.</div>
     </div>
   </div>
 </section>
@@ -170,9 +170,9 @@
   <div class="section-label"><span class="num">04</span>When It Matters</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <ul class="matters-list">
-    <li>The same input needs several independent views (legal check, factual check, tone check).</li>
-    <li>You are processing a list (100 product reviews, 50 PDFs) and each item is independent.</li>
-    <li>Latency matters and the steps truly do not depend on each other.</li>
+    <li><strong>The same input needs several independent views</strong> (legal check, factual check, tone check).</li>
+    <li><strong>You are processing a list</strong> (100 product reviews, 50 PDFs) and each item is independent.</li>
+    <li><strong>Latency matters</strong> and the steps truly do not depend on each other.</li>
   </ul>
 </section>
 

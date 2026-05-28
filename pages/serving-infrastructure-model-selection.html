@@ -181,17 +181,17 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">What it shapes</div>
-      <div class="fits-desc">The runtime picks which model the call goes to, based on cost and latency targets. It does not change the prompt or the answer logic. Same in, just routed to a smaller engine.</div>
+      <div class="fits-desc"><strong>The runtime decision of which model the call goes to,</strong> based on cost and latency targets. It does not change the prompt or the answer logic. Same in, just routed to a smaller engine.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Not the same as</div>
-      <div class="fits-desc">Cascading (cheap first, then escalate if the answer looks weak) is a composition pattern with two calls. Picking the cheapest model that fits is one runtime decision before any call runs.</div>
+      <div class="fits-desc"><strong>Cascading</strong> (cheap first, then escalate if the answer looks weak) is a composition pattern with two calls. Picking the cheapest model that fits is one runtime decision before any call runs.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Sits on top of</div>
-      <div class="fits-desc">A cost and quality budget. The runtime is applying a budget you set: how much quality you trade for how much money saved.</div>
+      <div class="fits-desc"><strong>A cost and quality budget.</strong> The runtime is applying a budget you set: how much quality you trade for how much money saved.</div>
     </div>
   </div>
 </section>
@@ -200,10 +200,10 @@
   <div class="section-label"><span class="num">04</span>When It Matters</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <ul class="matters-list">
-    <li>Traffic is a mix of easy and hard requests. Most are easy. Pay accordingly.</li>
-    <li>You have a clear quality bar and can measure it, so you know when the cheap tier holds up.</li>
-    <li>Cost per call is starting to drive total spend, and one model size for everything is wasteful.</li>
-    <li>Skip this when every call is high-stakes or when quality differences are hard to measure: just use the strong model.</li>
+    <li><strong>Traffic is a mix of easy and hard requests.</strong> Most are easy. Pay accordingly.</li>
+    <li><strong>You have a clear quality bar and can measure it,</strong> so you know when the cheap tier holds up.</li>
+    <li><strong>Cost per call is starting to drive total spend,</strong> and one model size for everything is wasteful.</li>
+    <li><strong>Skip this when every call is high-stakes</strong> or when quality differences are hard to measure: just use the strong model.</li>
   </ul>
 </section>
 

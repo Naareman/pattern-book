@@ -157,17 +157,17 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">What it shapes</div>
-      <div class="fits-desc">You hand the model a shape for its answer when you make the call, and it fills that shape inside the same call. No second call, no separate checker model.</div>
+      <div class="fits-desc"><strong>You hand the model a shape for its answer</strong> when you make the call, and it fills that shape inside the same call. No second call, no separate checker model.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Compare to</div>
-      <div class="fits-desc">Constrained decoding works word by word, ruling out any next word that would break the format. Schema enforcement works at the level of fields and types ("name is text, age is a number") and usually sits on top of that lower-level control.</div>
+      <div class="fits-desc"><strong>Constrained decoding</strong> works word by word, ruling out any next word that would break the format. Schema enforcement works at the level of fields and types ("name is text, age is a number") and usually sits on top of that lower-level control.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Not this</div>
-      <div class="fits-desc">If a separate model checks or fixes the answer afterward, that is a verify step, not this. Schema enforcement is the one-call, one-model version.</div>
+      <div class="fits-desc">If <strong>a separate model checks or fixes the answer afterward,</strong> that is a verify step, not this. Schema enforcement is the one-call, one-model version.</div>
     </div>
   </div>
 </section>
@@ -176,9 +176,9 @@
   <div class="section-label"><span class="num">04</span>When It Matters</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <ul class="matters-list">
-    <li>Any pipeline that feeds the model's answer straight into other code.</li>
-    <li>The model sometimes invents field names, drops required keys, or returns a number as text, and that breaks your parser.</li>
-    <li>You want a guaranteed-valid response instead of an occasional crash.</li>
+    <li><strong>Any pipeline that feeds the model's answer straight into other code.</strong></li>
+    <li><strong>The model sometimes invents field names,</strong> drops required keys, or returns a number as text, and that breaks your parser.</li>
+    <li><strong>You want a guaranteed-valid response</strong> instead of an occasional crash.</li>
   </ul>
 </section>
 

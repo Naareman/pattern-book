@@ -155,17 +155,17 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">Home</div>
-      <div class="fits-desc">A way of shaping the output as the model writes it. The rules run inside one call, narrowing the model's word choices at each step before it picks one.</div>
+      <div class="fits-desc"><strong>A way of shaping the output as the model writes it.</strong> The rules run inside one call, narrowing the model's word choices at each step before it picks one.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Neighbor</div>
-      <div class="fits-desc">Schema Enforcement is the higher-level cousin: it says which fields and types are required. Constrained Decoding is the mechanism that can guarantee that shape letter by letter. They often work together.</div>
+      <div class="fits-desc"><strong>Schema Enforcement</strong> is the higher-level cousin: it says which fields and types are required. Constrained Decoding is the mechanism that can guarantee that shape letter by letter. They often work together.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Cross-reference</div>
-      <div class="fits-desc">The rules are usually built into the software that runs the model. The decision to use them lives here; the machinery that runs them lives in the serving setup.</div>
+      <div class="fits-desc"><strong>The rules are usually built into the software that runs the model.</strong> The decision to use them lives here; the machinery that runs them lives in the serving setup.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="filing-note">
@@ -179,9 +179,9 @@
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <div class="matters-card">
     <ul class="matters-list">
-      <li>You run the model yourself and can plug rules into how it generates text.</li>
-      <li>A badly formatted reply would break something downstream (a database write, an API call, a safety check).</li>
-      <li>Asking nicely in the prompt gets you most of the way; this is the last-mile guarantee that even an odd input cannot produce invalid output.</li>
+      <li><strong>You run the model yourself</strong> and can plug rules into how it generates text.</li>
+      <li><strong>A badly formatted reply would break something downstream</strong> (a database write, an API call, a safety check).</li>
+      <li><strong>Asking nicely in the prompt gets you most of the way;</strong> this is the last-mile guarantee that even an odd input cannot produce invalid output.</li>
     </ul>
   </div>
 </section>

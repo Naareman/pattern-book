@@ -165,12 +165,12 @@
   <div class="fits-card">
     <div class="fits-row">
       <div class="fits-label">Sits next to</div>
-      <div class="fits-desc">Single-call patterns (one step) and parallel fan-out (many steps at once). A pipeline is many steps, but always in a fixed order, one after the other.</div>
+      <div class="fits-desc"><strong>Single-call patterns (one step) and parallel fan-out (many steps at once).</strong> A pipeline is many steps, but always in a fixed order, one after the other.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
       <div class="fits-label">Not the same as</div>
-      <div class="fits-desc">A loop that decides at runtime what to do next. In a pipeline the steps and their order are decided up front, not by the model mid-run.</div>
+      <div class="fits-desc"><strong>A loop that decides at runtime what to do next.</strong> In a pipeline the steps and their order are decided up front, not by the model mid-run.</div>
     </div>
   </div>
 </section>
@@ -179,9 +179,9 @@
   <div class="section-label"><span class="num">04</span>When It Matters</div>
   <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <ul class="matters-list">
-    <li>The job has clear stages and one always feeds the next (extract, then translate, then summarize).</li>
-    <li>One big prompt keeps failing in subtle ways; breaking it up makes each step easier to test.</li>
-    <li>You want to swap one step's model or prompt without redoing the rest.</li>
+    <li><strong>The job has clear stages</strong> and one always feeds the next (extract, then translate, then summarize).</li>
+    <li><strong>One big prompt keeps failing in subtle ways;</strong> breaking it up makes each step easier to test.</li>
+    <li><strong>You want to swap one step's model or prompt</strong> without redoing the rest.</li>
   </ul>
 </section>
 
