@@ -3,21 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Serving Infrastructure · L0 · The Pattern Book</title>
+<title>Serving &amp; Infrastructure · The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
     --border:#E8EAEE; --border-strong:#D5D9E0;
     --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
-    --radius:16px;
-    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.10);
+    --radius:16px; --radius-sm:11px;
     --success:#0E9F6E; --success-soft:#E7F7F0;
-    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
-    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-padding-top: 80px; }
@@ -29,13 +28,29 @@
     -webkit-font-smoothing: antialiased;
   }
   body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
 
   /* a11y */
-  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
   .skip-link:focus { top: 8px; }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 
   /* top bar */
   .topbar {
@@ -46,16 +61,15 @@
     border-bottom: 1px solid var(--border);
   }
   .topbar-inner {
-    max-width: 920px; margin: 0 auto; padding: 11px 24px;
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
   }
   .back {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 13px; font-weight: 500; color: var(--text);
     text-decoration: none; padding: 5px 11px;
-    border: 1px solid var(--border-strong); border-radius: 20px;
-    background: #fff; white-space: nowrap;
-    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
   }
   .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
   .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -65,7 +79,7 @@
   .crumb .here { color: var(--soft); }
 
   /* header */
-  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
   .eyebrow {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
@@ -80,165 +94,98 @@
   }
   .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
+  /* title row + see-it-in-action pill */
+  .title-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:16px 0 0}
+  .title-row .pattern-title{margin:0;flex:1 1 auto;min-width:240px}
+  .how-pill{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--accent);border-radius:22px;padding:8px 15px;box-shadow:var(--shadow);transition:background .15s ease,transform .15s ease}
+  .how-pill:hover{background:#E3DBFD;transform:translateY(-1px)}
+  .how-pill .arr{display:inline-block;transition:transform .18s ease}
+  .how-pill:hover .arr{transform:translateX(3px)}
+  @media (prefers-reduced-motion:reduce){.how-pill,.how-pill .arr{transition:none}.how-pill:hover,.how-pill:hover .arr{transform:none}}
+  @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
+
+  /* flow legend (stage pills + arrows) */
+  .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
+  .flow-chip {
+    font-family: inherit; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; box-shadow: var(--shadow); padding: 7px 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--soft); white-space: nowrap;
+    letter-spacing: .01em; cursor: pointer;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .flow-chip:hover { color: var(--accent-hover); border-color: var(--border-strong); }
+  .flow-chip.lit { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); }
+  .flow-arrow { flex: none; color: var(--accent); font-size: 15px; line-height: 1; }
+  .flow-caption { text-align: center; color: var(--faint); font-size: 13px; line-height: 1.5; margin-top: 12px; }
+
   /* sections */
-  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
-  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
-  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
-  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  section {
+    max-width: 920px; margin: 0 auto;
+    padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px;
+  }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
+    line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
+  }
   h2 em { font-style: italic; color: var(--accent); }
 
-  /* idea card */
-  .idea-card {
+  /* ============ STAGE CARDS ============ */
+  .stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 6px; }
+
+  .stage-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
+    scroll-margin-top: 80px;
+    transition: box-shadow .55s ease, border-color .55s ease;
+    display: flex; flex-direction: column;
   }
-  .idea-card p {
-    font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px;
-    line-height: 1.5; color: var(--text);
+  .stage-card.glow {
+    box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42);
+    border-color: var(--accent);
+  }
+  @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
+
+  .stage-card.clickable {
+    cursor: pointer;
+    transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
+  @media (prefers-reduced-motion: reduce) {
+    .stage-card.clickable { transition: none; }
+    .stage-card.clickable:hover { transform: none; }
   }
 
-  /* ======== DEMO STAGE ======== */
-  .demo-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
-  }
-  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 20px; }
+  /* de-squeezed: icon + name share a full-width row of their own */
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; }
+  .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
+  .stage-head .sico svg { width: 18px; height: 18px; display: block; }
+  .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
 
-  /* pipeline canvas area */
-  .pipeline {
-    background: var(--bg-subtle); border: 1px solid var(--border-strong);
-    border-radius: var(--radius-sm); padding: 20px 16px; position: relative;
-    min-height: 320px;
-  }
+  .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* lane labels */
-  .lane-label {
-    font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
-    color: var(--faint); margin-bottom: 10px;
+  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    flex: none; display: inline-flex; align-items: center; gap: 3px;
+    padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    line-height: 1.2; white-space: nowrap;
+    border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
 
-  /* requests row */
-  .req-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; min-height: 44px; align-items: center; }
-  .req-bubble {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 40px; height: 40px; border-radius: 50%;
-    background: var(--surface); border: 1.5px solid var(--border-strong);
-    font-size: 18px; box-shadow: var(--shadow-sm);
-    transition: transform 0.3s ease, opacity 0.3s ease, border-color 0.3s ease, background 0.3s ease;
-    flex-shrink: 0;
+  /* "see how" lives at the bottom of each card, pushed down by margin-top:auto */
+  .see-how {
+    display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--accent-hover);
+    transition: color .15s ease;
   }
-  .req-bubble.active { border-color: var(--accent); background: var(--accent-soft); transform: scale(1.08); }
-  .req-bubble.done { opacity: 0.3; transform: scale(0.92); }
-
-  /* pipeline nodes */
-  .pipe-nodes {
-    display: flex; align-items: flex-start; gap: 8px;
-    margin-top: 8px;
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion: reduce) {
+    .see-how, .see-how .arr { transition: none; }
+    .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; }
   }
-  .pipe-node {
-    flex: 1; background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm); padding: 12px 10px; text-align: center;
-    min-height: 72px; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 5px;
-    position: relative; transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
-  }
-  .pipe-node.lit { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 3px rgba(124,92,246,.12); }
-  .pipe-node.cache-hit { border-color: var(--success); background: var(--success-soft); box-shadow: 0 0 0 3px rgba(14,159,110,.12); }
-  .pipe-node-icon { font-size: 22px; line-height: 1; }
-  .pipe-node-name { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--soft); }
-  .pipe-node-note { font-size: 11px; color: var(--faint); line-height: 1.4; min-height: 16px; }
-
-  .pipe-arrow { flex: none; align-self: center; color: var(--accent); font-size: 18px; line-height: 1; margin-bottom: 20px; }
-
-  /* status bar */
-  .status-bar {
-    margin-top: 18px; padding: 12px 14px;
-    background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); font-size: 14px;
-    color: var(--soft); line-height: 1.5; min-height: 48px;
-    transition: color 0.3s ease;
-  }
-  .status-bar strong { color: var(--accent-hover); }
-  .status-bar.cache { color: var(--success); }
-  .status-bar.cache strong { color: var(--success); }
-
-  /* controls */
-  .demo-controls {
-    display: flex; gap: 10px; flex-wrap: wrap;
-    padding-top: 16px; margin-top: 16px;
-    border-top: 1px solid var(--border);
-  }
-  .diagram-btn {
-    padding: 10px 16px; border: 1px solid var(--border-strong);
-    background: var(--surface); border-radius: var(--radius-sm);
-    cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px;
-    font-weight: 600; color: var(--text);
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
-  }
-  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
-  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
-  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-
-  /* ======== SECTION 03: TAP CARDS ======== */
-  .cards-grid { display: flex; flex-direction: column; gap: 12px; }
-  .flip-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 14px 16px;
-    cursor: pointer; box-shadow: var(--shadow-sm);
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-  }
-  .flip-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
-  .flip-card .q {
-    font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px;
-    line-height: 1.3; color: var(--text); display: flex; align-items: center; gap: 10px;
-  }
-  .flip-card .q .chip {
-    flex-shrink: 0; font-size: 20px; line-height: 1;
-  }
-  .flip-card .body {
-    font-size: 13.5px; color: var(--soft); line-height: 1.55;
-    max-height: 0; overflow: hidden;
-    transition: max-height 0.35s ease, margin 0.3s ease, opacity 0.3s ease;
-    opacity: 0;
-  }
-  .flip-card.open .body { max-height: 120px; margin-top: 12px; opacity: 1; }
-  .flip-card .tap-hint { font-size: 11px; color: var(--faint); margin-top: 5px; }
-  .flip-card.open .tap-hint { display: none; }
-
-  /* ======== TRADEOFFS ======== */
-  .tradeoffs-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
-  }
-  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
-  .tradeoff-row:last-of-type { margin-bottom: 0; }
-  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
-  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
-  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
-  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
-  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
-  .tradeoff-scale .spacer { width: 170px; flex: none; }
-  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
-  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
-
-  /* ======== GUIDE (in-place, section 05) ======== */
-  .guide { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
-  .guide-row { display: flex; align-items: baseline; justify-content: flex-start; flex-wrap: wrap; gap: 4px 10px; padding: 17px 22px; border-top: 1px solid var(--border); }
-  .guide-row:first-child { border-top: none; }
-  .want { font-size: 15px; line-height: 1.4; color: var(--text); }
-  .resolve { display: inline-flex; align-items: baseline; gap: 8px; flex: none; }
-  .connect { color: var(--faint); font-size: 15px; line-height: 1.4; }
-  .tech { font-family: 'Fraunces', serif; font-size: 16px; color: var(--text); line-height: 1.4; }
-  a.tech { color: var(--accent-hover); transition: color .15s ease; }
-  a.tech:hover { color: var(--accent); }
-  a.tech .ext { font-size: 11px; color: var(--accent); margin-left: 2px; vertical-align: baseline; }
-  @media (prefers-reduced-motion: reduce) { a.tech { transition: none; } }
-  .cluster-head { padding: 16px 22px 8px; }
-  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
-  .cluster-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text); line-height: 1.3; }
-  .cluster-head + .guide-row { border-top: none; }
-  .cluster-head ~ .guide-row { padding-left: 40px; }
 
   /* back link */
   .back-link {
@@ -246,348 +193,138 @@
     padding: 14px 16px; background: var(--surface);
     border: 1px solid var(--border); border-radius: var(--radius);
     box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; cursor: pointer;
   }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
-  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s; }
   .back-link:hover .back-arrow { transform: translateX(-3px); }
   .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
   .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
 
-  /* sources + footer */
-  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
-  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
-  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
-  .sources li em { font-style: italic; color: var(--text); }
-  .sources li .note { color: var(--faint); }
-  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  /* footer */
+  footer {
+    max-width: 920px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
   footer strong { color: var(--soft); font-weight: 500; }
 
   /* responsive */
+  @media (max-width: 720px) {
+    .stages { grid-template-columns: 1fr; gap: 14px; }
+  }
   @media (max-width: 560px) {
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .pipe-nodes { gap: 5px; }
-    .pipe-node-name { font-size: 10px; }
-    .pipe-arrow { font-size: 14px; }
-  }
-  @media (max-width: 480px) {
-    .pipe-nodes { flex-direction: column; }
-    .pipe-arrow { transform: rotate(90deg); }
-    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
-    .tradeoff-label { min-width: 0; }
-    .demo-controls { flex-direction: column; align-items: stretch; }
+    .flow-chip { font-size: 12px; padding: 6px 12px; }
   }
 </style>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 
+<!-- TOP BAR -->
 <nav class="topbar">
   <div class="topbar-inner">
     <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a>
-      <span class="sep">/</span>
-      <a href="layers.html">Layers</a>
-      <span class="sep">/</span>
-      <span class="here">Serving Infrastructure</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">Serving &amp; Infrastructure</span>
     </nav>
   </div>
 </nav>
 
+<!-- HEADER -->
 <header class="header" id="main">
   <span class="eyebrow">
     <span class="ico" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="3" width="20" height="5" rx="2"/><rect x="2" y="10" width="20" height="5" rx="2"/><rect x="2" y="17" width="20" height="5" rx="2"/>
-        <circle cx="6" cy="5.5" r="1" fill="currentColor" stroke="none"/><circle cx="6" cy="12.5" r="1" fill="currentColor" stroke="none"/>
+        <rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/><path d="M8 7h.01M8 17h.01"/>
       </svg>
-    </span>
-    Layer &middot; L0
+    </span>Layer &middot; 2
   </span>
-  <h1 class="pattern-title">Serving Infrastructure</h1>
-  <p class="explainer">Everything the runtime does to a model call before the call happens and after the answer comes back, without touching what the model says.</p>
+  <div class="title-row"><h1 class="pattern-title">Serving &amp; Infrastructure</h1><a class="how-pill" href="serving-infrastructure-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
+  <p class="explainer">Everything around a model call that keeps the AI fast and always on for everyone, without changing what it says.</p>
+
+  <div class="flow" aria-label="Jump to a part of serving and infrastructure">
+    <button type="button" class="flow-chip" data-target="card-fast">Run fast</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-up">Keep it up</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-save">Save money</button>
+  </div>
+  <p class="flow-caption">Three jobs the system does around every call.</p>
 </header>
 
-<!-- 01 THE IDEA -->
+<!-- STAGE CARDS -->
 <section>
-  <div class="section-label"><span class="num">01</span>The Idea</div>
-  <h2>What <em>is</em> it?</h2>
-  <div class="idea-card">
-    <p>
-      When you ask an AI a question, the words go to a <strong style="color:var(--accent-hover)">server with powerful GPUs</strong> (GPU: the chip that does the heavy computing) that run the model.
-      To handle thousands of people at once, three tricks work together:
-      requests get <strong style="color:var(--accent-hover)">batched</strong> (grouped so the GPU works on many at once),
-      popular answers are <strong style="color:var(--accent-hover)">cached</strong> (stored so the GPU skips the work entirely),
-      and traffic is split across <strong style="color:var(--accent-hover)">multiple machines</strong> so no single server gets overwhelmed.
-    </p>
-  </div>
-</section>
+  <div class="stages">
 
-<!-- 02 SEE IT WORK -->
-<section>
-  <div class="section-label"><span class="num">02</span>See it work</div>
-  <h2>Watch the <em>flow</em>.</h2>
-
-  <div class="demo-stage">
-    <p class="demo-lede">
-      Six users send requests. Tap Play to watch them flow through the pipeline.
-      One is a repeat question: watch the cache short-circuit the work.
-    </p>
-
-    <div class="pipeline" aria-label="Serving pipeline diagram" role="region">
-      <div class="lane-label">Incoming requests</div>
-      <div class="req-row" id="reqRow" aria-live="polite" aria-atomic="false">
-        <!-- bubbles injected by JS -->
+    <!-- RUN FAST -->
+    <section class="stage-card clickable" id="card-fast" aria-labelledby="g-fast">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </span>
+        <h2 id="g-fast"><span class="stage-name">Run fast</span></h2>
       </div>
-
-      <div class="lane-label" style="margin-top: 4px;">Pipeline</div>
-      <div class="pipe-nodes" id="pipeNodes" aria-live="polite">
-
-        <div class="pipe-node" id="nodeQueue">
-          <span class="pipe-node-icon" aria-hidden="true">📥</span>
-          <span class="pipe-node-name">Queue</span>
-          <span class="pipe-node-note" id="noteQueue">waiting</span>
-        </div>
-
-        <span class="pipe-arrow" aria-hidden="true">&rarr;</span>
-
-        <div class="pipe-node" id="nodeCache">
-          <span class="pipe-node-icon" aria-hidden="true">⚡</span>
-          <span class="pipe-node-name">Cache</span>
-          <span class="pipe-node-note" id="noteCache">check first</span>
-        </div>
-
-        <span class="pipe-arrow" aria-hidden="true">&rarr;</span>
-
-        <div class="pipe-node" id="nodeBatch">
-          <span class="pipe-node-icon" aria-hidden="true">📦</span>
-          <span class="pipe-node-name">Batch</span>
-          <span class="pipe-node-note" id="noteBatch">group together</span>
-        </div>
-
-        <span class="pipe-arrow" aria-hidden="true">&rarr;</span>
-
-        <div class="pipe-node" id="nodeGPU">
-          <span class="pipe-node-icon" aria-hidden="true">🖥️</span>
-          <span class="pipe-node-name">GPU</span>
-          <span class="pipe-node-note" id="noteGPU">run the model</span>
-        </div>
-
+      <p class="stage-lead">Get the answer out quickly, even under heavy load.</p>
+      <div class="chips">
+        <span class="chip">Answering many at once</span>
+        <span class="chip">Reusing work within an answer</span>
+        <span class="chip">Smart memory layout</span>
+        <span class="chip">Drafting fast, then checking</span>
+        <span class="chip">Slimming the model to fit</span>
       </div>
+      <a class="see-how" href="serving-infrastructure-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
-      <div class="status-bar" id="statusBar" role="status" aria-live="polite" aria-atomic="true">
-        Press Play to start.
+    <!-- KEEP IT UP -->
+    <section class="stage-card clickable" id="card-up" aria-labelledby="g-up">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>
+          </svg>
+        </span>
+        <h2 id="g-up"><span class="stage-name">Keep it up</span></h2>
       </div>
-    </div>
-
-    <div class="demo-controls">
-      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
-      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
-    </div>
-  </div>
-</section>
-
-<!-- 03 REAL EXAMPLE -->
-<section>
-  <div class="section-label"><span class="num">03</span>A real example</div>
-  <h2>Where you've <em>felt</em> this.</h2>
-
-  <div class="cards-grid">
-    <div class="flip-card" tabindex="0" role="button" aria-expanded="false">
-      <div class="q"><span class="chip" aria-hidden="true">⚡</span>ChatGPT answers fast even when millions use it</div>
-      <div class="tap-hint">Tap to see why</div>
-      <div class="body">OpenAI runs thousands of GPUs in parallel and batches concurrent requests together. Your prompt usually shares a GPU pass with dozens of other users' prompts, so the cost per answer stays low and the wait stays short.</div>
-    </div>
-    <div class="flip-card" tabindex="0" role="button" aria-expanded="false">
-      <div class="q"><span class="chip" aria-hidden="true">💾</span>Asking the same question twice feels instant the second time</div>
-      <div class="tap-hint">Tap to see why</div>
-      <div class="body">Many inference providers cache the output for common or identical prompts. The second request hits the cache and returns in milliseconds. The GPU never runs at all.</div>
-    </div>
-    <div class="flip-card" tabindex="0" role="button" aria-expanded="false">
-      <div class="q"><span class="chip" aria-hidden="true">🌍</span>AI apps still work during a datacenter outage</div>
-      <div class="tap-hint">Tap to see why</div>
-      <div class="body">Traffic is split across multiple servers and regions. A load balancer watches which machines are healthy and reroutes requests around any that go down, so the service stays up even when hardware fails.</div>
-    </div>
-  </div>
-</section>
-
-<!-- 04 TRADEOFFS -->
-<section>
-  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
-  <h2>What each trick <em>costs</em>.</h2>
-  <div class="tradeoffs-stage">
-    <div class="tradeoff-scale">
-      <span class="spacer"></span>
-      <div class="scale-track"><span>low</span><span>high</span></div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Batching: speed gain</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      <p class="stage-lead">Stay online for everyone when machines fail.</p>
+      <div class="chips">
+        <span class="chip">Spreading the load across machines</span>
+        <span class="chip">Switching to a backup model</span>
+        <span class="chip">Pausing a failing service</span>
+        <span class="chip">Retrying safely</span>
       </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Batching: added wait</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      <a class="see-how" href="serving-infrastructure-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
+
+    <!-- SAVE MONEY -->
+    <section class="stage-card clickable" id="card-save" aria-labelledby="g-save">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/><path d="M14.5 9a2.5 2.5 0 0 0-5 0c0 3 5 1.5 5 4.5a2.5 2.5 0 0 1-5 0M12 6v1.5M12 16.5V18"/>
+          </svg>
+        </span>
+        <h2 id="g-save"><span class="stage-name">Save money</span></h2>
       </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Caching: speed gain</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      <p class="stage-lead">Skip work and pick the cheapest path where you can.</p>
+      <div class="chips">
+        <span class="chip">Reusing stored answers</span>
+        <span class="chip">Picking the cheapest model that fits</span>
+        <span class="chip">Tracking speed and cost</span>
       </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Caching: staleness risk</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Multi-server: reliability</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Multi-server: cost</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-quote">
-      These three techniques work together. Caching saves the most time for repeated questions. Batching saves money for unique ones. Multiple servers mean users never notice when a machine goes down.
-    </div>
-  </div>
-</section>
-
-<!-- 05 INSIDE THIS LAYER -->
-<section>
-  <div class="section-label"><span class="num">05</span>Inside This Layer</div>
-  <h2>What <em>lives</em> here.</h2>
-
-  <div class="guide" role="list" aria-label="Infrastructure functions in this layer">
-
-    <!-- CLUSTER 1 -->
-    <div class="cluster-head" role="listitem">
-      <h3 class="cluster-label">Run the model fast</h3>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to handle many users at once?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Inference Serving</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to make the GPU work on many requests in one pass?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Batching</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to reuse computed memory across tokens in a sequence?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">KV-Cache</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to manage GPU memory so large requests don't waste space?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Paged Attention</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to draft tokens fast and verify them before committing?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Speculative Decoding</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to shrink the model so it fits on fewer or cheaper chips?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Quantization and Compression at Serving Time</span>
-      </span>
-    </div>
-
-    <!-- CLUSTER 2 -->
-    <div class="cluster-head cluster-break" role="listitem">
-      <h3 class="cluster-label">Keep it up for everyone</h3>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to spread requests across servers so no one machine gets overwhelmed?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Routing and Load Balancing</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to switch to a backup model when the first one fails or is too slow?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Fallback Chains</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to stop hammering a failing service and know when to try again?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Circuit Breakers and Retry Policies</span>
-      </span>
-    </div>
-
-    <!-- CLUSTER 3 -->
-    <div class="cluster-head cluster-break" role="listitem">
-      <h3 class="cluster-label">Save time and money</h3>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to answer repeated questions instantly without running the model?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Cache Check and Substitution</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to pick the cheapest or fastest model variant for each call at runtime?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Cost/Latency-Optimized Model Selection</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to emit latency, token counts, and errors so dashboards can show what happened?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Observability Hooks</span>
-      </span>
-    </div>
+      <a class="see-how" href="serving-infrastructure-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
   </div>
 </section>
 
-<!-- BACK NAV -->
+<!-- BACK LINK -->
 <section style="padding-top: 20px; padding-bottom: 40px;">
   <a href="layers.html" class="back-link">
     <div class="back-arrow">&larr;</div>
@@ -598,186 +335,72 @@
   </a>
 </section>
 
-<!-- SOURCES -->
-<div class="sources">
-  <div class="sources-title">Sources</div>
-  <ul>
-    <li>Kwon et al. (2023). <em>Efficient Memory Management for Large Language Model Serving with PagedAttention.</em> <span class="note">Describes how vLLM batches and schedules GPU memory for concurrent requests.</span></li>
-    <li>Yu et al. (2022). <em>Orca: A Distributed Serving System for Transformer-Based Generative Models.</em> <span class="note">Introduces iteration-level scheduling to maximize GPU throughput.</span></li>
-    <li>Pope et al. (2023). <em>Efficiently Scaling Transformer Inference.</em> <span class="note">Google analysis of partitioning large models across many chips.</span></li>
-    <li>Ainslie et al. (2023). <em>GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints.</em> <span class="note">Covers KV-cache techniques that make serving faster.</span></li>
-  </ul>
-</div>
-
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
 </footer>
 
 <script>
-// ============ HELPERS ============
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// flow legend: scroll + glow on card click, one-time load sweep, card-door click guard
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var stages = ['card-fast','card-up','card-save'];
+  var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
 
-// ============ REQUESTS ============
-const REQUESTS = [
-  { emoji: '👩', label: 'User A' },
-  { emoji: '🧑', label: 'User B' },
-  { emoji: '👦', label: 'User C' },
-  { emoji: '👧', label: 'User D (repeat question)' },  // cache hit
-  { emoji: '👴', label: 'User E' },
-  { emoji: '👩‍💻', label: 'User F' },
-];
-const CACHE_HIT_IDX = 3; // User D hits the cache
+  function pillFor(cardId){
+    for(var i=0;i<pills.length;i++){ if(pills[i].getAttribute('data-target')===cardId) return pills[i]; }
+    return null;
+  }
 
-// nodes
-const nodeQueue = document.getElementById('nodeQueue');
-const nodeCache = document.getElementById('nodeCache');
-const nodeBatch = document.getElementById('nodeBatch');
-const nodeGPU   = document.getElementById('nodeGPU');
-const noteQueue = document.getElementById('noteQueue');
-const noteCache = document.getElementById('noteCache');
-const noteBatch = document.getElementById('noteBatch');
-const noteGPU   = document.getElementById('noteGPU');
-const statusBar = document.getElementById('statusBar');
-const reqRow    = document.getElementById('reqRow');
-const playBtn   = document.getElementById('playBtn');
-const resetBtn  = document.getElementById('resetBtn');
-
-let bubbles = [];
-let playing = false;
-
-function buildBubbles() {
-  reqRow.innerHTML = '';
-  bubbles = REQUESTS.map((r, i) => {
-    const b = document.createElement('div');
-    b.className = 'req-bubble';
-    b.textContent = r.emoji;
-    b.setAttribute('aria-label', r.label);
-    b.setAttribute('title', r.label);
-    reqRow.appendChild(b);
-    return b;
+  // nav buttons: smooth-scroll to the stage card + brief glow
+  pills.forEach(function(btn){
+    var target = btn.getAttribute('data-target');
+    var card = document.getElementById(target);
+    btn.addEventListener('click', function(){
+      if(!card) return;
+      card.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+      card.classList.add('glow');
+      window.setTimeout(function(){ card.classList.remove('glow'); }, 1200);
+    });
   });
-}
 
-function litNode(node, noteEl, msg, isCacheHit) {
-  node.classList.add(isCacheHit ? 'cache-hit' : 'lit');
-  if (noteEl) noteEl.textContent = msg;
-}
-function unlitNode(node, noteEl, defaultMsg) {
-  node.classList.remove('lit', 'cache-hit');
-  if (noteEl) noteEl.textContent = defaultMsg;
-}
-function setStatus(msg, cls) {
-  statusBar.className = 'status-bar' + (cls ? ' ' + cls : '');
-  statusBar.innerHTML = msg;
-}
-
-function resetDemo() {
-  playing = false;
-  buildBubbles();
-  unlitNode(nodeQueue, noteQueue, 'waiting');
-  unlitNode(nodeCache, noteCache, 'check first');
-  unlitNode(nodeBatch, noteBatch, 'group together');
-  unlitNode(nodeGPU,   noteGPU,  'run the model');
-  setStatus('Press Play to start.');
-  playBtn.disabled = false;
-  playBtn.textContent = '► Play';
-}
-
-async function runDemo() {
-  if (playing) return;
-  playing = true;
-  playBtn.disabled = true;
-
-  // If reduced motion: show end state instantly
-  if (reduceMotion) {
-    bubbles.forEach(b => b.classList.add('done'));
-    litNode(nodeGPU, noteGPU, 'done');
-    setStatus('<strong>All 6 requests answered.</strong> User D was served from cache. The GPU never ran for that one.', '');
-    playing = false;
-    playBtn.disabled = false;
-    return;
-  }
-
-  // Step 1: requests arrive in the queue one by one
-  setStatus('Requests are arriving...');
-  litNode(nodeQueue, noteQueue, 'filling up');
-  for (let i = 0; i < bubbles.length; i++) {
-    bubbles[i].classList.add('active');
-    await sleep(220);
-  }
-  await sleep(400);
-
-  // Step 2: check cache for each request
-  unlitNode(nodeQueue, noteQueue, 'waiting');
-  litNode(nodeCache, noteCache, 'checking...');
-  setStatus('Checking the cache for each request...');
-  await sleep(600);
-
-  // cache miss for first 3, cache hit for User D
-  for (let i = 0; i < bubbles.length; i++) {
-    bubbles[i].classList.remove('active');
-    if (i === CACHE_HIT_IDX) {
-      litNode(nodeCache, noteCache, 'hit!');
-      setStatus('<strong>Cache hit!</strong> User D asked the same question before. The answer is already stored, so the GPU skips it entirely.', 'cache');
-      bubbles[i].classList.add('done');
-      await sleep(900);
-      litNode(nodeCache, noteCache, 'checking...');
-      setStatus('Checking the cache for remaining requests...');
-    } else {
-      await sleep(180);
+  // one-time load sweep: highlight each card in order, lighting the matching pill
+  if(!reduce){
+    var step = 0;
+    function tour(){
+      if(step > 0){
+        var prevCard = document.getElementById(stages[step-1]);
+        var prevPill = pillFor(stages[step-1]);
+        if(prevCard) prevCard.classList.remove('glow');
+        if(prevPill) prevPill.classList.remove('lit');
+      }
+      if(step >= stages.length) return;
+      var curCard = document.getElementById(stages[step]);
+      var curPill = pillFor(stages[step]);
+      if(curCard) curCard.classList.add('glow');
+      if(curPill) curPill.classList.add('lit');
+      step++;
+      window.setTimeout(tour, 900);
     }
+    window.setTimeout(tour, 350);
   }
-  await sleep(400);
 
-  // Step 3: batch the remaining 5 requests
-  unlitNode(nodeCache, noteCache, 'check first');
-  litNode(nodeBatch, noteBatch, 'grouping 5');
-  setStatus('The 5 new requests are <strong>grouped into one batch</strong> so the GPU can work on them together.');
-  // light up remaining bubbles to show grouping
-  for (let i = 0; i < bubbles.length; i++) {
-    if (i !== CACHE_HIT_IDX) bubbles[i].classList.add('active');
-  }
-  await sleep(900);
-
-  // Step 4: GPU runs the batch
-  unlitNode(nodeBatch, noteBatch, 'group together');
-  litNode(nodeGPU, noteGPU, 'running batch');
-  setStatus('The GPU runs the whole batch at once. One pass through the model, five answers out.');
-  await sleep(1100);
-
-  // Step 5: done
-  unlitNode(nodeGPU, noteGPU, 'done');
-  nodeGPU.classList.add('lit');
-  noteGPU.textContent = 'done ✓';
-  bubbles.forEach(b => { b.classList.remove('active'); b.classList.add('done'); });
-  setStatus('<strong>All 6 requests answered.</strong> User D was served from cache instantly. The other 5 shared one GPU pass.');
-
-  playing = false;
-  playBtn.disabled = false;
-}
-
-playBtn.addEventListener('click', runDemo);
-resetBtn.addEventListener('click', () => { if (!playing) resetDemo(); });
-
-// init
-resetDemo();
-
-// ============ FLIP CARDS ============
-const flipCards = document.querySelectorAll('.flip-card');
-flipCards.forEach(card => {
-  function toggle() {
-    const open = card.classList.toggle('open');
-    card.setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-  card.addEventListener('click', toggle);
-  card.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-      e.preventDefault();
-      toggle();
-    }
+  // each stage card is a door to the how-it-works page; chip clicks are ignored
+  var doors = {
+    'card-fast': 'serving-infrastructure-how-it-works.html',
+    'card-up': 'serving-infrastructure-how-it-works.html',
+    'card-save': 'serving-infrastructure-how-it-works.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('.chip')) return; // chip clicks never trigger the card door
+      if(e.target.closest('a')) return; // let real links handle their own clicks
+      window.location.href = doorHref;
+    });
   });
-});
+})();
 </script>
 </body>
 </html>

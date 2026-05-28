@@ -70,6 +70,15 @@
   }
   .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
+  .title-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:16px 0 0}
+  .title-row .page-title{margin:0;flex:1 1 auto;min-width:240px}
+  .how-pill{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--accent);border-radius:22px;padding:8px 15px;box-shadow:var(--shadow);transition:background .15s ease,transform .15s ease}
+  .how-pill:hover{background:#E3DBFD;transform:translateY(-1px)}
+  .how-pill .arr{display:inline-block;transition:transform .18s ease}
+  .how-pill:hover .arr{transform:translateX(3px)}
+  @media (prefers-reduced-motion:reduce){.how-pill,.how-pill .arr{transition:none}.how-pill:hover,.how-pill:hover .arr{transform:none}}
+  @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
+
   /* flow legend */
   .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
   .flow-chip { font-family: inherit; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow); padding: 7px 14px; font-size: 12.5px; font-weight: 600; color: var(--soft); white-space: nowrap; letter-spacing: .01em; cursor: pointer; transition: background .2s ease, color .2s ease, border-color .2s ease; }
@@ -85,75 +94,7 @@
   h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
   h2 em { font-style: italic; color: var(--accent); }
 
-  /* idea card */
-  .idea-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
-  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.6; color: var(--text); }
-
-  /* artifact grid */
-  .artifact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
-  .artifact-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
-    box-shadow: var(--shadow-sm); padding: 18px 16px; cursor: pointer;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-  }
-  .artifact-card:hover, .artifact-card.active { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); background: var(--accent-soft); }
-  .artifact-card .a-icon { font-size: 22px; line-height: 1; margin-bottom: 8px; }
-  .artifact-card .a-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--accent-hover); margin-bottom: 4px; }
-  .artifact-card .a-what { font-size: 13px; color: var(--soft); line-height: 1.5; }
-  .artifact-detail {
-    margin-top: 14px; padding: 16px 20px;
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
-    font-size: 15px; line-height: 1.6; color: var(--soft);
-    min-height: 62px;
-    transition: opacity 0.25s ease;
-  }
-  .artifact-detail .d-label { font-weight: 600; color: var(--text); font-size: 14px; margin-bottom: 4px; }
-  .artifact-detail .d-hint { font-size: 13px; color: var(--faint); font-style: italic; }
-
-  /* demo stage */
-  .demo-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
-  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 20px; }
-
-  /* pipeline */
-  .pipeline { display: flex; flex-direction: column; gap: 0; }
-  .pipe-row { display: flex; align-items: flex-start; gap: 14px; }
-  .pipe-row + .pipe-row { margin-top: 10px; }
-  .pipe-connector { width: 30px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; padding-top: 24px; }
-  .pipe-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border-strong); flex-shrink: 0; transition: background 0.4s ease; }
-  .pipe-dot.active { background: var(--accent); }
-  .pipe-line { width: 2px; flex: 1; min-height: 24px; background: var(--border); margin: 3px 0; transition: background 0.4s ease; }
-  .pipe-line.active { background: var(--accent); }
-  .pipe-box {
-    flex: 1; min-width: 0; padding: 14px 16px; border-radius: var(--radius-sm);
-    border: 1px solid var(--border); background: var(--bg-subtle);
-    opacity: 0.35; transform: translateX(-6px);
-    transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.4s ease, background 0.4s ease;
-  }
-  .pipe-box.active { opacity: 1; transform: translateX(0); border-color: var(--accent); background: var(--surface); }
-  .pipe-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; transition: color 0.4s ease; }
-  .pipe-box.active .pipe-label { color: var(--accent-hover); }
-  .pipe-content { font-size: 14px; line-height: 1.55; color: var(--text); min-height: 20px; }
-  .pipe-note { font-size: 12px; color: var(--soft); margin-top: 5px; line-height: 1.4; }
-  .embed-canvas-wrap { margin-top: 6px; }
-  #embedCanvas { display: block; width: 100%; max-width: 480px; height: 220px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-subtle); }
-
-  /* controls */
-  .demo-controls { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border); }
-  .diagram-btn { padding: 10px 16px; border: 1px solid var(--border-strong); background: var(--surface); border-radius: var(--radius-sm); cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease; }
-  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
-  .diagram-btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
-  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-
-  /* real example */
-  .example-row { display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap; margin-top: 6px; }
-  .example-cell { flex: 1; min-width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 16px; box-shadow: var(--shadow-sm); }
-  .example-cell .ec-step { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
-  .example-cell .ec-text { font-family: 'Fraunces', serif; font-weight: 400; font-size: 16px; line-height: 1.5; color: var(--text); }
-  .example-cell .ec-note { font-size: 12.5px; color: var(--soft); margin-top: 6px; line-height: 1.45; }
-  .example-arrow { align-self: center; color: var(--accent); font-size: 20px; flex-shrink: 0; }
-
-  /* ============ STAGE CARDS (L4 pattern) ============ */
+  /* ============ STAGE CARDS ============ */
   .stages { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 6px; }
 
   .stage-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; scroll-margin-top: 80px; transition: box-shadow .55s ease, border-color .55s ease; display: flex; flex-direction: column; }
@@ -190,22 +131,6 @@
   a.chip:hover .arr { transform: translate(1px, -1px); }
   @media (prefers-reduced-motion: reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
 
-  /* ============ TRADEOFFS ============ */
-  .tradeoffs-stage {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 20px; box-shadow: var(--shadow);
-  }
-  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
-  .tradeoff-row:last-of-type { margin-bottom: 0; }
-  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
-  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
-  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
-  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
-  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
-  .tradeoff-scale .spacer { width: 170px; flex: none; }
-  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
-  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
-
   /* back link */
   .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; cursor: pointer; }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
@@ -231,17 +156,8 @@
     h1.page-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .artifact-grid { grid-template-columns: 1fr; }
-    .example-arrow { display: none; }
-    .example-row { flex-direction: column; }
     .stages { grid-template-columns: 1fr; gap: 14px; }
     .flow-chip { font-size: 12px; padding: 6px 12px; }
-  }
-  @media (max-width: 480px) {
-    .demo-controls { flex-direction: column; align-items: stretch; }
-    .diagram-btn { flex: 1; }
-    .tradeoff-row { flex-direction: column; align-items: stretch; }
-    .tradeoff-label { min-width: 0; }
   }
 </style>
 </head>
@@ -265,9 +181,9 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
       </svg>
-    </span>Layer &middot; L&minus;1
+    </span>Layer &middot; 1
   </span>
-  <h1 class="page-title">Data &amp; Artifact Lifecycle</h1>
+  <div class="title-row"><h1 class="page-title">Data &amp; Artifact Lifecycle</h1><a class="how-pill" href="data-artifacts-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
   <p class="explainer">Everything AI systems are built from: the data they learn and look things up in, and the versioned artifacts that define how they behave at runtime.</p>
 
   <div class="flow" aria-label="Jump to a part of this layer">
@@ -278,167 +194,8 @@
   <p class="flow-caption">Two kinds of thing the system depends on before it can run.</p>
 </header>
 
-<!-- 01 THE IDEA -->
-<section>
-  <div class="section-label"><span class="num">01</span>The Idea</div>
-  <h2>What <em>is</em> it?</h2>
-  <div class="idea-card">
-    <p>Before any AI can answer a question, four things have to exist. First, <span style="color:var(--accent-hover);font-weight:600">training data</span>: the enormous pile of text the model read to learn how language works. Second, <span style="color:var(--accent-hover);font-weight:600">documents</span>: the specific files or web pages you give it to look things up in. Third, <span style="color:var(--accent-hover);font-weight:600">embeddings</span> (number-lists that encode meaning, so similar ideas sit close together): every piece of text turned into a list of numbers so that "find the most relevant paragraph" is fast. Fourth, <span style="color:var(--accent-hover);font-weight:600">weights</span>: the actual trained model file, billions of numbers that encode everything it learned. Every other layer in this book sits on top of these four.</p>
-  </div>
-
-  <!-- Tap-to-explore cards -->
-  <div class="artifact-grid" role="list" aria-label="The four data artifacts">
-    <div class="artifact-card" role="listitem" tabindex="0" data-id="training" aria-pressed="false">
-      <div class="a-icon" aria-hidden="true">&#128218;</div>
-      <div class="a-name">Training Data</div>
-      <div class="a-what">What the model read to learn.</div>
-    </div>
-    <div class="artifact-card" role="listitem" tabindex="0" data-id="documents" aria-pressed="false">
-      <div class="a-icon" aria-hidden="true">&#128196;</div>
-      <div class="a-name">Documents</div>
-      <div class="a-what">Files it looks things up in at run-time.</div>
-    </div>
-    <div class="artifact-card" role="listitem" tabindex="0" data-id="embeddings" aria-pressed="false">
-      <div class="a-icon" aria-hidden="true">&#128290;</div>
-      <div class="a-name">Embeddings</div>
-      <div class="a-what">Text turned into numbers so meaning can be searched.</div>
-    </div>
-    <div class="artifact-card" role="listitem" tabindex="0" data-id="weights" aria-pressed="false">
-      <div class="a-icon" aria-hidden="true">&#129504;</div>
-      <div class="a-name">Weights</div>
-      <div class="a-what">The trained model file: billions of numbers.</div>
-    </div>
-  </div>
-  <div class="artifact-detail" id="artifactDetail" aria-live="polite">
-    <div class="d-hint">Tap a card to learn more.</div>
-  </div>
-</section>
-
-<!-- 02 SEE IT WORK -->
-<section>
-  <div class="section-label"><span class="num">02</span>See It Work</div>
-  <h2>Raw text to <em>embeddings</em>.</h2>
-  <p class="demo-lede">Watch how a document sentence gets cleaned up and then turned into a dot in embedding space (a map where similar sentences land close together; unrelated ones land far apart).</p>
-
-  <div class="demo-stage">
-    <div class="pipeline" id="pipeline" aria-live="polite">
-
-      <div class="pipe-row">
-        <div class="pipe-connector">
-          <div class="pipe-dot" id="dot0"></div>
-          <div class="pipe-line" id="line01"></div>
-        </div>
-        <div class="pipe-box" id="box0">
-          <div class="pipe-label">Raw Text (From Document)</div>
-          <div class="pipe-content" id="rawText">The  central bank  sets &lt;br&gt; interest&amp;nbsp;rates...</div>
-          <div class="pipe-note">Messy: HTML tags, extra spaces, encoded characters.</div>
-        </div>
-      </div>
-
-      <div class="pipe-row">
-        <div class="pipe-connector">
-          <div class="pipe-dot" id="dot1"></div>
-          <div class="pipe-line" id="line12"></div>
-        </div>
-        <div class="pipe-box" id="box1">
-          <div class="pipe-label">Cleaned Text</div>
-          <div class="pipe-content" id="cleanText">The central bank sets interest rates.</div>
-          <div class="pipe-note">Tags stripped, whitespace fixed, ready to encode.</div>
-        </div>
-      </div>
-
-      <div class="pipe-row">
-        <div class="pipe-connector">
-          <div class="pipe-dot" id="dot2"></div>
-        </div>
-        <div class="pipe-box" id="box2">
-          <div class="pipe-label">Embedding Space</div>
-          <div class="embed-canvas-wrap">
-            <canvas id="embedCanvas" aria-label="A 2-D map of sentences. Similar sentences are close together; different ones are far apart."></canvas>
-          </div>
-          <div class="pipe-note" id="embedNote">Each dot is a sentence. Similar ones cluster together.</div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="demo-controls">
-      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
-      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
-    </div>
-  </div>
-</section>
-
-<!-- 03 A REAL EXAMPLE -->
-<section>
-  <div class="section-label"><span class="num">03</span>A Real Example</div>
-  <h2>How it fits in <em>practice</em>.</h2>
-  <p style="font-size:15px;color:var(--soft);line-height:1.6;margin-bottom:18px;">A company wants to let employees ask questions about internal policy documents.</p>
-  <div class="example-row">
-    <div class="example-cell">
-      <div class="ec-step">Documents</div>
-      <div class="ec-text">200 PDF policy files.</div>
-      <div class="ec-note">The raw source of truth. Text is extracted and cleaned.</div>
-    </div>
-    <div class="example-arrow" aria-hidden="true">&rarr;</div>
-    <div class="example-cell">
-      <div class="ec-step">Embeddings</div>
-      <div class="ec-text">Each paragraph becomes a number-list and is stored in a vector database.</div>
-      <div class="ec-note">Enables fast "find the most similar chunk" search.</div>
-    </div>
-    <div class="example-arrow" aria-hidden="true">&rarr;</div>
-    <div class="example-cell">
-      <div class="ec-step">Weights</div>
-      <div class="ec-text">A pre-trained language model reads the retrieved paragraphs and answers.</div>
-      <div class="ec-note">The model's knowledge comes from its training data; the documents supply the specifics.</div>
-    </div>
-  </div>
-</section>
-
-<!-- 04 TRADEOFFS -->
-<section>
-  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
-  <h2>What you're always <em>balancing</em>.</h2>
-  <div class="tradeoffs-stage">
-    <div class="tradeoff-scale">
-      <div class="spacer"></div>
-      <div class="scale-track"><span>Low</span><span>High</span></div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Data freshness</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Privacy risk</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Reproduce&shy;ability</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Rollback speed</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
-      </div>
-    </div>
-    <div class="tradeoff-quote">
-      Fresher data means more work to re-clean, re-version, and re-validate. Better versioning costs storage but makes every incident easier to diagnose.
-    </div>
-  </div>
-</section>
-
-<!-- 05 INSIDE THIS LAYER: stage cards -->
+<!-- STAGE CARDS -->
 <section id="stage-section">
-  <div class="section-label"><span class="num">05</span>Inside This Layer</div>
-  <h2>Two kinds of thing to manage in <em>L&minus;1</em>.</h2>
-
   <div class="stages">
 
     <section class="stage-card clickable" id="card-data" aria-labelledby="g-data">
@@ -516,177 +273,6 @@
 </footer>
 
 <script>
-// ============ ARTIFACT CARDS ============
-const artifactDetails = {
-  training: {
-    label: 'Training Data',
-    text: 'Trillions of words from books, websites, and code. The model reads all of it once, during training, and never again. It cannot look things up in training data at run-time: everything it learned is baked into the weights.'
-  },
-  documents: {
-    label: 'Documents',
-    text: 'Files you supply at run-time: PDFs, web pages, support articles, internal wikis. The model has not seen these before. They are fetched, cleaned, and handed to the model along with the question.'
-  },
-  embeddings: {
-    label: 'Embeddings',
-    text: 'A number-list (a vector) for each piece of text. The list is generated by a model trained specifically to put similar meanings close together in number-space. This is what makes "find the most relevant paragraph" fast and accurate.'
-  },
-  weights: {
-    label: 'Weights (the model file)',
-    text: 'Billions of decimal numbers saved to disk after training. When you call an API like GPT-4 or Claude, those weights load into memory and run. The weights encode the model\'s language ability; documents and embeddings supply the specific facts.'
-  }
-};
-
-const artifactCards = document.querySelectorAll('.artifact-card');
-const artifactDetail = document.getElementById('artifactDetail');
-
-function showArtifact(id) {
-  const d = artifactDetails[id];
-  artifactDetail.innerHTML = '<div class="d-label">' + d.label + '</div>' + d.text;
-  artifactCards.forEach(function(c) {
-    var active = c.dataset.id === id;
-    c.classList.toggle('active', active);
-    c.setAttribute('aria-pressed', String(active));
-  });
-}
-
-artifactCards.forEach(function(card) {
-  card.addEventListener('click', function() { showArtifact(card.dataset.id); });
-  card.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showArtifact(card.dataset.id); }
-  });
-});
-
-// ============ PIPELINE DEMO ============
-var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-var boxes = [
-  document.getElementById('box0'),
-  document.getElementById('box1'),
-  document.getElementById('box2')
-];
-var dots = [
-  document.getElementById('dot0'),
-  document.getElementById('dot1'),
-  document.getElementById('dot2')
-];
-var lines = [
-  document.getElementById('line01'),
-  document.getElementById('line12')
-];
-
-var playBtn = document.getElementById('playBtn');
-var resetBtn = document.getElementById('resetBtn');
-var demoStep = -1;
-var demoPlaying = false;
-
-var embDots = [
-  { x: 0.18, y: 0.28, label: 'interest rates', group: 0, highlight: true },
-  { x: 0.22, y: 0.38, label: 'monetary policy', group: 0 },
-  { x: 0.12, y: 0.35, label: 'inflation data', group: 0 },
-  { x: 0.28, y: 0.25, label: 'bank reserves', group: 0 },
-  { x: 0.70, y: 0.22, label: 'ocean waves', group: 1 },
-  { x: 0.78, y: 0.32, label: 'mountain peaks', group: 1 },
-  { x: 0.65, y: 0.30, label: 'forest canopy', group: 1 },
-  { x: 0.55, y: 0.72, label: 'pasta recipe', group: 2 },
-  { x: 0.65, y: 0.78, label: 'bread baking', group: 2 },
-  { x: 0.48, y: 0.80, label: 'vegetable soup', group: 2 }
-];
-var groupColors = ['#7C5CF6', '#0E9F6E', '#E8882A'];
-var groupColorsSoft = ['rgba(124,92,246,0.15)', 'rgba(14,159,110,0.12)', 'rgba(232,136,42,0.12)'];
-var groupLabels = ['finance', 'nature', 'food'];
-
-var canvas, ctx, canvasW, canvasH, visibleDots = 0;
-
-function setupCanvas() {
-  canvas = document.getElementById('embedCanvas');
-  ctx = canvas.getContext('2d');
-  resizeCanvas();
-}
-function resizeCanvas() {
-  var rect = canvas.parentElement.getBoundingClientRect();
-  canvasW = Math.min(480, rect.width || 320);
-  canvasH = 220;
-  canvas.width = canvasW;
-  canvas.height = canvasH;
-}
-function drawCanvas(showN) {
-  if (!ctx) return;
-  ctx.clearRect(0, 0, canvasW, canvasH);
-  if (showN >= embDots.length) {
-    [0, 1, 2].forEach(function(g) {
-      var gDots = embDots.filter(function(d) { return d.group === g; });
-      if (!gDots.length) return;
-      var cx = gDots.reduce(function(s, d) { return s + d.x * canvasW; }, 0) / gDots.length;
-      var cy = gDots.reduce(function(s, d) { return s + d.y * canvasH; }, 0) / gDots.length;
-      var grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 90);
-      grad.addColorStop(0, groupColorsSoft[g]);
-      grad.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.beginPath(); ctx.arc(cx, cy, 90, 0, Math.PI * 2);
-      ctx.fillStyle = grad; ctx.fill();
-      ctx.font = '600 11px Inter, sans-serif';
-      ctx.fillStyle = groupColors[g]; ctx.globalAlpha = 0.8;
-      ctx.fillText(groupLabels[g], cx - ctx.measureText(groupLabels[g]).width / 2, cy + 78);
-      ctx.globalAlpha = 1;
-    });
-  }
-  for (var i = 0; i < Math.min(showN, embDots.length); i++) {
-    var d = embDots[i];
-    var px = d.x * canvasW; var py = d.y * canvasH;
-    var r = d.highlight ? 7 : 5;
-    if (d.highlight) {
-      ctx.beginPath(); ctx.arc(px, py, r + 6, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(124,92,246,0.18)'; ctx.fill();
-    }
-    ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2);
-    ctx.fillStyle = d.highlight ? '#7C5CF6' : groupColors[d.group];
-    ctx.globalAlpha = d.highlight ? 1 : 0.8; ctx.fill(); ctx.globalAlpha = 1;
-    if (d.highlight || showN >= embDots.length) {
-      ctx.font = d.highlight ? '600 12px Inter, sans-serif' : '400 11px Inter, sans-serif';
-      ctx.fillStyle = d.highlight ? '#6D4DE6' : '#565C68';
-      ctx.fillText(d.label, px + r + 5, py + 4);
-    }
-  }
-}
-function resetDemo() {
-  demoStep = -1; visibleDots = 0;
-  boxes.forEach(function(b) { b.classList.remove('active'); });
-  dots.forEach(function(d) { d.classList.remove('active'); });
-  lines.forEach(function(l) { l.classList.remove('active'); });
-  if (canvas && ctx) drawCanvas(0);
-}
-function activateStep(n) {
-  boxes[n].classList.add('active'); dots[n].classList.add('active');
-  if (n > 0) lines[n - 1].classList.add('active');
-}
-function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
-async function runPlay() {
-  if (demoPlaying) return;
-  demoPlaying = true; playBtn.disabled = true; resetBtn.disabled = true;
-  resetDemo();
-  await sleep(300);
-  activateStep(0); await sleep(reduceMotion ? 0 : 900);
-  activateStep(1); await sleep(reduceMotion ? 0 : 900);
-  activateStep(2); await sleep(reduceMotion ? 0 : 300);
-  if (reduceMotion) {
-    visibleDots = embDots.length; drawCanvas(visibleDots);
-  } else {
-    for (var i = 1; i <= embDots.length; i++) {
-      visibleDots = i; drawCanvas(visibleDots);
-      await sleep(i === 1 ? 600 : 160);
-    }
-    drawCanvas(embDots.length);
-  }
-  demoStep = 2; demoPlaying = false; playBtn.disabled = false; resetBtn.disabled = false;
-}
-playBtn.addEventListener('click', function() { if (!demoPlaying) runPlay(); });
-resetBtn.addEventListener('click', function() { if (!demoPlaying) resetDemo(); });
-
-window.addEventListener('DOMContentLoaded', function() {
-  setupCanvas(); drawCanvas(0);
-  if (reduceMotion) runPlay();
-});
-window.addEventListener('resize', function() { resizeCanvas(); drawCanvas(visibleDots); });
-
 // ============ FLOW LEGEND + LOAD TOUR ============
 (function() {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;

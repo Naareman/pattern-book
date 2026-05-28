@@ -82,6 +82,15 @@
   }
   .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
+  .title-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:16px 0 0}
+  .title-row .pattern-title{margin:0;flex:1 1 auto;min-width:240px}
+  .how-pill{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--accent);border-radius:22px;padding:8px 15px;box-shadow:var(--shadow);transition:background .15s ease,transform .15s ease}
+  .how-pill:hover{background:#E3DBFD;transform:translateY(-1px)}
+  .how-pill .arr{display:inline-block;transition:transform .18s ease}
+  .how-pill:hover .arr{transform:translateX(3px)}
+  @media (prefers-reduced-motion:reduce){.how-pill,.how-pill .arr{transition:none}.how-pill:hover,.how-pill:hover .arr{transform:none}}
+  @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
+
   /* flow legend */
   .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
   .flow-chip {
@@ -103,149 +112,7 @@
   h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
   h2 em { font-style: italic; color: var(--accent); }
 
-  /* idea card */
-  .idea-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
-  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
-
-  /* ---- DEMO: vote stage ---- */
-  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
-
-  .vote-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
-  }
-
-  /* question pill at top */
-  .vote-question {
-    background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 18px;
-  }
-  .vote-qlabel { display: block; font-size: 12px; font-weight: 500; color: var(--faint); margin-bottom: 6px; }
-  .vote-qtext { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; line-height: 1.4; color: var(--text); }
-
-  /* three answer cards */
-  .answers { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
-  .ans-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 14px 16px;
-    display: flex; align-items: flex-start; gap: 12px;
-    opacity: 0; transform: translateY(8px);
-    transition: opacity .4s ease, transform .4s ease, border-color .3s ease, background .3s ease;
-  }
-  .ans-card.shown { opacity: 1; transform: translateY(0); }
-  .ans-card.winner { background: var(--success-soft); border-color: var(--success); }
-
-  .ans-label {
-    flex: none; width: 26px; height: 26px; border-radius: 50%;
-    background: var(--accent-soft); color: var(--accent-hover);
-    font-size: 12px; font-weight: 600;
-    display: flex; align-items: center; justify-content: center;
-    margin-top: 1px; transition: background .3s ease, color .3s ease;
-  }
-  .ans-card.winner .ans-label { background: var(--success); color: #fff; }
-
-  .ans-body { flex: 1; min-width: 0; }
-  .ans-run { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--faint); margin-bottom: 5px; }
-  .ans-text { font-size: 15px; line-height: 1.5; color: var(--text); }
-  .ans-tag {
-    display: inline-block; margin-top: 7px;
-    font-size: 12px; font-weight: 600; padding: 2px 8px;
-    border-radius: 20px;
-    background: var(--accent-soft); color: var(--accent-hover);
-    opacity: 0; transition: opacity .3s ease;
-  }
-  .ans-tag.visible { opacity: 1; }
-  .ans-tag.match { background: var(--success-soft); color: var(--success); }
-
-  /* tally */
-  .tally {
-    border-top: 1px solid var(--border); padding-top: 14px; margin-top: 6px;
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-  }
-  .tally-label { font-size: 13px; font-weight: 500; color: var(--soft); flex: none; }
-  .tally-options { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
-  .tally-option {
-    display: flex; align-items: center; gap: 7px;
-    font-size: 14px; padding: 7px 13px;
-    background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    transition: background .3s ease, border-color .3s ease;
-  }
-  .tally-option .tally-ans { font-weight: 600; color: var(--text); }
-  .tally-option .tally-count {
-    background: var(--border); color: var(--soft);
-    font-size: 12px; font-weight: 700;
-    width: 20px; height: 20px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    transition: background .3s ease, color .3s ease;
-  }
-  .tally-option.winner-opt { background: var(--success-soft); border-color: var(--success); }
-  .tally-option.winner-opt .tally-count { background: var(--success); color: #fff; }
-
-  /* verdict banner */
-  .verdict-banner {
-    display: flex; align-items: center; gap: 12px;
-    margin-top: 14px; padding: 13px 16px;
-    background: var(--text); color: #fff;
-    border-radius: var(--radius-sm);
-    opacity: 0; transform: translateY(8px) scale(0.98);
-    transition: opacity .4s ease, transform .4s ease;
-  }
-  .verdict-banner.shown { opacity: 1; transform: translateY(0) scale(1); }
-  .verdict-icon { font-size: 20px; flex: none; }
-  .verdict-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; line-height: 1.4; }
-  .verdict-sub { font-size: 12.5px; color: rgba(255,255,255,.65); margin-top: 2px; }
-
-  /* controls */
-  .board-controls {
-    display: flex; gap: 10px; flex-wrap: wrap;
-    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
-  }
-  .diagram-btn {
-    padding: 10px 16px; border: 1px solid var(--border-strong);
-    background: var(--surface); border-radius: var(--radius-sm);
-    cursor: pointer; font-family: 'Inter', sans-serif;
-    font-size: 14px; font-weight: 600; color: var(--text);
-    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
-  }
-  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
-  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
-  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-
-  /* ---- section 03: when it matters ---- */
-  .examples-grid { display: flex; flex-direction: column; gap: 10px; }
-  .eg-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);
-    padding: 16px 18px; display: flex; align-items: flex-start; gap: 14px;
-    cursor: pointer;
-    transition: border-color .2s ease, background .2s ease, transform .15s ease, box-shadow .15s ease;
-  }
-  .eg-card:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
-  .eg-icon { font-size: 22px; flex: none; line-height: 1; margin-top: 1px; }
-  .eg-body { flex: 1; min-width: 0; }
-  .eg-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; line-height: 1.3; color: var(--text); }
-  .eg-sub { font-size: 13.5px; color: var(--soft); line-height: 1.5; margin-top: 4px; }
-  .eg-detail {
-    font-size: 13px; color: var(--soft); line-height: 1.55;
-    max-height: 0; overflow: hidden;
-    transition: max-height .35s ease, margin .3s ease;
-  }
-  .eg-card.open .eg-detail { max-height: 200px; margin-top: 10px; }
-
-  /* ---- section 04: tradeoffs (canonical monochrome meter) ---- */
-  .tradeoffs-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
-  .tradeoff-scale { display: flex; justify-content: space-between; font-size: 11px; font-weight: 500; color: var(--faint); letter-spacing: .03em; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
-  .tradeoff-row { display: flex; align-items: center; gap: 14px; }
-  .tradeoff-label { width: 170px; font-size: 13px; font-weight: 600; color: var(--text); flex: none; }
-  .tradeoff-bars { display: flex; gap: 4px; flex: 1; }
-  .seg { flex: 1; height: 16px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 3px; }
-  .seg.on { background: var(--accent); border-color: var(--accent); }
-  .tradeoff-quote { font-size: 12px; color: var(--faint); line-height: 1.45; margin-top: 2px; padding-top: 10px; border-top: 1px solid var(--border); font-style: italic; }
-  @media(max-width:480px){.tradeoff-row{flex-direction:column;align-items:stretch}.tradeoff-label{min-width:0}}
-
-  /* ---- stage cards (L4-pattern) ---- */
+  /* ---- stage cards ---- */
   .stages { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: 6px; }
 
   .stage-card {
@@ -321,7 +188,6 @@
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .board-controls { flex-direction: column; align-items: stretch; }
     .flow-chip { font-size: 12px; padding: 6px 12px; }
   }
 </style>
@@ -351,9 +217,9 @@
         <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/>
         <path d="M12 3v18M4 7.5l8 4.5 8-4.5"/>
       </svg>
-    </span>Layer &middot; L2
+    </span>Layer &middot; 4
   </span>
-  <h1 class="pattern-title">Structural Composition</h1>
+  <div class="title-row"><h1 class="pattern-title">Structural Composition</h1><a class="how-pill" href="composition-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
   <p class="explainer">How multiple model calls are organized into a single good answer: combine, choose, or check.</p>
 
   <div class="flow" aria-label="Jump to a stage of composition">
@@ -366,178 +232,8 @@
   <p class="flow-caption">Three moves. One final answer.</p>
 </header>
 
-<!-- 01 THE IDEA -->
+<!-- STAGE CARDS -->
 <section>
-  <div class="section-label"><span class="num">01</span>The Idea</div>
-  <h2>What <em>is</em> it?</h2>
-  <div class="idea-card">
-    <p>One answer from one LLM (large language model, the AI that reads and writes text) can be wrong. <span style="color:var(--accent-hover);font-weight:500">Structural Composition</span> fixes that by deciding how multiple model calls are organized into one reliable answer. The three moves: fuse several outputs together (Combine), pick the best one from a set of candidates (Select), or gate the answer through a separate judgment step (Verify).</p>
-  </div>
-</section>
-
-<!-- 02 SEE IT WORK -->
-<section>
-  <div class="section-label"><span class="num">02</span>See It Work</div>
-  <h2>Ask three times, <em>vote</em>.</h2>
-
-  <p class="demo-lede">The same question goes to the model three times. Each run gives a slightly different answer. Then a vote picks the most common one.</p>
-
-  <div class="vote-stage" aria-live="polite">
-    <div class="vote-question">
-      <span class="vote-qlabel">Question</span>
-      <span class="vote-qtext">A train leaves at 14:00 and arrives 2 hours 40 minutes later. What time does it arrive?</span>
-    </div>
-
-    <div class="answers" id="answers">
-      <div class="ans-card" id="ans0">
-        <div class="ans-label" aria-hidden="true">A</div>
-        <div class="ans-body">
-          <div class="ans-run">Run 1</div>
-          <div class="ans-text">14:00 + 2 h 40 min = <strong>16:40</strong></div>
-          <span class="ans-tag" id="tag0">16:40</span>
-        </div>
-      </div>
-      <div class="ans-card" id="ans1">
-        <div class="ans-label" aria-hidden="true">B</div>
-        <div class="ans-body">
-          <div class="ans-run">Run 2</div>
-          <div class="ans-text">2 hours after 14:00 is 16:00, plus 40 minutes is <strong>16:40</strong></div>
-          <span class="ans-tag" id="tag1">16:40</span>
-        </div>
-      </div>
-      <div class="ans-card" id="ans2">
-        <div class="ans-label" aria-hidden="true">C</div>
-        <div class="ans-body">
-          <div class="ans-run">Run 3</div>
-          <div class="ans-text">14 + 2 = 16, then 0 + 40 = 40 ... so <strong>16:30</strong></div>
-          <span class="ans-tag" id="tag2">16:30</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="tally" id="tally" style="opacity:0;transition:opacity .4s ease">
-      <span class="tally-label">Vote count:</span>
-      <div class="tally-options">
-        <div class="tally-option" id="opt-a">
-          <span class="tally-ans">16:40</span>
-          <span class="tally-count" id="count-a">0</span>
-        </div>
-        <div class="tally-option" id="opt-b">
-          <span class="tally-ans">16:30</span>
-          <span class="tally-count" id="count-b">0</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="verdict-banner" id="verdict">
-      <div class="verdict-icon" aria-hidden="true">&#10003;</div>
-      <div>
-        <div class="verdict-text">16:40 wins (2 votes to 1).</div>
-        <div class="verdict-sub">The majority answer is chosen, and the lone outlier is discarded.</div>
-      </div>
-    </div>
-
-    <div class="board-controls">
-      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
-      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
-    </div>
-  </div>
-</section>
-
-<!-- 03 A REAL EXAMPLE -->
-<section>
-  <div class="section-label"><span class="num">03</span>A Real Example</div>
-  <h2>Real <em>examples</em>.</h2>
-
-  <div class="examples-grid" id="examples">
-    <div class="eg-card" tabindex="0" role="button" aria-expanded="false">
-      <div class="eg-icon" aria-hidden="true">&#x1F517;</div>
-      <div class="eg-body">
-        <div class="eg-title">Chaining</div>
-        <div class="eg-sub">The output of one step becomes the input of the next.</div>
-        <div class="eg-detail">A research tool first asks the model to find the key claim in an article, then passes that claim into a second call that checks whether it is supported by a cited source. Each step is narrow and easy; together they do something neither could alone.</div>
-      </div>
-    </div>
-
-    <div class="eg-card" tabindex="0" role="button" aria-expanded="false">
-      <div class="eg-icon" aria-hidden="true">&#x1F5F3;</div>
-      <div class="eg-body">
-        <div class="eg-title">Voting (self-consistency)</div>
-        <div class="eg-sub">Run the same question several times, take the most common answer.</div>
-        <div class="eg-detail">Medical triage software asks its diagnosis model three times with slightly different prompts. If two out of three agree, that answer goes forward. The disagreeing run is discarded. This catches the cases where a single run would give an unlucky wrong answer.</div>
-      </div>
-    </div>
-
-    <div class="eg-card" tabindex="0" role="button" aria-expanded="false">
-      <div class="eg-icon" aria-hidden="true">&#x1F500;</div>
-      <div class="eg-body">
-        <div class="eg-title">Routing</div>
-        <div class="eg-sub">Send the question to the model best suited for it.</div>
-        <div class="eg-detail">A customer service platform classifies incoming messages first. Simple greetings go to a small fast model. Legal or billing questions go to a bigger, more careful model. The user gets the right quality at the right cost without seeing any of that complexity.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 04 TRADEOFFS -->
-<section>
-  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
-  <h2>What each move <em>costs</em>.</h2>
-
-  <div class="tradeoffs-stage">
-    <div class="tradeoff-scale"><span>Low</span><span>High</span></div>
-
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Combining (cost)</div>
-      <div class="tradeoff-bars" aria-label="Cost: high (4 of 5)">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
-      </div>
-    </div>
-
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Combining (accuracy)</div>
-      <div class="tradeoff-bars" aria-label="Accuracy: high (4 of 5)">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
-      </div>
-    </div>
-
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Selecting (cost)</div>
-      <div class="tradeoff-bars" aria-label="Cost: low-medium (2 of 5)">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Selecting (accuracy)</div>
-      <div class="tradeoff-bars" aria-label="Accuracy: medium (3 of 5)">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Verifying (cost)</div>
-      <div class="tradeoff-bars" aria-label="Cost: medium (3 of 5)">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Verifying (accuracy)</div>
-      <div class="tradeoff-bars" aria-label="Accuracy: high (4 of 5)">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
-      </div>
-    </div>
-
-    <div class="tradeoff-quote">Combine runs the most calls and costs the most, but gives the highest accuracy gain. Select is cheap but depends on a good routing classifier. Verify adds one extra judgment call and catches errors without multiplying cost as aggressively as full voting.</div>
-  </div>
-</section>
-
-<!-- 05 INSIDE THIS LAYER: stage cards -->
-<section>
-  <div class="section-label"><span class="num">05</span>Inside This Layer</div>
-  <h2>Three ways to <em>use multiple calls</em>.</h2>
-
   <div class="stages">
 
     <section class="stage-card clickable" id="card-combine" aria-labelledby="g-combine">
@@ -626,116 +322,6 @@
 </footer>
 
 <script>
-// ====== helpers ======
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-// ====== VOTE DEMO ======
-const ans0 = document.getElementById('ans0');
-const ans1 = document.getElementById('ans1');
-const ans2 = document.getElementById('ans2');
-const tag0 = document.getElementById('tag0');
-const tag1 = document.getElementById('tag1');
-const tag2 = document.getElementById('tag2');
-const tallyEl = document.getElementById('tally');
-const countA = document.getElementById('count-a');
-const countB = document.getElementById('count-b');
-const optA = document.getElementById('opt-a');
-const optB = document.getElementById('opt-b');
-const verdict = document.getElementById('verdict');
-const playBtn = document.getElementById('playBtn');
-const resetBtn = document.getElementById('resetBtn');
-
-tag0.classList.add('match');
-tag1.classList.add('match');
-
-let running = false;
-
-function demoReset() {
-  [ans0, ans1, ans2].forEach(c => { c.classList.remove('shown', 'winner'); });
-  [tag0, tag1, tag2].forEach(t => { t.classList.remove('visible'); });
-  tallyEl.style.opacity = '0';
-  countA.textContent = '0'; countB.textContent = '0';
-  optA.classList.remove('winner-opt'); optB.classList.remove('winner-opt');
-  verdict.classList.remove('shown');
-  playBtn.disabled = false;
-}
-
-async function demoPlay() {
-  if (running) return;
-  running = true;
-  playBtn.disabled = true;
-
-  if (reduceMotion) {
-    [ans0, ans1, ans2].forEach(c => c.classList.add('shown'));
-    [tag0, tag1, tag2].forEach(t => t.classList.add('visible'));
-    tallyEl.style.opacity = '1';
-    countA.textContent = '2'; countB.textContent = '1';
-    optA.classList.add('winner-opt');
-    ans0.classList.add('winner'); ans1.classList.add('winner');
-    verdict.classList.add('shown');
-    running = false;
-    playBtn.disabled = false;
-    return;
-  }
-
-  ans0.classList.add('shown');
-  await sleep(550);
-  ans1.classList.add('shown');
-  await sleep(550);
-  ans2.classList.add('shown');
-  await sleep(700);
-
-  tag0.classList.add('visible');
-  await sleep(300);
-  tag1.classList.add('visible');
-  await sleep(300);
-  tag2.classList.add('visible');
-  await sleep(600);
-
-  tallyEl.style.opacity = '1';
-  await sleep(400);
-
-  countA.textContent = '1';
-  await sleep(320);
-  countA.textContent = '2';
-  await sleep(320);
-  countB.textContent = '1';
-  await sleep(500);
-
-  optA.classList.add('winner-opt');
-  ans0.classList.add('winner');
-  ans1.classList.add('winner');
-  await sleep(400);
-
-  verdict.classList.add('shown');
-
-  running = false;
-  playBtn.disabled = false;
-}
-
-playBtn.addEventListener('click', demoPlay);
-resetBtn.addEventListener('click', () => { if (running) return; demoReset(); });
-
-// ====== EXAMPLE CARDS (tap to expand) ======
-document.querySelectorAll('.eg-card').forEach(card => {
-  function toggle() {
-    const isOpen = card.classList.contains('open');
-    document.querySelectorAll('.eg-card').forEach(c => {
-      c.classList.remove('open');
-      c.setAttribute('aria-expanded', 'false');
-    });
-    if (!isOpen) {
-      card.classList.add('open');
-      card.setAttribute('aria-expanded', 'true');
-    }
-  }
-  card.addEventListener('click', toggle);
-  card.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
-  });
-});
-
 // ====== FLOW LEGEND: scroll-to + glow ======
 (function(){
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
