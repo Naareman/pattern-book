@@ -160,10 +160,6 @@
       flex-direction:column;
       gap:14px;   /* visible separation between Layers and Builds (the "produces" sits in between) */
     }
-    /* gap between top group and the Considerations box below
-       (the .across element sits between .top and .concerns in the DOM but is display:none on mobile) */
-    .box.concerns{margin-top:14px}
-
     /* ---- box-head: grid so title/subtitle stack left, CTA sits right ---- */
     /*
       Row 1: step + name (col 1) | CTA pill (col 2, row-spans 2, aligned start)
@@ -292,10 +288,60 @@
     .produces.glow .flow-x::after{border-top-color:var(--accent)}
 
     /* ---- "applies to every layer" across bracket: stays hidden on mobile ---- */
-    /* The bracket spans Layers width minus the Builds column (calc(100%-394px))
-       which collapses to nearly zero on phone. The Considerations title +
-       subtitle ("what every layer must get right") communicates the same idea. */
+    /* The bracket collapses to ~zero width on phone, so we hide it and instead
+       inject a quiet caption above the Considerations card via ::before. */
     .across{display:none}
+
+    /* ---- Mobile "applies to every layer" marker above Considerations ---- */
+    /* Two pseudo-elements replace the desktop bracket: ::before = 1px hairline
+       connector, ::after = small uppercase caption. Both are absolutely positioned
+       in the gap above the card (position:relative on .box.concerns).
+       Pseudo-elements are decorative and not in the a11y tree -- no aria needed.
+       Glows via .box.concerns.glow which the tour JS already adds. */
+    .box.concerns{
+      margin-top:28px;   /* extra room for the marker (was 14px) */
+      position:relative;
+      overflow:visible;  /* pseudo-elements extend above the card; must not be clipped */
+    }
+    /* hairline: thin vertical line from gap into the top edge of the card */
+    .box.concerns::before{
+      content:"";
+      display:block;
+      position:absolute;
+      bottom:calc(100% + 8px);   /* 8px above card top = gap between caption and card */
+      left:50%;
+      transform:translateX(-50%);
+      width:1.5px;
+      height:16px;
+      background:var(--border-strong);
+      border-radius:2px;
+      transition:background .35s ease, box-shadow .35s ease;
+    }
+    /* caption: sits above the hairline, centered */
+    .box.concerns::after{
+      content:"applies to every layer";
+      display:block;
+      position:absolute;
+      bottom:calc(100% + 28px);   /* hairline is 16px tall + 4px gap = 20px; add 8px => 28px */
+      left:0;
+      right:0;
+      text-align:center;
+      font-size:11px;
+      font-weight:600;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      color:var(--faint);
+      line-height:1;
+      transition:color .35s ease;
+    }
+    /* glow state: tour fires .glow on concernsBox at the same step it adds .revealed */
+    .box.concerns.glow::before{
+      background:var(--accent);
+      box-shadow:0 0 6px 2px rgba(124,92,246,.45);
+    }
+    .box.concerns.glow::after{
+      color:var(--accent-hover);
+    }
 
     /* ---- Builds: full-width when stacked ---- */
     .builds{width:100%;align-self:auto}
