@@ -45,12 +45,14 @@
   .eyebrow .ico svg{width:15px;height:15px;display:block}
   .title{font-family:'Fraunces',serif;font-weight:500;font-size:38px;letter-spacing:-.015em;margin:16px 0 0;line-height:1.08}
   .explainer{color:var(--soft);font-size:16px;line-height:1.6;max-width:660px;margin-top:14px}
-  /* accent link to the interactive "how it works" page, under the title/explainer */
-  .how-link{display:inline-flex;align-items:center;gap:5px;margin-top:14px;font-size:14px;font-weight:600;color:var(--accent-hover)}
-  .how-link:hover{color:var(--accent)}
-  .how-link .arr{display:inline-block;transition:transform .18s ease}
-  .how-link:hover .arr{transform:translateX(3px)}
-  @media (prefers-reduced-motion:reduce){.how-link .arr{transition:none}.how-link:hover .arr{transform:none}}
+  .title-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:16px 0 0}
+  .title-row .title{margin:0;flex:1 1 auto;min-width:240px}
+  .how-pill{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--accent);border-radius:22px;padding:8px 15px;box-shadow:var(--shadow);transition:background .15s ease,transform .15s ease}
+  .how-pill:hover{background:#E3DBFD;transform:translateY(-1px)}
+  .how-pill .arr{display:inline-block;transition:transform .18s ease}
+  .how-pill:hover .arr{transform:translateX(3px)}
+  @media (prefers-reduced-motion:reduce){.how-pill,.how-pill .arr{transition:none}.how-pill:hover,.how-pill:hover .arr{transform:none}}
+  @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
 
   /* top flow legend: four stages of one call, joined by accent arrows */
   .flow{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 10px;margin-top:24px}
@@ -131,9 +133,8 @@
   <div class="wrap">
     <header>
       <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>Layer · L4</span>
-      <h1 class="title">Single-Call Control</h1>
+      <div class="title-row"><h1 class="title">Single-Call Control</h1><a class="how-pill" href="single-call-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
       <p class="explainer">How do you get the best answer out of a single message to the AI?</p>
-      <a class="how-link" href="single-call-how-it-works.html">How it works <span class="arr" aria-hidden="true">&rarr;</span></a>
 
       <div class="flow" aria-label="Jump to a stage of a single call">
         <button type="button" class="flow-chip" data-target="card-ask">Ask it well</button>

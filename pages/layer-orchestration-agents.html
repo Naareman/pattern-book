@@ -124,19 +124,14 @@
   }
   h2 em { font-style: italic; color: var(--accent); }
 
-  /* accent link to the interactive "how it works" page, under the title/explainer */
-  .how-link {
-    display: inline-flex; align-items: center; gap: 5px; margin-top: 14px;
-    font-size: 14px; font-weight: 600; color: var(--accent-hover);
-    transition: color .15s ease;
-  }
-  .how-link:hover { color: var(--accent); }
-  .how-link .arr { display: inline-block; transition: transform .18s ease; }
-  .how-link:hover .arr { transform: translateX(3px); }
-  @media (prefers-reduced-motion: reduce) {
-    .how-link, .how-link .arr { transition: none; }
-    .how-link:hover .arr { transform: none; }
-  }
+  .title-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:16px 0 0}
+  .title-row .pattern-title{margin:0;flex:1 1 auto;min-width:240px}
+  .how-pill{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--accent);border-radius:22px;padding:8px 15px;box-shadow:var(--shadow);transition:background .15s ease,transform .15s ease}
+  .how-pill:hover{background:#E3DBFD;transform:translateY(-1px)}
+  .how-pill .arr{display:inline-block;transition:transform .18s ease}
+  .how-pill:hover .arr{transform:translateX(3px)}
+  @media (prefers-reduced-motion:reduce){.how-pill,.how-pill .arr{transition:none}.how-pill:hover,.how-pill:hover .arr{transform:none}}
+  @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
 
   /* ============ STAGE CARDS (L4-style) ============ */
   .stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 6px; }
@@ -274,9 +269,8 @@
       </svg>
     </span>Layer · L5
   </span>
-  <h1 class="pattern-title">Orchestration</h1>
+  <div class="title-row"><h1 class="pattern-title">Orchestration</h1><a class="how-pill" href="orchestration-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
   <p class="explainer">How the system organizes its calls across time, takes action in the world, and talks to other AI actors.</p>
-  <a class="how-link" href="orchestration-how-it-works.html">How it works <span class="arr" aria-hidden="true">&rarr;</span></a>
 
   <div class="flow" aria-label="Jump to a dimension of orchestration">
     <button type="button" class="flow-chip" data-target="card-structure">Structure the steps</button>
@@ -288,11 +282,8 @@
   <p class="flow-caption">Three dimensions of how systems organize their work.</p>
 </header>
 
-<!-- 01 · INSIDE THIS LAYER -->
+<!-- STAGE CARDS -->
 <section>
-  <div class="section-label"><span class="num">01</span>Inside This Layer</div>
-  <h2>Three dimensions, one <em>system</em>.</h2>
-
   <div class="stages">
 
     <section class="stage-card clickable" id="card-structure" aria-labelledby="g-structure">
