@@ -22,6 +22,7 @@ The standing gate. Every page, and every agent that builds or edits a page, must
 
 ## 3. Plain words
 - No internal taxonomy codes (L-1...L7, L3a, L3b, C1-C7) and no jargon sub-axis names ("Input Shape", "discipline crosscut") in any user-facing copy. A reader arriving from the homepage will not know them. Use plain language or the layer's human name.
+- DECIDED 2026-05-28: the user-facing layer reference is the plain stack number 1-10 (Data & artifacts = 1, Serving & infrastructure = 2, Training & adaptation = 3, Composition = 4, Stateless Retrieval = 5, Stateful Memory = 6, Single-call control = 7, Orchestration & agents = 8, Application patterns = 9, User experience = 10) plus the human name. Use it IDENTICALLY on the homepage list and on every layer page eyebrow, breadcrumb, and title tag. The L-notation (L-1...L7, L3a/L3b) lives ONLY in taxonomy.md as the internal filing system and never appears on a page. The L3a/L3b pairing is conveyed by grouping/wording, not codes.
 - 10-year-old plain. Define any necessary term inline. No clever metaphors. No condescending negations like "(not different AIs)".
 - No em dashes, ever. Use colons, periods, or parentheses.
 - Goal/intent first ("Want to X? -> Technique"), not abstract category lists.
