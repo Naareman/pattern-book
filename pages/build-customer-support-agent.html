@@ -203,22 +203,63 @@
   .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
   .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 
-  /* -------- 03 REAL EXAMPLE -------- */
-  .example-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .example-card {
+  /* -------- PATTERNS IT USES -------- */
+  .patterns-stage {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); padding: 18px;
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
   }
-  .example-card .ec-label { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
-  .example-card .ec-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--text); margin-bottom: 6px; line-height: 1.3; }
-  .example-card .ec-desc { font-size: 13.5px; color: var(--soft); line-height: 1.55; }
-  .example-card .ec-tag {
+  .pattern-chip-grid {
+    display: flex; flex-wrap: wrap; gap: 10px;
+  }
+  .pattern-chip {
+    display: inline-flex; flex-direction: column; gap: 3px;
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    text-decoration: none; color: var(--text);
+    transition: border-color .2s ease, background .2s ease;
+    min-width: 160px; flex: 1 1 160px;
+  }
+  .pattern-chip:hover { border-color: var(--accent); background: #e4dcfe; }
+  .pattern-chip-layer {
+    font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--accent-hover);
+  }
+  .pattern-chip-clause {
+    font-size: 13px; color: var(--soft); line-height: 1.4;
+  }
+
+  /* -------- 03 REAL EXAMPLE -------- */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .step-pills {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px;
+  }
+  .step-pill {
+    padding: 8px 14px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border: 1px solid var(--border-strong); background: var(--bg-subtle);
+    color: var(--soft); font-family: 'Inter', sans-serif;
+    transition: background .18s ease, border-color .18s ease, color .18s ease;
+    white-space: nowrap;
+  }
+  .step-pill:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .step-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step-card {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 18px 20px; min-height: 96px;
+  }
+  .step-card-label { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .step-card-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
+  .step-card-text { font-size: 13.5px; color: var(--soft); line-height: 1.55; }
+  .step-card-tag {
     display: inline-block; margin-top: 10px;
     font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
     padding: 3px 9px; border-radius: 20px;
   }
-  .example-card .ec-tag.resolve { background: var(--success-soft); color: var(--success); }
-  .example-card .ec-tag.escalate { background: var(--warn-soft); color: var(--warn); }
+  .step-card-tag.resolve { background: var(--success-soft); color: var(--success); }
+  .step-card-tag.escalate { background: var(--warn-soft); color: var(--warn); }
 
   /* -------- 04 TRADEOFFS -------- */
   .tradeoffs-stage {
@@ -269,7 +310,7 @@
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .example-grid { grid-template-columns: 1fr; }
+
     .demo-controls { flex-direction: column; align-items: stretch; }
     .diagram-btn { flex: 1; }
     .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
@@ -395,41 +436,53 @@
   </div>
 </section>
 
-<!-- 03 REAL EXAMPLE -->
-<section>
-  <div class="section-label"><span class="num">03</span>A Real Example</div>
-  <h2>Where it <em>lives</em> today.</h2>
-  <div class="example-grid">
-    <div class="example-card">
-      <div class="ec-label">Resolve path</div>
-      <div class="ec-name">Intercom Fin</div>
-      <div class="ec-desc">Trained on a company's own help center articles. Answers up to 50% of tickets without human involvement by citing the exact article it used.</div>
-      <span class="ec-tag resolve">Self-resolved</span>
-    </div>
-    <div class="example-card">
-      <div class="ec-label">Escalate path</div>
-      <div class="ec-name">Zendesk AI</div>
-      <div class="ec-desc">Drafts a suggested reply for the agent to review. On billing disputes and account suspensions, it routes to a human rather than answering directly.</div>
-      <span class="ec-tag escalate">Hands off to human</span>
-    </div>
-    <div class="example-card">
-      <div class="ec-label">Retrieval grounding</div>
-      <div class="ec-name">Notion AI Q&amp;A</div>
-      <div class="ec-desc">Searches workspace pages before answering an internal query. If no page matches, it says so rather than inventing an answer.</div>
-      <span class="ec-tag resolve">Grounded in docs</span>
-    </div>
-    <div class="example-card">
-      <div class="ec-label">Sensitive escalate</div>
-      <div class="ec-name">Klarna AI</div>
-      <div class="ec-desc">Handles routine refund and order queries autonomously. Routes to a human for anything involving dispute resolution or fraud suspicion.</div>
-      <span class="ec-tag escalate">Human for disputes</span>
+<!-- 03 PATTERNS IT USES -->
+<section aria-labelledby="patterns-heading">
+  <div class="section-label"><span class="num">03</span>Patterns It Uses</div>
+  <h2 id="patterns-heading">The <em>layers</em> inside.</h2>
+  <div class="patterns-stage">
+    <div class="pattern-chip-grid" role="list" aria-label="Layers used by this build">
+      <a class="pattern-chip" href="layer-stateless-retrieval.html" role="listitem">
+        <span class="pattern-chip-layer">Stateless Retrieval</span>
+        <span class="pattern-chip-clause">searches help articles for the closest match</span>
+      </a>
+      <a class="pattern-chip" href="layer-stateless-retrieval.html" role="listitem">
+        <span class="pattern-chip-layer">Stateless Retrieval</span>
+        <span class="pattern-chip-clause">reads the matched article section for grounding</span>
+      </a>
+      <a class="pattern-chip" href="layer-application-patterns.html" role="listitem">
+        <span class="pattern-chip-layer">Application patterns</span>
+        <span class="pattern-chip-clause">scores confidence to decide resolve or escalate</span>
+      </a>
+      <a class="pattern-chip" href="layer-application-patterns.html" role="listitem">
+        <span class="pattern-chip-layer">Application patterns</span>
+        <span class="pattern-chip-clause">hands low-confidence cases to a human agent</span>
+      </a>
     </div>
   </div>
 </section>
 
-<!-- 04 TRADEOFFS -->
+<!-- 04 REAL EXAMPLE -->
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">04</span>A Real Example</div>
+  <h2 id="example-heading">Where it <em>lives</em> today.</h2>
+  <div class="example-stage">
+    <p style="font-size:13px;color:var(--soft);margin-bottom:16px;line-height:1.6">
+      Four products that shipped this pattern. Tap each to see how they use it.
+    </p>
+    <div class="step-pills" role="tablist" aria-label="Real-world examples">
+      <button class="step-pill active" role="tab" aria-selected="true" aria-controls="ex-card" data-step="0">Intercom Fin</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="ex-card" data-step="1">Zendesk AI</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="ex-card" data-step="2">Notion AI</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="ex-card" data-step="3">Klarna AI</button>
+    </div>
+    <div class="step-card" id="ex-card" role="tabpanel" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- 05 TRADEOFFS -->
 <section>
-  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <div class="section-label"><span class="num">05</span>Tradeoffs</div>
   <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
@@ -629,6 +682,67 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // init
 runBtn.disabled = true;
+
+// ============ REAL EXAMPLE TAP-THROUGH ============
+const exSteps = [
+  {
+    label: 'Resolve path',
+    name: 'Intercom Fin',
+    text: 'Trained on a company\'s own help center articles. Answers up to 50% of tickets without human involvement by citing the exact article it used.',
+    tag: 'resolve', tagText: 'Self-resolved'
+  },
+  {
+    label: 'Escalate path',
+    name: 'Zendesk AI',
+    text: 'Drafts a suggested reply for the agent to review. On billing disputes and account suspensions, it routes to a human rather than answering directly.',
+    tag: 'escalate', tagText: 'Hands off to human'
+  },
+  {
+    label: 'Retrieval grounding',
+    name: 'Notion AI Q&A',
+    text: 'Searches workspace pages before answering an internal query. If no page matches, it says so rather than inventing an answer.',
+    tag: 'resolve', tagText: 'Grounded in docs'
+  },
+  {
+    label: 'Sensitive escalate',
+    name: 'Klarna AI',
+    text: 'Handles routine refund and order queries autonomously. Routes to a human for anything involving dispute resolution or fraud suspicion.',
+    tag: 'escalate', tagText: 'Human for disputes'
+  }
+];
+
+const exCard = document.getElementById('ex-card');
+const exPills = document.querySelectorAll('.step-pill[data-step]');
+
+function renderExStep(idx) {
+  const s = exSteps[idx];
+  exCard.innerHTML =
+    '<div class="step-card-label">' + s.label + '</div>' +
+    '<div class="step-card-name">' + s.name + '</div>' +
+    '<div class="step-card-text">' + s.text + '</div>' +
+    '<span class="step-card-tag ' + s.tag + '">' + s.tagText + '</span>';
+}
+
+exPills.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const idx = parseInt(btn.dataset.step);
+    exPills.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    renderExStep(idx);
+  });
+  btn.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') {
+      const next = (parseInt(btn.dataset.step) + 1) % exPills.length;
+      exPills[next].click(); exPills[next].focus();
+    } else if (e.key === 'ArrowLeft') {
+      const prev = (parseInt(btn.dataset.step) - 1 + exPills.length) % exPills.length;
+      exPills[prev].click(); exPills[prev].focus();
+    }
+  });
+});
+
+renderExStep(0);
 </script>
 </body>
 </html>

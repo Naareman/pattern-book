@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A pause before a big action · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --ok:#0E9F6E; --hold:#B54708; --bad:#D92D20;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* approval sheet visual */
+  .sheet-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .sheet-header { padding: 12px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); }
+  .sheet-body { padding: 20px 22px; }
+  .sheet-title { font-family: 'Fraunces', serif; font-size: 20px; line-height: 1.25; color: var(--text); margin-bottom: 14px; }
+  .sheet-preview { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .preview-row { display: flex; gap: 10px; align-items: baseline; font-size: 13.5px; line-height: 1.5; }
+  .preview-key { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); flex-shrink: 0; min-width: 64px; }
+  .preview-val { color: var(--text); }
+  .preview-val strong { color: var(--accent-hover); }
+
+  .sheet-actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .btn { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; padding: 10px 18px; border-radius: 10px; border: 1px solid var(--border-strong); background: #fff; color: var(--text); cursor: pointer; transition: all .18s; }
+  .btn:hover { border-color: var(--text); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .btn.ghost { background: transparent; color: var(--soft); border-color: transparent; }
+  .btn.ghost:hover { color: var(--text); background: var(--bg-subtle); }
+
+  .sheet-result { margin-top: 14px; padding: 12px 14px; border-radius: var(--radius-sm); font-size: 13.5px; line-height: 1.55; min-height: 24px; display: none; }
+  .sheet-result.show { display: block; }
+  .sheet-result.ok { background: rgba(14,159,110,0.08); border: 1px solid rgba(14,159,110,0.3); color: var(--text); }
+  .sheet-result.bad { background: rgba(217,45,32,0.08); border: 1px solid rgba(217,45,32,0.3); color: var(--text); }
+  .sheet-result.edit { background: rgba(181,71,8,0.08); border: 1px solid rgba(181,71,8,0.3); color: var(--text); }
+  .sheet-result strong.ok-t { color: var(--ok); }
+  .sheet-result strong.bad-t { color: var(--bad); }
+  .sheet-result strong.edit-t { color: var(--hold); }
+
+  .sheet-note { padding: 12px 18px; border-top: 1px solid var(--border); background: var(--bg-subtle); font-size: 13px; color: var(--soft); line-height: 1.55; }
+  .sheet-note strong { color: var(--text); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .sheet-actions { flex-direction: column; align-items: stretch; }
+    .btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-user-experience.html"><span aria-hidden="true">&larr;</span> User Experience</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-user-experience.html">User Experience</a><span class="sep" aria-hidden="true">/</span><span>Staying in control</span><span class="sep" aria-hidden="true">/</span><span class="here">A pause before a big action</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">User Experience &middot; Staying in control</span>
+  <h1 class="page-title">A pause before a big action</h1>
+  <p class="explainer">Before the AI does something the user would not want to undo, it stops and shows what it is about to do. The user can say yes, edit, or say no.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">A planned <em>pause</em>.</h2>
+  <div class="what-card">
+    <p>An <strong style="color:var(--accent-hover)">approval step</strong> is a screen the AI shows before it acts. It spells out the action in plain words, surfaces the details that would matter to a person, and waits. The user picks: confirm, edit, or cancel. Small or routine steps run on their own; this pause is reserved for the ones that would sting if they were wrong.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Tap a choice to see what <em>happens</em>.</h2>
+  <div class="sheet-card" role="region" aria-label="Approval sheet for an outgoing email">
+    <div class="sheet-header">About to send</div>
+    <div class="sheet-body">
+      <div class="sheet-title">Send the proposal to all 48 clients?</div>
+      <div class="sheet-preview" role="group" aria-label="Action details">
+        <div class="preview-row"><span class="preview-key">To</span><span class="preview-val"><strong>48 recipients</strong> on the Q2 client list</span></div>
+        <div class="preview-row"><span class="preview-key">Subject</span><span class="preview-val">Your 2026 renewal proposal</span></div>
+        <div class="preview-row"><span class="preview-key">Attaches</span><span class="preview-val">proposal-personalised.pdf (one per client)</span></div>
+        <div class="preview-row"><span class="preview-key">Visible to</span><span class="preview-val">Only the named recipient on each email</span></div>
+      </div>
+      <div class="sheet-actions">
+        <button class="btn primary" data-result="ok" aria-describedby="sheet-result">Send</button>
+        <button class="btn" data-result="edit" aria-describedby="sheet-result">Edit first</button>
+        <button class="btn ghost" data-result="bad" aria-describedby="sheet-result">Cancel</button>
+      </div>
+      <div class="sheet-result" id="sheet-result" role="status" aria-live="polite"></div>
+    </div>
+    <div class="sheet-note">
+      <strong>Show, don't summarise.</strong> The pause is only useful if the screen tells the truth about the action: who, how many, what is attached, what becomes public. Vague confirmations train people to click yes without reading.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">Where it <em>sits</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Two halves</div>
+      <div class="fits-desc">The runtime that holds the action mid-air (the orchestration side) and the screen that shows it and collects the answer (the user interface side). This page is about the screen.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">External action and tool use. The pause exists because the next step changes the world: a payment, an email, a deletion, a public post.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Not the same as</div>
+      <div class="fits-desc">An "are you sure?" pop-up over everything. Pause on the few big ones; let the small ones flow. Overuse trains people to click through without reading.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>The action is hard or embarrassing to take back: money moved, messages sent, records changed, files deleted.</li>
+    <li>The user wants visible control. Even a fast confirm builds trust that the AI is not running off on its own.</li>
+    <li>Rules require a human signature: finance, legal, health, anything customer-facing at scale.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-user-experience.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">User Experience</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Apple Human Interface Guidelines. <em>Confirming and undoing actions.</em> <span class="note">Reserve confirmation for destructive or irreversible actions; for everything else, prefer undo.</span></li>
+    <li>Anthropic (2024). <em>Building effective agents.</em> <span class="note">Human-in-the-loop checkpoints around irreversible or high-stakes actions are recommended for agents.</span></li>
+    <li>Microsoft (2019). <em>Guidelines for human-AI interaction.</em> <span class="note">Make clear what the AI can do before it does it, and support easy correction.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var buttons = document.querySelectorAll('.sheet-actions .btn');
+  var result = document.getElementById('sheet-result');
+  var messages = {
+    ok:   { cls: 'ok',   html: '<strong class="ok-t">Sent.</strong> 48 emails went out. The action is logged so you can see exactly what was sent.' },
+    edit: { cls: 'edit', html: '<strong class="edit-t">On hold.</strong> The draft is open for changes. Nothing has been sent.' },
+    bad:  { cls: 'bad',  html: '<strong class="bad-t">Cancelled.</strong> No emails sent. The pause did its job.' }
+  };
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var r = btn.getAttribute('data-result');
+      var m = messages[r];
+      result.className = 'sheet-result show ' + m.cls;
+      result.innerHTML = m.html;
+    });
+  });
+}());
+</script>
+</body>
+</html>

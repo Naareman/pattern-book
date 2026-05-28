@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A thumbs-up or thumbs-down on each answer &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px; --bg-subtle:#F6F7F9;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.12);
+    --red:#D92D20; --red-soft:rgba(217,45,32,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none; padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* feedback demo */
+  .fb-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .fb-bar { padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--bg-subtle); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .fb-bar-label { font-size: 12px; font-weight: 600; color: var(--soft); text-transform: uppercase; letter-spacing: .06em; }
+  .fb-status { font-size: 12px; font-weight: 600; color: var(--faint); font-family: 'JetBrains Mono', monospace; }
+  .fb-status.up { color: var(--green); }
+  .fb-status.down { color: var(--red); }
+  .fb-body { padding: 20px 22px; }
+  .fb-reply { font-size: 14.5px; line-height: 1.65; color: var(--text); margin-bottom: 16px; padding: 14px 16px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+  .fb-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .fb-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 22px; border: 1px solid var(--border-strong); background: var(--surface); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: var(--soft); cursor: pointer; transition: all .18s ease; min-height: 40px; }
+  .fb-btn:hover { color: var(--text); border-color: var(--accent); }
+  .fb-btn .ico { width: 16px; height: 16px; display: block; }
+  .fb-btn.up.picked { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+  .fb-btn.down.picked { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+  .fb-followup { margin-top: 14px; padding: 12px 14px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--soft); line-height: 1.55; display: none; }
+  .fb-followup.show { display: block; }
+  .fb-followup strong { color: var(--text); font-weight: 600; }
+  .fb-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .fb-tag { padding: 5px 11px; border-radius: 16px; font-size: 12px; font-weight: 500; border: 1px solid var(--border-strong); background: var(--surface); color: var(--soft); cursor: pointer; transition: all .15s; font-family: 'Inter', sans-serif; }
+  .fb-tag:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .fb-tag.picked { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .fb-reset { background: none; border: none; color: var(--faint); font-size: 12px; cursor: pointer; padding: 4px 8px; font-family: 'Inter', sans-serif; }
+  .fb-reset:hover { color: var(--accent-hover); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .sources { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 22px; }
+  .sources-label { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 10px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13.5px; line-height: 1.55; color: var(--soft); }
+  .sources a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+  .sources a:hover { border-bottom-color: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) { h1.page-title { font-size: 30px; } .explainer { font-size: 15px; } h2 { font-size: 21px; } .fits-row { flex-wrap: wrap; } .fits-label { min-width: 0; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-user-experience.html"><span aria-hidden="true">&larr;</span> User Experience</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-user-experience.html">User Experience</a><span class="sep" aria-hidden="true">/</span><span class="here">How answers show up</span><span class="sep" aria-hidden="true">/</span><span class="here">A thumbs-up or thumbs-down on each answer</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">User Experience &middot; How answers show up</span>
+  <h1 class="page-title">A thumbs-up or thumbs-down on each answer</h1>
+  <p class="explainer">A small rating sits next to every reply, so the person can say it landed (or did not) with one tap.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">One tap, one <em>signal</em>.</h2>
+  <div class="what-card">
+    <p>Two small icons next to each reply: thumbs-up and thumbs-down. A tap is enough. On a thumbs-down, a couple of follow-up tags (off-topic, not true, too long) and an optional comment box let the person say a little more if they want to. The signal flows back to the team behind the product. Over time, it shows which kinds of answers are landing and which are not.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Tap a thumb to <em>try it</em>.</h2>
+  <div class="fb-card" role="region" aria-label="Feedback demo">
+    <div class="fb-bar">
+      <span class="fb-bar-label">Reply</span>
+      <span class="fb-status" id="fbStatus">no rating yet</span>
+    </div>
+    <div class="fb-body">
+      <div class="fb-reply">Paris is six hours ahead of New York. Right now it is 8:14 in the evening there.</div>
+      <div class="fb-actions">
+        <button class="fb-btn up" id="fbUp" aria-label="Thumbs up" aria-pressed="false">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 22V11M2 13v7a2 2 0 0 0 2 2h13.764a2 2 0 0 0 1.991-1.802l1.291-9A2 2 0 0 0 19.054 9H14V5a3 3 0 0 0-3-3l-1 8H7"/></svg>
+          <span>Helpful</span>
+        </button>
+        <button class="fb-btn down" id="fbDown" aria-label="Thumbs down" aria-pressed="false">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2v11M22 11V4a2 2 0 0 0-2-2H6.236a2 2 0 0 0-1.991 1.802l-1.291 9A2 2 0 0 0 4.946 15H10v4a3 3 0 0 0 3 3l1-8h3"/></svg>
+          <span>Not helpful</span>
+        </button>
+        <button class="fb-reset" id="fbReset" aria-label="Reset rating">Reset</button>
+      </div>
+      <div class="fb-followup" id="fbFollowup">
+        <strong>Thanks. What was off?</strong>
+        <div class="fb-tags" id="fbTags">
+          <button class="fb-tag" data-tag="wrong">Not true</button>
+          <button class="fb-tag" data-tag="off-topic">Off topic</button>
+          <button class="fb-tag" data-tag="too-long">Too long</button>
+          <button class="fb-tag" data-tag="other">Something else</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it sits next to <em>other pieces</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it is</div>
+      <div class="fits-desc">A small control next to each reply. The person taps it. The product gets a signal.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">A pipe that collects the taps and the optional comments, and a way to inspect them later. Those pipes and dashboards live elsewhere; this page is the control itself.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Not this</div>
+      <div class="fits-desc">A long survey shown at the end of the session. That asks too much, too late. This catches the reaction in the moment.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>The product is new and you do not yet know which answers feel right.</li>
+    <li>You need real signal from real use, not just lab tests.</li>
+    <li>You want to spot a sudden dip in quality after a change to the model or the prompt.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="sources-heading">
+  <div class="section-label"><span class="num">05</span>Sources</div>
+  <h2 id="sources-heading" class="sr-only">Sources</h2>
+  <div class="sources">
+    <div class="sources-label">For the curious</div>
+    <ul>
+      <li>OpenAI, <a href="https://openai.com/index/chatgpt/" target="_blank" rel="noopener noreferrer">Introducing ChatGPT</a>, on how thumbs-up and thumbs-down ratings feed the next round of training.</li>
+      <li>Microsoft, <a href="https://www.microsoft.com/en-us/haxtoolkit/library/" target="_blank" rel="noopener noreferrer">Guidelines for Human-AI Interaction</a> (Guideline 15: Encourage granular feedback).</li>
+      <li>Stiennon et al., <a href="https://arxiv.org/abs/2009.01325" target="_blank" rel="noopener noreferrer">Learning to summarize from human feedback</a>, on how light, frequent ratings turn into model improvements.</li>
+    </ul>
+  </div>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-user-experience.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">User Experience</div>
+    </div>
+  </a>
+</section>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  const upBtn = document.getElementById('fbUp');
+  const downBtn = document.getElementById('fbDown');
+  const resetBtn = document.getElementById('fbReset');
+  const status = document.getElementById('fbStatus');
+  const followup = document.getElementById('fbFollowup');
+  const tags = document.querySelectorAll('.fb-tag');
+
+  function clearTags() {
+    tags.forEach(function (t) { t.classList.remove('picked'); });
+  }
+
+  function reset() {
+    upBtn.classList.remove('picked');
+    downBtn.classList.remove('picked');
+    upBtn.setAttribute('aria-pressed', 'false');
+    downBtn.setAttribute('aria-pressed', 'false');
+    status.textContent = 'no rating yet';
+    status.className = 'fb-status';
+    followup.classList.remove('show');
+    clearTags();
+  }
+
+  upBtn.addEventListener('click', function () {
+    upBtn.classList.add('picked');
+    downBtn.classList.remove('picked');
+    upBtn.setAttribute('aria-pressed', 'true');
+    downBtn.setAttribute('aria-pressed', 'false');
+    status.textContent = 'thumbs up: noted';
+    status.className = 'fb-status up';
+    followup.classList.remove('show');
+    clearTags();
+  });
+
+  downBtn.addEventListener('click', function () {
+    downBtn.classList.add('picked');
+    upBtn.classList.remove('picked');
+    downBtn.setAttribute('aria-pressed', 'true');
+    upBtn.setAttribute('aria-pressed', 'false');
+    status.textContent = 'thumbs down: noted';
+    status.className = 'fb-status down';
+    followup.classList.add('show');
+  });
+
+  resetBtn.addEventListener('click', reset);
+
+  tags.forEach(function (tag) {
+    tag.addEventListener('click', function () {
+      tag.classList.toggle('picked');
+    });
+  });
+}());
+</script>
+</body>
+</html>

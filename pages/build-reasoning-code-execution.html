@@ -254,19 +254,34 @@
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
   }
-  .example-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
-  .example-flow { display: flex; flex-direction: column; gap: 0; }
-  .ex-row {
-    display: flex; align-items: flex-start; gap: 14px;
-    padding: 14px 0; border-bottom: 1px solid var(--border);
+  .step-pills {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px;
   }
-  .ex-row:last-child { border-bottom: 0; padding-bottom: 0; }
-  .ex-icon { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; }
-  .ex-icon svg { width: 16px; height: 16px; color: var(--accent-hover); display: block; }
-  .ex-body { flex: 1; min-width: 0; }
-  .ex-step { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
-  .ex-text { font-size: 14px; line-height: 1.6; color: var(--text); }
-  .ex-text strong { color: var(--accent-hover); }
+  .step-pill {
+    padding: 8px 14px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border: 1px solid var(--border-strong); background: var(--bg-subtle);
+    color: var(--soft); font-family: 'Inter', sans-serif;
+    transition: background .18s ease, border-color .18s ease, color .18s ease;
+    white-space: nowrap;
+  }
+  .step-pill:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .step-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step-card {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 18px 20px; min-height: 96px;
+  }
+  .step-card-icon {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--accent-soft); display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px;
+  }
+  .step-card-icon svg { width: 15px; height: 15px; color: var(--accent-hover); display: block; }
+  .step-card-name {
+    font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 6px;
+  }
+  .step-card-text { font-size: 14px; line-height: 1.65; color: var(--text); }
 
   /* code block for real-world example */
   .code-stage {
@@ -292,47 +307,25 @@
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
   }
-  .patterns-intro { font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 18px; }
-  .pattern-row {
-    display: flex; align-items: flex-start; gap: 14px;
-    padding: 14px 0; border-bottom: 1px solid var(--border);
+  .pattern-chip-grid {
+    display: flex; flex-wrap: wrap; gap: 10px;
   }
-  .pattern-row:last-of-type { border-bottom: 0; padding-bottom: 0; }
-  .pattern-layer-tag {
-    flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px;
-    font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
-    color: var(--accent-hover); background: var(--accent-soft);
-    border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px;
-    white-space: nowrap; text-decoration: none;
+  .pattern-chip {
+    display: inline-flex; flex-direction: column; gap: 3px;
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    text-decoration: none; color: var(--text);
     transition: border-color .2s ease, background .2s ease;
+    min-width: 160px; flex: 1 1 160px;
   }
-  .pattern-layer-tag:hover { border-color: var(--accent); background: #e4dcfe; }
-  .pattern-info { flex: 1; min-width: 0; }
-  .pattern-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
-  .pattern-desc { font-size: 13.5px; color: var(--soft); line-height: 1.5; }
-
-  .recipe-note {
-    margin-top: 18px; padding: 14px 16px;
-    background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-size: 13.5px; color: var(--soft); line-height: 1.6;
+  .pattern-chip:hover { border-color: var(--accent); background: #e4dcfe; }
+  .pattern-chip-layer {
+    font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--accent-hover);
   }
-  .recipe-note strong { color: var(--text); }
-
-  /* sequencing list */
-  .sequencing-list {
-    display: flex; flex-direction: column; gap: 0;
-    border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden;
-    margin-top: 10px;
+  .pattern-chip-clause {
+    font-size: 13px; color: var(--soft); line-height: 1.4;
   }
-  .seq-row {
-    display: flex; align-items: center; gap: 14px;
-    padding: 12px 14px; border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
-  .seq-row:last-child { border-bottom: 0; }
-  .seq-arrow { font-size: 13px; color: var(--accent); font-weight: 700; flex-shrink: 0; min-width: 20px; text-align: center; }
-  .seq-text { font-size: 13.5px; color: var(--text); line-height: 1.5; }
 
   /* ============ TRADEOFFS ============ */
   .tradeoffs-stage {
@@ -391,7 +384,7 @@
     .diagram-btn { flex: 1; }
     .compare-toggle { width: 100%; }
     .toggle-btn { flex: 1; }
-    .ex-row { gap: 10px; }
+
   }
 </style>
 </head>
@@ -573,56 +566,20 @@ total       = sold_so_far + restock
 </section>
 
 <!-- 03 A REAL EXAMPLE -->
-<section>
+<section aria-labelledby="example-heading">
   <div class="section-label"><span class="num">03</span>A Real Example</div>
-  <h2>How it <em>runs in practice</em>.</h2>
+  <h2 id="example-heading">How it <em>runs in practice</em>.</h2>
   <div class="example-stage">
-    <p class="example-intro">
-      This is what happens when a math tutor app uses PAL to answer a student's homework problem. The user only sees the final answer; all code is internal.
+    <p style="font-size:13px;color:var(--soft);margin-bottom:16px;line-height:1.6">
+      A math tutor app uses PAL to answer a homework problem. The student only sees the final answer. Tap each step to follow what happens internally.
     </p>
-    <div class="example-flow">
-
-      <div class="ex-row">
-        <div class="ex-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5l4 4L7 21H3v-4z"/></svg>
-        </div>
-        <div class="ex-body">
-          <div class="ex-step">Step 1: Prompt with a few examples</div>
-          <div class="ex-text">The prompt (the text sent to the model) includes 2 to 3 solved examples, each showing the word problem and the Python code that solves it. This is <strong>few-shot framing</strong>: the model learns the pattern by example, not by instruction.</div>
-        </div>
-      </div>
-
-      <div class="ex-row">
-        <div class="ex-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l3 3-3 3M13 15h3"/><rect x="2" y="3" width="20" height="18" rx="3"/></svg>
-        </div>
-        <div class="ex-body">
-          <div class="ex-step">Step 2: Model writes code</div>
-          <div class="ex-text">The model generates a short Python snippet. It does <strong>no arithmetic</strong>: it only encodes the structure of the problem as variable assignments and arithmetic operators.</div>
-        </div>
-      </div>
-
-      <div class="ex-row">
-        <div class="ex-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        </div>
-        <div class="ex-body">
-          <div class="ex-step">Step 3: Sandboxed execution</div>
-          <div class="ex-text">The snippet runs in a <strong>sandboxed interpreter</strong> (a locked environment with no internet access, no file writes, time-limited) so it cannot cause side effects. The numerical result is captured.</div>
-        </div>
-      </div>
-
-      <div class="ex-row">
-        <div class="ex-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6M9 16h4M6 3h8l4 4v14H6z"/></svg>
-        </div>
-        <div class="ex-body">
-          <div class="ex-step">Step 4: Result injected into the answer</div>
-          <div class="ex-text">The model is called again (or the result is templated in) so the final answer contains the <strong>computed number</strong>, not the model's mental guess. The student sees a friendly explanation, not a code dump.</div>
-        </div>
-      </div>
-
+    <div class="step-pills" role="tablist" aria-label="How PAL runs in practice">
+      <button class="step-pill active" role="tab" aria-selected="true" aria-controls="ex-card" data-step="0">Prompt</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="ex-card" data-step="1">Write code</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="ex-card" data-step="2">Run it</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="ex-card" data-step="3">Inject result</button>
     </div>
+    <div class="step-card" id="ex-card" role="tabpanel" aria-live="polite"></div>
   </div>
 
   <!-- The prompt snippet -->
@@ -655,58 +612,27 @@ answer   = speed * hours
 </section>
 
 <!-- 04 PATTERNS IT USES -->
-<section>
+<section aria-labelledby="patterns-heading">
   <div class="section-label"><span class="num">04</span>Patterns It Uses</div>
-  <h2>The <em>pieces</em> inside.</h2>
+  <h2 id="patterns-heading">The <em>pieces</em> inside.</h2>
   <div class="patterns-card">
-    <p class="patterns-intro">
-      PAL stitches together three layers, which is why no single layer name covers it on its own.
-    </p>
-
-    <div class="pattern-row">
-      <a class="pattern-layer-tag" href="layer-single-call-control.html" aria-label="Single-call control layer page">Single-call control</a>
-      <div class="pattern-info">
-        <div class="pattern-name">Chain-of-Thought (externalized)</div>
-        <div class="pattern-desc">Every reasoning step is written as a line of code, so the code itself is the chain of thought.</div>
-      </div>
-    </div>
-
-    <div class="pattern-row">
-      <a class="pattern-layer-tag" href="layer-single-call-control.html" aria-label="Single-call control layer page">Single-call control</a>
-      <div class="pattern-info">
-        <div class="pattern-name">Few-Shot Framing</div>
-        <div class="pattern-desc">A few solved examples in the prompt teach the model what code style to write, no fine-tuning needed.</div>
-      </div>
-    </div>
-
-    <div class="pattern-row">
-      <a class="pattern-layer-tag" href="layer-stateless-retrieval.html" aria-label="Stateless Retrieval layer page">Stateless Retrieval</a>
-      <div class="pattern-info">
-        <div class="pattern-name">Sandboxed Pure-Functional Execution</div>
-        <div class="pattern-desc">Running the code changes nothing (no disk writes, no network), so it counts as read-only.</div>
-      </div>
-    </div>
-
-    <div class="pattern-row">
-      <a class="pattern-layer-tag" href="layer-orchestration-agents.html" aria-label="Orchestration and agents layer page">Orchestration &amp; agents</a>
-      <div class="pattern-info">
-        <div class="pattern-name">Sequential Pipeline</div>
-        <div class="pattern-desc">Three steps in strict order: write code, run it, compose the final answer.</div>
-      </div>
-    </div>
-
-    <div class="recipe-note">
-      <strong>Why no single layer name fits:</strong> writing the code happens inside one model call, running it is read-only retrieval, and chaining the steps is orchestration. PAL crosses all three, so it is best described by the combination, not by any one layer.
-    </div>
-
-    <!-- sequencing -->
-    <div style="margin-top:22px">
-      <div style="font-size:13px;font-weight:600;color:var(--soft);margin-bottom:8px;letter-spacing:.03em">Sequencing</div>
-      <div class="sequencing-list">
-        <div class="seq-row"><span class="seq-arrow">1</span><span class="seq-text"><strong>Model call 1:</strong> prompt with few-shot examples + word problem. Model outputs Python code only.</span></div>
-        <div class="seq-row"><span class="seq-arrow">2</span><span class="seq-text"><strong>Sandboxed interpreter:</strong> execute the snippet, capture stdout. On error: surface to user or retry.</span></div>
-        <div class="seq-row"><span class="seq-arrow">3</span><span class="seq-text"><strong>Model call 2 (or template):</strong> combine the original problem + computed result into a natural-language answer.</span></div>
-      </div>
+    <div class="pattern-chip-grid" role="list" aria-label="Layers used by this build">
+      <a class="pattern-chip" href="layer-single-call-control.html" role="listitem">
+        <span class="pattern-chip-layer">Single-call control</span>
+        <span class="pattern-chip-clause">writes code as the chain of thought in one call</span>
+      </a>
+      <a class="pattern-chip" href="layer-single-call-control.html" role="listitem">
+        <span class="pattern-chip-layer">Single-call control</span>
+        <span class="pattern-chip-clause">uses few-shot examples to teach code style</span>
+      </a>
+      <a class="pattern-chip" href="layer-stateless-retrieval.html" role="listitem">
+        <span class="pattern-chip-layer">Stateless Retrieval</span>
+        <span class="pattern-chip-clause">runs code in a sandbox with no side effects</span>
+      </a>
+      <a class="pattern-chip" href="layer-orchestration-agents.html" role="listitem">
+        <span class="pattern-chip-layer">Orchestration &amp; agents</span>
+        <span class="pattern-chip-clause">sequences write, run, compose in strict order</span>
+      </a>
     </div>
   </div>
 </section>
@@ -961,6 +887,62 @@ if (reduceMotion) {
     }
   })();
 }
+
+// ============ REAL EXAMPLE TAP-THROUGH ============
+const exSteps = [
+  {
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5l4 4L7 21H3v-4z"/></svg>',
+    name: 'Prompt with examples',
+    text: 'The prompt includes 2 or 3 solved word problems, each paired with the Python code that solves it. The model learns the pattern from examples, not from instruction.'
+  },
+  {
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l3 3-3 3M13 15h3"/><rect x="2" y="3" width="20" height="18" rx="3"/></svg>',
+    name: 'Write code',
+    text: 'The model generates a short Python snippet. It does no arithmetic: it only encodes the problem as variable assignments and operators, then calls print(answer).'
+  },
+  {
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
+    name: 'Run it',
+    text: 'The snippet runs in a sandboxed interpreter: no internet, no file writes, time-limited. It cannot cause side effects. The numerical result is captured from stdout.'
+  },
+  {
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6M9 16h4M6 3h8l4 4v14H6z"/></svg>',
+    name: 'Inject result',
+    text: 'The computed number goes back to the model (or into a template). The student sees a friendly explanation with the real answer, not code output.'
+  }
+];
+
+const exCard = document.getElementById('ex-card');
+const exPills = document.querySelectorAll('.step-pill[data-step]');
+
+function renderExStep(idx) {
+  const s = exSteps[idx];
+  exCard.innerHTML =
+    '<div class="step-card-icon" aria-hidden="true">' + s.icon + '</div>' +
+    '<div class="step-card-name">' + s.name + '</div>' +
+    '<div class="step-card-text">' + s.text + '</div>';
+}
+
+exPills.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const idx = parseInt(btn.dataset.step);
+    exPills.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    renderExStep(idx);
+  });
+  btn.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') {
+      const next = (parseInt(btn.dataset.step) + 1) % exPills.length;
+      exPills[next].click(); exPills[next].focus();
+    } else if (e.key === 'ArrowLeft') {
+      const prev = (parseInt(btn.dataset.step) - 1 + exPills.length) % exPills.length;
+      exPills[prev].click(); exPills[prev].focus();
+    }
+  });
+});
+
+renderExStep(0);
 </script>
 </body>
 </html>

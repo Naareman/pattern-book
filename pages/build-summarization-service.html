@@ -212,43 +212,67 @@
   .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
   .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 
-  /* ============ REAL EXAMPLE ============ */
+  /* ============ REAL EXAMPLE: tap-through steps ============ */
   .example-stage {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
   }
   .example-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
-  .example-flow { display: flex; flex-direction: column; gap: 0; }
-  .ex-row {
-    display: flex; align-items: flex-start; gap: 14px;
-    padding: 14px 0; border-bottom: 1px solid var(--border);
-  }
-  .ex-row:last-child { border-bottom: 0; padding-bottom: 0; }
-  .ex-icon { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; }
-  .ex-icon svg { width: 16px; height: 16px; color: var(--accent-hover); display: block; }
-  .ex-body { flex: 1; min-width: 0; }
-  .ex-step { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
-  .ex-text { font-size: 14px; line-height: 1.6; color: var(--text); }
-  .ex-text strong { color: var(--accent-hover); }
 
-  /* ============ PATTERNS IT USES ============ */
-  .patterns-grid {
-    display: flex; flex-direction: column; gap: 10px;
+  /* pill row */
+  .step-pills {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
   }
-  .pattern-row {
+  .step-pill {
+    padding: 7px 14px; border: 1px solid var(--border-strong);
+    border-radius: 20px; font-size: 13px; font-weight: 600;
+    color: var(--soft); background: var(--bg-subtle);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    transition: border-color .18s ease, background .18s ease, color .18s ease;
+    white-space: nowrap;
+  }
+  .step-pill:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .step-pill[aria-selected="true"] {
+    background: var(--accent); border-color: var(--accent); color: #fff;
+  }
+
+  /* single content card */
+  .step-card {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 18px 20px;
     display: flex; align-items: flex-start; gap: 14px;
-    padding: 14px 16px; background: var(--surface);
-    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    min-height: 100px;
   }
-  .pattern-tag {
-    flex-shrink: 0; font-size: 11px; font-weight: 700; letter-spacing: .05em;
-    text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft);
-    border: 1px solid var(--border); border-radius: 6px;
-    padding: 3px 8px; white-space: nowrap; margin-top: 1px;
+  .step-card-icon {
+    flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
   }
-  .pattern-info { flex: 1; min-width: 0; }
-  .pattern-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
-  .pattern-desc { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .step-card-icon svg { width: 17px; height: 17px; color: var(--accent-hover); display: block; }
+  .step-card-body { flex: 1; min-width: 0; }
+  .step-card-name {
+    font-size: 12px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--accent-hover); margin-bottom: 6px;
+  }
+  .step-card-text { font-size: 14px; line-height: 1.65; color: var(--text); }
+  .step-card-text strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* ============ PATTERNS IT USES: compact chips ============ */
+  .layer-chips {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .layer-chip {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    padding: 9px 14px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 20px;
+    text-decoration: none; font-size: 13px; font-weight: 500;
+    color: var(--text); transition: border-color .18s ease, background .18s ease;
+    line-height: 1.4;
+  }
+  .layer-chip:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .layer-chip-name { color: var(--accent-hover); font-weight: 700; white-space: nowrap; }
+  .layer-chip-sep { color: var(--border-strong); font-weight: 400; }
+  .layer-chip-clause { color: var(--soft); }
 
   /* ============ TRADEOFFS ============ */
   .tradeoffs-stage {
@@ -474,61 +498,24 @@
   <div class="section-label"><span class="num">03</span>A Real Example</div>
   <h2>How a <em>real one</em> runs.</h2>
   <div class="example-stage">
-    <p class="example-intro">
-      A legal team uses a summarization service to process hundreds of contracts per week. Here is the pipeline, step by step.
-    </p>
-    <div class="example-flow">
+    <p class="example-intro">A legal team processes hundreds of contracts a week. Tap each step to walk through the pipeline.</p>
 
-      <div class="ex-row">
-        <div class="ex-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6M9 16h4M6 3h8l4 4v14H6z"/></svg>
-        </div>
-        <div class="ex-body">
-          <div class="ex-step">Step 1: Ingest</div>
-          <div class="ex-text">A 60-page contract arrives as a PDF. The system extracts text and counts tokens. At ~900 tokens per page, that is roughly <strong>54,000 tokens</strong>, far above any single-call limit.</div>
-        </div>
+    <div class="step-pills" role="tablist" aria-label="Pipeline steps">
+      <button class="step-pill" role="tab" aria-selected="true"  aria-controls="step-card" data-step="0" tabindex="0">Step 1: Ingest</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="step-card" data-step="1" tabindex="-1">Step 2: Chunk</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="step-card" data-step="2" tabindex="-1">Step 3: Map</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="step-card" data-step="3" tabindex="-1">Step 4: Reduce</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="step-card" data-step="4" tabindex="-1">Step 5: Deliver</button>
+    </div>
+
+    <div class="step-card" id="step-card" role="tabpanel" aria-live="polite">
+      <div class="step-card-icon" id="step-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6M9 16h4M6 3h8l4 4v14H6z"/></svg>
       </div>
-
-      <div class="ex-row">
-        <div class="ex-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h7"/></svg>
-        </div>
-        <div class="ex-body">
-          <div class="ex-step">Step 2: Chunk</div>
-          <div class="ex-text">The text is split at paragraph breaks into chunks of <strong>3,000 tokens each</strong>, leaving headroom in the 8,000-token context window for the prompt and the summary output.</div>
-        </div>
+      <div class="step-card-body">
+        <div class="step-card-name" id="step-name">Ingest</div>
+        <div class="step-card-text" id="step-text">A 60-page contract arrives as a PDF. The system extracts text: at roughly 900 tokens per page, that is <strong>54,000 tokens</strong> total, far above any single-call limit.</div>
       </div>
-
-      <div class="ex-row">
-        <div class="ex-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 11.5l10-5.5M7 12.5l10 5.5"/></svg>
-        </div>
-        <div class="ex-body">
-          <div class="ex-step">Step 3: Map (parallel calls)</div>
-          <div class="ex-text">18 chunks, 18 calls fire in parallel. Each prompt instructs the LLM (large language model, the AI model doing the work) to extract <strong>key obligations, dates, and risk clauses</strong> only.</div>
-        </div>
-      </div>
-
-      <div class="ex-row">
-        <div class="ex-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/></svg>
-        </div>
-        <div class="ex-body">
-          <div class="ex-step">Step 4: Reduce (combine)</div>
-          <div class="ex-text">The 18 mini-summaries (now a few thousand tokens total) are assembled into one final prompt. A single call produces the <strong>one-page executive summary</strong> that the lawyer reads.</div>
-        </div>
-      </div>
-
-      <div class="ex-row">
-        <div class="ex-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-        </div>
-        <div class="ex-body">
-          <div class="ex-step">Step 5: Deliver</div>
-          <div class="ex-text">The summary is returned with <strong>section references</strong> so the lawyer can jump to the source clause. Total wall-clock time: under 30 seconds for a 60-page contract.</div>
-        </div>
-      </div>
-
     </div>
   </div>
 </section>
@@ -537,35 +524,23 @@
 <section>
   <div class="section-label"><span class="num">04</span>Patterns It Uses</div>
   <h2>The <em>building blocks</em>.</h2>
-  <div class="patterns-grid">
-    <div class="pattern-row">
-      <div class="pattern-tag">Application patterns</div>
-      <div class="pattern-info">
-        <div class="pattern-name">Transformation</div>
-        <div class="pattern-desc">The output keeps the meaning of the input in a shorter form, rather than inventing or looking up new facts.</div>
-      </div>
-    </div>
-    <div class="pattern-row">
-      <div class="pattern-tag">Single-call control</div>
-      <div class="pattern-info">
-        <div class="pattern-name">Prompt and Output Shape</div>
-        <div class="pattern-desc">Each chunk call is shaped by a clear instruction ("2 sentences, no new claims") inside one call.</div>
-      </div>
-    </div>
-    <div class="pattern-row">
-      <div class="pattern-tag">Composition</div>
-      <div class="pattern-info">
-        <div class="pattern-name">Decomposition and Recomposition</div>
-        <div class="pattern-desc">The document is split into parts, each part is summarized on its own, then the parts are fused into one answer.</div>
-      </div>
-    </div>
-    <div class="pattern-row">
-      <div class="pattern-tag">Cost &amp; latency</div>
-      <div class="pattern-info">
-        <div class="pattern-name">Cost Grows with Length</div>
-        <div class="pattern-desc">Every chunk costs tokens, so longer documents cost more. Chunk size and summary length are the main cost levers.</div>
-      </div>
-    </div>
+  <div class="layer-chips">
+    <a class="layer-chip" href="layer-application-patterns.html">
+      <span class="layer-chip-name">Application Patterns</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">transformation job, meaning in, shorter out</span>
+    </a>
+    <a class="layer-chip" href="layer-single-call-control.html">
+      <span class="layer-chip-name">Single-Call Control</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">shapes each chunk call with a tight instruction</span>
+    </a>
+    <a class="layer-chip" href="layer-composition.html">
+      <span class="layer-chip-name">Composition</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">splits the doc into parts, recombines partial summaries</span>
+    </a>
+    <a class="layer-chip" href="consideration-cost.html">
+      <span class="layer-chip-name">Cost &amp; Latency</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">keeps the bill bounded via chunk size and summary length</span>
+    </a>
   </div>
 </section>
 
@@ -771,6 +746,65 @@ if (reduceMotion) {
     demoStep = 2;
   })();
 }
+
+// ============ REAL EXAMPLE: tap-through steps ============
+const stepData = [
+  {
+    name: 'Ingest',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6M9 16h4M6 3h8l4 4v14H6z"/></svg>',
+    text: 'A 60-page contract arrives as a PDF. The system extracts text: at roughly 900 tokens per page, that is <strong>54,000 tokens</strong> total, far above any single-call limit.'
+  },
+  {
+    name: 'Chunk',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h7"/></svg>',
+    text: 'The text is split at paragraph breaks into pieces of <strong>3,000 tokens each</strong>, leaving headroom in the 8,000-token context window for the prompt and the output.'
+  },
+  {
+    name: 'Map',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 11.5l10-5.5M7 12.5l10 5.5"/></svg>',
+    text: '18 chunks, 18 calls fire in parallel. Each call asks the model to extract <strong>key obligations, dates, and risk clauses</strong> only, nothing else.'
+  },
+  {
+    name: 'Reduce',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/></svg>',
+    text: 'The 18 mini-summaries are assembled into one final prompt. A single call produces the <strong>one-page executive summary</strong> the lawyer reads.'
+  },
+  {
+    name: 'Deliver',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+    text: 'The summary arrives with <strong>section references</strong> so the lawyer can jump to the source clause. Total time: under 30 seconds for a 60-page contract.'
+  }
+];
+
+const pills = Array.from(document.querySelectorAll('.step-pill'));
+const stepIcon = document.getElementById('step-icon');
+const stepName = document.getElementById('step-name');
+const stepText = document.getElementById('step-text');
+
+function showStep(idx) {
+  const d = stepData[idx];
+  stepIcon.innerHTML = d.icon;
+  stepName.textContent = d.name;
+  stepText.innerHTML = d.text;
+  pills.forEach((p, i) => {
+    const active = i === idx;
+    p.setAttribute('aria-selected', active ? 'true' : 'false');
+    p.tabIndex = active ? 0 : -1;
+  });
+}
+
+pills.forEach((pill, idx) => {
+  pill.addEventListener('click', () => showStep(idx));
+  pill.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); showStep((idx + 1) % pills.length); pills[(idx + 1) % pills.length].focus(); }
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); showStep((idx - 1 + pills.length) % pills.length); pills[(idx - 1 + pills.length) % pills.length].focus(); }
+    if (e.key === 'Home') { e.preventDefault(); showStep(0); pills[0].focus(); }
+    if (e.key === 'End')  { e.preventDefault(); showStep(pills.length - 1); pills[pills.length - 1].focus(); }
+  });
+});
+
+// Initialize on first step
+showStep(0);
 </script>
 </body>
 </html>

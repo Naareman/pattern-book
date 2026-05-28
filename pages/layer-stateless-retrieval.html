@@ -145,16 +145,6 @@
   }
   @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
 
-  .stage-card.clickable {
-    cursor: pointer;
-    transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
-  }
-  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
-  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
-  @media (prefers-reduced-motion: reduce) {
-    .stage-card.clickable { transition: none; }
-    .stage-card.clickable:hover { transform: none; }
-  }
 
   /* de-squeezed: icon + name share a full-width row of their own */
   .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; }
@@ -173,19 +163,32 @@
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
 
-  /* "see how" lives at the bottom of each card, pushed down by margin-top:auto */
+  /* card-door: whole card is clickable to its guide */
+  .stage-card {
+    cursor: pointer;
+    text-decoration: none;
+  }
+  a.stage-card:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent);
+  }
+
+  /* see-how link inside the card */
   .see-how {
-    display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 14px;
-    font-size: 12.5px; font-weight: 600; color: var(--accent-hover);
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: auto; padding-top: 16px;
+    font-size: 13px; font-weight: 600;
+    color: var(--accent-hover); text-decoration: none;
     transition: color .15s ease;
   }
-  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
-  .see-how .arr { display: inline-block; transition: transform .18s ease; }
-  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  .see-how:hover { color: var(--accent); }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; font-size: 12px; }
+  .see-how:hover .arr { transform: translateX(3px); }
   @media (prefers-reduced-motion: reduce) {
     .see-how, .see-how .arr { transition: none; }
-    .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; }
+    .see-how:hover .arr { transform: none; }
   }
+
 
   /* back link */
   .back-link {
@@ -262,7 +265,7 @@
   <div class="stages">
 
     <!-- FIND -->
-    <section class="stage-card clickable" id="card-find" aria-labelledby="g-find">
+    <a class="stage-card" id="card-find" aria-labelledby="g-find" href="stateless-retrieval-find.html">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -277,11 +280,11 @@
         <span class="chip">Search by meaning or words</span>
         <span class="chip">Rerank the best matches</span>
       </div>
-      <a class="see-how" href="stateless-retrieval-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
-    </section>
+      <span class="see-how" aria-label="See how Find works" tabindex="-1">See how <span class="arr" aria-hidden="true">&rarr;</span></span>
+    </a>
 
     <!-- FEED IT IN WELL -->
-    <section class="stage-card clickable" id="card-feed" aria-labelledby="g-feed">
+    <a class="stage-card" id="card-feed" aria-labelledby="g-feed" href="stateless-retrieval-feed.html">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -296,11 +299,11 @@
         <span class="chip">Pull from a live source</span>
         <span class="chip">Show where the answer came from</span>
       </div>
-      <a class="see-how" href="stateless-retrieval-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
-    </section>
+      <span class="see-how" aria-label="See how Feed it in well works" tabindex="-1">See how <span class="arr" aria-hidden="true">&rarr;</span></span>
+    </a>
 
     <!-- KEEP IT FRESH -->
-    <section class="stage-card clickable" id="card-fresh" aria-labelledby="g-fresh">
+    <a class="stage-card" id="card-fresh" aria-labelledby="g-fresh" href="stateless-retrieval-fresh.html">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -314,8 +317,8 @@
         <span class="chip">Reuse recent lookups</span>
         <span class="chip">Notice when content is old</span>
       </div>
-      <a class="see-how" href="stateless-retrieval-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
-    </section>
+      <span class="see-how" aria-label="See how Keep it fresh works" tabindex="-1">See how <span class="arr" aria-hidden="true">&rarr;</span></span>
+    </a>
 
   </div>
 </section>
@@ -336,7 +339,7 @@
 </footer>
 
 <script>
-// flow legend: scroll + glow on card click, one-time load sweep, card-door click guard
+// flow legend: scroll + glow on card click, one-time load sweep
 (function(){
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
   var stages = ['card-find','card-feed','card-fresh'];
@@ -380,22 +383,6 @@
     window.setTimeout(tour, 350);
   }
 
-  // each stage card is a door to the how-it-works page; chip clicks are ignored
-  var doors = {
-    'card-find': 'stateless-retrieval-how-it-works.html',
-    'card-feed': 'stateless-retrieval-how-it-works.html',
-    'card-fresh': 'stateless-retrieval-how-it-works.html'
-  };
-  Object.keys(doors).forEach(function(cardId){
-    var doorCard = document.getElementById(cardId);
-    if(!doorCard) return;
-    var doorHref = doors[cardId];
-    doorCard.addEventListener('click', function(e){
-      if(e.target.closest('.chip')) return; // chip clicks never trigger the card door
-      if(e.target.closest('a')) return; // let real links handle their own clicks
-      window.location.href = doorHref;
-    });
-  });
 })();
 </script>
 </body>

@@ -139,53 +139,44 @@
     transition: box-shadow .55s ease, border-color .55s ease;
     display: flex; flex-direction: column; height: 100%;
   }
+  .stage-card.clickable { cursor: pointer; }
+  .stage-card.clickable:hover { box-shadow: var(--shadow-lg); border-color: var(--border-strong); }
   .stage-card.glow {
     box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42);
     border-color: var(--accent);
   }
   @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
 
-  .stage-card.clickable {
-    cursor: pointer;
-    transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
-  }
-  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
-  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
-  @media (prefers-reduced-motion: reduce) {
-    .stage-card.clickable { transition: none; }
-    .stage-card.clickable:hover { transform: none; }
-  }
-
   /* de-squeezed: icon + name share a full-width row of their own */
   .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; }
   .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
   .stage-head .sico svg { width: 18px; height: 18px; display: block; }
-  .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
+  .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; text-decoration: none; }
+  a.stage-name:hover { color: var(--accent-hover); }
 
   .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
-  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  /* wrapping chip grid */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
   .chip {
     flex: none; display: inline-flex; align-items: center; gap: 3px;
     padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500;
     line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
+  a.chip { cursor: pointer; text-decoration: none; color: var(--accent-hover); border-color: var(--accent); background: var(--accent-soft); }
+  a.chip:hover { background: #E3DBFD; }
+  .arr { font-size: 11px; }
 
-  /* "see how" lives at the bottom of each card, pushed down by margin-top:auto */
+  /* see-how link at the bottom of each card */
   .see-how {
-    display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 14px;
-    font-size: 12.5px; font-weight: 600; color: var(--accent-hover);
-    transition: color .15s ease;
+    display: inline-flex; align-items: center; gap: 5px; margin-top: auto;
+    font-size: 13px; font-weight: 600; color: var(--accent-hover);
+    text-decoration: none; padding: 0; border: none; background: none;
+    transition: gap .15s ease;
   }
-  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
-  .see-how .arr { display: inline-block; transition: transform .18s ease; }
-  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
-  @media (prefers-reduced-motion: reduce) {
-    .see-how, .see-how .arr { transition: none; }
-    .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; }
-  }
+  .see-how:hover { color: var(--accent); gap: 8px; }
+
 
   /* back link */
   .back-link {
@@ -267,15 +258,15 @@
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
         </span>
-        <h2 id="g-remember"><span class="stage-name">What it remembers</span></h2>
+        <h2 id="g-remember"><a class="stage-name" href="stateful-memory-what-remembers.html">What it remembers</a></h2>
       </div>
       <p class="stage-lead">What memory can hold for you.</p>
       <div class="chips">
-        <span class="chip">This conversation so far</span>
-        <span class="chip">Your name, preferences, habits</span>
-        <span class="chip">Specific past events</span>
+        <a class="chip" href="stateful-memory-conversation-history.html">This conversation so far<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="stateful-memory-user-profile.html">Your name, preferences, habits<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="stateful-memory-episodic.html">Specific past events<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <a class="see-how" href="stateful-memory-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="stateful-memory-what-remembers.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
     <!-- MANAGING THE MEMORY -->
@@ -286,16 +277,16 @@
             <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
           </svg>
         </span>
-        <h2 id="g-manage"><span class="stage-name">Managing the memory</span></h2>
+        <h2 id="g-manage"><a class="stage-name" href="stateful-memory-managing.html">Managing the memory</a></h2>
       </div>
       <p class="stage-lead">Keep it useful, current, and yours.</p>
       <div class="chips">
-        <span class="chip">Shrinking old memories</span>
-        <span class="chip">Deciding when to surface one</span>
-        <span class="chip">Dropping or deleting what is no longer useful</span>
-        <span class="chip">Recognizing you across sessions</span>
+        <a class="chip" href="stateful-memory-consolidation.html">Shrinking old memories<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="stateful-memory-retrieval-triggers.html">Deciding when to surface one<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="stateful-memory-eviction.html">Dropping or deleting what is no longer useful<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="stateful-memory-identity-continuity.html">Recognizing you across sessions<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <a class="see-how" href="stateful-memory-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="stateful-memory-managing.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
   </div>
@@ -317,7 +308,7 @@
 </footer>
 
 <script>
-// flow legend: scroll + glow on card click, one-time load sweep, card-door click guard
+// flow legend: scroll + glow on card click, one-time load sweep
 (function(){
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
   var stages = ['card-remember','card-manage'];
@@ -361,21 +352,22 @@
     window.setTimeout(tour, 350);
   }
 
-  // each stage card is a door to the how-it-works page; chip clicks are ignored
+  // card-door: clicking anywhere on a card navigates to its guide page,
+  // except clicks on inner anchors or chips (which navigate on their own)
   var doors = {
-    'card-remember': 'stateful-memory-how-it-works.html',
-    'card-manage': 'stateful-memory-how-it-works.html'
+    'card-remember': 'stateful-memory-what-remembers.html',
+    'card-manage':   'stateful-memory-managing.html'
   };
   Object.keys(doors).forEach(function(cardId){
     var doorCard = document.getElementById(cardId);
     if(!doorCard) return;
     var doorHref = doors[cardId];
     doorCard.addEventListener('click', function(e){
-      if(e.target.closest('.chip')) return; // chip clicks never trigger the card door
-      if(e.target.closest('a')) return; // let real links handle their own clicks
+      if(e.target.closest('a')) return;
       window.location.href = doorHref;
     });
   });
+
 })();
 </script>
 </body>

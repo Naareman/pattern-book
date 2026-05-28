@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Picking the cheapest model that fits · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* picker visual */
+  .pick-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .pick-input { padding: 14px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; }
+  .pick-q { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; padding: 8px 14px; border: 1px solid var(--border-strong); background: #fff; border-radius: 20px; cursor: pointer; color: var(--text); transition: border-color .15s, color .15s, background .15s; }
+  .pick-q:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .pick-q.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .pick-body { padding: 22px; }
+  .pick-request { padding: 12px 14px; background: var(--bg-subtle); border: 1px solid var(--border-strong); border-radius: 10px; font-size: 14px; color: var(--text); margin-bottom: 16px; }
+  .pick-request .lbl { display: block; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+  .pick-models { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .pick-model { padding: 12px; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--bg-subtle); text-align: center; opacity: 0.55; transition: opacity .2s ease, background .2s ease, border-color .2s ease; }
+  .pick-model.chosen { opacity: 1; background: var(--green-soft); border-color: var(--green); box-shadow: 0 0 0 2px rgba(14,159,110,0.18); }
+  .pick-model .tier { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--soft); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+  .pick-model.chosen .tier { color: var(--green); }
+  .pick-model .name { font-size: 14px; font-weight: 600; color: var(--text); margin: 4px 0 6px; }
+  .pick-model .cost { font-size: 12px; color: var(--faint); }
+  .pick-model.chosen .cost strong { color: var(--green); }
+  .pick-decision { margin-top: 14px; padding: 12px 14px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--soft); line-height: 1.55; }
+  .pick-decision strong { color: var(--text); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .pick-models { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-serving-infrastructure.html"><span aria-hidden="true">&larr;</span> Serving &amp; Infrastructure</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-serving-infrastructure.html">Serving &amp; Infrastructure</a><span class="sep" aria-hidden="true">/</span><span class="here">Save money</span><span class="sep" aria-hidden="true">/</span><span class="here">Picking the cheapest model that fits</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Serving &amp; Infrastructure &middot; Save money</span>
+  <h1 class="page-title">Picking the cheapest model that fits</h1>
+  <p class="explainer">For each request, send it to the smallest, cheapest model that is good enough. Reserve the expensive one for the calls that truly need it.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What Is It?</div>
+  <h2 id="what-heading">Right-size the model for <em>each call</em>.</h2>
+  <div class="what-card">
+    <p>You keep two or three models on hand: a small fast one, a medium one, and a large one. A quick check looks at the request (length, topic, complexity, who is asking) and picks the cheapest model that can handle it. The big model is only used when the small one would clearly fall short. Same product, but most calls land on the cheap tier, so the average cost per request drops a lot.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Three asks, <em>three tiers</em>.</h2>
+  <div class="pick-card" role="region" aria-label="Model selection example">
+    <div class="pick-input" role="tablist" aria-label="Sample requests">
+      <button class="pick-q active" role="tab" aria-selected="true" data-q="0">"Summarize this email"</button>
+      <button class="pick-q" role="tab" aria-selected="false" data-q="1">"Draft a polite refund reply"</button>
+      <button class="pick-q" role="tab" aria-selected="false" data-q="2">"Review this 40-page contract"</button>
+    </div>
+    <div class="pick-body">
+      <div class="pick-request">
+        <span class="lbl">Request</span>
+        <span id="pick-req">Summarize this email</span>
+      </div>
+      <div class="pick-models">
+        <div class="pick-model" id="pick-small">
+          <div class="tier">Small</div>
+          <div class="name">Cheap model</div>
+          <div class="cost"><strong>$0.0002</strong> / call</div>
+        </div>
+        <div class="pick-model" id="pick-medium">
+          <div class="tier">Medium</div>
+          <div class="name">Balanced model</div>
+          <div class="cost"><strong>$0.003</strong> / call</div>
+        </div>
+        <div class="pick-model" id="pick-large">
+          <div class="tier">Large</div>
+          <div class="name">Top model</div>
+          <div class="cost"><strong>$0.04</strong> / call</div>
+        </div>
+      </div>
+      <div class="pick-decision" id="pick-why">
+        <strong>Why:</strong> a short summary is well within the small model. No reason to spend more.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">How it sits next to <em>other ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it shapes</div>
+      <div class="fits-desc">The runtime picks which model the call goes to, based on cost and latency targets. It does not change the prompt or the answer logic. Same in, just routed to a smaller engine.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Not the same as</div>
+      <div class="fits-desc">Cascading (cheap first, then escalate if the answer looks weak) is a composition pattern with two calls. Picking the cheapest model that fits is one runtime decision before any call runs.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Sits on top of</div>
+      <div class="fits-desc">A cost and quality budget. The runtime is applying a budget you set: how much quality you trade for how much money saved.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Traffic is a mix of easy and hard requests. Most are easy. Pay accordingly.</li>
+    <li>You have a clear quality bar and can measure it, so you know when the cheap tier holds up.</li>
+    <li>Cost per call is starting to drive total spend, and one model size for everything is wasteful.</li>
+    <li>Skip this when every call is high-stakes or when quality differences are hard to measure: just use the strong model.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-serving-infrastructure.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Serving &amp; Infrastructure</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Chen et al. (2023). <em>FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance.</em> <span class="note">Shows how routing requests across model tiers cuts cost by an order of magnitude with comparable accuracy.</span></li>
+    <li>Ong et al. (2024). <em>RouteLLM: Learning to Route LLMs with Preference Data.</em> <span class="note">Trains a router to send each query to the cheapest model that meets the quality target.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var data = [
+    {
+      req: 'Summarize this email',
+      chosen: 'small',
+      why: '<strong>Why:</strong> a short summary is well within the small model. No reason to spend more.'
+    },
+    {
+      req: 'Draft a polite refund reply',
+      chosen: 'medium',
+      why: '<strong>Why:</strong> needs decent tone and context handling. The balanced model is the safe middle.'
+    },
+    {
+      req: 'Review this 40-page contract',
+      chosen: 'large',
+      why: '<strong>Why:</strong> long input, careful reading, real risk if it gets things wrong. Use the top model.'
+    }
+  ];
+  var btns = document.querySelectorAll('.pick-q');
+  var req = document.getElementById('pick-req');
+  var why = document.getElementById('pick-why');
+  var nodes = {
+    small: document.getElementById('pick-small'),
+    medium: document.getElementById('pick-medium'),
+    large: document.getElementById('pick-large')
+  };
+
+  function apply(i){
+    var d = data[i];
+    req.textContent = d.req;
+    why.innerHTML = d.why;
+    Object.keys(nodes).forEach(function(k){
+      nodes[k].classList.remove('chosen');
+    });
+    nodes[d.chosen].classList.add('chosen');
+  }
+
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      btns.forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      apply(parseInt(btn.getAttribute('data-q'), 10));
+    });
+  });
+
+  apply(0);
+}());
+</script>
+</body>
+</html>

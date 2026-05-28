@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statistical rigor &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* error-bar comparison */
+  .ci-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .ci-head {
+    padding: 12px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border);
+    font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--soft);
+  }
+  .ci-body { padding: 20px 22px 14px; }
+  .ci-row {
+    display: grid; grid-template-columns: 110px 1fr 90px;
+    align-items: center; gap: 14px; padding: 10px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .ci-row:last-child { border-bottom: none; }
+  .ci-label { font-size: 13.5px; font-weight: 600; color: var(--text); }
+  .ci-track {
+    position: relative; height: 26px; background: var(--bg-subtle);
+    border-radius: 13px; border: 1px solid var(--border);
+  }
+  .ci-bar {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    height: 10px; background: var(--accent-soft);
+    border: 1px solid var(--accent); border-radius: 6px;
+  }
+  .ci-point {
+    position: absolute; top: 50%; transform: translate(-50%, -50%);
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--accent-hover); border: 2px solid #fff;
+    box-shadow: 0 0 0 1px var(--accent-hover);
+  }
+  .ci-val { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--soft); text-align: right; }
+  .ci-scale {
+    display: flex; justify-content: space-between; padding: 6px 0 0;
+    margin-left: 124px; margin-right: 104px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--faint);
+  }
+  .ci-caption {
+    padding: 11px 18px; background: var(--bg-subtle); border-top: 1px solid var(--border);
+    font-size: 12.5px; color: var(--faint); line-height: 1.5;
+  }
+  .ci-caption strong { color: var(--text); }
+
+  .fits-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 110px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); color: var(--text);
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .ci-row { grid-template-columns: 1fr; gap: 4px; }
+    .ci-val { text-align: left; }
+    .ci-scale { margin: 0; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-evaluation.html"><span aria-hidden="true">&larr;</span> Evaluation</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-evaluation.html">Evaluation</a><span class="sep" aria-hidden="true">/</span><span>Check the answers</span><span class="sep" aria-hidden="true">/</span><span class="here">Statistical rigor</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Evaluation &middot; Check the answers</span>
+  <h1 class="page-title">Statistical rigor</h1>
+  <p class="explainer">Treat each eval score as a measurement with uncertainty. A small difference on a small test set is often noise, and pretending it is a real win wastes weeks.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What It Is</div>
+  <h2 id="what-heading">A number with <em>error bars</em>.</h2>
+  <div class="what-card">
+    <p>Statistical rigor is the habit of treating an eval score as an estimate, not a fact. Every score comes with a range of plausible values that shrinks as the test set grows. A 2% gain across 50 cases sits inside the noise, so it could be a real improvement or pure luck. A 2% gain across 5,000 cases usually means a real change. Reporting the score with its uncertainty (a confidence interval) lets the reader tell the difference.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Same gap, <em>two different stories</em>.</h2>
+  <div class="ci-card" role="region" aria-label="Confidence interval comparison">
+    <div class="ci-head">Two test runs comparing model A vs model B</div>
+    <div class="ci-body">
+      <div class="ci-row">
+        <div class="ci-label">A &middot; 50 cases</div>
+        <div class="ci-track" aria-label="Score 78 percent, range 68 to 88">
+          <div class="ci-bar" style="left: 68%; width: 20%;"></div>
+          <div class="ci-point" style="left: 78%;"></div>
+        </div>
+        <div class="ci-val">78% &plusmn;10</div>
+      </div>
+      <div class="ci-row">
+        <div class="ci-label">B &middot; 50 cases</div>
+        <div class="ci-track" aria-label="Score 80 percent, range 70 to 90">
+          <div class="ci-bar" style="left: 70%; width: 20%;"></div>
+          <div class="ci-point" style="left: 80%;"></div>
+        </div>
+        <div class="ci-val">80% &plusmn;10</div>
+      </div>
+      <div class="ci-row">
+        <div class="ci-label">A &middot; 5,000 cases</div>
+        <div class="ci-track" aria-label="Score 78 percent, range 77 to 79">
+          <div class="ci-bar" style="left: 77%; width: 2%;"></div>
+          <div class="ci-point" style="left: 78%;"></div>
+        </div>
+        <div class="ci-val">78% &plusmn;1</div>
+      </div>
+      <div class="ci-row">
+        <div class="ci-label">B &middot; 5,000 cases</div>
+        <div class="ci-track" aria-label="Score 80 percent, range 79 to 81">
+          <div class="ci-bar" style="left: 79%; width: 2%;"></div>
+          <div class="ci-point" style="left: 80%;"></div>
+        </div>
+        <div class="ci-val">80% &plusmn;1</div>
+      </div>
+      <div class="ci-scale">
+        <span>60%</span><span>70%</span><span>80%</span><span>90%</span>
+      </div>
+    </div>
+    <div class="ci-caption"><strong>Top:</strong> the two ranges overlap heavily. The 2-point lead is inside the noise. <strong>Bottom:</strong> the same 2-point lead, but the ranges no longer overlap, so model B really is better.</div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it is</div>
+      <div class="fits-desc">A way of reading any eval score. It says: never compare two numbers without knowing how noisy each one is.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">A bigger and broader golden set, and reporting per-topic breakdowns so you can see where a real gap sits.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Two prompts or two models look close: rigor tells you whether to ship the change or keep iterating.</li>
+    <li>Eval cases are expensive (human graders, long runs): you need to know if 100 cases is enough or if you need 1,000.</li>
+    <li>You report a number to a stakeholder: a confidence interval keeps the conversation honest.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-evaluation.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Evaluation</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Card, D. et al. (2020). <em>With Little Power Comes Great Responsibility.</em> EMNLP 2020. <span class="note">Shows that most NLP eval comparisons are underpowered and how to design ones that are not.</span></li>
+    <li>Dror, R. et al. (2018). <em>The Hitchhiker's Guide to Testing Statistical Significance in NLP.</em> ACL 2018. <span class="note">Practical guide to picking the right test for comparing model scores.</span></li>
+    <li>Madaan, A. et al. (2024). <em>Quantifying Variance in Evaluation Benchmarks.</em> arXiv:2406.10229. <span class="note">Recent measurement of how much benchmark noise sits underneath single-number leaderboard reports.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+</body>
+</html>

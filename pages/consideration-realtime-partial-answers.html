@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checking partial answers &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px; --bg-subtle:#F6F7F9;
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.10);
+    --orange:#E8882A; --orange-soft:rgba(232,136,42,0.10);
+    --red:#D92D20; --red-soft:rgba(217,45,32,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* partial JSON demo */
+  .pj-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .pj-bar { padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--bg-subtle); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .pj-bar-label { font-size: 12px; font-weight: 600; color: var(--soft); text-transform: uppercase; letter-spacing: .06em; }
+  .pj-status { font-size: 12px; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--faint); }
+  .pj-status.ok { color: var(--green); }
+  .pj-status.warn { color: var(--orange); }
+  .pj-status.bad { color: var(--red); }
+  .pj-body { display: grid; grid-template-columns: 1.1fr 1fr; gap: 0; }
+  .pj-pane { padding: 16px 18px; }
+  .pj-pane:first-child { border-right: 1px solid var(--border); }
+  .pj-pane-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); margin-bottom: 8px; }
+  .pj-code { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.75; color: var(--text); white-space: pre-wrap; min-height: 160px; word-break: break-word; }
+  .pj-code .key { color: var(--accent-hover); }
+  .pj-code .str { color: var(--green); }
+  .pj-code .num { color: var(--orange); }
+  .pj-cursor { display: inline-block; width: 2px; height: 1em; background: var(--accent); vertical-align: text-bottom; animation: blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .pj-tree { display: flex; flex-direction: column; gap: 8px; }
+  .pj-row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 8px; background: var(--bg-subtle); border: 1px solid var(--border); font-size: 13px; }
+  .pj-row .nm { font-family: 'JetBrains Mono', monospace; color: var(--text); font-weight: 600; }
+  .pj-row .val { font-family: 'JetBrains Mono', monospace; color: var(--soft); margin-left: auto; }
+  .pj-row.ready { border-color: var(--green); background: var(--green-soft); }
+  .pj-row.ready .nm { color: var(--green); }
+  .pj-row.live { border-color: var(--accent); background: var(--accent-soft); }
+  .pj-footer { padding: 12px 20px; border-top: 1px solid var(--border); background: var(--bg-subtle); font-size: 13px; color: var(--soft); line-height: 1.6; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .pj-btn { padding: 6px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer; transition: all .2s; }
+  .pj-btn:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 720px) { .pj-body { grid-template-columns: 1fr; } .pj-pane:first-child { border-right: none; border-bottom: 1px solid var(--border); } }
+  @media (max-width: 560px) { h1.page-title { font-size: 30px; } .explainer { font-size: 15px; } h2 { font-size: 21px; } .fits-row { flex-wrap: wrap; } .fits-label { min-width: 0; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-real-time.html"><span aria-hidden="true">&larr;</span> Real-time / Streaming</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-real-time.html">Real-time / Streaming</a><span class="sep" aria-hidden="true">/</span><span>Keep the words flowing</span><span class="sep" aria-hidden="true">/</span><span class="here">Checking partial answers</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Real-time / Streaming &middot; Keep the words flowing</span>
+  <h1 class="page-title">Checking partial answers</h1>
+  <p class="explainer">Read structured output before it is finished, so each field can be acted on the moment it is ready.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">Read the shape <em>as it grows</em>.</h2>
+  <div class="what-card">
+    <p>Structured replies (JSON, key-value lists, function calls) often stream in the same way as plain text. A normal parser waits for the whole thing and falls over on anything that looks half-built. A <strong style="color:var(--accent-hover)">partial-answer parser</strong> tolerates the unfinished shape: open braces, half-typed strings, missing commas. It keeps a running picture of what is complete, what is still being typed, and what is still expected. Each time a field finishes (the name, then the price, then the tags), the parser fires that field downstream so the page can render or the next step can begin. Latency drops because work starts on field one before field five exists.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Fields light up <em>one by one</em>.</h2>
+  <div class="pj-card" role="region" aria-label="Partial JSON parsing demo">
+    <div class="pj-bar">
+      <span class="pj-bar-label">Streaming JSON for an order draft</span>
+      <span class="pj-status" id="pjStatus">idle</span>
+    </div>
+    <div class="pj-body">
+      <div class="pj-pane">
+        <div class="pj-pane-title">Raw stream</div>
+        <div class="pj-code" id="pjCode" aria-live="polite"><span id="pjText"></span><span class="pj-cursor" id="pjCursor" aria-hidden="true"></span></div>
+      </div>
+      <div class="pj-pane">
+        <div class="pj-pane-title">Fields ready to use</div>
+        <div class="pj-tree" id="pjTree">
+          <div class="pj-row" data-key="customer"><span class="nm">customer</span><span class="val" id="vCust">waiting...</span></div>
+          <div class="pj-row" data-key="items"><span class="nm">items</span><span class="val" id="vItems">waiting...</span></div>
+          <div class="pj-row" data-key="total"><span class="nm">total</span><span class="val" id="vTotal">waiting...</span></div>
+          <div class="pj-row" data-key="ship"><span class="nm">ship_by</span><span class="val" id="vShip">waiting...</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="pj-footer">
+      <span id="pjNote">Press play. Each field flips to ready the moment its closing quote or comma arrives.</span>
+      <button class="pj-btn" id="pjBtn">Play</button>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it sits next to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it does</div>
+      <div class="fits-desc">Parses a half-built reply and surfaces each field as soon as it is whole, so the next step does not wait for the whole document.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">Often shows up with structured output and schema enforcement. The schema gives the parser its map of what to expect next.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Not this</div>
+      <div class="fits-desc">It is a parser move, not a quality or safety judgement. Whether each field is correct or appropriate is a separate check.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Forms and dashboards that paint field by field so the user sees progress.</li>
+    <li>Tool calls where the first argument can fire a lookup while the others are still streaming.</li>
+    <li>Long structured outputs where the last bracket is many seconds after the first useful value.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-real-time.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Real-time / Streaming</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Willard, B. & Louf, R. (2023). <em>Efficient guided generation for large language models.</em> arXiv:2307.09702. <span class="note">Outlines schema-guided generation and parsing of partial JSON during streaming.</span></li>
+    <li>Vercel. (2024). <em>AI SDK: streamObject and partial object parsing.</em> Documentation. <span class="note">Production reference for incrementally usable structured streams in the browser.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  const btn = document.getElementById('pjBtn');
+  const textEl = document.getElementById('pjText');
+  const cursor = document.getElementById('pjCursor');
+  const status = document.getElementById('pjStatus');
+  const note = document.getElementById('pjNote');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const chunks = [
+    { html: '{\n  ', fire: null, note: 'Stream opens.', status: 'streaming' },
+    { html: '<span class="key">"customer"</span>: ', fire: null, note: 'Reading the customer key.', status: 'streaming' },
+    { html: '<span class="str">"Acme"</span>,\n  ', fire: { key: 'customer', val: 'Acme' }, note: 'customer is ready. UI can show the name now.', status: 'streaming' },
+    { html: '<span class="key">"items"</span>: ', fire: null, note: 'Items key opening...', status: 'streaming' },
+    { html: '<span class="num">3</span>,\n  ', fire: { key: 'items', val: '3' }, note: 'items is ready. The cart count appears.', status: 'streaming' },
+    { html: '<span class="key">"total"</span>: ', fire: null, note: 'Total being typed...', status: 'streaming' },
+    { html: '<span class="num">128.40</span>,\n  ', fire: { key: 'total', val: '$128.40' }, note: 'total is ready. The price renders.', status: 'streaming' },
+    { html: '<span class="key">"ship_by"</span>: ', fire: null, note: 'Last field opening.', status: 'streaming' },
+    { html: '<span class="str">"Friday"</span>\n}', fire: { key: 'ship', val: 'Friday' }, note: 'Done. All four fields rendered well before the closing brace arrived for some users.', status: 'complete' }
+  ];
+
+  const tree = document.getElementById('pjTree');
+  function rowFor(key) { return tree.querySelector('[data-key="' + key + '"]'); }
+  function valFor(key) { return document.getElementById('v' + key.charAt(0).toUpperCase() + key.slice(1)); }
+
+  let running = false;
+  function reset() {
+    textEl.innerHTML = '';
+    status.textContent = 'idle';
+    status.className = 'pj-status';
+    note.textContent = 'Press play. Each field flips to ready the moment its closing quote or comma arrives.';
+    btn.textContent = 'Play';
+    btn.disabled = false;
+    cursor.style.display = 'inline-block';
+    ['customer','items','total','ship'].forEach(function (k) {
+      const r = rowFor(k); if (r) r.classList.remove('ready','live');
+      const v = valFor(k); if (v) v.textContent = 'waiting...';
+    });
+    running = false;
+  }
+  function play() {
+    if (running) return;
+    running = true;
+    btn.disabled = true;
+    textEl.innerHTML = '';
+    let i = 0;
+    const delay = reduce ? 20 : 700;
+    function step() {
+      if (i >= chunks.length) {
+        cursor.style.display = 'none';
+        btn.disabled = false;
+        btn.textContent = 'Replay';
+        btn.onclick = function () { reset(); setTimeout(play, 60); };
+        return;
+      }
+      const c = chunks[i++];
+      const span = document.createElement('span');
+      span.innerHTML = c.html;
+      textEl.appendChild(span);
+      if (c.fire) {
+        const row = rowFor(c.fire.key);
+        if (row) { row.classList.remove('live'); row.classList.add('ready'); }
+        const v = valFor(c.fire.key);
+        if (v) v.textContent = c.fire.val;
+      }
+      status.textContent = c.status;
+      status.className = 'pj-status ' + (c.status === 'complete' ? 'ok' : 'ok');
+      note.textContent = c.note;
+      setTimeout(step, delay);
+    }
+    step();
+  }
+  btn.onclick = play;
+}());
+</script>
+</body>
+</html>

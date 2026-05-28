@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pull from a live source &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* live source visual: tap source to see live call */
+  .live-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .live-header { padding: 12px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); }
+  .live-tabs { display: flex; gap: 6px; padding: 14px 18px 0; flex-wrap: wrap; }
+  .live-tab { font-family: inherit; font-size: 13px; font-weight: 600; padding: 7px 13px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; color: var(--soft); cursor: pointer; transition: border-color .15s, color .15s, background .15s; }
+  .live-tab:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .live-tab.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .live-body { padding: 18px 22px 22px; }
+  .live-flow { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: stretch; }
+  .live-node { padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-subtle); display: flex; flex-direction: column; gap: 5px; }
+  .live-node .role { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: .05em; }
+  .live-node .what { font-size: 13.5px; color: var(--text); font-weight: 500; line-height: 1.4; }
+  .live-node .detail { font-size: 12.5px; color: var(--soft); line-height: 1.5; }
+  .live-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); align-self: center; text-align: center; }
+  .live-note { margin-top: 14px; padding: 12px 14px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--soft); line-height: 1.55; }
+  .live-note strong { color: var(--text); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .live-flow { grid-template-columns: 1fr; }
+    .live-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-stateless-retrieval.html"><span aria-hidden="true">&larr;</span> Stateless Retrieval</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-stateless-retrieval.html">Stateless Retrieval</a><span class="sep" aria-hidden="true">/</span><span class="here">Feed it in well &middot; Pull from a live source</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Stateless Retrieval &middot; Feed it in well</span>
+  <h1 class="page-title">Pull from a live source</h1>
+  <p class="explainer">For facts that change by the hour, search a live source at question time instead of a pile of stored documents. Read-only: the system asks, reads, and uses the answer.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">A <em>read-only</em> call to a fresh source.</h2>
+  <div class="what-card">
+    <p>Some facts move too fast to store: today's news, current stock prices, this morning's flight status. Instead of indexing them ahead of time, the system runs a live lookup at the moment the question arrives. The look-up may be a web search, a weather feed, or a database query. It only reads; it never changes anything in the source. The result is treated like any other retrieved piece and fed to the model.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Three questions, <em>three live calls</em>.</h2>
+  <div class="live-card" role="region" aria-label="Live source example">
+    <div class="live-header">Live look-ups happen at question time</div>
+    <div class="live-tabs" role="tablist" aria-label="Pick a question">
+      <button type="button" class="live-tab active" role="tab" aria-selected="true" data-q="0">"What's the weather in Cairo?"</button>
+      <button type="button" class="live-tab" role="tab" aria-selected="false" data-q="1">"Tesla share price today?"</button>
+      <button type="button" class="live-tab" role="tab" aria-selected="false" data-q="2">"Top headline on BBC?"</button>
+    </div>
+    <div class="live-body">
+      <div class="live-flow">
+        <div class="live-node">
+          <span class="role">Question</span>
+          <span class="what" id="liveQ">What's the weather in Cairo?</span>
+        </div>
+        <div class="live-arrow" aria-hidden="true">&rarr;</div>
+        <div class="live-node">
+          <span class="role">Read-only live call</span>
+          <span class="what" id="liveCall">Weather feed</span>
+          <span class="detail" id="liveDetail">Calls a public weather feed for "Cairo, EG" and reads back the current conditions.</span>
+        </div>
+      </div>
+      <div class="live-note" id="liveNote"><strong>Why live:</strong> the weather changes every hour. A stored snapshot would be stale before the user even reads the answer.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Sits next to</div>
+      <div class="fits-desc">Search over a prepared library. A live look-up plays the same role: it pulls in passages the model would not know from training. The difference is the source is queried fresh each time.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Read-only by rule</div>
+      <div class="fits-desc">A live look-up only reads. The moment the system writes, books, posts, or cancels something, it has crossed into an action, which is a different shape entirely.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Watch for</div>
+      <div class="fits-desc">Latency and outages. A live call can add hundreds of milliseconds and can fail. Plan a fallback: a cached value, a graceful "I could not check just now", or a stored backup.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <div class="matters-card">
+    <ul class="matters-list">
+      <li>The answer depends on facts that change daily or by the minute.</li>
+      <li>A trusted live source already exists (an API, a search engine, a weather feed) and is cheap to call.</li>
+      <li>Storing a snapshot would mean serving stale answers most of the time.</li>
+    </ul>
+  </div>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-stateless-retrieval.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Stateless Retrieval</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Schick et al. (2023). <em>Toolformer: Language Models Can Teach Themselves to Use Tools.</em> NeurIPS. <span class="note">Frames live look-ups (calculator, search, calendar) as a tool the model invokes.</span></li>
+    <li>Nakano et al. (2021). <em>WebGPT: Browser-assisted question-answering with human feedback.</em> arXiv:2112.09332. <span class="note">Early system that ran a live web search inside the answer loop.</span></li>
+    <li>OpenAI (2024). <em>Function calling and the web-search tool.</em> platform.openai.com. <span class="note">A current product view of read-only live look-ups during an answer.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var data = [
+    { q: "What's the weather in Cairo?", call: "Weather feed", detail: 'Calls a public weather feed for "Cairo, EG" and reads back the current conditions.', note: '<strong>Why live:</strong> the weather changes every hour. A stored snapshot would be stale before the user even reads the answer.' },
+    { q: "Tesla share price today?", call: "Market data API", detail: 'Calls a market data service for the latest TSLA quote and reads the last traded price.', note: '<strong>Why live:</strong> prices move every second the market is open. Only a real-time fetch will be right.' },
+    { q: "Top headline on BBC?", call: "Web search", detail: 'Runs a live web search for "bbc.com top story" and reads the first result.', note: '<strong>Why live:</strong> the homepage rotates many times a day. A library indexed last night would already be wrong.' }
+  ];
+  var btns = document.querySelectorAll('.live-tab');
+  var q = document.getElementById('liveQ');
+  var call = document.getElementById('liveCall');
+  var detail = document.getElementById('liveDetail');
+  var note = document.getElementById('liveNote');
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      btns.forEach(function (x) { x.classList.remove('active'); x.setAttribute('aria-selected', 'false'); });
+      b.classList.add('active');
+      b.setAttribute('aria-selected', 'true');
+      var d = data[parseInt(b.getAttribute('data-q'), 10)];
+      q.textContent = d.q;
+      call.textContent = d.call;
+      detail.textContent = d.detail;
+      note.innerHTML = d.note;
+    });
+  });
+}());
+</script>
+</body>
+</html>

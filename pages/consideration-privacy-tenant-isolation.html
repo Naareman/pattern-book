@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One customer's data never reaches another &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --green:#0E9F6E; --red:#D92D20;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 760px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 760px; margin: 0 auto; padding: 44px 24px 10px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 600px; margin-top: 14px; }
+
+  section { max-width: 760px; margin: 0 auto; padding: 20px 24px 36px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .prose-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 26px;
+  }
+  .prose-card p { font-size: 16px; line-height: 1.7; color: var(--soft); }
+  .prose-card p strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* tenants demo */
+  .tenants-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+  }
+  .tenants-lede { font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 16px; }
+
+  .tenant-picker { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tenant-btn {
+    font-family: 'Inter', sans-serif;
+    padding: 8px 14px; border-radius: 20px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    font-size: 13px; font-weight: 600; color: var(--soft);
+    cursor: pointer; transition: border-color .2s, background .2s, color .2s;
+  }
+  .tenant-btn:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .tenant-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .query-box {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6;
+    color: var(--text); margin-bottom: 14px;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .query-box .v { color: var(--accent-hover); font-weight: 600; }
+
+  .results-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
+  .results { display: flex; flex-direction: column; gap: 8px; }
+  .result-row {
+    display: flex; gap: 10px; align-items: center;
+    padding: 10px 12px; border-radius: 10px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    font-size: 13.5px;
+  }
+  .result-row.match { background: rgba(14,159,110,0.08); border-color: rgba(14,159,110,0.3); }
+  .result-row.blocked { background: rgba(217,45,32,0.06); border-color: rgba(217,45,32,0.2); opacity: .7; }
+  .result-row .icon {
+    width: 20px; height: 20px; border-radius: 6px; flex: none;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 12px;
+    background: #fff; border: 1px solid var(--border-strong);
+  }
+  .result-row.match .icon { background: rgba(14,159,110,0.15); color: var(--green); border-color: rgba(14,159,110,0.4); }
+  .result-row.blocked .icon { background: rgba(217,45,32,0.12); color: var(--red); border-color: rgba(217,45,32,0.4); }
+  .result-row .text { color: var(--text); }
+  .result-row .tag {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    background: #fff; border: 1px solid var(--border-strong); border-radius: 6px;
+    padding: 2px 7px; color: var(--soft); margin-left: auto;
+  }
+  .result-row.blocked .text { color: var(--soft); }
+
+  .tenants-note {
+    margin-top: 14px; padding: 12px 14px;
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px; color: var(--soft); line-height: 1.6;
+  }
+  .tenants-note strong { color: var(--text); font-weight: 600; }
+
+  .fits-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .fits-row { display: flex; gap: 12px; align-items: flex-start; }
+  .fits-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 5px; }
+  .fits-text { font-size: 15px; color: var(--soft); line-height: 1.65; }
+  .fits-text strong { color: var(--text); font-weight: 600; }
+  .filing-box {
+    margin-top: 6px; padding: 12px 16px;
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px; color: var(--soft); line-height: 1.6;
+  }
+  .filing-box strong { color: var(--text); font-weight: 600; }
+
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 16px 18px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 24px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 760px; margin: 0 auto; padding: 0 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 10px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer {
+    max-width: 760px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-direction: column; gap: 6px; }
+    .fits-dot { display: none; }
+    .result-row .tag { display: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-privacy.html"><span aria-hidden="true">&larr;</span> Privacy, Security &amp; Governance</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-privacy.html">Privacy, Security &amp; Governance</a><span class="sep" aria-hidden="true">/</span><span class="here">Keep people apart</span><span class="sep" aria-hidden="true">/</span><span class="here">One customer's data never reaches another</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Privacy, Security &amp; Governance &middot; Keep people apart</span>
+  <h1 class="page-title">One customer's data never reaches another</h1>
+  <p class="explainer">Each customer's records, prompts, and search results live in a sealed lane. A query from customer A only ever returns rows that belong to customer A.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">What <em>is it?</em></h2>
+  <div class="prose-card">
+    <p><strong>Tenant isolation</strong> is the rule that every record, every chunk in the search index, and every memory snippet carries the tenant id it belongs to, and every read filters on that tenant id at the lowest level of the stack. The model never even sees a row from another tenant, because the search step rejected it first. Done right, leakage stops being a question of trust in the prompt or trust in the model: the wrong tenant's data simply was never on the table.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Pick a tenant. See <em>what gets through</em>.</h2>
+  <div class="tenants-card" role="region" aria-label="Tenant isolation demo">
+    <p class="tenants-lede">Two companies use the same search index. Each query carries the asking tenant's id. The index returns only matching rows.</p>
+
+    <div class="tenant-picker" role="tablist" aria-label="Pick a tenant">
+      <button type="button" class="tenant-btn active" data-tenant="acme" role="tab">Acme</button>
+      <button type="button" class="tenant-btn" data-tenant="globex" role="tab">Globex</button>
+    </div>
+
+    <div class="query-box" aria-live="polite">SELECT * FROM docs
+WHERE tenant_id = <span class="v" id="qTenant">'acme'</span>
+  AND text MATCH 'pricing policy'</div>
+
+    <div class="results-label">Rows the index returns</div>
+    <div class="results" id="results" aria-live="polite">
+      <!-- filled by JS -->
+    </div>
+
+    <div class="tenants-note">
+      <strong>The filter runs in the index, not the model.</strong> Even a stray phrase like "tell me about Globex" comes back empty for Acme, because Globex rows were never read.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-dot" aria-hidden="true"></div>
+      <div class="fits-text">
+        <strong>What it covers:</strong> the wall between customers. A single shared model is fine: a single shared data path is the bug. Isolation lives at the data and search layer, under every model call.
+      </div>
+    </div>
+    <div class="fits-row">
+      <div class="fits-dot" aria-hidden="true"></div>
+      <div class="fits-text">
+        <strong>Sits next to:</strong> deciding what one user inside a customer can do is the next step in (access control). Isolation puts each customer in a sealed lane. Access control sets the rules inside that lane.
+      </div>
+    </div>
+    <div class="filing-box">
+      <strong>Quick test:</strong> if you ran the same query for customer A and customer B, would the results overlap by even one row? If yes, isolation is broken.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Several customers share one running app: a B2B SaaS, a multi-tenant agent, or a hosted assistant.</li>
+    <li>You use a shared search index or memory store across customers to save cost.</li>
+    <li>A leak across customers would be a deal-ending event: medical, legal, financial, defense.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 12px; padding-bottom: 44px;">
+  <a href="consideration-privacy.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Privacy, Security &amp; Governance</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>AWS Well-Architected Framework (2024). <em>SaaS Lens: tenant isolation strategies.</em> <span class="note">Reference catalogue of silo, pool, and bridge models for keeping tenants apart in shared infrastructure.</span></li>
+    <li>OWASP (2024). <em>LLM Top 10: LLM06 Sensitive Information Disclosure.</em> <span class="note">Calls out cross-tenant leakage through retrieval and memory as a top risk for LLM apps.</span></li>
+    <li>Pinecone (2024). <em>Multi-tenancy with metadata filtering and namespaces.</em> <span class="note">Worked example of putting a tenant id on every chunk and filtering on it at search time.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var rows = {
+    acme: [
+      { kind: 'match', text: 'Acme pricing policy v3 (Q1 2026)', tag: 'tenant: acme' },
+      { kind: 'match', text: 'Acme discount tiers for enterprise', tag: 'tenant: acme' },
+      { kind: 'blocked', text: 'Globex pricing playbook', tag: 'filtered out' },
+      { kind: 'blocked', text: 'Globex Q4 quote templates', tag: 'filtered out' }
+    ],
+    globex: [
+      { kind: 'match', text: 'Globex pricing playbook', tag: 'tenant: globex' },
+      { kind: 'match', text: 'Globex Q4 quote templates', tag: 'tenant: globex' },
+      { kind: 'blocked', text: 'Acme pricing policy v3 (Q1 2026)', tag: 'filtered out' },
+      { kind: 'blocked', text: 'Acme discount tiers for enterprise', tag: 'filtered out' }
+    ]
+  };
+
+  var picker = document.querySelectorAll('.tenant-btn');
+  var qTenant = document.getElementById('qTenant');
+  var results = document.getElementById('results');
+
+  function render(tenant) {
+    qTenant.textContent = "'" + tenant + "'";
+    results.innerHTML = '';
+    rows[tenant].forEach(function(r){
+      var row = document.createElement('div');
+      row.className = 'result-row ' + r.kind;
+      var icon = document.createElement('span');
+      icon.className = 'icon';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.textContent = r.kind === 'match' ? '✓' : '✕';
+      var text = document.createElement('span');
+      text.className = 'text';
+      text.textContent = r.text;
+      var tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = r.tag;
+      row.appendChild(icon);
+      row.appendChild(text);
+      row.appendChild(tag);
+      results.appendChild(row);
+    });
+  }
+
+  picker.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      picker.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      render(btn.getAttribute('data-tenant'));
+    });
+  });
+
+  render('acme');
+}());
+</script>
+</body>
+</html>

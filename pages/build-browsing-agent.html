@@ -251,53 +251,60 @@
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
   }
-  .pattern-group { margin-bottom: 22px; }
-  .pattern-group:last-child { margin-bottom: 0; }
-  .pattern-group-head {
-    font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
-    color: var(--faint); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  .pattern-chip-grid {
+    display: flex; flex-wrap: wrap; gap: 10px;
   }
-  .pattern-rows { display: flex; flex-direction: column; gap: 10px; }
-  .pattern-row {
-    display: flex; align-items: flex-start; gap: 12px;
+  .pattern-chip {
+    display: inline-flex; flex-direction: column; gap: 3px;
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    text-decoration: none; color: var(--text);
+    transition: border-color .2s ease, background .2s ease;
+    min-width: 160px; flex: 1 1 160px;
   }
-  .pattern-layer-tag {
-    flex-shrink: 0; display: inline-flex; align-items: center;
-    font-size: 11px; font-weight: 700; letter-spacing: .04em;
-    padding: 3px 9px; border-radius: 20px; margin-top: 1px;
-    background: var(--accent-soft); color: var(--accent-hover); border: 1px solid var(--border);
-    white-space: nowrap;
+  .pattern-chip:hover { border-color: var(--accent); background: #e4dcfe; }
+  .pattern-chip-layer {
+    font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--accent-hover);
   }
-  .pattern-info { flex: 1; min-width: 0; }
-  .pattern-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
-  .pattern-desc { font-size: 13px; color: var(--soft); line-height: 1.55; }
-
-  /* read vs action note */
-  .rw-note {
-    margin-top: 18px; padding: 14px 16px;
-    background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm);
-    font-size: 13px; line-height: 1.65; color: var(--soft);
+  .pattern-chip-clause {
+    font-size: 13px; color: var(--soft); line-height: 1.4;
   }
-  .rw-note strong { color: var(--text); }
 
   /* ============ REAL EXAMPLE ============ */
   .example-stage {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
   }
-  .example-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
-  .example-flow { display: flex; flex-direction: column; gap: 0; }
-  .ex-row {
-    display: flex; align-items: flex-start; gap: 14px;
-    padding: 14px 0; border-bottom: 1px solid var(--border);
+  .step-pills {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px;
   }
-  .ex-row:last-child { border-bottom: 0; padding-bottom: 0; }
-  .ex-icon { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; }
-  .ex-icon svg { width: 16px; height: 16px; color: var(--accent-hover); display: block; }
-  .ex-body { flex: 1; min-width: 0; }
-  .ex-step { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
-  .ex-text { font-size: 14px; line-height: 1.6; color: var(--text); }
-  .ex-text strong { color: var(--accent-hover); }
+  .step-pill {
+    padding: 8px 14px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border: 1px solid var(--border-strong); background: var(--bg-subtle);
+    color: var(--soft); font-family: 'Inter', sans-serif;
+    transition: background .18s ease, border-color .18s ease, color .18s ease;
+    white-space: nowrap;
+  }
+  .step-pill:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .step-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step-card {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 18px 20px; min-height: 96px;
+    transition: opacity .2s ease;
+  }
+  .step-card-icon {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--accent-soft); display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px;
+  }
+  .step-card-icon svg { width: 15px; height: 15px; color: var(--accent-hover); display: block; }
+  .step-card-name {
+    font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 6px;
+  }
+  .step-card-text { font-size: 14px; line-height: 1.65; color: var(--text); }
 
   /* ============ TRADEOFFS ============ */
   .tradeoffs-stage {
@@ -352,7 +359,7 @@
   @media (max-width: 480px) {
     .demo-controls { flex-direction: column; align-items: stretch; }
     .diagram-btn { flex: 1; }
-    .ex-row { gap: 10px; }
+
     .tradeoff-row { flex-direction: column; align-items: stretch; }
     .tradeoff-label { min-width: 0; }
   }
@@ -550,62 +557,23 @@
   <h2 id="patterns-heading">The <em>layers</em> inside.</h2>
 
   <div class="patterns-stage">
-
-    <div class="pattern-group">
-      <div class="pattern-group-head">Orchestration &amp; agents</div>
-      <div class="pattern-rows">
-        <div class="pattern-row">
-          <span class="pattern-layer-tag">Loop</span>
-          <div class="pattern-info">
-            <div class="pattern-name">Iterative Loop</div>
-            <div class="pattern-desc">Read a page, decide, act, repeat until the goal is met. The backbone of any browsing agent.</div>
-          </div>
-        </div>
-        <div class="pattern-row">
-          <span class="pattern-layer-tag">Action</span>
-          <div class="pattern-info">
-            <div class="pattern-name">External Action (clicks and submits)</div>
-            <div class="pattern-desc">Every click or form submit changes state outside the agent, so it cannot be safely undone by retrying.</div>
-          </div>
-        </div>
-        <div class="pattern-row">
-          <span class="pattern-layer-tag">Action</span>
-          <div class="pattern-info">
-            <div class="pattern-name">Approval Gates</div>
-            <div class="pattern-desc">Before a high-stakes step like "Confirm and Pay," the agent pauses and waits for a person to authorise it.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="pattern-group">
-      <div class="pattern-group-head">Stateless Retrieval</div>
-      <div class="pattern-rows">
-        <div class="pattern-row">
-          <span class="pattern-layer-tag">Read only</span>
-          <div class="pattern-info">
-            <div class="pattern-name">Read-Only Page Reads (Scraping)</div>
-            <div class="pattern-desc">Loading a URL and reading its text changes nothing. A live page is just an external source, safe to repeat.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="pattern-group">
-      <div class="pattern-group-head">Single-call control</div>
-      <div class="pattern-rows">
-        <div class="pattern-row">
-          <span class="pattern-layer-tag">Per step</span>
-          <div class="pattern-info">
-            <div class="pattern-name">Reasoning Per Step</div>
-            <div class="pattern-desc">Each loop is one model call: "here is the page and my goal, what is the next action?"</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="rw-note" role="note">
-      <strong>The boundary that matters most:</strong> reading a page is read-only and safe to retry. Clicking or submitting changes real-world state. A well-built browsing agent labels every planned action so guardrails can block irreversible steps until a human approves.
+    <div class="pattern-chip-grid" role="list" aria-label="Layers used by this build">
+      <a class="pattern-chip" href="layer-orchestration-agents.html" role="listitem">
+        <span class="pattern-chip-layer">Orchestration &amp; agents</span>
+        <span class="pattern-chip-clause">runs the read-decide-act loop</span>
+      </a>
+      <a class="pattern-chip" href="layer-orchestration-agents.html" role="listitem">
+        <span class="pattern-chip-layer">Orchestration &amp; agents</span>
+        <span class="pattern-chip-clause">gates high-stakes actions for human approval</span>
+      </a>
+      <a class="pattern-chip" href="layer-stateless-retrieval.html" role="listitem">
+        <span class="pattern-chip-layer">Stateless Retrieval</span>
+        <span class="pattern-chip-clause">reads each page without changing anything</span>
+      </a>
+      <a class="pattern-chip" href="layer-single-call-control.html" role="listitem">
+        <span class="pattern-chip-layer">Single-call control</span>
+        <span class="pattern-chip-clause">one model call decides the next action per step</span>
+      </a>
     </div>
   </div>
 </section>
@@ -615,52 +583,16 @@
   <div class="section-label"><span class="num">04</span>A Real Example</div>
   <h2 id="example-heading">How a <em>real one</em> runs.</h2>
   <div class="example-stage">
-    <p class="example-intro">
-      Anthropic's Computer Use (Claude) and OpenAI's Operator are working Browsing Agents. Here is what happens under the hood when one is given a goal.
+    <p style="font-size:13px;color:var(--soft);margin-bottom:16px;line-height:1.6">
+      Claude Computer Use and OpenAI Operator both follow this sequence. Tap each step to see what happens.
     </p>
-    <div class="example-flow">
-
-      <div class="ex-row">
-        <div class="ex-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20M12 2a15.3 15.3 0 0 0 0 20"/></svg>
-        </div>
-        <div class="ex-body">
-          <div class="ex-step">Step 1: Open a page</div>
-          <div class="ex-text">The agent receives a goal and loads the first URL. It reads the page text (read-only). Nothing has changed in the world yet.</div>
-        </div>
-      </div>
-
-      <div class="ex-row">
-        <div class="ex-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5l4 4L7 21H3v-4z"/></svg>
-        </div>
-        <div class="ex-body">
-          <div class="ex-step">Step 2: Decide the next action</div>
-          <div class="ex-text">One call to the LLM: "Given this page and my goal, <strong>what is the next action?</strong>" The model chooses from: navigate, click, type, scroll, or finish.</div>
-        </div>
-      </div>
-
-      <div class="ex-row">
-        <div class="ex-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg>
-        </div>
-        <div class="ex-body">
-          <div class="ex-step">Step 3: Execute or gate</div>
-          <div class="ex-text">Read-only actions (navigate, scroll) run immediately. <strong>Side-effectful actions</strong> (click Submit, confirm purchase) check against a guardrail. High-stakes ones pause for human approval.</div>
-        </div>
-      </div>
-
-      <div class="ex-row">
-        <div class="ex-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
-        </div>
-        <div class="ex-body">
-          <div class="ex-step">Step 4: Loop back</div>
-          <div class="ex-text">After each action, the agent reads the new page state and loops. The loop continues until the goal is met, the agent is stuck, or a maximum step count is reached.</div>
-        </div>
-      </div>
-
+    <div class="step-pills" role="tablist" aria-label="How a real browsing agent runs">
+      <button class="step-pill active" role="tab" aria-selected="true" aria-controls="ex-card" data-step="0">Open a page</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="ex-card" data-step="1">Decide</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="ex-card" data-step="2">Execute or gate</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="ex-card" data-step="3">Loop back</button>
     </div>
+    <div class="step-card" id="ex-card" role="tabpanel" aria-live="polite"></div>
   </div>
 </section>
 
@@ -822,6 +754,62 @@ if (reduceMotion) {
     demoStep = 3;
   })();
 }
+
+// ============ REAL EXAMPLE TAP-THROUGH ============
+const exSteps = [
+  {
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20M12 2a15.3 15.3 0 0 0 0 20"/></svg>',
+    name: 'Open a page',
+    text: 'The agent receives a goal and loads the first URL. It reads the page text. Nothing in the world has changed yet.'
+  },
+  {
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5l4 4L7 21H3v-4z"/></svg>',
+    name: 'Decide',
+    text: 'One model call: "Given this page and my goal, what is the next action?" The model picks from navigate, click, type, scroll, or finish.'
+  },
+  {
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9V3z"/></svg>',
+    name: 'Execute or gate',
+    text: 'Read-only actions run immediately. Side-effectful ones (Submit, Confirm) check a guardrail. High-stakes actions pause for human approval before proceeding.'
+  },
+  {
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>',
+    name: 'Loop back',
+    text: 'After each action the agent reads the new page state and loops. It stops when the goal is met, it gets stuck, or it hits the maximum step count.'
+  }
+];
+
+const exCard = document.getElementById('ex-card');
+const exPills = document.querySelectorAll('.step-pill[data-step]');
+
+function renderExStep(idx) {
+  const s = exSteps[idx];
+  exCard.innerHTML =
+    '<div class="step-card-icon" aria-hidden="true">' + s.icon + '</div>' +
+    '<div class="step-card-name">' + s.name + '</div>' +
+    '<div class="step-card-text">' + s.text + '</div>';
+}
+
+exPills.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const idx = parseInt(btn.dataset.step);
+    exPills.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    renderExStep(idx);
+  });
+  btn.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') {
+      const next = (parseInt(btn.dataset.step) + 1) % exPills.length;
+      exPills[next].click(); exPills[next].focus();
+    } else if (e.key === 'ArrowLeft') {
+      const prev = (parseInt(btn.dataset.step) - 1 + exPills.length) % exPills.length;
+      exPills[prev].click(); exPills[prev].focus();
+    }
+  });
+});
+
+renderExStep(0);
 </script>
 </body>
 </html>

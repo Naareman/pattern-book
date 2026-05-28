@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Automation and workflow execution · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --done:#0E9F6E; --done-soft:#E7F7F0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* automation visual: tap "Run" -> steps tick on with side-effect tags */
+  .auto-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .auto-head { padding: 14px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .auto-goal { font-size: 13.5px; color: var(--text); font-weight: 500; flex: 1; min-width: 0; }
+  .auto-goal strong { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent-hover); text-transform: uppercase; letter-spacing: .06em; margin-right: 8px; font-weight: 600; }
+  .auto-btn { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 16px; border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 20px; cursor: pointer; transition: background .15s; }
+  .auto-btn:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .auto-btn[disabled] { opacity: .55; cursor: default; }
+  .auto-body { padding: 16px 22px 20px; }
+  .auto-step { display: grid; grid-template-columns: 28px 1fr auto; gap: 12px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--border); opacity: .4; transition: opacity .25s ease, background .25s ease; }
+  .auto-step:last-child { border-bottom: none; }
+  .auto-step.on { opacity: 1; }
+  .auto-tick { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--faint); background: #fff; }
+  .auto-step.on .auto-tick { background: var(--done-soft); border-color: var(--done); color: var(--done); }
+  .auto-name { font-size: 14px; color: var(--text); line-height: 1.4; }
+  .auto-tag { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 12px; padding: 2px 8px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+  .auto-note { margin-top: 14px; padding: 12px 14px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--soft); line-height: 1.55; }
+  .auto-note strong { color: var(--text); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .auto-step { grid-template-columns: 24px 1fr; }
+    .auto-tag { grid-column: 2; justify-self: start; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-application-patterns.html"><span aria-hidden="true">&larr;</span> Application Patterns</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-application-patterns.html">Application Patterns</a><span class="sep" aria-hidden="true">/</span><span class="here">Make or do something new</span><span class="sep" aria-hidden="true">/</span><span class="here">Automation and workflow execution</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Application Patterns &middot; Make or do something new</span>
+  <h1 class="page-title">Automation and workflow execution</h1>
+  <p class="explainer">The AI runs a real procedure end to end. The output is the work itself, done in the world.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">A multi-step job, <em>actually run</em>.</h2>
+  <div class="what-card">
+    <p>The input is a goal. The output is a series of real actions taken: forms filled, emails sent, records updated, browsers driven, files moved. Each step touches outside systems and leaves a trace.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Tap Run, <em>watch it work</em>.</h2>
+  <div class="auto-card" role="region" aria-label="Automation example">
+    <div class="auto-head">
+      <div class="auto-goal"><strong>Goal</strong>Refund order #4471 and notify the customer.</div>
+      <button class="auto-btn" id="auto-btn" type="button">Run</button>
+    </div>
+    <div class="auto-body" id="auto-body">
+      <div class="auto-step" data-step="0">
+        <div class="auto-tick">&#10003;</div>
+        <div class="auto-name">Look up order #4471 in the order system.</div>
+        <div class="auto-tag">read</div>
+      </div>
+      <div class="auto-step" data-step="1">
+        <div class="auto-tick">&#10003;</div>
+        <div class="auto-name">Check the refund policy for this product class.</div>
+        <div class="auto-tag">read</div>
+      </div>
+      <div class="auto-step" data-step="2">
+        <div class="auto-tick">&#10003;</div>
+        <div class="auto-name">Issue a refund of $84 to the original card.</div>
+        <div class="auto-tag">write</div>
+      </div>
+      <div class="auto-step" data-step="3">
+        <div class="auto-tick">&#10003;</div>
+        <div class="auto-name">Send a confirmation email to the customer.</div>
+        <div class="auto-tag">write</div>
+      </div>
+      <div class="auto-step" data-step="4">
+        <div class="auto-tick">&#10003;</div>
+        <div class="auto-name">Log the refund and reason in the case file.</div>
+        <div class="auto-tag">write</div>
+      </div>
+    </div>
+    <div style="padding: 0 22px 18px;">
+      <div class="auto-note" id="auto-note"><strong>Tap Run</strong> to watch each step turn on. Three of these touch live systems and cannot be taken back.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it sits next to <em>other shapes</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Sits next to</div>
+      <div class="fits-desc">Decision. A decision picks what should happen. Automation goes and does it, often with several tool calls and side effects along the way.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Highest cost</div>
+      <div class="fits-desc">Generation can be reviewed before sending. Automation changes the world as it runs. A mistake is already done by the time it shows up.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>A procedure is well defined, runs often, and each step has a clear tool to call.</li>
+    <li>Speed and consistency beat human-in-the-loop review for the routine cases.</li>
+    <li>Approval gates and undo paths exist for the rare cases that should pause for a human.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-application-patterns.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Application Patterns</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Yao et al. (2023). <em>ReAct: Synergizing Reasoning and Acting in Language Models.</em> <span class="note">Foundational pattern for tool-using agents that take real actions.</span></li>
+    <li>Anthropic (2024). <em>Building effective agents.</em> <span class="note">Practical guidance on agent loops, side effects, and approval gates.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var btn = document.getElementById('auto-btn');
+  var steps = document.querySelectorAll('.auto-step');
+  var note = document.getElementById('auto-note');
+
+  function reset() {
+    steps.forEach(function (s) { s.classList.remove('on'); });
+    btn.disabled = false;
+    btn.textContent = 'Run';
+    note.innerHTML = '<strong>Tap Run</strong> to watch each step turn on. Three of these touch live systems and cannot be taken back.';
+  }
+
+  btn.addEventListener('click', function () {
+    if (btn.disabled) return;
+    reset();
+    btn.disabled = true;
+    btn.textContent = 'Running...';
+    if (reduce) {
+      steps.forEach(function (s) { s.classList.add('on'); });
+      btn.textContent = 'Done. Run again';
+      btn.disabled = false;
+      note.innerHTML = '<strong>Done.</strong> Five steps ran; three changed live state (refund, email, log).';
+      return;
+    }
+    var i = 0;
+    function tick() {
+      if (i >= steps.length) {
+        btn.textContent = 'Run again';
+        btn.disabled = false;
+        note.innerHTML = '<strong>Done.</strong> Five steps ran; three changed live state (refund, email, log).';
+        return;
+      }
+      steps[i].classList.add('on');
+      i++;
+      window.setTimeout(tick, 520);
+    }
+    window.setTimeout(tick, 250);
+  });
+}());
+</script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mark AI-made output so you can trace it &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --green:#0E9F6E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 760px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 760px; margin: 0 auto; padding: 44px 24px 10px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 600px; margin-top: 14px; }
+
+  section { max-width: 760px; margin: 0 auto; padding: 20px 24px 36px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .prose-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 26px;
+  }
+  .prose-card p { font-size: 16px; line-height: 1.7; color: var(--soft); }
+  .prose-card p strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* provenance demo */
+  .prov-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+  }
+  .prov-lede { font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 16px; }
+
+  .image-frame {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, #C7BBFA 0%, #8E76F2 50%, #5934D5 100%);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .image-frame .sun {
+    width: 38%; aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle, #FFEDB0 0%, #F0B95C 65%, transparent 100%);
+    margin-bottom: 18%;
+  }
+  .image-frame .img-label {
+    position: absolute; bottom: 10px; left: 12px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    background: rgba(255,255,255,0.88); color: var(--text);
+    padding: 3px 8px; border-radius: 6px;
+  }
+
+  .badge-strip {
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    margin-top: 14px; padding: 12px 14px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 20px;
+    background: #fff; border: 1px solid var(--border-strong);
+    font-size: 12px; font-weight: 600; color: var(--soft);
+    font-family: 'Inter', sans-serif;
+  }
+  .badge .pip { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+  .badge.ok { color: var(--green); border-color: rgba(14,159,110,0.4); background: rgba(14,159,110,0.08); }
+  .badge.ok .pip { background: var(--green); }
+
+  .check-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 16px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong); background: var(--surface);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 13px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+    margin-top: 14px;
+  }
+  .check-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .check-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .prov-detail {
+    margin-top: 12px; padding: 14px 18px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+    line-height: 1.8; color: var(--text);
+    white-space: pre-wrap; word-break: break-word;
+    display: none;
+  }
+  .prov-detail.open { display: block; }
+  .prov-detail .k { color: var(--faint); }
+  .prov-detail .v { color: var(--accent-hover); font-weight: 600; }
+
+  .prov-note {
+    margin-top: 14px; padding: 12px 14px;
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px; color: var(--soft); line-height: 1.6;
+  }
+  .prov-note strong { color: var(--text); font-weight: 600; }
+
+  .fits-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .fits-row { display: flex; gap: 12px; align-items: flex-start; }
+  .fits-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 5px; }
+  .fits-text { font-size: 15px; color: var(--soft); line-height: 1.65; }
+  .fits-text strong { color: var(--text); font-weight: 600; }
+  .filing-box {
+    margin-top: 6px; padding: 12px 16px;
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px; color: var(--soft); line-height: 1.6;
+  }
+  .filing-box strong { color: var(--text); font-weight: 600; }
+
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 16px 18px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 24px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 760px; margin: 0 auto; padding: 0 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 10px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer {
+    max-width: 760px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-direction: column; gap: 6px; }
+    .fits-dot { display: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-privacy.html"><span aria-hidden="true">&larr;</span> Privacy, Security &amp; Governance</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-privacy.html">Privacy, Security &amp; Governance</a><span class="sep" aria-hidden="true">/</span><span class="here">Prove it later</span><span class="sep" aria-hidden="true">/</span><span class="here">Mark AI-made output so you can trace it</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Privacy, Security &amp; Governance &middot; Prove it later</span>
+  <h1 class="page-title">Mark AI-made output so you can trace it</h1>
+  <p class="explainer">Attach a tamper-resistant tag to every image, video, or document the system makes. Anyone receiving it can check the tag and learn which model, which prompt, which moment.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">What <em>is it?</em></h2>
+  <div class="prose-card">
+    <p><strong>Provenance and watermarking</strong> are two tools for one job: making AI-made output traceable. <strong>Provenance</strong> attaches a signed metadata card to the file: who made it, with which model, at what time, from which prompt. <strong>Watermarking</strong> hides a hard-to-remove signal inside the pixels or words themselves, so even if the metadata is stripped, the file still says "AI made me". Together they answer the question "where did this come from?" months after the file left your system.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Tap the image. Read <em>its origin card</em>.</h2>
+  <div class="prov-card" role="region" aria-label="Provenance demo">
+    <p class="prov-lede">An AI-made image is sent to a journalist. The badges sit alongside the file. The signed origin card is one tap away.</p>
+
+    <div class="image-frame" aria-label="Example AI-made illustration: a sun over purple sky">
+      <div class="sun" aria-hidden="true"></div>
+      <span class="img-label">sunrise.png</span>
+    </div>
+
+    <div class="badge-strip">
+      <span class="badge ok"><span class="pip" aria-hidden="true"></span> AI-made</span>
+      <span class="badge"><span class="pip" aria-hidden="true"></span> Signed origin (C2PA)</span>
+      <span class="badge"><span class="pip" aria-hidden="true"></span> Pixel watermark</span>
+    </div>
+
+    <button type="button" class="check-btn" id="checkBtn" aria-expanded="false" aria-controls="provDetail">Read the origin card</button>
+
+    <div class="prov-detail" id="provDetail" aria-live="polite"><span class="k">file</span>: <span class="v">sunrise.png</span>
+<span class="k">claim_generator</span>: <span class="v">image-studio v4.2</span>
+<span class="k">model</span>: <span class="v">flux-dev @ 2026-05-26</span>
+<span class="k">prompt</span>: <span class="v">"sunrise over purple sky, soft, painterly"</span>
+<span class="k">issuer</span>: <span class="v">acme-design</span>
+<span class="k">signature</span>: <span class="v">valid (rsa-2048, c2pa)</span>
+<span class="k">watermark</span>: <span class="v">detected (synthid-image)</span></div>
+
+    <div class="prov-note">
+      <strong>Provenance is the receipt. The watermark is the seal.</strong> Strip the receipt and the seal still tells the truth.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-dot" aria-hidden="true"></div>
+      <div class="fits-text">
+        <strong>What it covers:</strong> the bit of metadata or signal that travels with the output once it leaves your system, so the world can tell it apart from a human-made one.
+      </div>
+    </div>
+    <div class="fits-row">
+      <div class="fits-dot" aria-hidden="true"></div>
+      <div class="fits-text">
+        <strong>Sits next to:</strong> the audit log records what your system did. Provenance records what the output is. The first is for you. The second is for whoever opens the file later.
+      </div>
+    </div>
+    <div class="filing-box">
+      <strong>Quick test:</strong> take an output your system made yesterday. Hand it to someone outside the team. Can they tell, with one tool, that it was made by your AI and by which model? If yes, provenance is real.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>You make images, video, or audio: deepfake risk and platform rules push you toward C2PA or similar signing.</li>
+    <li>You operate in the European Union: the AI Act requires generated and edited content to be machine-readable as AI-made.</li>
+    <li>You publish to journalists, regulators, or schools: people downstream need to tell what is original from what is generated.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 12px; padding-bottom: 44px;">
+  <a href="consideration-privacy.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Privacy, Security &amp; Governance</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>C2PA (2024). <em>Coalition for Content Provenance and Authenticity, technical specification 2.0.</em> <span class="note">The industry standard for signed origin manifests on images, video, audio, and PDFs.</span></li>
+    <li>Dathathri et al. (2024). <em>SynthID-Text: scalable watermarking for large language models.</em> Nature. <span class="note">Google DeepMind's production watermark for generated text, used inside Gemini.</span></li>
+    <li>European Parliament (2024). <em>EU AI Act, Article 50: transparency obligations for generated content.</em> <span class="note">Legal requirement that providers mark AI-generated and AI-edited output in a machine-readable way.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var btn = document.getElementById('checkBtn');
+  var detail = document.getElementById('provDetail');
+  var open = false;
+
+  function toggle() {
+    open = !open;
+    detail.classList.toggle('open', open);
+    btn.classList.toggle('active', open);
+    btn.setAttribute('aria-expanded', String(open));
+    btn.textContent = open ? 'Hide the origin card' : 'Read the origin card';
+  }
+
+  btn.addEventListener('click', toggle);
+  btn.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+  });
+}());
+</script>
+</body>
+</html>

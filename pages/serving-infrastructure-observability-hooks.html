@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tracking speed and cost · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* trace visual */
+  .trace-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .trace-input { padding: 14px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; }
+  .trace-q { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; padding: 8px 14px; border: 1px solid var(--border-strong); background: #fff; border-radius: 20px; cursor: pointer; color: var(--text); transition: border-color .15s, color .15s, background .15s; }
+  .trace-q:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .trace-q.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .trace-body { padding: 22px; }
+  .trace-title { font-size: 13px; color: var(--soft); margin-bottom: 14px; }
+  .trace-title strong { color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12.5px; background: var(--bg-subtle); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); }
+  .trace-rows { display: flex; flex-direction: column; gap: 10px; }
+  .trace-row { display: grid; grid-template-columns: 130px 1fr 80px; gap: 12px; align-items: center; }
+  .trace-step { font-size: 13px; font-weight: 600; color: var(--text); }
+  .trace-step .sub { display: block; font-size: 11px; color: var(--faint); font-weight: 500; margin-top: 1px; }
+  .trace-bar-wrap { background: var(--bg-subtle); border-radius: 6px; height: 22px; overflow: hidden; border: 1px solid var(--border); position: relative; }
+  .trace-bar { height: 100%; background: var(--accent); transition: width .4s ease; min-width: 3px; }
+  .trace-bar.bar-cache { background: var(--green); }
+  .trace-time { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--soft); text-align: right; }
+  .trace-totals { display: flex; gap: 14px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+  .trace-total { font-size: 12px; color: var(--faint); }
+  .trace-total strong { color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .trace-row { grid-template-columns: 100px 1fr 64px; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-serving-infrastructure.html"><span aria-hidden="true">&larr;</span> Serving &amp; Infrastructure</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-serving-infrastructure.html">Serving &amp; Infrastructure</a><span class="sep" aria-hidden="true">/</span><span class="here">Save money</span><span class="sep" aria-hidden="true">/</span><span class="here">Tracking speed and cost</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Serving &amp; Infrastructure &middot; Save money</span>
+  <h1 class="page-title">Tracking speed and cost</h1>
+  <p class="explainer">Record what every call did: which model, how long, how many tokens, which steps fired. That record is what lets you find the slow spots and the expensive ones.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What Is It?</div>
+  <h2 id="what-heading">Leave a <em>trail</em> for every call.</h2>
+  <div class="what-card">
+    <p>The runtime emits a small record for each request: a trace. Each step (cache check, model call, tool call, retrieval) writes its time, its token count, its cost, and any errors. Later you can replay the trail to see why a call was slow, which model the router picked, and what the total bill was. The runtime only emits the signals. Deciding what to look at and what to fix is a separate discipline that lives in the observability crosscut.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">One request, <em>step by step</em>.</h2>
+  <div class="trace-card" role="region" aria-label="Trace example">
+    <div class="trace-input" role="tablist" aria-label="Sample traces">
+      <button class="trace-q active" role="tab" aria-selected="true" data-q="0">Normal call</button>
+      <button class="trace-q" role="tab" aria-selected="false" data-q="1">Cache hit</button>
+      <button class="trace-q" role="tab" aria-selected="false" data-q="2">Slow tool call</button>
+    </div>
+    <div class="trace-body">
+      <div class="trace-title">Trace ID <strong id="trace-id">req_8f3a01</strong></div>
+      <div class="trace-rows" id="trace-rows"></div>
+      <div class="trace-totals">
+        <div class="trace-total">Total time <strong id="trace-total-time">1,420 ms</strong></div>
+        <div class="trace-total">Total cost <strong id="trace-total-cost">$0.0042</strong></div>
+        <div class="trace-total">Tokens <strong id="trace-total-tokens">1,180</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">How it sits next to <em>other ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it shapes</div>
+      <div class="fits-desc">Nothing about the answer itself. It only emits the data so someone (or another system) can see what happened: timing, cost, which step did what.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Feeds into</div>
+      <div class="fits-desc">Cost tracking, latency reviews, and incident debugging. The numbers are also what the "pick the cheapest model" decision relies on later, since you cannot pick well without knowing what each tier actually costs and how often it suffices.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Mechanism vs discipline</div>
+      <div class="fits-desc">The hooks (the code that emits the records) live here in the runtime. Tracing as a way of thinking (what to log, how to look at it, when to alert) is a separate crosscut concern.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>The system is in production and surprises start happening: a slow call, a spike in spend, a wrong answer you cannot reproduce.</li>
+    <li>Calls have many steps (retrieval, tools, multiple models) and "the AI was slow" is not enough to debug.</li>
+    <li>Cost is climbing and you cannot say which feature or which prompt is driving it.</li>
+    <li>You want to set budgets and alerts, which need real numbers from real traffic, not estimates.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-serving-infrastructure.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Serving &amp; Infrastructure</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>OpenTelemetry (2024). <em>Semantic conventions for generative AI systems.</em> <span class="note">Standard field names for tracing model calls: model, tokens, latency, prompt and completion metadata.</span></li>
+    <li>Langfuse (2024). <em>Tracing for LLM applications.</em> <span class="note">Reference for capturing step-by-step traces of LLM apps, including cost and token usage per span.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var scenarios = [
+    {
+      id: 'req_8f3a01',
+      steps: [
+        { name: 'Cache check', sub: 'no match', ms: 12, type: '' },
+        { name: 'Retrieval', sub: 'top 5 docs', ms: 180, type: '' },
+        { name: 'Model call', sub: 'medium tier', ms: 1180, type: '' },
+        { name: 'Log + return', sub: '', ms: 48, type: '' }
+      ],
+      totalTime: '1,420 ms',
+      totalCost: '$0.0042',
+      totalTokens: '1,180'
+    },
+    {
+      id: 'req_8f3a02',
+      steps: [
+        { name: 'Cache check', sub: 'match found', ms: 18, type: 'cache' },
+        { name: 'Skip retrieval', sub: 'not needed', ms: 0, type: '' },
+        { name: 'Skip model', sub: 'not needed', ms: 0, type: '' },
+        { name: 'Return cached', sub: '', ms: 5, type: 'cache' }
+      ],
+      totalTime: '23 ms',
+      totalCost: '$0.0000',
+      totalTokens: '0'
+    },
+    {
+      id: 'req_8f3a03',
+      steps: [
+        { name: 'Cache check', sub: 'no match', ms: 11, type: '' },
+        { name: 'Retrieval', sub: 'top 5 docs', ms: 175, type: '' },
+        { name: 'Tool call', sub: 'external API', ms: 3200, type: '' },
+        { name: 'Model call', sub: 'medium tier', ms: 950, type: '' },
+        { name: 'Log + return', sub: '', ms: 41, type: '' }
+      ],
+      totalTime: '4,377 ms',
+      totalCost: '$0.0051',
+      totalTokens: '1,290'
+    }
+  ];
+
+  var btns = document.querySelectorAll('.trace-q');
+  var rowsEl = document.getElementById('trace-rows');
+  var idEl = document.getElementById('trace-id');
+  var totalTimeEl = document.getElementById('trace-total-time');
+  var totalCostEl = document.getElementById('trace-total-cost');
+  var totalTokensEl = document.getElementById('trace-total-tokens');
+
+  function render(i) {
+    var s = scenarios[i];
+    idEl.textContent = s.id;
+    totalTimeEl.textContent = s.totalTime;
+    totalCostEl.textContent = s.totalCost;
+    totalTokensEl.textContent = s.totalTokens;
+
+    var maxMs = 0;
+    s.steps.forEach(function (st) { if (st.ms > maxMs) maxMs = st.ms; });
+    if (maxMs === 0) maxMs = 1;
+
+    rowsEl.innerHTML = '';
+    s.steps.forEach(function (st) {
+      var row = document.createElement('div');
+      row.className = 'trace-row';
+
+      var step = document.createElement('div');
+      step.className = 'trace-step';
+      step.innerHTML = st.name + (st.sub ? '<span class="sub">' + st.sub + '</span>' : '');
+      row.appendChild(step);
+
+      var barWrap = document.createElement('div');
+      barWrap.className = 'trace-bar-wrap';
+      var bar = document.createElement('div');
+      bar.className = 'trace-bar' + (st.type === 'cache' ? ' bar-cache' : '');
+      var pct = st.ms === 0 ? 0 : Math.max(2, (st.ms / maxMs) * 100);
+      bar.style.width = pct + '%';
+      barWrap.appendChild(bar);
+      row.appendChild(barWrap);
+
+      var time = document.createElement('div');
+      time.className = 'trace-time';
+      time.textContent = st.ms === 0 ? '-' : (st.ms.toLocaleString() + ' ms');
+      row.appendChild(time);
+
+      rowsEl.appendChild(row);
+    });
+  }
+
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      btns.forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      render(parseInt(btn.getAttribute('data-q'), 10));
+    });
+  });
+
+  render(0);
+}());
+</script>
+</body>
+</html>

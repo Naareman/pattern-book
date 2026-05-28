@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catching harm mid-stream &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px; --bg-subtle:#F6F7F9;
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.10);
+    --red:#D92D20; --red-soft:rgba(217,45,32,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* safety guard demo */
+  .sg-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .sg-bar { padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--bg-subtle); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .sg-bar-label { font-size: 12px; font-weight: 600; color: var(--soft); text-transform: uppercase; letter-spacing: .06em; }
+  .sg-status { font-size: 12px; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--faint); }
+  .sg-status.ok { color: var(--green); }
+  .sg-status.cut { color: var(--red); }
+  .sg-flow { display: grid; grid-template-columns: 1fr 56px 1fr; align-items: stretch; }
+  .sg-pane { padding: 18px 18px; min-height: 160px; }
+  .sg-pane-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); margin-bottom: 8px; }
+  .sg-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; color: var(--text); min-height: 100px; }
+  .sg-text .ok-w { color: var(--text); }
+  .sg-text .bad-w { color: var(--red); background: var(--red-soft); padding: 1px 4px; border-radius: 3px; }
+  .sg-text .hold { color: var(--faint); text-decoration: line-through; }
+  .sg-arrow { display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 18px; background: var(--bg-subtle); border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+  .sg-guard { background: var(--bg-subtle); }
+  .sg-guard-rule { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 6px 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 6px; }
+  .sg-guard-rule .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex: none; }
+  .sg-guard-rule.fired { border-color: var(--red); background: var(--red-soft); }
+  .sg-guard-rule.fired .dot { background: var(--red); }
+  .sg-footer { padding: 12px 20px; border-top: 1px solid var(--border); background: var(--bg-subtle); font-size: 13px; color: var(--soft); line-height: 1.6; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .sg-btn { padding: 6px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer; transition: all .2s; }
+  .sg-btn:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 720px) { .sg-flow { grid-template-columns: 1fr; } .sg-arrow { transform: rotate(90deg); padding: 8px; min-height: 32px; } }
+  @media (max-width: 560px) { h1.page-title { font-size: 30px; } .explainer { font-size: 15px; } h2 { font-size: 21px; } .fits-row { flex-wrap: wrap; } .fits-label { min-width: 0; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-real-time.html"><span aria-hidden="true">&larr;</span> Real-time / Streaming</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-real-time.html">Real-time / Streaming</a><span class="sep" aria-hidden="true">/</span><span>Keep the words flowing</span><span class="sep" aria-hidden="true">/</span><span class="here">Catching harm mid-stream</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Real-time / Streaming &middot; Keep the words flowing</span>
+  <h1 class="page-title">Catching harm mid-stream</h1>
+  <p class="explainer">Put a safety check between the model and the reader, so a harmful sentence can be cut before anyone sees it.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">A guard sits <em>on the wire</em>.</h2>
+  <div class="what-card">
+    <p>A streamed answer is leaving the server one chunk at a time. A <strong style="color:var(--accent-hover)">mid-stream safety guard</strong> sits in that flow and looks at every new chunk before it is forwarded to the user. Each rule is small and fast: short blocklist matches, a lightweight classifier, or a pattern that watches for personal data leaking out. As long as nothing fires, the chunks pass through untouched. The moment a rule fires, the guard can swap in a safe phrase, hold the next few words for review, or end the stream and tell the user the answer was stopped. The key word is <em>before</em>: the harmful piece never reaches the screen.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">A guard in <em>the middle of the pipe</em>.</h2>
+  <div class="sg-card" role="region" aria-label="Safety guard demo">
+    <div class="sg-bar">
+      <span class="sg-bar-label">Streamed reply going through a safety guard</span>
+      <span class="sg-status" id="sgStatus">idle</span>
+    </div>
+    <div class="sg-flow">
+      <div class="sg-pane">
+        <div class="sg-pane-title">From the model</div>
+        <div class="sg-text" id="sgRaw"></div>
+      </div>
+      <div class="sg-arrow" aria-hidden="true">&rarr;</div>
+      <div class="sg-pane sg-guard">
+        <div class="sg-pane-title">Guard + to user</div>
+        <div id="sgRules">
+          <div class="sg-guard-rule" id="rule1"><span class="dot"></span><span>Personal data</span></div>
+          <div class="sg-guard-rule" id="rule2"><span class="dot"></span><span>Harmful instructions</span></div>
+          <div class="sg-guard-rule" id="rule3"><span class="dot"></span><span>Slur or insult</span></div>
+        </div>
+        <div class="sg-text" id="sgClean" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <div class="sg-footer">
+      <span id="sgNote">Press play. The harmful chunk lights a rule and is held back from the user pane.</span>
+      <button class="sg-btn" id="sgBtn">Play</button>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it sits next to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it does</div>
+      <div class="fits-desc">Sits between the model and the user, watching each chunk and intervening before harm reaches the screen.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">Pairs with safety training that shapes the model and with checks that run on the finished answer. A guard catches the rare slips that get past training.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Not this</div>
+      <div class="fits-desc">Checking quality (drift, accuracy, repetition) is a separate signal. Safety guards focus on harm, on policy, and on data leaks.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Public-facing products where a single harmful sentence on screen carries real cost.</li>
+    <li>Regulated spaces (health, legal, finance) where personal data must stay in the building.</li>
+    <li>Voice assistants, where there is no chance to delete a sentence the user already heard.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-real-time.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Real-time / Streaming</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Rebedea, T. et al. (2023). <em>NeMo Guardrails: a toolkit for controllable and safe LLM applications.</em> arXiv:2310.10501. <span class="note">Open-source pattern for inline rule-based guards that act on streamed model output.</span></li>
+    <li>Inan, H. et al. (2023). <em>Llama Guard: LLM-based input-output safeguard for human-AI conversations.</em> arXiv:2312.06674. <span class="note">Reference design for a classifier-based safety check on model output.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  const btn = document.getElementById('sgBtn');
+  const status = document.getElementById('sgStatus');
+  const raw = document.getElementById('sgRaw');
+  const clean = document.getElementById('sgClean');
+  const note = document.getElementById('sgNote');
+  const rule1 = document.getElementById('rule1');
+  const rule2 = document.getElementById('rule2');
+  const rule3 = document.getElementById('rule3');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const steps = [
+    { add: 'You can reach support ', cls: 'ok-w', clean: 'You can reach support ', rule: null, status: 'streaming', note: 'Clean text passes through.' },
+    { add: 'by email any weekday. ', cls: 'ok-w', clean: 'by email any weekday. ', rule: null, status: 'streaming', note: 'Still clean.' },
+    { add: 'The number on file is 555-2204. ', cls: 'bad-w', clean: 'The number on file is [hidden]. ', rule: 'rule1', status: 'flagged', note: 'Personal data rule fired. The number is masked before it leaves.' },
+    { add: 'Hours are 9 to 5. ', cls: 'ok-w', clean: 'Hours are 9 to 5. ', rule: null, status: 'streaming', note: 'Back to clean output. Stream continues.' },
+    { add: 'You can also try the chat link.', cls: 'ok-w', clean: 'You can also try the chat link.', rule: null, status: 'streaming', note: 'Done. Reply finished safely.' }
+  ];
+
+  let running = false;
+  function reset() {
+    raw.innerHTML = '';
+    clean.innerHTML = '';
+    [rule1, rule2, rule3].forEach(function (r) { r.classList.remove('fired'); });
+    status.textContent = 'idle';
+    status.className = 'sg-status';
+    note.textContent = 'Press play. The harmful chunk lights a rule and is held back from the user pane.';
+    btn.textContent = 'Play';
+    btn.disabled = false;
+    running = false;
+  }
+  function play() {
+    if (running) return;
+    running = true;
+    btn.disabled = true;
+    raw.innerHTML = ''; clean.innerHTML = '';
+    let i = 0;
+    const delay = reduce ? 20 : 850;
+    function step() {
+      if (i >= steps.length) {
+        btn.disabled = false;
+        btn.textContent = 'Replay';
+        btn.onclick = function () { reset(); setTimeout(play, 60); };
+        return;
+      }
+      const s = steps[i++];
+      const a = document.createElement('span');
+      a.className = s.cls;
+      a.textContent = s.add;
+      raw.appendChild(a);
+      const b = document.createElement('span');
+      b.textContent = s.clean;
+      clean.appendChild(b);
+      [rule1, rule2, rule3].forEach(function (r) { r.classList.remove('fired'); });
+      if (s.rule) document.getElementById(s.rule).classList.add('fired');
+      status.textContent = s.status;
+      status.className = 'sg-status ' + (s.status === 'streaming' ? 'ok' : 'cut');
+      note.textContent = s.note;
+      setTimeout(step, delay);
+    }
+    step();
+  }
+  btn.onclick = play;
+}());
+</script>
+</body>
+</html>

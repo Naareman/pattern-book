@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turn the law into checklist items &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --green:#0E9F6E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 760px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 760px; margin: 0 auto; padding: 44px 24px 10px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 600px; margin-top: 14px; }
+
+  section { max-width: 760px; margin: 0 auto; padding: 20px 24px 36px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .prose-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 26px;
+  }
+  .prose-card p { font-size: 16px; line-height: 1.7; color: var(--soft); }
+  .prose-card p strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* mapping table */
+  .map-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+  }
+  .map-lede { font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 16px; }
+
+  .law-picker { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .law-btn {
+    font-family: 'Inter', sans-serif;
+    padding: 8px 14px; border-radius: 20px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    font-size: 13px; font-weight: 600; color: var(--soft);
+    cursor: pointer; transition: border-color .2s, background .2s, color .2s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .law-btn:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .law-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .law-btn .scope { font-size: 11px; font-weight: 500; opacity: .85; }
+
+  .map-rows { display: flex; flex-direction: column; gap: 8px; }
+  .map-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    padding: 12px 14px; border-radius: 10px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    align-items: start;
+  }
+  .map-clause {
+    font-size: 13px; line-height: 1.5; color: var(--text);
+  }
+  .map-clause .num {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--accent-hover); font-weight: 600; display: block; margin-bottom: 2px;
+  }
+  .map-clause .body { color: var(--soft); }
+  .map-control {
+    font-size: 13px; line-height: 1.5;
+    padding-left: 14px; border-left: 2px solid var(--accent);
+  }
+  .map-control .label {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--faint); display: block; margin-bottom: 3px;
+  }
+  .map-control .name { color: var(--text); font-weight: 600; }
+
+  .map-note {
+    margin-top: 14px; padding: 12px 14px;
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px; color: var(--soft); line-height: 1.6;
+  }
+  .map-note strong { color: var(--text); font-weight: 600; }
+
+  .fits-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .fits-row { display: flex; gap: 12px; align-items: flex-start; }
+  .fits-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 5px; }
+  .fits-text { font-size: 15px; color: var(--soft); line-height: 1.65; }
+  .fits-text strong { color: var(--text); font-weight: 600; }
+  .filing-box {
+    margin-top: 6px; padding: 12px 16px;
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px; color: var(--soft); line-height: 1.6;
+  }
+  .filing-box strong { color: var(--text); font-weight: 600; }
+
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 16px 18px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 24px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 760px; margin: 0 auto; padding: 0 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 10px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer {
+    max-width: 760px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .map-row { grid-template-columns: 1fr; }
+    .map-control { padding-left: 0; border-left: none; border-top: 2px solid var(--accent); padding-top: 10px; }
+    .fits-row { flex-direction: column; gap: 6px; }
+    .fits-dot { display: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-privacy.html"><span aria-hidden="true">&larr;</span> Privacy, Security &amp; Governance</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-privacy.html">Privacy, Security &amp; Governance</a><span class="sep" aria-hidden="true">/</span><span class="here">Prove it later</span><span class="sep" aria-hidden="true">/</span><span class="here">Turn the law into checklist items</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Privacy, Security &amp; Governance &middot; Prove it later</span>
+  <h1 class="page-title">Turn the law into checklist items</h1>
+  <p class="explainer">Read the rule, pull out the clauses that bite, and tie each clause to one control inside the system. Audits stop being a panic and start being a lookup.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">What <em>is it?</em></h2>
+  <div class="prose-card">
+    <p><strong>Compliance mapping</strong> is the work of translating a legal text (GDPR, HIPAA, the EU AI Act, SOC 2) into a flat list of "this clause needs that control inside our system". Each line of the law points to a feature you already built (or one you owe). When a regulator or buyer asks "how do you meet article 15?", the answer is a row in a spreadsheet, with the linked screen, log, or policy attached.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Pick a regulation. See <em>its clauses mapped</em>.</h2>
+  <div class="map-card" role="region" aria-label="Compliance mapping demo">
+    <p class="map-lede">A snippet from a real mapping document. Each line takes a clause and points to the control or evidence that satisfies it.</p>
+
+    <div class="law-picker" role="tablist" aria-label="Pick a regulation">
+      <button type="button" class="law-btn active" data-law="gdpr" role="tab">GDPR <span class="scope">(EU)</span></button>
+      <button type="button" class="law-btn" data-law="hipaa" role="tab">HIPAA <span class="scope">(US health)</span></button>
+      <button type="button" class="law-btn" data-law="soc2" role="tab">SOC 2 <span class="scope">(B2B trust)</span></button>
+    </div>
+
+    <div class="map-rows" id="mapRows" aria-live="polite">
+      <!-- filled by JS -->
+    </div>
+
+    <div class="map-note">
+      <strong>One clause, one control, one piece of evidence.</strong> The mapping is small on purpose: a long answer to a yes-or-no question is what triggers more questions.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-dot" aria-hidden="true"></div>
+      <div class="fits-text">
+        <strong>What it covers:</strong> the bridge between a regulation and a running system. A document, owned by legal and security, kept fresh as the law changes and as the system ships.
+      </div>
+    </div>
+    <div class="fits-row">
+      <div class="fits-dot" aria-hidden="true"></div>
+      <div class="fits-text">
+        <strong>Sits next to:</strong> the audit log is the evidence. The mapping is the index that says which log answers which clause. Together they let you answer an auditor in minutes instead of weeks.
+      </div>
+    </div>
+    <div class="filing-box">
+      <strong>Quick test:</strong> pick any clause from your top regulation. Can you point to the one control and the one piece of evidence that satisfies it, in under sixty seconds? If not, the mapping needs a refresh.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>You sell to enterprises that send security questionnaires before signing: the mapping is what fills them in.</li>
+    <li>You operate in a regulated sector: health, finance, education, public sector, child-facing products.</li>
+    <li>You ship in the European Union and need to track the new obligations the EU AI Act adds on top of GDPR.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 12px; padding-bottom: 44px;">
+  <a href="consideration-privacy.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Privacy, Security &amp; Governance</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>European Parliament (2024). <em>EU AI Act, final text.</em> <span class="note">The newest regulation that adds AI-specific obligations on top of GDPR for systems sold inside the European Union.</span></li>
+    <li>NIST AI Risk Management Framework (2023). <em>AI RMF 1.0 with generative AI profile (2024).</em> <span class="note">Widely cited control catalogue that maps cleanly to AI Act and SOC 2 requirements.</span></li>
+    <li>AICPA (2024). <em>SOC 2 Trust Services Criteria.</em> <span class="note">The de facto B2B compliance standard buyers ask for, with explicit mapping support to ISO 27001 and NIST.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var maps = {
+    gdpr: [
+      { num: 'Article 5(1)(c)', body: 'Data minimisation: only the personal data needed for the purpose.', label: 'Control', name: 'Hide personal details before send' },
+      { num: 'Article 15', body: 'Right of access: a user may request a copy of their data.', label: 'Control', name: 'Per-user export from audit log' },
+      { num: 'Article 17', body: 'Right to erasure: delete user data on request.', label: 'Control', name: 'Delete + tombstone in storage and index' },
+      { num: 'Article 30', body: 'Records of processing activities (the processing register).', label: 'Evidence', name: 'Processing register page in admin' }
+    ],
+    hipaa: [
+      { num: '164.312(a)', body: 'Access control: unique user identity per person.', label: 'Control', name: 'SSO login required for every call' },
+      { num: '164.312(b)', body: 'Audit controls: record activity in information systems.', label: 'Evidence', name: 'Append-only audit log (7-year retention)' },
+      { num: '164.312(e)', body: 'Transmission security: encrypt protected health info in transit.', label: 'Control', name: 'TLS 1.3 everywhere, mTLS between services' },
+      { num: '164.308(a)(1)', body: 'Risk analysis as part of the security management process.', label: 'Evidence', name: 'Annual risk assessment document' }
+    ],
+    soc2: [
+      { num: 'CC6.1', body: 'Logical access controls protect against unauthorised access.', label: 'Control', name: 'Role-based gate on every tool call' },
+      { num: 'CC7.2', body: 'Detect and respond to security events.', label: 'Control', name: 'Alerts on refusal spikes and policy denies' },
+      { num: 'CC4.1', body: 'Monitor the effectiveness of controls.', label: 'Evidence', name: 'Quarterly control review meeting notes' },
+      { num: 'A1.2', body: 'Availability: meet committed service levels.', label: 'Evidence', name: 'Status-page uptime &amp; incident reports' }
+    ]
+  };
+
+  var picker = document.querySelectorAll('.law-btn');
+  var rows = document.getElementById('mapRows');
+
+  function render(law) {
+    rows.innerHTML = '';
+    maps[law].forEach(function(r){
+      var row = document.createElement('div');
+      row.className = 'map-row';
+
+      var clause = document.createElement('div');
+      clause.className = 'map-clause';
+      var num = document.createElement('span');
+      num.className = 'num';
+      num.textContent = r.num;
+      var body = document.createElement('span');
+      body.className = 'body';
+      body.textContent = r.body;
+      clause.appendChild(num);
+      clause.appendChild(body);
+
+      var ctrl = document.createElement('div');
+      ctrl.className = 'map-control';
+      var label = document.createElement('span');
+      label.className = 'label';
+      label.textContent = r.label;
+      var name = document.createElement('span');
+      name.className = 'name';
+      name.innerHTML = r.name;
+      ctrl.appendChild(label);
+      ctrl.appendChild(name);
+
+      row.appendChild(clause);
+      row.appendChild(ctrl);
+      rows.appendChild(row);
+    });
+  }
+
+  picker.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      picker.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      render(btn.getAttribute('data-law'));
+    });
+  });
+
+  render('gdpr');
+}());
+</script>
+</body>
+</html>

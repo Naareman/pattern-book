@@ -235,6 +235,66 @@
   .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
   .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 
+  /* ============ REAL EXAMPLE: tap-through steps ============ */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .example-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
+
+  .step-pills {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .step-pill {
+    padding: 7px 14px; border: 1px solid var(--border-strong);
+    border-radius: 20px; font-size: 13px; font-weight: 600;
+    color: var(--soft); background: var(--bg-subtle);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    transition: border-color .18s ease, background .18s ease, color .18s ease;
+    white-space: nowrap;
+  }
+  .step-pill:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .step-pill[aria-selected="true"] {
+    background: var(--accent); border-color: var(--accent); color: #fff;
+  }
+
+  .step-card {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 18px 20px;
+    display: flex; align-items: flex-start; gap: 14px;
+    min-height: 100px;
+  }
+  .step-card-icon {
+    flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-card-icon svg { width: 17px; height: 17px; color: var(--accent-hover); display: block; }
+  .step-card-body { flex: 1; min-width: 0; }
+  .step-card-name {
+    font-size: 12px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--accent-hover); margin-bottom: 6px;
+  }
+  .step-card-text { font-size: 14px; line-height: 1.65; color: var(--text); }
+  .step-card-text strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* ============ PATTERNS IT USES: compact chips ============ */
+  .layer-chips {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .layer-chip {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    padding: 9px 14px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 20px;
+    text-decoration: none; font-size: 13px; font-weight: 500;
+    color: var(--text); transition: border-color .18s ease, background .18s ease;
+    line-height: 1.4;
+  }
+  .layer-chip:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .layer-chip-name { color: var(--accent-hover); font-weight: 700; white-space: nowrap; }
+  .layer-chip-sep { color: var(--border-strong); font-weight: 400; }
+  .layer-chip-clause { color: var(--soft); }
+
   /* ============ WHEN IT MATTERS ============ */
   .example-card {
     background: var(--surface); border: 1px solid var(--border);
@@ -452,9 +512,52 @@
   </div>
 </section>
 
-<!-- 03: WHEN IT MATTERS -->
+<!-- 03: A REAL EXAMPLE -->
 <section>
-  <div class="section-label"><span class="num">03</span>When it Matters</div>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>How a <em>real one</em> runs.</h2>
+  <div class="example-stage">
+    <p class="example-intro">A smart home speaker receives a voice command. Tap each step to walk through the pipeline.</p>
+
+    <div class="step-pills" role="tablist" aria-label="Pipeline steps">
+      <button class="step-pill" role="tab" aria-selected="true"  aria-controls="va-step-card" data-step="0" tabindex="0">Step 1: Capture</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="va-step-card" data-step="1" tabindex="-1">Step 2: Transcribe</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="va-step-card" data-step="2" tabindex="-1">Step 3: Understand</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="va-step-card" data-step="3" tabindex="-1">Step 4: Reply</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="va-step-card" data-step="4" tabindex="-1">Step 5: Speak</button>
+    </div>
+
+    <div class="step-card" id="va-step-card" role="tabpanel" aria-live="polite">
+      <div class="step-card-icon" id="va-step-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      </div>
+      <div class="step-card-body">
+        <div class="step-card-name" id="va-step-name">Capture</div>
+        <div class="step-card-text" id="va-step-text">The microphone opens the moment it hears the wake word. It records a <strong>short audio clip</strong> of your voice and passes the raw audio bytes to the next stage.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03b: PATTERNS IT USES -->
+<section>
+  <div class="section-label"><span class="num">03b</span>Patterns It Uses</div>
+  <h2>The <em>building blocks</em>.</h2>
+  <div class="layer-chips">
+    <a class="layer-chip" href="layer-single-call-control.html">
+      <span class="layer-chip-name">Single-Call Control</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">each stage is one tight call with a clear output shape</span>
+    </a>
+    <a class="layer-chip" href="layer-serving-infrastructure.html">
+      <span class="layer-chip-name">Serving &amp; Infrastructure</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">low-latency servers and streaming keep the reply under 800 ms</span>
+    </a>
+  </div>
+</section>
+
+<!-- 04: WHEN IT MATTERS -->
+<section>
+  <div class="section-label"><span class="num">04</span>When it Matters</div>
   <h2>Latency is the <em>product</em>.</h2>
 
   <div class="example-card">
@@ -494,9 +597,9 @@
   </div>
 </section>
 
-<!-- 04: TRADEOFFS -->
+<!-- 05: TRADEOFFS -->
 <section>
-  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <div class="section-label"><span class="num">05</span>Tradeoffs</div>
   <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale">
@@ -681,6 +784,64 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 playBtn.addEventListener('click', runPipeline);
 resetBtn.addEventListener('click', resetAll);
+
+// ============ REAL EXAMPLE: tap-through steps ============
+const vaStepData = [
+  {
+    name: 'Capture',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+    text: 'The microphone opens the moment it hears the wake word. It records a <strong>short audio clip</strong> of your voice and passes the raw audio bytes to the next stage.'
+  },
+  {
+    name: 'Transcribe',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h7"/></svg>',
+    text: 'A fast speech-to-text model converts the audio into a plain text string in roughly <strong>200 ms</strong>. Speed here matters: every extra millisecond delays the whole reply.'
+  },
+  {
+    name: 'Understand',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>',
+    text: 'The text question goes to the language model. It generates a <strong>short spoken-style reply</strong>, streamed token by token so audio can start playing before the full sentence is ready.'
+  },
+  {
+    name: 'Reply',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>',
+    text: 'The reply text is handed to a text-to-speech model while tokens are still arriving. Audio synthesis starts <strong>before the sentence is complete</strong>, cutting perceived latency in half.'
+  },
+  {
+    name: 'Speak',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>',
+    text: 'Audio streams out of the speaker. Total round-trip from wake word to first spoken syllable: <strong>under 800 ms</strong>, the threshold where a conversation feels live.'
+  }
+];
+
+const vaPills = Array.from(document.querySelectorAll('.step-pill'));
+const vaStepIcon = document.getElementById('va-step-icon');
+const vaStepName = document.getElementById('va-step-name');
+const vaStepText = document.getElementById('va-step-text');
+
+function vaShowStep(idx) {
+  const d = vaStepData[idx];
+  vaStepIcon.innerHTML = d.icon;
+  vaStepName.textContent = d.name;
+  vaStepText.innerHTML = d.text;
+  vaPills.forEach((p, i) => {
+    const active = i === idx;
+    p.setAttribute('aria-selected', active ? 'true' : 'false');
+    p.tabIndex = active ? 0 : -1;
+  });
+}
+
+vaPills.forEach((pill, idx) => {
+  pill.addEventListener('click', () => vaShowStep(idx));
+  pill.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); vaShowStep((idx + 1) % vaPills.length); vaPills[(idx + 1) % vaPills.length].focus(); }
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); vaShowStep((idx - 1 + vaPills.length) % vaPills.length); vaPills[(idx - 1 + vaPills.length) % vaPills.length].focus(); }
+    if (e.key === 'Home') { e.preventDefault(); vaShowStep(0); vaPills[0].focus(); }
+    if (e.key === 'End')  { e.preventDefault(); vaShowStep(vaPills.length - 1); vaPills[vaPills.length - 1].focus(); }
+  });
+});
+
+vaShowStep(0);
 </script>
 
 </body>

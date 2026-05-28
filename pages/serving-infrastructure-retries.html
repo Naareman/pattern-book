@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retrying safely · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --ok:#0E9F6E; --bad:#D92D20;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* timeline visual */
+  .retry-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 26px; }
+  .retry-title { font-size: 13px; color: var(--soft); margin-bottom: 18px; }
+  .retry-title strong { color: var(--text); }
+  .retry-track { display: grid; grid-template-columns: 70px 1fr; gap: 14px; row-gap: 10px; align-items: center; }
+  .retry-when { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--faint); text-align: right; }
+  .retry-bar { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-subtle); font-size: 13px; color: var(--text); }
+  .retry-bar .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .retry-bar.bad .dot { background: var(--bad); }
+  .retry-bar.bad { border-color: rgba(217,45,32,0.25); background: rgba(217,45,32,0.05); }
+  .retry-bar.ok .dot { background: var(--ok); }
+  .retry-bar.ok { border-color: rgba(14,159,110,0.3); background: rgba(14,159,110,0.05); }
+  .retry-bar .stretch { flex: 1; color: var(--soft); font-size: 12.5px; }
+  .retry-bar .stretch strong { color: var(--text); font-weight: 500; }
+  .retry-note { margin-top: 18px; padding: 12px 14px; background: var(--accent-soft); border: 1px solid rgba(124,92,246,0.25); border-radius: var(--radius-sm); font-size: 13.5px; color: var(--text); line-height: 1.6; }
+  .retry-note strong { color: var(--accent-hover); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .retry-track { grid-template-columns: 56px 1fr; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-serving-infrastructure.html"><span aria-hidden="true">&larr;</span> Serving &amp; Infrastructure</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-serving-infrastructure.html">Serving &amp; Infrastructure</a><span class="sep" aria-hidden="true">/</span><span>Keep it up</span><span class="sep" aria-hidden="true">/</span><span class="here">Retrying safely</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Serving &amp; Infrastructure &middot; Keep it up</span>
+  <h1 class="page-title">Retrying safely</h1>
+  <p class="explainer">When a call fails, try again. Wait a bit longer before each new try, add a random jitter so callers spread out across the next few seconds, and cap how many tries you allow.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">Try again, with <em>patience</em>.</h2>
+  <div class="what-card">
+    <p>A naive retry asks again right away. If thousands of users are doing that at the same moment, the recovering service gets a wave of traffic and falls over for a second time. <strong style="color:var(--accent-hover)">Retrying safely</strong> means waiting an increasing amount of time between tries (exponential backoff), adding a small random pause so requests spread out (jitter), and stopping after a set number of attempts so a stubborn failure stays bounded instead of turning into an infinite loop.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Four tries, growing <em>pauses</em>.</h2>
+  <div class="retry-card" role="region" aria-label="Retry timeline with exponential backoff and jitter">
+    <div class="retry-title">A model call fails. The client waits, doubles the wait, doubles again, and eventually <strong>succeeds on try four</strong>.</div>
+    <div class="retry-track">
+      <div class="retry-when">t = 0s</div>
+      <div class="retry-bar bad"><span class="dot" aria-hidden="true"></span><span class="stretch"><strong>Try 1:</strong> fails with a timeout</span></div>
+
+      <div class="retry-when">wait 1s</div>
+      <div class="retry-bar bad"><span class="dot" aria-hidden="true"></span><span class="stretch"><strong>Try 2:</strong> fails again</span></div>
+
+      <div class="retry-when">wait 2s</div>
+      <div class="retry-bar bad"><span class="dot" aria-hidden="true"></span><span class="stretch"><strong>Try 3:</strong> fails again</span></div>
+
+      <div class="retry-when">wait 4s</div>
+      <div class="retry-bar ok"><span class="dot" aria-hidden="true"></span><span class="stretch"><strong>Try 4:</strong> success</span></div>
+    </div>
+    <div class="retry-note"><strong>Plus jitter:</strong> the real waits land near 1, 2, and 4 seconds. Each one has a random fraction added so 10,000 clients retrying together spread across a few seconds instead of all hitting the service at the same instant.</div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">Where it <em>sits</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">An idempotency key. Retries are only safe if the same call done twice does the same thing once. For payments and bookings, that means a key that the server recognizes as a repeat.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">A circuit breaker. The breaker stops retries from piling on a service that has already given up.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Three knobs</div>
+      <div class="fits-desc">How long to wait (backoff), how much randomness to add (jitter), and how many tries before you give up (max attempts). Wrong values turn retries from a safety net into the cause of the next outage.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>The failure is likely temporary: a brief network blip, a rate-limit window closing, a model server warming up after a deploy.</li>
+    <li>The call is safe to repeat, either because it only reads data or because it carries an idempotency key.</li>
+    <li>Many clients can fail at once, so a flat "retry now" would stack into a stampede that hurts the recovering service more than the first failure did.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-serving-infrastructure.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Serving &amp; Infrastructure</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>AWS Architecture Blog. <em>Exponential Backoff and Jitter.</em> <span class="note">The reference write-up: why jitter is required to stop retry stampedes, with three jitter recipes.</span></li>
+    <li>Google SRE Book. <em>Handling Overload.</em> <span class="note">How retry storms cause cascading failures and how budgets cap the damage.</span></li>
+    <li>Nygard, M. (2018). <em>Release It! Second Edition.</em> Pragmatic Bookshelf. <span class="note">Retries paired with timeouts, circuit breakers, and bulkheads as part of a stability toolkit.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reuse recent lookups &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --bg-subtle:#F6F7F9;
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* cache visual: timeline of repeat questions */
+  .cache-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .cache-header { padding: 12px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .cache-stats { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid rgba(124,92,246,0.2); border-radius: 8px; padding: 2px 10px; }
+  .cache-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 8px; }
+  .cache-row { display: grid; grid-template-columns: 64px 1fr 100px 90px; gap: 12px; align-items: center; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; }
+  .cache-time { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--faint); font-weight: 600; }
+  .cache-q { font-size: 13.5px; color: var(--text); font-weight: 500; }
+  .cache-q .repeat { font-size: 11px; font-weight: 600; color: var(--faint); margin-left: 6px; }
+  .cache-status { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 3px 9px; border-radius: 10px; text-align: center; }
+  .cache-status.miss { background: var(--bg-subtle); color: var(--soft); border: 1px solid var(--border); }
+  .cache-status.hit { background: var(--green-soft); color: var(--green); border: 1px solid var(--green); }
+  .cache-dur { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--soft); text-align: right; }
+  .cache-dur.fast { color: var(--green); font-weight: 700; }
+  .cache-note { padding: 12px 14px; background: var(--bg-subtle); border-top: 1px solid var(--border); font-size: 13px; color: var(--soft); line-height: 1.55; }
+  .cache-note strong { color: var(--text); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 720px) {
+    .cache-row { grid-template-columns: 56px 1fr 88px; }
+    .cache-dur { display: none; }
+  }
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-stateless-retrieval.html"><span aria-hidden="true">&larr;</span> Stateless Retrieval</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-stateless-retrieval.html">Stateless Retrieval</a><span class="sep" aria-hidden="true">/</span><span class="here">Keep it fresh &middot; Reuse recent lookups</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Stateless Retrieval &middot; Keep it fresh</span>
+  <h1 class="page-title">Reuse recent lookups</h1>
+  <p class="explainer">Many users ask the same thing within minutes. Save the search result the first time, then serve the saved copy for repeats so the work happens only once.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">Store a result so the <em>next person</em> gets it instantly.</h2>
+  <div class="what-card">
+    <p>The first time a question comes in, the system runs the full search and saves the matched pieces under a key (often the question itself). When the same question, or a very close one, arrives again, the system finds the saved result and skips the search. The reader gets an answer in a few hundred milliseconds; the bill goes down.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">One hour, <em>five questions</em>, two real searches.</h2>
+  <div class="cache-card" role="region" aria-label="Cache hit and miss timeline">
+    <div class="cache-header">
+      <span>Five users, one help-desk bot</span>
+      <span class="cache-stats">3 of 5 served from cache</span>
+    </div>
+    <div class="cache-body">
+      <div class="cache-row">
+        <span class="cache-time">09:01</span>
+        <span class="cache-q">How many vacation days do I get?</span>
+        <span class="cache-status miss">Miss</span>
+        <span class="cache-dur">820 ms</span>
+      </div>
+      <div class="cache-row">
+        <span class="cache-time">09:04</span>
+        <span class="cache-q">How many vacation days do I get?<span class="repeat">(repeat)</span></span>
+        <span class="cache-status hit">Hit</span>
+        <span class="cache-dur fast">35 ms</span>
+      </div>
+      <div class="cache-row">
+        <span class="cache-time">09:09</span>
+        <span class="cache-q">How do I reset my password?</span>
+        <span class="cache-status miss">Miss</span>
+        <span class="cache-dur">780 ms</span>
+      </div>
+      <div class="cache-row">
+        <span class="cache-time">09:11</span>
+        <span class="cache-q">How many vacation days do I get?<span class="repeat">(repeat)</span></span>
+        <span class="cache-status hit">Hit</span>
+        <span class="cache-dur fast">28 ms</span>
+      </div>
+      <div class="cache-row">
+        <span class="cache-time">09:18</span>
+        <span class="cache-q">How do I reset my password?<span class="repeat">(repeat)</span></span>
+        <span class="cache-status hit">Hit</span>
+        <span class="cache-dur fast">31 ms</span>
+      </div>
+    </div>
+    <div class="cache-note"><strong>What changed:</strong> only two of the five questions hit the real search. The other three were served from a stored copy in milliseconds. Same answers, a fraction of the work.</div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Sits in front of</div>
+      <div class="fits-desc">Every search and live look-up. The cache is checked first; the heavier work only runs on a miss.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">A way to notice when content is old. A cache alone is happy to serve a stale answer; pairing it with a freshness rule keeps that from happening.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Watch for</div>
+      <div class="fits-desc">Caching errors. If a search fails, store the failure and you have just made it permanent. Only cache real answers.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <div class="matters-card">
+    <ul class="matters-list">
+      <li>A small group of questions makes up most of your traffic.</li>
+      <li>Search costs or wait times are showing up on your bill or in user feedback.</li>
+      <li>The same answer is good for at least a few minutes before the underlying content changes.</li>
+    </ul>
+  </div>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-stateless-retrieval.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Stateless Retrieval</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Bang (2023). <em>GPTCache: An Open-Source Semantic Cache for LLM Applications.</em> arXiv:2311.04250. <span class="note">A widely used cache that matches questions by meaning, not just exact text.</span></li>
+    <li>Anthropic (2024). <em>Prompt caching.</em> docs.anthropic.com. <span class="note">Reuses the work of reading a long prompt across many calls.</span></li>
+    <li>Karger and Lehman (1997). <em>Consistent Hashing and Random Trees.</em> STOC. <span class="note">The classic technique behind sharing a cache across many servers without losing items.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search by meaning or words &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* search visual: toggle search mode */
+  .search-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .search-header { padding: 12px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .mode-toggle { display: inline-flex; gap: 0; border: 1px solid var(--border-strong); border-radius: 20px; overflow: hidden; background: #fff; }
+  .mode-toggle button { font-family: inherit; font-size: 12px; font-weight: 600; padding: 5px 12px; background: transparent; color: var(--soft); border: 0; cursor: pointer; transition: background .15s, color .15s; }
+  .mode-toggle button.active { background: var(--accent-soft); color: var(--accent-hover); }
+  .search-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+  .query-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; }
+  .query-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--faint); text-transform: uppercase; letter-spacing: .06em; }
+  .query-text { font-size: 14px; color: var(--text); font-weight: 500; }
+  .results-list { display: flex; flex-direction: column; gap: 8px; }
+  .result-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+  .result-rank { flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-hover); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+  .result-text { flex: 1; font-size: 13.5px; color: var(--soft); line-height: 1.5; }
+  .result-text mark { background: rgba(124,92,246,0.16); color: var(--text); padding: 0 3px; border-radius: 3px; }
+  .search-note { padding: 12px 14px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--soft); line-height: 1.55; }
+  .search-note strong { color: var(--text); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-stateless-retrieval.html"><span aria-hidden="true">&larr;</span> Stateless Retrieval</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-stateless-retrieval.html">Stateless Retrieval</a><span class="sep" aria-hidden="true">/</span><span class="here">Find &middot; Search by meaning or words</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Stateless Retrieval &middot; Find</span>
+  <h1 class="page-title">Search by meaning or words</h1>
+  <p class="explainer">Pull back the pieces most likely to answer the question. Match on shared words, or on shared meaning, or both at once.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">Two ways to <em>find</em> the right pieces.</h2>
+  <div class="what-card">
+    <p>A word search matches text the user actually typed: fast, exact, great for product codes and names. A meaning search compares ideas instead of words, so it still finds a passage about "annual leave" when the question asks for "vacation days". Most strong systems run both and merge the results.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Same question, <em>two ways</em> to look.</h2>
+  <div class="search-card" role="region" aria-label="Search mode example">
+    <div class="search-header">
+      <span>Question: how many vacation days do I get?</span>
+      <div class="mode-toggle" role="tablist" aria-label="Search mode">
+        <button type="button" role="tab" aria-selected="true" class="active" data-mode="words">By words</button>
+        <button type="button" role="tab" aria-selected="false" data-mode="meaning">By meaning</button>
+        <button type="button" role="tab" aria-selected="false" data-mode="both">Both</button>
+      </div>
+    </div>
+    <div class="search-body">
+      <div class="query-row">
+        <span class="query-label">Query</span>
+        <span class="query-text">vacation days</span>
+      </div>
+      <div class="results-list" id="resultsList" aria-live="polite"></div>
+      <div class="search-note" id="searchNote"></div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Runs after</div>
+      <div class="fits-desc">The prep step. Search reads the small, tagged pieces that were prepared ahead of time.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Hands off to</div>
+      <div class="fits-desc">Rerank. The first search pulls back a dozen plausible matches; rerank sorts them so the strongest go in front.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">The choice</div>
+      <div class="fits-desc">Words alone miss synonyms. Meaning alone misses exact codes and names. Running both and blending the lists is usually the safer default.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>tune it</em>.</h2>
+  <div class="matters-card">
+    <ul class="matters-list">
+      <li>Your users phrase questions in many ways for the same idea.</li>
+      <li>Some questions need exact terms (order numbers, model codes, drug names).</li>
+      <li>The right text is in your files, yet the model keeps answering from somewhere else.</li>
+    </ul>
+  </div>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-stateless-retrieval.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Stateless Retrieval</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Robertson and Zaragoza (2009). <em>The Probabilistic Relevance Framework: BM25 and Beyond.</em> Foundations and Trends in Information Retrieval. <span class="note">The canonical keyword-search algorithm used in most word-based search.</span></li>
+    <li>Karpukhin et al. (2020). <em>Dense Passage Retrieval for Open-Domain Question Answering.</em> EMNLP. <span class="note">The meaning-based search method that powered modern RAG.</span></li>
+    <li>Cormack, Clarke, and Buettcher (2009). <em>Reciprocal Rank Fusion outperforms Condorcet and individual Rank Learning Methods.</em> SIGIR. <span class="note">A simple way to merge two ranked lists into one stronger list.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var modes = {
+    words: {
+      results: [
+        { text: 'A <mark>vacation</mark> request must go through the manager portal.', rank: 1 },
+        { text: 'Holiday <mark>vacation</mark> closure runs the last week of December.', rank: 2 }
+      ],
+      note: '<strong>Word search</strong> finds passages with the exact word "vacation". It misses the paragraph that calls them "leave days", even though that is the right answer.'
+    },
+    meaning: {
+      results: [
+        { text: 'Every full-time employee gets 22 <mark>leave</mark> days a year.', rank: 1 },
+        { text: 'Paid time off resets on the anniversary of your start date.', rank: 2 },
+        { text: 'Sabbaticals are separate from regular <mark>annual leave</mark>.', rank: 3 }
+      ],
+      note: '<strong>Meaning search</strong> finds passages about the same idea even when the words differ. "Vacation" maps to "leave" and "paid time off" because they live near each other in meaning.'
+    },
+    both: {
+      results: [
+        { text: 'Every full-time employee gets 22 <mark>leave</mark> days a year.', rank: 1 },
+        { text: 'A <mark>vacation</mark> request must go through the manager portal.', rank: 2 },
+        { text: 'Paid time off resets on the anniversary of your start date.', rank: 3 }
+      ],
+      note: '<strong>Both at once</strong> blends the two lists. You get the right policy line (from meaning) and the booking rule (from words), so the model can answer the full question.'
+    }
+  };
+  var btns = document.querySelectorAll('.mode-toggle button');
+  var list = document.getElementById('resultsList');
+  var note = document.getElementById('searchNote');
+  function render(mode) {
+    var d = modes[mode];
+    list.innerHTML = d.results.map(function (r) {
+      return '<div class="result-row"><div class="result-rank">' + r.rank + '</div><div class="result-text">' + r.text + '</div></div>';
+    }).join('');
+    note.innerHTML = d.note;
+  }
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      btns.forEach(function (x) { x.classList.remove('active'); x.setAttribute('aria-selected', 'false'); });
+      b.classList.add('active');
+      b.setAttribute('aria-selected', 'true');
+      render(b.getAttribute('data-mode'));
+    });
+  });
+  render('words');
+}());
+</script>
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finding the real cause of a failure · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.10);
+    --red:#D92D20; --red-soft:rgba(217,45,32,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* Five whys ladder */
+  .why-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .why-header {
+    padding: 12px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border);
+    font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint);
+  }
+  .why-body { padding: 22px; display: flex; flex-direction: column; gap: 12px; }
+  .why-row {
+    display: grid; grid-template-columns: 60px 1fr;
+    gap: 14px; align-items: stretch;
+  }
+  .why-step {
+    background: var(--bg-subtle); color: var(--soft);
+    border: 1px solid var(--border); border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 8px 6px; text-align: center; font-weight: 500;
+  }
+  .why-step strong { display: block; font-size: 16px; color: var(--accent-hover); font-weight: 600; }
+  .why-content {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .why-q { font-size: 13px; color: var(--faint); margin-bottom: 4px; }
+  .why-a { font-size: 14.5px; line-height: 1.55; color: var(--text); }
+  .why-row.hidden { display: none; }
+  .why-controls {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 8px 0 0;
+  }
+  .why-btn {
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+    color: #fff; background: var(--accent); border: 1px solid var(--accent);
+    border-radius: 10px; padding: 8px 14px; cursor: pointer;
+    transition: background .18s, transform .18s;
+  }
+  .why-btn:hover { background: var(--accent-hover); }
+  .why-btn:disabled { background: var(--border-strong); border-color: var(--border-strong); cursor: default; }
+  .why-btn-soft {
+    color: var(--soft); background: var(--surface); border: 1px solid var(--border-strong);
+  }
+  .why-btn-soft:hover { color: var(--accent-hover); border-color: var(--accent); background: var(--accent-soft); }
+  .why-progress {
+    font-size: 12.5px; color: var(--faint); font-family: 'JetBrains Mono', monospace;
+  }
+  .why-root {
+    margin-top: 4px; padding: 14px 16px;
+    background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 12px;
+    font-size: 14px; line-height: 1.6; color: var(--text); display: none;
+  }
+  .why-root.shown { display: block; }
+  .why-root strong { color: var(--accent-hover); }
+  .why-caption {
+    padding: 11px 18px; background: var(--bg-subtle); border-top: 1px solid var(--border);
+    font-size: 12.5px; color: var(--faint); line-height: 1.5;
+  }
+
+  .fits-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .why-row { grid-template-columns: 50px 1fr; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-observability.html"><span aria-hidden="true">&larr;</span> Observability &amp; Debuggability</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-observability.html">Observability &amp; Debuggability</a><span class="sep" aria-hidden="true">/</span><span>Find what went wrong</span><span class="sep" aria-hidden="true">/</span><span class="here">Finding the real cause of a failure</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Observability &amp; Debuggability &middot; Find what went wrong</span>
+  <h1 class="page-title">Finding the real cause of a failure</h1>
+  <p class="explainer">Causal analysis keeps asking "why" past the first explanation, so the fix lands at the source instead of the surface.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What It Is</div>
+  <h2 id="what-heading">The first answer is <em>rarely the cause</em>.</h2>
+  <div class="what-card">
+    <p>When something fails, the first thing you see is the symptom: a wrong number, a broken tool call, a stale citation. The first explanation that lands is usually a <strong style="color:var(--accent-hover)">proximate cause</strong>: the closest piece in the chain. Fixing only that piece patches today's failure and lets tomorrow's slip through under a new disguise. Causal analysis keeps walking back: each answer becomes the next question. The technique most teams use is <strong style="color:var(--accent-hover)">the five whys</strong>: keep asking "why" until you reach something a single owner can actually change. That last "why" is the <strong style="color:var(--accent-hover)">root cause</strong>.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Tap "ask why" to <em>go one level deeper</em>.</h2>
+  <div class="why-card" role="region" aria-label="Five whys example">
+    <div class="why-header">Symptom: the bot quoted last year's refund policy to a customer this week</div>
+    <div class="why-body">
+      <div class="why-row" data-step="0">
+        <div class="why-step"><strong>0</strong>Symptom</div>
+        <div class="why-content">
+          <div class="why-q">What did the user see?</div>
+          <div class="why-a">The bot returned the 2025 refund window (14 days) instead of the current one (30 days).</div>
+        </div>
+      </div>
+      <div class="why-row hidden" data-step="1">
+        <div class="why-step"><strong>1</strong>Why</div>
+        <div class="why-content">
+          <div class="why-q">Why did it answer with the old window?</div>
+          <div class="why-a">The retrieval step pulled in the 2025 policy document instead of the 2026 one.</div>
+        </div>
+      </div>
+      <div class="why-row hidden" data-step="2">
+        <div class="why-step"><strong>2</strong>Why</div>
+        <div class="why-content">
+          <div class="why-q">Why did it pull the older document?</div>
+          <div class="why-a">Both versions live in the index. The 2025 one ranks higher because it has been seen more often.</div>
+        </div>
+      </div>
+      <div class="why-row hidden" data-step="3">
+        <div class="why-step"><strong>3</strong>Why</div>
+        <div class="why-content">
+          <div class="why-q">Why is the old one still in the index?</div>
+          <div class="why-a">The reindex job runs nightly, but the deprecation flag on old docs is checked only on full rebuild.</div>
+        </div>
+      </div>
+      <div class="why-row hidden" data-step="4">
+        <div class="why-step"><strong>4</strong>Why</div>
+        <div class="why-content">
+          <div class="why-q">Why is the deprecation flag ignored on the nightly job?</div>
+          <div class="why-a">The flag was added last quarter and never wired into the nightly ingestion path. Only the full rebuild path knows about it.</div>
+        </div>
+      </div>
+      <div class="why-row hidden" data-step="5">
+        <div class="why-step"><strong>5</strong>Why</div>
+        <div class="why-content">
+          <div class="why-q">Why was the new path missed?</div>
+          <div class="why-a">There is no shared filter step between the two ingestion paths. Each path implements its own filtering from scratch.</div>
+        </div>
+      </div>
+      <div class="why-root" id="root">
+        <strong>Root cause:</strong> the two ingestion paths do not share a filter step. The fix is to extract one shared filter and call it from both paths, then add a test that fails if either path skips it. Patching the nightly job alone would leave the same gap waiting in any future path.
+      </div>
+      <div class="why-controls">
+        <button type="button" class="why-btn" id="ask-why">Ask why &rarr;</button>
+        <button type="button" class="why-btn why-btn-soft" id="reset">Start over</button>
+        <span class="why-progress" id="progress">step 0 of 5</span>
+      </div>
+    </div>
+    <div class="why-caption">If you stop at step 1, you fix tomorrow's broken bot. If you stop at step 5, the next bot built on the same ingestion does not break the same way.</div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it is</div>
+      <div class="fits-desc">A way of thinking about a failure, not a tool. The discipline is to keep going past the first plausible answer.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Sits next to</div>
+      <div class="fits-desc">Pairs with tracing (the evidence), replay (the test bench), drift detection (the trigger), and incident postmortems (the place a root cause gets written down so the team learns).</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>The same kind of failure keeps coming back even after the obvious fix has shipped.</li>
+    <li>A failure touches more than one piece of the system and you suspect the cause sits earlier than where it showed up.</li>
+    <li>You are writing a postmortem and need the lasting fix, not just the patch that quieted the alert.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-observability.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Observability &amp; Debuggability</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Ohno, T. (1988). <em>Toyota Production System: Beyond Large-Scale Production.</em> Productivity Press. <span class="note">The original framing of the five whys as a habit for finding the cause behind the cause.</span></li>
+    <li>Allspaw, J. (2012). <em>Blameless PostMortems and a Just Culture.</em> Etsy Engineering blog. <span class="note">Argues that the question "why" is only useful in a culture that treats people as part of a system, not the cause of the bug.</span></li>
+    <li>Rasmussen, J. (1997). <em>Risk management in a dynamic society: a modelling problem.</em> Safety Science, 27(2/3). <span class="note">A foundational paper on tracing failures back through nested system layers instead of stopping at the operator.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var ask = document.getElementById('ask-why');
+  var reset = document.getElementById('reset');
+  var progress = document.getElementById('progress');
+  var root = document.getElementById('root');
+  var rows = document.querySelectorAll('.why-row');
+  var step = 0;
+  var max = 5;
+  function render() {
+    rows.forEach(function (r) {
+      var s = parseInt(r.getAttribute('data-step'), 10);
+      if (s <= step) r.classList.remove('hidden'); else r.classList.add('hidden');
+    });
+    progress.textContent = 'step ' + step + ' of ' + max;
+    if (step >= max) {
+      root.classList.add('shown');
+      ask.disabled = true;
+      ask.textContent = 'Reached root cause';
+    } else {
+      root.classList.remove('shown');
+      ask.disabled = false;
+      ask.textContent = 'Ask why →';
+    }
+  }
+  ask.addEventListener('click', function () {
+    if (step < max) { step++; render(); }
+  });
+  reset.addEventListener('click', function () {
+    step = 0; render();
+  });
+  render();
+}());
+</script>
+</body>
+</html>

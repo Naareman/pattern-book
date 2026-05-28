@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A camera that looks and answers &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* camera viewfinder */
+  .demo-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; }
+  .vf-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; }
+  .vf {
+    position: relative; border-radius: 14px; overflow: hidden;
+    background: #1A1B22; min-height: 240px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .vf-scene {
+    width: 100%; height: 100%; position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 84px; line-height: 1;
+    background: radial-gradient(circle at 50% 40%, #2A2C36 0%, #14151B 100%);
+    transition: opacity .25s ease;
+  }
+  .vf-scene .glyph { filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4)); }
+  .vf-bracket {
+    position: absolute; width: 30px; height: 30px;
+    border: 2px solid rgba(255,255,255,0.5); border-radius: 4px;
+  }
+  .vf-bracket.tl { top: 14px; left: 14px; border-right: none; border-bottom: none; }
+  .vf-bracket.tr { top: 14px; right: 14px; border-left: none; border-bottom: none; }
+  .vf-bracket.bl { bottom: 14px; left: 14px; border-right: none; border-top: none; }
+  .vf-bracket.br { bottom: 14px; right: 14px; border-left: none; border-top: none; }
+  .vf-shutter {
+    position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none;
+    transition: opacity .08s linear;
+  }
+  .vf-shutter.flash { opacity: 0.8; transition: opacity .35s ease-out; }
+  .vf-label {
+    position: absolute; bottom: 14px; left: 14px;
+    background: rgba(0,0,0,0.5); color: #fff;
+    font-size: 11px; padding: 3px 8px; border-radius: 12px;
+    backdrop-filter: blur(6px);
+  }
+  .vf-readout {
+    background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; min-height: 240px;
+  }
+  .vf-readout-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 4px;
+  }
+  .vf-q { font-size: 14px; color: var(--soft); padding: 8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; line-height: 1.5; }
+  .vf-a { font-size: 14px; color: var(--text); line-height: 1.6; padding: 8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; min-height: 70px; }
+  .vf-a.loading { color: var(--faint); font-style: italic; }
+  .vf-empty { color: var(--faint); font-style: italic; font-size: 13px; padding: 20px 0; text-align: center; }
+  .scene-controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
+  .scene-btn {
+    font-family: inherit; padding: 8px 16px; border-radius: 18px;
+    border: 1px solid var(--border-strong); background: var(--surface);
+    font-size: 12.5px; font-weight: 600; color: var(--soft); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px;
+    transition: border-color .15s, color .15s, background .15s;
+  }
+  .scene-btn:hover, .scene-btn:focus-visible { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .scene-btn.active { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .scene-btn .ic { font-size: 15px; }
+  .demo-caption { text-align: center; font-size: 12.5px; color: var(--faint); line-height: 1.5; margin-top: 14px; }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 620px) {
+    .vf-wrap { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-user-experience.html"><span aria-hidden="true">&larr;</span> User Experience</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-user-experience.html">User Experience</a><span class="sep" aria-hidden="true">/</span><span class="here">Where you meet the AI</span><span class="sep" aria-hidden="true">/</span><span class="here">A camera that looks and answers</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">User Experience &middot; Where you meet the AI</span>
+  <h1 class="page-title">A camera that looks and answers</h1>
+  <p class="explainer">You point your phone at the world and the AI tells you what it sees. The question is the photo. The answer is whatever you wanted to know about it.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">The world becomes <em>the prompt</em>.</h2>
+  <div class="what-card">
+    <p>A <strong style="color:var(--accent-hover)">camera surface</strong> uses an image, or a live feed, as the way you ask. The model reads the picture and replies in words or actions. Google Lens identifies the plant. Be My Eyes describes the room to a blind user. ChatGPT's vision mode reads the screenshot you just took. The mental model is "show, don't type," which works in moments when you cannot describe a thing but you can point at it.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Pick a scene to <em>point the camera at</em>.</h2>
+  <div class="demo-card" role="region" aria-label="Camera example">
+    <div class="vf-wrap">
+      <div class="vf">
+        <div class="vf-scene" id="vf-scene"><span class="glyph" id="vf-glyph" aria-hidden="true">&#x1F343;</span></div>
+        <span class="vf-bracket tl" aria-hidden="true"></span>
+        <span class="vf-bracket tr" aria-hidden="true"></span>
+        <span class="vf-bracket bl" aria-hidden="true"></span>
+        <span class="vf-bracket br" aria-hidden="true"></span>
+        <div class="vf-label" id="vf-label">Viewfinder</div>
+        <div class="vf-shutter" id="shutter"></div>
+      </div>
+      <div class="vf-readout">
+        <div class="vf-readout-label">What the model sees</div>
+        <div class="vf-q" id="vf-q">A leafy houseplant on a wooden surface.</div>
+        <div class="vf-readout-label">Answer</div>
+        <div class="vf-a" id="vf-a">A Monstera deliciosa. Bright indirect light, water when the top inch of soil is dry. The split leaves usually appear after the first year.</div>
+      </div>
+    </div>
+    <div class="scene-controls" role="group" aria-label="Pick a scene">
+      <button class="scene-btn active" data-scene="plant"><span class="ic" aria-hidden="true">&#x1F343;</span>Plant</button>
+      <button class="scene-btn" data-scene="menu"><span class="ic" aria-hidden="true">&#x1F37D;</span>Menu in Italian</button>
+      <button class="scene-btn" data-scene="receipt"><span class="ic" aria-hidden="true">&#x1F9FE;</span>Receipt</button>
+      <button class="scene-btn" data-scene="sign"><span class="ic" aria-hidden="true">&#x1F6A6;</span>Street sign</button>
+    </div>
+    <p class="demo-caption">The photo replaces the typed question. No words to look up, no description to compose.</p>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it is</div>
+      <div class="fits-desc">A surface, not a skill. The camera is just the way the question goes in. The model behind it is a vision-capable language model.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">Voice. People often want to point and ask out loud at the same time ("what is this plant?"), so camera and voice land well together on a phone.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Not the same as</div>
+      <div class="fits-desc">An image search. Image search returns matching pictures. A camera surface returns an answer about the thing in front of you.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>The user cannot easily describe the thing in words: an unknown plant, a foreign-language menu, an error message on a screen.</li>
+    <li>The answer depends on details a photo carries for free: brand, condition, layout, the exact line on a receipt.</li>
+    <li>Accessibility. For low-vision users, a camera plus a voice answer turns the visual world into something they can ask about.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-user-experience.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">User Experience</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>OpenAI (2023). <em>GPT-4 with vision (GPT-4V) system card.</em> <span class="note">Behaviour and limits of a general-purpose model that takes images as input.</span></li>
+    <li>Google (2017). <em>Google Lens announcement.</em> <span class="note">Early mainstream example of a camera-as-query surface, from plant identification to live translation.</span></li>
+    <li>Be My Eyes &amp; OpenAI (2023). <em>Be My AI for blind and low-vision users.</em> <span class="note">Real-world deployment of a camera surface as an accessibility tool.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var scene = document.getElementById('vf-scene');
+  var glyph = document.getElementById('vf-glyph');
+  var label = document.getElementById('vf-label');
+  var q = document.getElementById('vf-q');
+  var a = document.getElementById('vf-a');
+  var shutter = document.getElementById('shutter');
+  var btns = document.querySelectorAll('.scene-btn');
+
+  var scenes = {
+    plant: {
+      glyph: '🍃',
+      label: 'Living room',
+      q: 'A leafy houseplant on a wooden surface.',
+      a: 'A Monstera deliciosa. Bright indirect light, water when the top inch of soil is dry. The split leaves usually appear after the first year.'
+    },
+    menu: {
+      glyph: '🍽',
+      label: 'Trattoria, Rome',
+      q: 'A printed menu, mostly Italian, with three pasta sections.',
+      a: 'Top section is fresh pasta. "Cacio e pepe" is pecorino and black pepper. "Amatriciana" is tomato, guanciale, and chili. Nothing here is gluten-free.'
+    },
+    receipt: {
+      glyph: '🧾',
+      label: 'Grocery receipt',
+      q: 'A grocery receipt with 11 items and a total at the bottom.',
+      a: 'Subtotal $42.18, tax $3.16, total $45.34. The avocados are charged twice. The third line looks like a duplicate scan.'
+    },
+    sign: {
+      glyph: '🚦',
+      label: 'Street corner',
+      q: 'A street sign on a metal pole at an intersection.',
+      a: 'No parking on this side, 8am to 6pm, Monday through Friday. Weekends are fine. Tow-away zone, so do not push it.'
+    }
+  };
+
+  function pick(key) {
+    var s = scenes[key];
+    if (!s) return;
+    shutter.classList.add('flash');
+    setTimeout(function () { shutter.classList.remove('flash'); }, 300);
+    setTimeout(function () {
+      glyph.innerHTML = s.glyph;
+      label.textContent = s.label;
+      q.textContent = s.q;
+      a.classList.add('loading');
+      a.textContent = 'Looking...';
+    }, 200);
+    setTimeout(function () {
+      a.classList.remove('loading');
+      a.textContent = s.a;
+    }, 900);
+  }
+
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      btns.forEach(function (x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      pick(b.getAttribute('data-scene'));
+    });
+  });
+}());
+</script>
+</body>
+</html>

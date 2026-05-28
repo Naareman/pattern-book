@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>This conversation so far · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* chat scroll example */
+  .chat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .chat-controls { display: flex; justify-content: space-between; align-items: center; padding: 13px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); gap: 10px; flex-wrap: wrap; }
+  .chat-step-label { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-hover); font-weight: 600; }
+  .chat-btn { font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 600; padding: 6px 14px; border: 1px solid var(--accent); background: var(--surface); color: var(--accent-hover); border-radius: 16px; cursor: pointer; transition: background .15s, color .15s; }
+  .chat-btn:hover { background: var(--accent); color: #fff; }
+  .chat-body { padding: 18px 20px; min-height: 220px; display: flex; flex-direction: column; gap: 8px; }
+  .msg { padding: 9px 13px; border-radius: 12px; font-size: 13.5px; line-height: 1.5; max-width: 86%; }
+  .msg.user { background: var(--accent-soft); color: var(--text); align-self: flex-end; border: 1px solid var(--border); }
+  .msg.bot { background: var(--bg-subtle); color: var(--text); align-self: flex-start; border: 1px solid var(--border); }
+  .msg.faded { opacity: .35; }
+  .msg .who { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); margin-bottom: 3px; }
+  .chat-caption { padding: 11px 18px; border-top: 1px solid var(--border); background: var(--bg-subtle); font-size: 13px; color: var(--soft); line-height: 1.55; }
+  .chat-caption strong { color: var(--text); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .msg { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-stateful-memory.html"><span aria-hidden="true">&larr;</span> Stateful Memory</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-stateful-memory.html">Stateful Memory</a><span class="sep" aria-hidden="true">/</span><span style="color:var(--soft)">What it remembers</span><span class="sep" aria-hidden="true">/</span><span class="here">This conversation so far</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Stateful Memory &middot; What it remembers</span>
+  <h1 class="page-title">This conversation so far</h1>
+  <p class="explainer">The running record of what you and the model just said to each other in this chat.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What it is</div>
+  <h2 id="what-heading">A scroll of the <em>last few turns</em>.</h2>
+  <div class="what-card">
+    <p>Every message in this chat (yours and the model's) is kept in a short list so the next reply can refer back to it. When the list gets too long to fit, the oldest turns are dropped or squeezed into a short summary.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">A short chat that <em>builds on itself</em>.</h2>
+  <div class="chat-card" role="region" aria-label="Chat history example">
+    <div class="chat-controls">
+      <span class="chat-step-label" id="chat-step-label">Turn 1 of 3</span>
+      <button class="chat-btn" id="chat-next" type="button">Next turn &rarr;</button>
+    </div>
+    <div class="chat-body" id="chat-body">
+      <div class="msg user"><div class="who">You</div>I am planning a trip to Tokyo in April.</div>
+      <div class="msg bot"><div class="who">Model</div>Cherry blossom season. Are you looking for food spots, sights, or both?</div>
+    </div>
+    <div class="chat-caption" id="chat-caption">
+      <strong>Turn 1.</strong> The model has heard about Tokyo and April. Both lines are now part of the history.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it sits next to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Sits next to</div>
+      <div class="fits-desc">Things you said about yourself (your name, your preferences). Those live longer than one chat. The history here is only this conversation.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">What happens when it overflows</div>
+      <div class="fits-desc">When the chat gets too long, older turns get shortened into a summary or dropped. The summary stays in the running history so the thread still makes sense.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Any chat where later questions only make sense given the earlier ones (follow-ups, clarifications).</li>
+    <li>The model needs to refer to something you said two or three turns ago.</li>
+    <li>Long chats where you have to decide what to keep versus what to drop.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-stateful-memory.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Stateful Memory</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Packer et al. (2023). <em>MemGPT: Towards LLMs as Operating Systems.</em> arXiv:2310.08560. <span class="note">Treats the conversation window as a small working area with older turns paged out to longer-term storage.</span></li>
+    <li>OpenAI (2024). <em>Best practices for managing chat context.</em> Developer documentation. <span class="note">Practical guidance on rolling windows and summarizing older turns.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var turns = [
+    {
+      label: 'Turn 1 of 3',
+      caption: '<strong>Turn 1.</strong> The model has heard about Tokyo and April. Both lines are now part of the history.',
+      messages: [
+        { who: 'You', cls: 'user', text: 'I am planning a trip to Tokyo in April.' },
+        { who: 'Model', cls: 'bot', text: 'Cherry blossom season. Are you looking for food spots, sights, or both?' }
+      ]
+    },
+    {
+      label: 'Turn 2 of 3',
+      caption: '<strong>Turn 2.</strong> The model remembers Tokyo and April from turn 1 without you having to repeat them.',
+      messages: [
+        { who: 'You', cls: 'user', text: 'I am planning a trip to Tokyo in April.' },
+        { who: 'Model', cls: 'bot', text: 'Cherry blossom season. Are you looking for food spots, sights, or both?' },
+        { who: 'You', cls: 'user', text: 'Mostly food. Anything seasonal I should know about?' },
+        { who: 'Model', cls: 'bot', text: 'April brings bamboo shoots, fresh sea bream, and strawberry desserts everywhere.' }
+      ]
+    },
+    {
+      label: 'Turn 3 of 3',
+      caption: '<strong>Turn 3.</strong> The oldest pair got shortened into a one-line summary (faded) so the chat can keep going without running out of room.',
+      messages: [
+        { who: 'Summary', cls: 'bot faded', text: 'Earlier: user is going to Tokyo in April, asked about food, model mentioned bamboo shoots, sea bream, strawberries.' },
+        { who: 'You', cls: 'user', text: 'Where do locals actually eat sea bream?' },
+        { who: 'Model', cls: 'bot', text: 'Small spots in Tsukiji outer market, or any neighborhood izakaya in spring.' }
+      ]
+    }
+  ];
+  var idx = 0;
+  var body = document.getElementById('chat-body');
+  var label = document.getElementById('chat-step-label');
+  var caption = document.getElementById('chat-caption');
+  var btn = document.getElementById('chat-next');
+  function render() {
+    var t = turns[idx];
+    label.textContent = t.label;
+    btn.textContent = idx === turns.length - 1 ? 'Restart' : 'Next turn →';
+    caption.innerHTML = t.caption;
+    body.innerHTML = t.messages.map(function (m) {
+      return '<div class="msg ' + m.cls + '"><div class="who">' + m.who + '</div>' + m.text + '</div>';
+    }).join('');
+  }
+  btn.addEventListener('click', function () {
+    idx = (idx + 1) % turns.length;
+    render();
+  });
+}());
+</script>
+</body>
+</html>

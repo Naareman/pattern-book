@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hide personal details before the AI sees them &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 760px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 760px; margin: 0 auto; padding: 44px 24px 10px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 600px; margin-top: 14px; }
+
+  section { max-width: 760px; margin: 0 auto; padding: 20px 24px 36px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .prose-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 26px;
+  }
+  .prose-card p { font-size: 16px; line-height: 1.7; color: var(--soft); }
+  .prose-card p strong { color: var(--accent-hover); font-weight: 600; }
+
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 22px;
+  }
+  .ex-lede { font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 16px; }
+  .ex-record {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 16px 18px;
+    white-space: pre-wrap; word-break: break-word;
+    transition: opacity .25s ease;
+  }
+  .ex-record .pii { color: #C00; font-weight: 600; }
+  .ex-record .mask { color: var(--accent-hover); font-weight: 600; }
+  .ex-controls {
+    display: flex; align-items: center; gap: 12px;
+    margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .ex-state-label { font-size: 13px; font-weight: 600; color: var(--soft); min-width: 90px; }
+  .hide-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 18px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong); background: var(--surface);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .hide-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .hide-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .hide-btn.active:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  .ex-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 12px; }
+  .ex-tag {
+    font-size: 11.5px; font-weight: 600; padding: 3px 10px;
+    border-radius: 20px; border: 1px solid var(--border);
+    background: var(--bg-subtle); color: var(--soft);
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .ex-tag.hit { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); }
+
+  .fits-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .fits-row { display: flex; gap: 12px; align-items: flex-start; }
+  .fits-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); flex-shrink: 0; margin-top: 5px;
+  }
+  .fits-text { font-size: 15px; color: var(--soft); line-height: 1.65; }
+  .fits-text strong { color: var(--text); font-weight: 600; }
+  .fits-text a { color: var(--accent-hover); font-weight: 500; }
+  .fits-text a:hover { text-decoration: underline; }
+
+  .filing-box {
+    margin-top: 6px; padding: 12px 16px;
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px; color: var(--soft); line-height: 1.6;
+  }
+  .filing-box strong { color: var(--text); font-weight: 600; }
+
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 16px 18px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow {
+    font-family: 'Fraunces', serif; font-size: 24px;
+    color: var(--accent); line-height: 1;
+    transition: transform .2s ease;
+  }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 760px; margin: 0 auto; padding: 0 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 10px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer {
+    max-width: 760px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-direction: column; gap: 6px; }
+    .fits-dot { display: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-privacy.html"><span aria-hidden="true">&larr;</span> Privacy, Security &amp; Governance</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-privacy.html">Privacy, Security &amp; Governance</a><span class="sep" aria-hidden="true">/</span><span class="here">Keep personal data private</span><span class="sep" aria-hidden="true">/</span><span class="here">Hide personal details before the AI sees them</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Privacy, Security &amp; Governance &middot; Keep personal data private</span>
+  <h1 class="page-title">Hide personal details before the AI sees them</h1>
+  <p class="explainer">Strip names, emails, phone numbers, and IDs out of a request or a document before any of it reaches the model.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">What <em>is it?</em></h2>
+  <div class="prose-card">
+    <p><strong>A cleaning step</strong> that runs in front of the model at request time. It scans whatever you are about to send (a chat message, a support ticket, an uploaded file) and replaces personal details with a tag like [NAME] or [EMAIL]. The model sees the scrubbed version. The tags can be swapped back in the final answer if the user expects to see their own name. The point is simple: the model gets the meaning, the personal details stay with you.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Before and <em>after</em>.</h2>
+  <div class="example-stage">
+    <p class="ex-lede">A customer is typing a complaint into a chat box. Tap to hide the personal bits.</p>
+
+    <div class="ex-record" id="exRecord" aria-live="polite" aria-label="Chat message before or after hiding">{"message": "Hi, I'm <span class="pii" id="pii-name">Sara Khalil</span>, my email is
+ <span class="pii" id="pii-email">sara.khalil@email.com</span> and the card ending
+ <span class="pii" id="pii-card">4821</span> was charged twice. Please call me on
+ <span class="pii" id="pii-phone">+20 100 555 7832</span>."}</div>
+
+    <div class="ex-tags" aria-label="Detected personal field types">
+      <span class="ex-tag" id="tag-name">NAME</span>
+      <span class="ex-tag" id="tag-email">EMAIL</span>
+      <span class="ex-tag" id="tag-card">CARD</span>
+      <span class="ex-tag" id="tag-phone">PHONE</span>
+    </div>
+
+    <div class="ex-controls">
+      <span class="ex-state-label" id="exStateLabel" aria-live="polite">Original</span>
+      <button class="hide-btn" id="hideBtn" aria-pressed="false">Hide personal details</button>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-dot" aria-hidden="true"></div>
+      <div class="fits-text">
+        <strong>When it happens:</strong> at the door of every model call. The user's words come in, the scrubber rewrites them, and the rewritten version is what gets sent.
+      </div>
+    </div>
+    <div class="fits-row">
+      <div class="fits-dot" aria-hidden="true"></div>
+      <div class="fits-text">
+        <strong>Sits next to:</strong> the same cleaning idea is also done on training data and search indexes, but that is a separate offline pass on a stored dataset. This page is about the live request: the message a person types right now.
+      </div>
+    </div>
+    <div class="filing-box">
+      <strong>Quick test:</strong> does it act on a live message a user is sending? That is the runtime version. Does it run once over a whole stored dataset before any model uses it? That is the data-prep version, filed under data and artifact lifecycle.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>You send user input to a model run by another company, where you would rather their logs hold tags than real names.</li>
+    <li>Your users paste in tickets, emails, or screenshots that often carry someone else's personal details.</li>
+    <li>You operate under rules like GDPR or HIPAA that ask you to limit how far personal data travels.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 12px; padding-bottom: 44px;">
+  <a href="consideration-privacy.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Privacy, Security &amp; Governance</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Pilán et al. (2022). <em>The Text Anonymization Benchmark (TAB).</em> Computational Linguistics. <span class="note">Standard benchmark for measuring how well a system finds and masks personal mentions in free text.</span></li>
+    <li>Microsoft Presidio (open source). <em>Presidio: data protection and de-identification SDK.</em> <span class="note">Widely used reference implementation for runtime detection and masking of personal data.</span></li>
+    <li>European Data Protection Board (2025). <em>Guidelines on processing of personal data through AI models.</em> <span class="note">Regulator guidance that minimising personal data sent to a third-party model is expected, not optional.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var hidden = false;
+  var btn = document.getElementById('hideBtn');
+  var label = document.getElementById('exStateLabel');
+  var ids = ['name','email','card','phone'];
+  var originals = {
+    name: 'Sara Khalil',
+    email: 'sara.khalil@email.com',
+    card: '4821',
+    phone: '+20 100 555 7832'
+  };
+  var masks = {
+    name: '[NAME]',
+    email: '[EMAIL]',
+    card: '[CARD]',
+    phone: '[PHONE]'
+  };
+
+  function apply(isHidden) {
+    hidden = isHidden;
+    ids.forEach(function(k){
+      var el = document.getElementById('pii-' + k);
+      var tag = document.getElementById('tag-' + k);
+      el.textContent = isHidden ? masks[k] : originals[k];
+      el.className = isHidden ? 'mask' : 'pii';
+      tag.className = 'ex-tag' + (isHidden ? ' hit' : '');
+    });
+    label.textContent = isHidden ? 'Hidden' : 'Original';
+    btn.textContent = isHidden ? 'Show original' : 'Hide personal details';
+    btn.setAttribute('aria-pressed', String(isHidden));
+    btn.classList.toggle('active', isHidden);
+  }
+
+  btn.addEventListener('click', function(){ apply(!hidden); });
+  btn.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); apply(!hidden); }
+  });
+}());
+</script>
+</body>
+</html>

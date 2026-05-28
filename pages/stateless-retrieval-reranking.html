@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rerank the best matches &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --bg-subtle:#F6F7F9;
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* rerank visual: before/after list */
+  .rr-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .rr-header { padding: 12px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .rr-body { padding: 20px 22px; display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: stretch; }
+  .rr-col { display: flex; flex-direction: column; gap: 8px; }
+  .rr-col-title { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
+  .rr-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); text-align: center; align-self: center; }
+  .rr-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 10px; background: #fff; font-size: 13px; color: var(--soft); line-height: 1.4; }
+  .rr-rank { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--bg-subtle); color: var(--faint); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; border: 1px solid var(--border); }
+  .rr-row.good { border-color: var(--green); background: var(--green-soft); color: var(--text); }
+  .rr-row.good .rr-rank { background: var(--green); color: #fff; border-color: var(--green); }
+  .rr-row.weak { opacity: 0.65; }
+  .rr-caption { padding: 12px 14px; background: var(--bg-subtle); border-top: 1px solid var(--border); font-size: 13px; color: var(--soft); line-height: 1.55; }
+  .rr-caption strong { color: var(--text); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .rr-body { grid-template-columns: 1fr; }
+    .rr-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-stateless-retrieval.html"><span aria-hidden="true">&larr;</span> Stateless Retrieval</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-stateless-retrieval.html">Stateless Retrieval</a><span class="sep" aria-hidden="true">/</span><span class="here">Find &middot; Rerank the best matches</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Stateless Retrieval &middot; Find</span>
+  <h1 class="page-title">Rerank the best matches</h1>
+  <p class="explainer">Search pulls back a wide pile of plausible pieces. A second pass reads each one against the question and reorders them so the strongest matches sit at the top.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">A <em>second look</em> at the search results.</h2>
+  <div class="what-card">
+    <p>The first search step is fast and casts a wide net: it grabs maybe twenty plausible pieces. A reranker is a smaller, slower model that scores each of those twenty against the actual question, one pair at a time. The few that score highest go to the model; the rest are dropped. The same model that ran the search would have been too slow to do this for every piece in the whole library, which is why it happens in two stages.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Same six pieces, <em>better order</em>.</h2>
+  <div class="rr-card" role="region" aria-label="Reranking example">
+    <div class="rr-header">
+      <span>Question: how do I reset my password?</span>
+    </div>
+    <div class="rr-body">
+      <div class="rr-col" aria-label="Before reranking">
+        <div class="rr-col-title">After first search</div>
+        <div class="rr-row weak"><div class="rr-rank">1</div><div>Password rules: 12 characters, one symbol.</div></div>
+        <div class="rr-row weak"><div class="rr-rank">2</div><div>Forgot username? See the IT portal.</div></div>
+        <div class="rr-row"><div class="rr-rank">3</div><div>Reset link: open settings, then "Reset password".</div></div>
+        <div class="rr-row weak"><div class="rr-rank">4</div><div>Two-factor login setup steps.</div></div>
+        <div class="rr-row"><div class="rr-rank">5</div><div>If reset email never arrives, contact the help desk.</div></div>
+        <div class="rr-row weak"><div class="rr-rank">6</div><div>Account lockout after 5 failed attempts.</div></div>
+      </div>
+      <div class="rr-arrow" aria-hidden="true">&rarr;</div>
+      <div class="rr-col" aria-label="After reranking">
+        <div class="rr-col-title">After rerank (top 3 kept)</div>
+        <div class="rr-row good"><div class="rr-rank">1</div><div>Reset link: open settings, then "Reset password".</div></div>
+        <div class="rr-row good"><div class="rr-rank">2</div><div>If reset email never arrives, contact the help desk.</div></div>
+        <div class="rr-row good"><div class="rr-rank">3</div><div>Password rules: 12 characters, one symbol.</div></div>
+      </div>
+    </div>
+    <div class="rr-caption"><strong>What changed:</strong> the rerank reads each piece against the actual question, not just shared words. The "reset" steps move to the top; the lockout policy and two-factor setup drop off.</div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Runs after</div>
+      <div class="fits-desc">Search. Rerank only ever sees the short list the search step handed it. It cannot pull in pieces the search missed.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Hands off to</div>
+      <div class="fits-desc">The step that packs the prompt. Only the top few pieces continue forward, so the prompt stays small.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">The tradeoff</div>
+      <div class="fits-desc">Reranking adds a small wait and a small cost per question. In return, the model sees a much cleaner shortlist and answers more reliably.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <div class="matters-card">
+    <ul class="matters-list">
+      <li>The model often answers from the wrong piece, even when the right piece is among the top twenty.</li>
+      <li>You want to keep the prompt small while still casting a wide search net.</li>
+      <li>Questions are subtle: the search step can match plausible words but miss the actual point.</li>
+    </ul>
+  </div>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-stateless-retrieval.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Stateless Retrieval</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Nogueira and Cho (2019). <em>Passage Re-ranking with BERT.</em> arXiv:1901.04085. <span class="note">The first widely used learned reranker over a search shortlist.</span></li>
+    <li>Khattab and Zaharia (2020). <em>ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction.</em> SIGIR. <span class="note">A faster reranker design that scales well in real systems.</span></li>
+    <li>Cohere (2024). <em>Rerank: improve search relevance.</em> docs.cohere.com. <span class="note">A practical product view of how rerankers slot into a retrieval pipeline.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+</body>
+</html>

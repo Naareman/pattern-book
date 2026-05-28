@@ -230,12 +230,12 @@
   }
   .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
   .tradeoff-row:last-of-type { margin-bottom: 0; }
-  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 200px; flex: none; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
   .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
   .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
   .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
   .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
-  .tradeoff-scale .spacer { width: 200px; flex: none; }
+  .tradeoff-scale .spacer { width: 170px; flex: none; }
   .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
   .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
 
@@ -427,34 +427,33 @@
   <div class="section-label"><span class="num">03</span>A Real Example</div>
   <h2>Four ways to <em>catch</em> a wrong answer.</h2>
   <div class="example-card">
-    <p>Real evaluation combines several methods. Each covers something the others miss.</p>
     <ul class="method-list">
       <li class="method-item">
         <div class="method-dot">A</div>
         <div class="method-body">
           <div class="method-name">Test set with known answers</div>
-          <div class="method-desc">A fixed set of questions where the right answer is already written down. Run the AI through them, count how many it gets right. This is the baseline.</div>
+          <div class="method-desc">Fixed questions with known answers; count what the AI gets right.</div>
         </div>
       </li>
       <li class="method-item">
         <div class="method-dot">B</div>
         <div class="method-body">
           <div class="method-name">Scoring functions</div>
-          <div class="method-desc">Code that checks answers automatically: exact match, substring match, or a numeric score like BLEU for translation. Fast, cheap, consistent.</div>
+          <div class="method-desc">Cheap code checks: exact match, regex, BLEU. Fast but blunt.</div>
         </div>
       </li>
       <li class="method-item">
         <div class="method-dot">C</div>
         <div class="method-body">
           <div class="method-name">Human review</div>
-          <div class="method-desc">A person reads a sample of answers and rates them. Catches subtle errors that code misses, like a technically correct but misleading phrasing. Slow and expensive, so used on a sample, not everything.</div>
+          <div class="method-desc">A person reads a sample. Catches nuance code misses, but slow.</div>
         </div>
       </li>
       <li class="method-item">
         <div class="method-dot">D</div>
         <div class="method-body">
           <div class="method-name">LLM (large language model) as judge</div>
-          <div class="method-desc">A second AI reads the answer and rates it against the known-correct answer. Scales better than human review and catches more nuance than code. It can still be fooled by confident-sounding errors, so it works best alongside a test set.</div>
+          <div class="method-desc">Another AI scores the answer. Scales, but can be fooled.</div>
         </div>
       </li>
     </ul>
@@ -468,58 +467,28 @@
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale">
       <span class="spacer"></span>
-      <div class="scale-track"><span>low</span><span>high</span></div>
+      <div class="scale-track"><span>low cost</span><span>high cost</span></div>
     </div>
     <div class="tradeoff-row">
-      <div class="tradeoff-label">Code scoring: speed and cost</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Code scoring: catching nuance</div>
-      <div class="tradeoff-bars">
+      <div class="tradeoff-label">Code scoring</div>
+      <div class="tradeoff-bars" role="img" aria-label="Code scoring: cost very low (1 of 5)">
         <div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
       </div>
     </div>
     <div class="tradeoff-row">
-      <div class="tradeoff-label">Human review: trust in the verdict</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Human review: cost per answer</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">LLM-as-judge: scale and nuance</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">LLM-as-judge: risk of being fooled</div>
-      <div class="tradeoff-bars">
+      <div class="tradeoff-label">LLM-as-judge</div>
+      <div class="tradeoff-bars" role="img" aria-label="LLM-as-judge: cost medium (3 of 5)">
         <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
       </div>
     </div>
     <div class="tradeoff-row">
-      <div class="tradeoff-label">More questions: confidence in the score</div>
-      <div class="tradeoff-bars">
+      <div class="tradeoff-label">Human review</div>
+      <div class="tradeoff-bars" role="img" aria-label="Human review: cost high (5 of 5)">
         <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
       </div>
     </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">More questions: total bill to run</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
-      </div>
-    </div>
     <div class="tradeoff-quote">
-      No single method is enough. Code is cheap but blunt. Humans are sharp but slow and expensive. An AI judge sits in the middle: fast and flexible, but can be fooled by the same confident-but-wrong answers a human would catch. The strong programs mix all three and only spend on humans where the other two disagree.
+      Most teams run code checks on everything, then spend human time only where code and LLM-as-judge disagree.
     </div>
   </div>
 </section>

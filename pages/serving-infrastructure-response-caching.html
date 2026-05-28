@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reusing stored answers · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* cache visual */
+  .cache-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .cache-input { padding: 14px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; }
+  .cache-q { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; padding: 8px 14px; border: 1px solid var(--border-strong); background: #fff; border-radius: 20px; cursor: pointer; color: var(--text); transition: border-color .15s, color .15s, background .15s; }
+  .cache-q:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .cache-q.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .cache-body { padding: 22px; }
+  .cache-flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 12px; align-items: center; }
+  .cache-node { padding: 14px 12px; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--bg-subtle); text-align: center; }
+  .cache-node .label { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+  .cache-node .name { font-size: 13.5px; font-weight: 600; color: var(--text); line-height: 1.3; }
+  .cache-node.hit { background: var(--green-soft); border-color: var(--green); }
+  .cache-node.hit .label { color: var(--green); }
+  .cache-node.miss { background: #FFF6E5; border-color: #D8A100; }
+  .cache-node.miss .label { color: #B07A00; }
+  .cache-node.skipped { opacity: 0.4; }
+  .cache-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--faint); text-align: center; }
+  .cache-decision { margin-top: 14px; padding: 12px 14px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--soft); line-height: 1.55; }
+  .cache-decision strong { color: var(--text); }
+  .cache-stats { display: flex; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
+  .cache-stat { font-size: 12px; color: var(--faint); }
+  .cache-stat strong { color: var(--text); }
+  .cache-stat.saving strong { color: var(--green); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .cache-flow { grid-template-columns: 1fr; }
+    .cache-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-serving-infrastructure.html"><span aria-hidden="true">&larr;</span> Serving &amp; Infrastructure</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-serving-infrastructure.html">Serving &amp; Infrastructure</a><span class="sep" aria-hidden="true">/</span><span class="here">Save money</span><span class="sep" aria-hidden="true">/</span><span class="here">Reusing stored answers</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Serving &amp; Infrastructure &middot; Save money</span>
+  <h1 class="page-title">Reusing stored answers</h1>
+  <p class="explainer">When a request looks like one you already answered, skip the model and serve the saved reply.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What Is It?</div>
+  <h2 id="what-heading">Answer once, then <em>serve it again</em>.</h2>
+  <div class="what-card">
+    <p>Before sending a request to the model, the system checks a store of past requests. If the same one (exact match) or a very close one (meaning match) is already there, return that saved answer. No model call. No new cost. Two flavors: exact-prefix caching reuses the start of identical prompts so the model only pays for the new tail, and semantic caching matches by meaning so "how do I reset my password" hits the cached answer for "I forgot my password".</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Same question, <em>skip the work</em>.</h2>
+  <div class="cache-card" role="region" aria-label="Cache lookup example">
+    <div class="cache-input" role="tablist" aria-label="Sample questions">
+      <button class="cache-q active" role="tab" aria-selected="true" data-q="0">"How do I reset my password?"</button>
+      <button class="cache-q" role="tab" aria-selected="false" data-q="1">"I forgot my password"</button>
+      <button class="cache-q" role="tab" aria-selected="false" data-q="2">"What is the warranty on a 2024 toaster?"</button>
+    </div>
+    <div class="cache-body">
+      <div class="cache-flow">
+        <div class="cache-node">
+          <div class="label">Request</div>
+          <div class="name" id="cache-req">How do I reset my password?</div>
+        </div>
+        <div class="cache-arrow" aria-hidden="true">&rarr;</div>
+        <div class="cache-node" id="cache-check-node">
+          <div class="label">Check store</div>
+          <div class="name" id="cache-check">Exact match found</div>
+        </div>
+        <div class="cache-arrow" aria-hidden="true">&rarr;</div>
+        <div class="cache-node" id="cache-result-node">
+          <div class="label">Result</div>
+          <div class="name" id="cache-result">Return saved answer</div>
+        </div>
+      </div>
+      <div class="cache-decision" id="cache-why">
+        <strong>Why:</strong> the exact prompt was answered before. Skip the model entirely and serve the stored reply.
+      </div>
+      <div class="cache-stats">
+        <div class="cache-stat"><strong id="cache-cost">$0</strong> cost</div>
+        <div class="cache-stat"><strong id="cache-latency">~10 ms</strong> to answer</div>
+        <div class="cache-stat saving" id="cache-saving"><strong>100% cheaper</strong> than calling the model</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">How it sits next to <em>other ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it shapes</div>
+      <div class="fits-desc">The runtime checks the cache before the call goes to the model. If it hits, the model never runs for this request. If it misses, the call proceeds and the new answer is stored for next time.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Two parts</div>
+      <div class="fits-desc">The check itself sits with the runtime here. The contents (what got stored, when it expires, when to invalidate) live with the data and artifact lifecycle, because the cache is a piece of data the runtime reads.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Many users ask the same small set of questions: support FAQs, product info, common how-to.</li>
+    <li>Cost per call is real and traffic is high enough that even a 20% hit rate pays back.</li>
+    <li>Answers do not change minute by minute. Cached replies stay correct for hours or days.</li>
+    <li>Be careful when answers depend on the user, the time, or live data. Then either skip the cache or scope it tightly.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-serving-infrastructure.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Serving &amp; Infrastructure</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Anthropic (2024). <em>Prompt caching.</em> <span class="note">Documents prefix caching: identical prompt prefixes are served from cache, cutting cost and time-to-first-token on repeat calls.</span></li>
+    <li>Bang (2023). <em>GPTCache: An Open-Source Semantic Cache for LLM Applications.</em> <span class="note">Introduces semantic caching: store query embeddings and return the cached answer when a new query is semantically close to a stored one.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var data = [
+    {
+      req: 'How do I reset my password?',
+      checkName: 'Exact match found',
+      checkClass: 'hit',
+      resultName: 'Return saved answer',
+      resultClass: 'hit',
+      why: '<strong>Why:</strong> the exact prompt was answered before. Skip the model entirely and serve the stored reply.',
+      cost: '$0', latency: '~10 ms', saving: '100% cheaper', savingClass: 'saving'
+    },
+    {
+      req: 'I forgot my password',
+      checkName: 'Meaning match found',
+      checkClass: 'hit',
+      resultName: 'Return saved answer',
+      resultClass: 'hit',
+      why: '<strong>Why:</strong> different words, same intent. Semantic match against the earlier reset-password question, so the stored reply is served.',
+      cost: '$0', latency: '~30 ms', saving: '~99% cheaper', savingClass: 'saving'
+    },
+    {
+      req: 'What is the warranty on a 2024 toaster?',
+      checkName: 'No match',
+      checkClass: 'miss',
+      resultName: 'Call the model',
+      resultClass: '',
+      why: '<strong>Why:</strong> nothing close in the store. The call goes to the model, and the answer is saved for next time.',
+      cost: '$0.004', latency: '~1.2 s', saving: 'normal cost', savingClass: ''
+    }
+  ];
+  var btns = document.querySelectorAll('.cache-q');
+  var req = document.getElementById('cache-req');
+  var checkName = document.getElementById('cache-check');
+  var checkNode = document.getElementById('cache-check-node');
+  var resultName = document.getElementById('cache-result');
+  var resultNode = document.getElementById('cache-result-node');
+  var why = document.getElementById('cache-why');
+  var cost = document.getElementById('cache-cost');
+  var latency = document.getElementById('cache-latency');
+  var saving = document.getElementById('cache-saving');
+
+  function apply(i){
+    var d = data[i];
+    req.textContent = d.req;
+    checkName.textContent = d.checkName;
+    checkNode.classList.remove('hit','miss','skipped');
+    if (d.checkClass) checkNode.classList.add(d.checkClass);
+    resultName.textContent = d.resultName;
+    resultNode.classList.remove('hit','miss','skipped');
+    if (d.resultClass) resultNode.classList.add(d.resultClass);
+    why.innerHTML = d.why;
+    cost.textContent = d.cost;
+    latency.textContent = d.latency;
+    saving.classList.remove('saving');
+    if (d.savingClass) saving.classList.add(d.savingClass);
+    saving.innerHTML = '<strong>' + d.saving + '</strong>' + (d.savingClass === 'saving' ? ' than calling the model' : ' (cache miss)');
+  }
+
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      btns.forEach(function (b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      apply(parseInt(btn.getAttribute('data-q'), 10));
+    });
+  });
+}());
+</script>
+</body>
+</html>

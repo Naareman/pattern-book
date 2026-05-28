@@ -146,16 +146,6 @@
   }
   @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
 
-  .stage-card.clickable {
-    cursor: pointer;
-    transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
-  }
-  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
-  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
-  @media (prefers-reduced-motion: reduce) {
-    .stage-card.clickable { transition: none; }
-    .stage-card.clickable:hover { transform: none; }
-  }
 
   /* icon + name share a full-width row of their own */
   .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; min-width: 0; }
@@ -264,7 +254,7 @@
   <div class="stages">
 
     <!-- KEEP PERSONAL DATA PRIVATE -->
-    <section class="stage-card clickable" id="card-private" aria-labelledby="g-private">
+    <section class="stage-card" id="card-private" aria-labelledby="g-private">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -279,11 +269,11 @@
         <span class="chip">Hide personal details before the AI sees them</span>
         <span class="chip">Keep data in the right country</span>
       </div>
-      <a class="see-how" href="consideration-privacy-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="consideration-privacy-private.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
     <!-- KEEP PEOPLE APART -->
-    <section class="stage-card clickable" id="card-apart" aria-labelledby="g-apart">
+    <section class="stage-card" id="card-apart" aria-labelledby="g-apart">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -300,11 +290,11 @@
         <span class="chip">One customer's data never reaches another</span>
         <span class="chip">Decide who can see and do what</span>
       </div>
-      <a class="see-how" href="consideration-privacy-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="consideration-privacy-apart.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
     <!-- PROVE IT LATER -->
-    <section class="stage-card clickable" id="card-prove" aria-labelledby="g-prove">
+    <section class="stage-card" id="card-prove" aria-labelledby="g-prove">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -320,7 +310,7 @@
         <span class="chip">Turn the law into checklist items</span>
         <span class="chip">Mark AI-made output so you can trace it</span>
       </div>
-      <a class="see-how" href="consideration-privacy-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="consideration-privacy-prove.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
   </div>
@@ -342,11 +332,29 @@
 </footer>
 
 <script>
-// flow legend: scroll + glow on card click, one-time load sweep, card-door click guard
+// flow legend: scroll + glow on chip click, one-time load sweep, card-door navigation
 (function(){
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
   var stages = ['card-private','card-apart','card-prove'];
   var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
+
+  // card-door: clicking anywhere on a stage card navigates to its guide page
+  var cardDoors = {
+    'card-private': 'consideration-privacy-private.html',
+    'card-apart':   'consideration-privacy-apart.html',
+    'card-prove':   'consideration-privacy-prove.html'
+  };
+  stages.forEach(function(id){
+    var card = document.getElementById(id);
+    var dest = cardDoors[id];
+    if(!card || !dest) return;
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function(e){
+      // don't double-navigate if user clicked the see-how link directly
+      if(e.target.closest && e.target.closest('a')) return;
+      window.location.href = dest;
+    });
+  });
 
   function pillFor(cardId){
     for(var i=0;i<pills.length;i++){ if(pills[i].getAttribute('data-target')===cardId) return pills[i]; }
@@ -386,22 +394,6 @@
     window.setTimeout(tour, 350);
   }
 
-  // each stage card is a door to the how-it-works page; chip clicks are ignored
-  var doors = {
-    'card-private': 'consideration-privacy-how-it-works.html',
-    'card-apart': 'consideration-privacy-how-it-works.html',
-    'card-prove': 'consideration-privacy-how-it-works.html'
-  };
-  Object.keys(doors).forEach(function(cardId){
-    var doorCard = document.getElementById(cardId);
-    if(!doorCard) return;
-    var doorHref = doors[cardId];
-    doorCard.addEventListener('click', function(e){
-      if(e.target.closest('.chip')) return; // chip clicks never trigger the card door
-      if(e.target.closest('a')) return; // let real links handle their own clicks
-      window.location.href = doorHref;
-    });
-  });
 })();
 </script>
 </body>

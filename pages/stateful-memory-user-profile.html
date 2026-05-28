@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your name, preferences, habits · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* profile card example */
+  .profile-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .profile-header { padding: 13px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .profile-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--soft); }
+  .profile-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent-hover); }
+  .profile-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 9px; }
+  .pf-row { display: flex; align-items: stretch; gap: 12px; padding: 11px 13px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; transition: border-color .15s, background .15s; }
+  .pf-row:hover, .pf-row:focus-visible { border-color: var(--accent); background: var(--accent-soft); outline: none; }
+  .pf-row.active { border-color: var(--accent); background: var(--accent-soft); }
+  .pf-key { flex: none; min-width: 110px; font-size: 12.5px; font-weight: 600; color: var(--text); }
+  .pf-val { flex: 1; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--accent-hover); }
+  .profile-caption { padding: 13px 18px; border-top: 1px solid var(--border); background: var(--surface); font-size: 13px; color: var(--soft); line-height: 1.6; min-height: 50px; }
+  .profile-caption strong { color: var(--text); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .pf-row { flex-direction: column; gap: 4px; }
+    .pf-key { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-stateful-memory.html"><span aria-hidden="true">&larr;</span> Stateful Memory</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-stateful-memory.html">Stateful Memory</a><span class="sep" aria-hidden="true">/</span><span style="color:var(--soft)">What it remembers</span><span class="sep" aria-hidden="true">/</span><span class="here">Your name, preferences, habits</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Stateful Memory &middot; What it remembers</span>
+  <h1 class="page-title">Your name, preferences, habits</h1>
+  <p class="explainer">Steady facts about you that stay true across chats: who you are, what you like, how you want answers.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What it is</div>
+  <h2 id="what-heading">A small card the model <em>keeps about you</em>.</h2>
+  <div class="what-card">
+    <p>A short, slow-changing file of things you have told the system about yourself: your name, the language you write in, your tone, allergies, what you are working on, anything you said "remember this" about. It is loaded at the start of every chat so the model does not ask you the same things over and over.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Tap a row to see <em>where it shows up</em>.</h2>
+  <div class="profile-card" role="region" aria-label="User profile example">
+    <div class="profile-header">
+      <span class="profile-title">Profile for user_nareman</span>
+      <span class="profile-meta">/memory/profile.json</span>
+    </div>
+    <div class="profile-body" role="tablist" aria-label="Pick a profile fact">
+      <button class="pf-row active" role="tab" aria-selected="true" data-key="name">
+        <span class="pf-key">Name</span>
+        <span class="pf-val">"Nareman"</span>
+      </button>
+      <button class="pf-row" role="tab" aria-selected="false" data-key="lang">
+        <span class="pf-key">Language</span>
+        <span class="pf-val">"replies in English, Arabic okay"</span>
+      </button>
+      <button class="pf-row" role="tab" aria-selected="false" data-key="tone">
+        <span class="pf-key">Tone</span>
+        <span class="pf-val">"direct, no fluff, short paragraphs"</span>
+      </button>
+      <button class="pf-row" role="tab" aria-selected="false" data-key="food">
+        <span class="pf-key">Allergies</span>
+        <span class="pf-val">"no shellfish"</span>
+      </button>
+    </div>
+    <div class="profile-caption" id="profile-caption" role="tabpanel" aria-live="polite">
+      <strong>Greets you by name.</strong> Next time you open a new chat, the first reply already says "Hi Nareman" without you saying it again.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it sits next to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Sits next to</div>
+      <div class="fits-desc">The running chat history. The chat is just this conversation. The profile is the slow-changing facts that carry across all your chats.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Not the same as</div>
+      <div class="fits-desc">Specific past events ("you booked a flight to Rome last Tuesday"). Events are time-stamped moments. The profile is general traits.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>You are tired of repeating the same setup ("I am a teacher", "reply in Arabic", "no shellfish") at the start of every chat.</li>
+    <li>You want the model to keep using your name, your tone, your defaults without being told.</li>
+    <li>You need a clear, editable list of what the system thinks it knows about you (so you can correct it).</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-stateful-memory.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Stateful Memory</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>OpenAI (2024). <em>Memory and new controls for ChatGPT.</em> Product announcement. <span class="note">User-facing memory: facts you tell the model that stick across chats, with a UI to view and delete them.</span></li>
+    <li>Park et al. (2023). <em>Generative Agents: Interactive Simulacra of Human Behavior.</em> arXiv:2304.03442. <span class="note">Demonstrates persistent character traits and preferences stored separately from short-term conversation.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var copy = {
+    name: '<strong>Greets you by name.</strong> Next time you open a new chat, the first reply already says "Hi Nareman" without you saying it again.',
+    lang: '<strong>Replies in English by default.</strong> No need to ask for English each session. If you write in Arabic, it still understands and replies the way you set.',
+    tone: '<strong>Skips the warm-up.</strong> Goes straight to the answer, no "great question!" opener, no padded summary at the end.',
+    food: '<strong>Filters recipes for you.</strong> When you ask for a dinner idea, shellfish dishes are quietly left out.'
+  };
+  var rows = document.querySelectorAll('.pf-row');
+  var caption = document.getElementById('profile-caption');
+  rows.forEach(function (row) {
+    row.addEventListener('click', function () {
+      rows.forEach(function (r) { r.classList.remove('active'); r.setAttribute('aria-selected', 'false'); });
+      row.classList.add('active');
+      row.setAttribute('aria-selected', 'true');
+      caption.innerHTML = copy[row.getAttribute('data-key')];
+    });
+  });
+}());
+</script>
+</body>
+</html>

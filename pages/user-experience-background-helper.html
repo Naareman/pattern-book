@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A quiet helper in the background &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* email inbox with quiet suggestion */
+  .demo-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; }
+  .inbox {
+    border: 1px solid var(--border-strong); border-radius: 12px; overflow: hidden;
+    background: var(--surface); box-shadow: var(--shadow-sm);
+  }
+  .inbox-bar {
+    padding: 10px 14px; background: var(--bg-subtle);
+    border-bottom: 1px solid var(--border);
+    font-size: 12px; font-weight: 600; color: var(--soft); letter-spacing: .04em; text-transform: uppercase;
+  }
+  .compose {
+    padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;
+    font-size: 13.5px; line-height: 1.6; color: var(--text);
+  }
+  .compose-line { display: flex; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .compose-line .label { color: var(--faint); width: 50px; font-size: 12.5px; }
+  .compose-line .val { color: var(--text); }
+  .compose-body { padding: 6px 0 0; color: var(--text); }
+  .compose-body p { margin-bottom: 8px; }
+  .compose-body .ghost {
+    color: var(--faint); font-style: italic;
+    border-bottom: 1px dashed var(--border-strong);
+    padding-bottom: 2px;
+  }
+  .nudge {
+    margin-top: 12px; padding: 11px 14px;
+    background: var(--accent-soft); border: 1px solid var(--accent);
+    border-radius: 10px; display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; line-height: 1.5; color: var(--text);
+    opacity: 0; transform: translateY(4px); transition: opacity .25s, transform .25s;
+  }
+  .nudge.show { opacity: 1; transform: translateY(0); }
+  .nudge .spark {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600; flex: none;
+  }
+  .nudge-body strong { color: var(--accent-hover); font-weight: 600; }
+  .nudge-actions { display: flex; gap: 7px; margin-top: 7px; }
+  .nudge-actions button {
+    font-family: inherit; padding: 4px 11px; border-radius: 14px;
+    border: 1px solid var(--border-strong); background: #fff;
+    font-size: 12px; font-weight: 600; color: var(--soft); cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .nudge-actions button:hover, .nudge-actions button:focus-visible { border-color: var(--accent); color: var(--accent-hover); }
+  .nudge-actions button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .nudge-actions button.primary:hover { background: var(--accent-hover); }
+  .demo-controls { margin-top: 14px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .demo-btn {
+    font-family: inherit; padding: 7px 14px; border-radius: 18px;
+    border: 1px solid var(--border-strong); background: var(--surface);
+    font-size: 12.5px; font-weight: 600; color: var(--soft); cursor: pointer;
+    transition: border-color .15s, color .15s, background .15s;
+  }
+  .demo-btn:hover, .demo-btn:focus-visible { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .demo-caption { text-align: center; font-size: 12.5px; color: var(--faint); line-height: 1.5; margin-top: 12px; }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-user-experience.html"><span aria-hidden="true">&larr;</span> User Experience</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-user-experience.html">User Experience</a><span class="sep" aria-hidden="true">/</span><span class="here">Where you meet the AI</span><span class="sep" aria-hidden="true">/</span><span class="here">A quiet helper in the background</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">User Experience &middot; Where you meet the AI</span>
+  <h1 class="page-title">A quiet helper in the background</h1>
+  <p class="explainer">No chat to open, no panel to click. The AI watches what you are already doing and offers a small nudge when it thinks it can help. You only notice it at the moment it is useful.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">Help that <em>finds you</em>.</h2>
+  <div class="what-card">
+    <p>A <strong style="color:var(--accent-hover)">background helper</strong> is an AI that runs alongside what you are doing and surfaces a small suggestion at the right moment: a finished sentence as you type (Gmail Smart Compose), a likely next line of code (Copilot ghost text), a reminder that you have a meeting starting. There is no AI surface to seek out. The product is the thing you came to use, and the help shows up in the corner of it.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Start the reply and <em>watch the nudge appear</em>.</h2>
+  <div class="demo-card" role="region" aria-label="Background helper example">
+    <div class="inbox">
+      <div class="inbox-bar">New message</div>
+      <div class="compose">
+        <div class="compose-line"><span class="label">To</span><span class="val">sara@team.co</span></div>
+        <div class="compose-line"><span class="label">Subject</span><span class="val">Re: Friday review</span></div>
+        <div class="compose-body" id="compose-body">
+          <p>Hi Sara,</p>
+          <p>Thanks for sending the deck. <span class="ghost" id="ghost-suggest">I had a chance to look through it...</span></p>
+        </div>
+        <div class="nudge" id="nudge" role="status" aria-live="polite">
+          <span class="spark" aria-hidden="true">AI</span>
+          <div class="nudge-body">
+            <strong>Smart Compose</strong><br>
+            Tap Tab to accept "I had a chance to look through it and have a few thoughts."
+            <div class="nudge-actions">
+              <button class="primary" id="accept-btn">Tab to accept</button>
+              <button id="dismiss-btn">Dismiss</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="demo-controls">
+      <button class="demo-btn" id="start-btn">Start typing</button>
+      <button class="demo-btn" id="reset-btn">Reset</button>
+    </div>
+    <p class="demo-caption">No menu to open. The helper appears only when it has something useful to offer, and you can ignore it.</p>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it is</div>
+      <div class="fits-desc">A surface that hides itself. The host app is the main thing; the AI only shows when it has earned the interruption.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Not the same as</div>
+      <div class="fits-desc">A sidebar. A sidebar is always visible and waits for you to talk to it. A background helper stays silent until it has something to say.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">Confidence checks. A background helper that nudges too often or with weak ideas trains people to dismiss it. It only works if the suggestions usually land.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>The work is something the user already knows how to do (writing an email, writing code, scheduling) and you just want to speed up the repetitive parts.</li>
+    <li>You can tell quickly whether the AI is confident enough that a suggestion is worth showing.</li>
+    <li>You want adoption from people who would never describe themselves as AI users: they just notice their tools got better.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-user-experience.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">User Experience</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Chen, M.X. et al. (2019). <em>Gmail Smart Compose: real-time assisted writing.</em> KDD. <span class="note">First large-scale study of an AI that completes sentences as the user types.</span></li>
+    <li>Horvitz, E. (1999). <em>Principles of mixed-initiative user interfaces.</em> CHI. <span class="note">Foundational rules for when an AI should interrupt and when it should stay quiet.</span></li>
+    <li>GitHub (2021). <em>GitHub Copilot.</em> <span class="note">Inline code suggestions that appear as faded ghost text and disappear if ignored.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var ghost = document.getElementById('ghost-suggest');
+  var nudge = document.getElementById('nudge');
+  var accept = document.getElementById('accept-btn');
+  var dismiss = document.getElementById('dismiss-btn');
+  var start = document.getElementById('start-btn');
+  var reset = document.getElementById('reset-btn');
+
+  function showNudge() {
+    nudge.classList.add('show');
+    ghost.textContent = 'I had a chance to look through it...';
+    ghost.style.display = '';
+  }
+
+  function reseter() {
+    nudge.classList.remove('show');
+    ghost.textContent = 'I had a chance to look through it...';
+    ghost.style.color = '';
+    ghost.style.fontStyle = 'italic';
+    ghost.style.borderBottom = '1px dashed var(--border-strong)';
+  }
+
+  start.addEventListener('click', function () {
+    reseter();
+    setTimeout(showNudge, 350);
+  });
+  reset.addEventListener('click', reseter);
+
+  accept.addEventListener('click', function () {
+    ghost.textContent = 'I had a chance to look through it and have a few thoughts.';
+    ghost.style.color = 'var(--text)';
+    ghost.style.fontStyle = 'normal';
+    ghost.style.borderBottom = 'none';
+    nudge.classList.remove('show');
+  });
+  dismiss.addEventListener('click', function () {
+    ghost.style.display = 'none';
+    nudge.classList.remove('show');
+  });
+
+  // auto-show on first paint so the page feels alive
+  setTimeout(showNudge, 700);
+}());
+</script>
+</body>
+</html>

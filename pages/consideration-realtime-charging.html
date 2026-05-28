@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Charging for partial answers &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px; --bg-subtle:#F6F7F9;
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.10);
+    --orange:#E8882A; --orange-soft:rgba(232,136,42,0.10);
+    --red:#D92D20; --red-soft:rgba(217,45,32,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* billing scenarios */
+  .bl-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .bl-bar { padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--bg-subtle); display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .bl-bar-label { font-size: 12px; font-weight: 600; color: var(--soft); text-transform: uppercase; letter-spacing: .06em; }
+  .bl-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .bl-tab { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 14px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--soft); cursor: pointer; transition: all .15s; }
+  .bl-tab.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .bl-body { padding: 22px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; align-items: stretch; }
+  .bl-story { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; font-size: 14px; line-height: 1.6; color: var(--soft); }
+  .bl-story strong { color: var(--text); }
+  .bl-receipt { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.9; color: var(--text); }
+  .bl-receipt-title { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); margin-bottom: 10px; }
+  .bl-line { display: flex; align-items: center; justify-content: space-between; }
+  .bl-line.muted { color: var(--faint); }
+  .bl-line.refund { color: var(--green); }
+  .bl-line.charge { color: var(--text); }
+  .bl-divider { border-top: 1px dashed var(--border-strong); margin: 8px 0; }
+  .bl-total { font-weight: 700; font-size: 14px; }
+  .bl-pill { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; background: var(--accent-soft); color: var(--accent-hover); }
+  .bl-pill.good { background: var(--green-soft); color: var(--green); }
+  .bl-pill.bad { background: var(--red-soft); color: var(--red); }
+  .bl-footer { padding: 12px 20px; border-top: 1px solid var(--border); background: var(--bg-subtle); font-size: 13px; color: var(--soft); line-height: 1.6; }
+  .bl-footer strong { color: var(--text); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 720px) { .bl-body { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { h1.page-title { font-size: 30px; } .explainer { font-size: 15px; } h2 { font-size: 21px; } .fits-row { flex-wrap: wrap; } .fits-label { min-width: 0; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-real-time.html"><span aria-hidden="true">&larr;</span> Real-time / Streaming</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-real-time.html">Real-time / Streaming</a><span class="sep" aria-hidden="true">/</span><span>Keep the words flowing</span><span class="sep" aria-hidden="true">/</span><span class="here">Charging for partial answers</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Real-time / Streaming &middot; Keep the words flowing</span>
+  <h1 class="page-title">Charging for partial answers</h1>
+  <p class="explainer">When a stream is cut, decide what counts: only what the user kept, all of what was generated, or something in between.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">A bill that <em>matches the reality</em>.</h2>
+  <div class="what-card">
+    <p>Streaming pricing has to deal with a question that batch pricing avoids: <strong style="color:var(--accent-hover)">when the user cancels at word 80 of 400, what do you charge?</strong> The token cost upstream is real (the model produced something) and the user value downstream may be tiny (they did not even read it). The policy is a product decision, not just an accounting one: charge for tokens generated, charge for tokens delivered, refund on safety stops, never charge when the user cuts the first second. The choice shapes user trust, agent runs (which can rack up a bill quickly), and your own dashboards. Whatever the policy, the same partial-counter has to be measured at cut time and recorded with the rest of the request.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Same cut, <em>three policies</em>.</h2>
+  <div class="bl-card" role="region" aria-label="Charging policies demo">
+    <div class="bl-bar">
+      <span class="bl-bar-label">Reply cut at word 80 of an expected 400</span>
+      <div class="bl-tabs" role="tablist">
+        <button class="bl-tab active" role="tab" aria-selected="true" data-mode="gen">Charge generated</button>
+        <button class="bl-tab" role="tab" aria-selected="false" data-mode="del">Charge delivered</button>
+        <button class="bl-tab" role="tab" aria-selected="false" data-mode="ref">Refund on safety</button>
+      </div>
+    </div>
+    <div class="bl-body">
+      <div class="bl-story" id="blStory">
+        <strong>Policy: charge for tokens generated.</strong> The model produced 105 tokens before the cancel arrived. Even though only 80 reached the user, all 105 are billable because the compute already happened.
+      </div>
+      <div class="bl-receipt" id="blReceipt">
+        <div class="bl-receipt-title">Receipt</div>
+        <div class="bl-line muted"><span>Input</span><span>120 tok</span></div>
+        <div class="bl-line muted"><span>Output (generated)</span><span>105 tok</span></div>
+        <div class="bl-line muted"><span>Output (delivered)</span><span>80 tok</span></div>
+        <div class="bl-divider"></div>
+        <div class="bl-line charge"><span>Billable output</span><span>105 tok <span class="bl-pill">policy</span></span></div>
+        <div class="bl-line bl-total"><span>Total</span><span>$0.0042</span></div>
+      </div>
+    </div>
+    <div class="bl-footer" id="blNote">
+      <strong>Tap a policy</strong> to see how the same cut produces a different bill. The user-facing message and the dashboard should both reflect the choice.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it sits next to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it does</div>
+      <div class="fits-desc">Maps a partial stream to a bill. Picks which counter (generated, delivered, accepted) becomes the price.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">Pairs tightly with clean stopping: the cut writes the exact counters that the bill needs. Pairs with safety: a refund rule may apply when a guard stops the stream.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Not this</div>
+      <div class="fits-desc">It is a product and pricing decision, not a metering technology. The counters exist regardless; the question is which ones become money.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Pay-as-you-go products where the user sees a token meter or a per-message price.</li>
+    <li>Agent platforms where a single run can cancel many times and bills can grow quickly.</li>
+    <li>Anywhere a safety stop, a quality cut, or an error must come with a clear bill story.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-real-time.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Real-time / Streaming</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Anthropic. (2024). <em>API pricing and partial-request billing behavior.</em> Documentation. <span class="note">Reference for how a major provider counts tokens generated before a cancel.</span></li>
+    <li>OpenAI. (2024). <em>Streaming usage reporting and cancellation accounting.</em> Documentation. <span class="note">Practical reference for how usage events are reported when a stream is closed early.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  const tabs = document.querySelectorAll('.bl-tab');
+  const story = document.getElementById('blStory');
+  const receipt = document.getElementById('blReceipt');
+  const note = document.getElementById('blNote');
+
+  const data = {
+    gen: {
+      story: '<strong>Policy: charge for tokens generated.</strong> The model produced 105 tokens before the cancel arrived. Even though only 80 reached the user, all 105 are billable because the compute already happened.',
+      bill: '<div class="bl-receipt-title">Receipt</div>' +
+            '<div class="bl-line muted"><span>Input</span><span>120 tok</span></div>' +
+            '<div class="bl-line muted"><span>Output (generated)</span><span>105 tok</span></div>' +
+            '<div class="bl-line muted"><span>Output (delivered)</span><span>80 tok</span></div>' +
+            '<div class="bl-divider"></div>' +
+            '<div class="bl-line charge"><span>Billable output</span><span>105 tok <span class="bl-pill">policy</span></span></div>' +
+            '<div class="bl-line bl-total"><span>Total</span><span>$0.0042</span></div>',
+      note: '<strong>Honest to compute cost.</strong> Easy for the provider to reason about. The user may grumble that they paid for the 25 tokens they never saw.'
+    },
+    del: {
+      story: '<strong>Policy: charge for tokens delivered.</strong> Only 80 tokens reached the user before the connection closed. The 25 already-generated tokens that never shipped are written off.',
+      bill: '<div class="bl-receipt-title">Receipt</div>' +
+            '<div class="bl-line muted"><span>Input</span><span>120 tok</span></div>' +
+            '<div class="bl-line muted"><span>Output (generated)</span><span>105 tok</span></div>' +
+            '<div class="bl-line muted"><span>Output (delivered)</span><span>80 tok</span></div>' +
+            '<div class="bl-divider"></div>' +
+            '<div class="bl-line charge"><span>Billable output</span><span>80 tok <span class="bl-pill good">user-friendly</span></span></div>' +
+            '<div class="bl-line bl-total"><span>Total</span><span>$0.0036</span></div>',
+      note: '<strong>Kinder to the user.</strong> The bill matches what they actually got. A small amount of compute is given away for free on every cancel.'
+    },
+    ref: {
+      story: '<strong>Policy: refund when safety stops it.</strong> The cut was triggered by the safety guard, so the output portion is fully refunded. Input tokens still count: that work was real.',
+      bill: '<div class="bl-receipt-title">Receipt</div>' +
+            '<div class="bl-line muted"><span>Input</span><span>120 tok</span></div>' +
+            '<div class="bl-line muted"><span>Output (generated)</span><span>105 tok</span></div>' +
+            '<div class="bl-line muted"><span>Output (delivered)</span><span>80 tok</span></div>' +
+            '<div class="bl-divider"></div>' +
+            '<div class="bl-line refund"><span>Output refund</span><span>105 tok <span class="bl-pill bad">safety stop</span></span></div>' +
+            '<div class="bl-line bl-total"><span>Total</span><span>$0.0014</span></div>',
+      note: '<strong>Reads as fair when a guard intervenes.</strong> The user is not punished for a response the system itself decided to cut.'
+    }
+  };
+
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      tabs.forEach(function (x) { x.classList.remove('active'); x.setAttribute('aria-selected', 'false'); });
+      t.classList.add('active');
+      t.setAttribute('aria-selected', 'true');
+      const m = t.getAttribute('data-mode');
+      story.innerHTML = data[m].story;
+      receipt.innerHTML = data[m].bill;
+      note.innerHTML = data[m].note;
+    });
+  });
+}());
+</script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Name and rank the harms · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --ok:#0E9F6E; --hold:#B54708; --bad:#D92D20;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* harms table */
+  .harms-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .harms-head { padding: 13px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); }
+  .harm-row { display: grid; grid-template-columns: 110px 1fr 1fr; gap: 14px; align-items: start; padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 14px; line-height: 1.55; }
+  .harm-row:last-child { border-bottom: none; }
+  .sev { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 4px 9px; border-radius: 12px; align-self: start; text-align: center; }
+  .sev.s1 { color: var(--bad); background: rgba(217,45,32,0.10); border: 1px solid rgba(217,45,32,0.3); }
+  .sev.s2 { color: var(--hold); background: rgba(181,71,8,0.10); border: 1px solid rgba(181,71,8,0.3); }
+  .sev.s3 { color: var(--ok); background: rgba(14,159,110,0.10); border: 1px solid rgba(14,159,110,0.3); }
+  .harm-name { font-weight: 600; color: var(--text); }
+  .harm-ex { color: var(--soft); font-size: 13px; }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .harm-row { grid-template-columns: 1fr; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-safety.html"><span aria-hidden="true">&larr;</span> Safety, Alignment &amp; Refusal</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-safety.html">Safety, Alignment &amp; Refusal</a><span class="sep" aria-hidden="true">/</span><span>Decide what is off-limits</span><span class="sep" aria-hidden="true">/</span><span class="here">Name and rank the harms</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Safety, Alignment &amp; Refusal &middot; Decide what is off-limits</span>
+  <h1 class="page-title">Name and rank the harms</h1>
+  <p class="explainer">Make a short list of the bad things this system could do. Rank each by how bad it is. The ranking is what tells the team where to spend safety effort first.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">A ranked list of <em>what could go wrong</em>.</h2>
+  <div class="what-card">
+    <p>A <strong style="color:var(--accent-hover)">harm taxonomy</strong> is a short, named list of the specific bad outcomes the system could cause. Each entry has a name, a one-line definition, and a severity rank. Severity is judged on how reversible the harm is, how many people it touches, and how much the model would have contributed beyond what a search engine already offers.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">A starter list for a <em>general chatbot</em>.</h2>
+  <div class="harms-card" role="region" aria-label="Example harm taxonomy with severity">
+    <div class="harms-head">Severity &middot; Harm &middot; What it looks like in practice</div>
+    <div class="harm-row">
+      <span class="sev s1">Severe</span>
+      <div>
+        <div class="harm-name">Help with mass-casualty attacks</div>
+      </div>
+      <div class="harm-ex">Step-by-step guidance on weapons, pathogens, or critical infrastructure attacks.</div>
+    </div>
+    <div class="harm-row">
+      <span class="sev s1">Severe</span>
+      <div>
+        <div class="harm-name">Sexual content involving minors</div>
+      </div>
+      <div class="harm-ex">Any generation, description, or roleplay that sexualises a child.</div>
+    </div>
+    <div class="harm-row">
+      <span class="sev s2">High</span>
+      <div>
+        <div class="harm-name">Targeted harassment or doxxing</div>
+      </div>
+      <div class="harm-ex">Writing abuse aimed at a named person, or exposing private contact details.</div>
+    </div>
+    <div class="harm-row">
+      <span class="sev s2">High</span>
+      <div>
+        <div class="harm-name">Confident medical or legal misinformation</div>
+      </div>
+      <div class="harm-ex">A wrong dosage or a made-up legal deadline given as fact.</div>
+    </div>
+    <div class="harm-row">
+      <span class="sev s3">Moderate</span>
+      <div>
+        <div class="harm-name">Persuasive scam content</div>
+      </div>
+      <div class="harm-ex">Polished phishing emails or fake reviews on demand.</div>
+    </div>
+    <div class="harm-row">
+      <span class="sev s3">Moderate</span>
+      <div>
+        <div class="harm-name">Stereotyping in everyday answers</div>
+      </div>
+      <div class="harm-ex">Casual generalisations about a group inside an otherwise normal reply.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Feeds into</div>
+      <div class="fits-desc">Drawing the line uses this list as input. Each named harm gets a rule: help, help with care, or stop.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Feeds into</div>
+      <div class="fits-desc">Red teaming uses the ranking to choose what to attack first. The severe items get attacked the hardest.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Different from</div>
+      <div class="fits-desc">A general ethics framework. This is product-specific and short enough to hold in your head while reviewing examples.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Early product design, so the team agrees on what counts as a safety bug versus a quality bug.</li>
+    <li>Whenever a new feature opens a new surface (voice, image, tool use), so its specific harms are added before launch.</li>
+    <li>During incident reviews, so a real failure gets sorted into an existing category or earns a new one.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-safety.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Safety, Alignment &amp; Refusal</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Weidinger et al. (2022). <em>Taxonomy of risks posed by language models.</em> ACM FAccT. <span class="note">The reference list of harm categories most teams start from.</span></li>
+    <li>Shelby et al. (2023). <em>Sociotechnical harms of algorithmic systems.</em> AIES. <span class="note">Adds the severity and population angle to the categories.</span></li>
+    <li>NIST (2023). <em>AI Risk Management Framework.</em> <span class="note">A standard way to score and rank AI harms inside an organisation.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+</body>
+</html>

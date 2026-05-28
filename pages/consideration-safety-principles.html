@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Values, not just rules · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --ok:#0E9F6E; --hold:#B54708; --bad:#D92D20;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* principle switch demo */
+  .prin-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; }
+  .prompt-box { padding: 14px 16px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6; color: var(--text); margin-bottom: 16px; }
+  .prompt-box .label { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); display: block; margin-bottom: 6px; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .tab { font-family: inherit; cursor: pointer; padding: 7px 13px; border-radius: 20px; font-size: 13px; font-weight: 600; border: 1px solid var(--border-strong); background: #fff; color: var(--soft); transition: background .15s, color .15s, border-color .15s; }
+  .tab:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .tab.active { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); }
+  .panel { display: none; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: #fff; }
+  .panel.show { display: block; }
+  .panel .ptitle { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-hover); margin-bottom: 8px; }
+  .panel .pquote { font-size: 14px; color: var(--soft); line-height: 1.6; font-style: italic; border-left: 3px solid var(--border); padding-left: 12px; margin-bottom: 10px; }
+  .panel .panswer { font-size: 14px; color: var(--text); line-height: 1.6; }
+  .panel .panswer strong { color: var(--accent-hover); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-safety.html"><span aria-hidden="true">&larr;</span> Safety, Alignment &amp; Refusal</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-safety.html">Safety, Alignment &amp; Refusal</a><span class="sep" aria-hidden="true">/</span><span>Decide what is off-limits</span><span class="sep" aria-hidden="true">/</span><span class="here">Values, not just rules</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Safety, Alignment &amp; Refusal &middot; Decide what is off-limits</span>
+  <h1 class="page-title">Values, not just rules</h1>
+  <p class="explainer">Long rule lists go stale and miss new cases. A short set of stated values lets the model reason about a fresh request instead of only matching it against a checklist.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">A spirit, not just a <em>checklist</em>.</h2>
+  <div class="what-card">
+    <p><strong style="color:var(--accent-hover)">Principle-based evaluation</strong> judges an answer against a short written set of values (be honest, avoid causing harm, respect the user's autonomy) instead of a long list of banned topics. Reviewers, or a separate model acting as judge, ask "did this reply uphold the principles?" and explain their reasoning. Rules tell the model what to do; principles tell it why.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">One question, three <em>principles</em>.</h2>
+  <div class="prin-card" role="region" aria-label="Three principles applied to the same question">
+    <div class="prompt-box"><span class="label">User asks</span>"My friend just told me she's been hiding a serious diagnosis from her family. Should I tell them?"</div>
+    <div class="tabs" role="tablist" aria-label="Pick a principle">
+      <button type="button" class="tab active" role="tab" data-target="p-honest" aria-selected="true">Be honest</button>
+      <button type="button" class="tab" role="tab" data-target="p-care" aria-selected="false">Avoid causing harm</button>
+      <button type="button" class="tab" role="tab" data-target="p-auto" aria-selected="false">Respect autonomy</button>
+    </div>
+    <div id="p-honest" class="panel show" role="tabpanel">
+      <div class="ptitle">Be honest</div>
+      <div class="pquote">Do not pretend the situation is simple. Name the tension.</div>
+      <div class="panswer">The reply <strong>names the dilemma</strong>: keeping a promise versus a real worry about your friend's wellbeing. It refuses to give a clean "yes" or "no" because the truthful answer is "it depends on what she asked of you and how serious the risk is."</div>
+    </div>
+    <div id="p-care" class="panel" role="tabpanel">
+      <div class="ptitle">Avoid causing harm</div>
+      <div class="pquote">Think about the downside for your friend if her trust is broken.</div>
+      <div class="panswer">The reply <strong>flags the cost of telling</strong>: it can damage her trust in you and her sense of control over her own diagnosis. It suggests asking her directly before going around her.</div>
+    </div>
+    <div id="p-auto" class="panel" role="tabpanel">
+      <div class="ptitle">Respect autonomy</div>
+      <div class="pquote">Her diagnosis is hers to share. Your role is to support, not decide.</div>
+      <div class="panswer">The reply <strong>keeps the decision with her</strong>. It coaches you on how to offer support and to encourage her to tell her family on her own terms, rather than acting on her behalf.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">Hard rules cover the easy cases (a list of banned weapons, a list of disallowed content). Principles cover the messy middle the rules miss.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">How it shows up</div>
+      <div class="fits-desc">A short written constitution given to the model, plus a judge model that scores answers against the same text. Used in both training and post-launch checks.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Different from</div>
+      <div class="fits-desc">A banned-words filter. A filter blocks tokens. A principle invites the model to think about why the words might be a problem here.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Open-domain assistants that face fresh, unscripted questions every day, where a static rule list always falls behind.</li>
+    <li>Cases where two reasonable rules collide (privacy versus safety) and someone has to weigh them.</li>
+    <li>Long-running products, so values can update once and ripple through training, evaluation, and product copy.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-safety.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Safety, Alignment &amp; Refusal</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Bai et al. (2022). <em>Constitutional AI: Harmlessness from AI Feedback.</em> Anthropic. <span class="note">Original write-up of training a model against a short set of stated principles.</span></li>
+    <li>Anthropic (2024). <em>Claude's constitution.</em> <span class="note">The current text of values used at training time and at evaluation time.</span></li>
+    <li>Glaese et al. (2022). <em>Improving alignment of dialogue agents via targeted human judgements.</em> DeepMind. <span class="note">Sparrow used a similar split between rule-style and value-style judgements.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function(){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      var target = tab.getAttribute('data-target');
+      tabs.forEach(function(t){
+        var active = t === tab;
+        t.classList.toggle('active', active);
+        t.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      panels.forEach(function(p){ p.classList.toggle('show', p.id === target); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

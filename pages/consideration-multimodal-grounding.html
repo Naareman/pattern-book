@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stay tied to what was actually shown or said · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* grounded vs ungrounded toggle */
+  .gnd-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .gnd-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--bg-subtle); }
+  .ptab { flex: 1; padding: 11px 16px; font-size: 13px; font-weight: 600; color: var(--faint); background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; transition: color .2s, border-color .2s; font-family: 'Inter', sans-serif; }
+  .ptab.active { color: var(--accent-hover); border-bottom-color: var(--accent); background: var(--surface); }
+  .ptab:hover:not(.active) { color: var(--soft); }
+  .gnd-body { padding: 20px 22px; }
+  .gnd-stem { font-size: 14px; line-height: 1.6; color: var(--soft); margin-bottom: 12px; }
+  .gnd-stem strong { color: var(--text); }
+  .gnd-label { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin: 14px 0 8px; }
+  .gnd-quote { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.65; color: var(--text); background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .gnd-quote .ok { color: var(--accent-hover); font-weight: 500; }
+  .gnd-quote .drift { color: var(--soft); font-style: italic; }
+  .gnd-note { margin-top: 14px; font-size: 13px; line-height: 1.6; color: var(--soft); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-multimodal.html"><span aria-hidden="true">&larr;</span> Multimodal</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-multimodal.html">Multimodal</a><span class="sep" aria-hidden="true">/</span><span>Keep the answer tied to what was sent</span><span class="sep" aria-hidden="true">/</span><span class="here">Stay tied to what was actually shown or said</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Multimodal &middot; Keep the answer tied to what was sent</span>
+  <h1 class="page-title">Stay tied to what was actually shown or said</h1>
+  <p class="explainer">The model's answer should describe the actual image or audio you sent. It should not borrow details from similar examples it has seen during training.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What Is It?</div>
+  <h2 id="what-heading">Pointing back to <em>the real input</em>.</h2>
+  <div class="what-card">
+    <p>A grounded answer is one where every claim can be traced to something the user actually sent. Ungrounded answers happen when a multimodal model fills in plausible details from memory: it sees a stethoscope and starts describing a hospital that is not in the photo, or it hears the word "Paris" and talks about the Eiffel Tower nobody mentioned. Grounding checks ask the model to quote, point at, or cite the part of the image or audio that justifies each claim, and reject claims that have no source.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">A photo of <em>a kitchen counter</em>.</h2>
+  <div class="gnd-card" role="region" aria-label="Grounded vs ungrounded answer">
+    <div class="gnd-tabs" role="tablist" aria-label="Compare answers">
+      <button class="ptab active" role="tab" aria-selected="true" aria-controls="panel-bad" id="tab-bad">Drifts from the photo</button>
+      <button class="ptab" role="tab" aria-selected="false" aria-controls="panel-good" id="tab-good">Stays tied to the photo</button>
+    </div>
+    <div class="gnd-body">
+      <div class="panel active" id="panel-bad" role="tabpanel" aria-labelledby="tab-bad">
+        <p class="gnd-stem"><strong>The photo:</strong> a counter with a half-cut tomato, a knife, and a bowl.</p>
+        <div class="gnd-label">Model's answer</div>
+        <div class="gnd-quote"><span class="drift">"A beautiful pasta sauce in progress, with garlic, onions, and a glass of red wine on the side."</span></div>
+        <p class="gnd-note">Garlic, onions, and wine are not in the picture. The model leaned on what kitchens "usually" look like.</p>
+      </div>
+      <div class="panel" id="panel-good" role="tabpanel" aria-labelledby="tab-good">
+        <p class="gnd-stem"><strong>The photo:</strong> a counter with a half-cut tomato, a knife, and a bowl.</p>
+        <div class="gnd-label">Model's answer</div>
+        <div class="gnd-quote"><span class="ok">"A tomato cut in half (left of frame), a knife next to it, and an empty bowl behind. No other ingredients are visible."</span></div>
+        <p class="gnd-note">Every item is pointed back to a spot in the image. Nothing extra is invented.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">How it sits next to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Cousin of</div>
+      <div class="fits-desc">Citing sources in text-based question answering. The mechanism is similar: every claim should point back to a piece of input the user can verify.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Different from</div>
+      <div class="fits-desc">A general accuracy check. Grounding asks "is this in the input?" rather than "is this true in the world?" An answer can be true and still ungrounded.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading">When to <em>think about it</em>.</h2>
+  <ul class="matters-list">
+    <li>The product reads medical images, legal documents, or anything where invented details cause real harm.</li>
+    <li>Users will quote the answer back to other people who did not see the original input.</li>
+    <li>The model sometimes "sees" objects, signs, or sounds that are not actually there.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-multimodal.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Multimodal</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Li et al. (2023). <em>Evaluating Object Hallucination in Large Vision-Language Models.</em> <span class="note">Defines and measures hallucination of objects not present in the image.</span></li>
+    <li>Rohrbach et al. (2018). <em>Object Hallucination in Image Captioning.</em> <span class="note">Early work showing caption models often add objects from prior bias.</span></li>
+    <li>Anthropic (2024). <em>Vision with Claude: prompting tips.</em> <span class="note">Recommends asking the model to point at the image region behind each claim.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var tabs = document.querySelectorAll('.ptab');
+  var panels = document.querySelectorAll('.panel');
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+      panels.forEach(function (p) { p.classList.remove('active'); });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      document.getElementById(tab.getAttribute('aria-controls')).classList.add('active');
+    });
+  });
+}());
+</script>
+</body>
+</html>

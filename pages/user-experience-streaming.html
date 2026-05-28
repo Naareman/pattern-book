@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Answers that stream word by word &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px; --bg-subtle:#F6F7F9;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.10);
+    --orange:#E8882A; --orange-soft:rgba(232,136,42,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none; padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* stream demo */
+  .stream-demo { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .stream-demo-bar { padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--bg-subtle); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .stream-bar-label { font-size: 12px; font-weight: 600; color: var(--soft); text-transform: uppercase; letter-spacing: .06em; }
+  .stream-status { font-size: 12px; font-weight: 600; color: var(--faint); font-family: 'JetBrains Mono', monospace; }
+  .stream-status.ok { color: var(--green); }
+  .stream-body { padding: 20px 22px; font-size: 14.5px; line-height: 1.75; color: var(--text); min-height: 130px; }
+  .stream-cursor { display: inline-block; width: 2px; height: 1em; background: var(--accent); vertical-align: text-bottom; animation: blink 1s step-end infinite; margin-left: 2px; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .stream-footer { padding: 12px 20px; border-top: 1px solid var(--border); background: var(--bg-subtle); font-size: 12.5px; color: var(--faint); display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .stream-btn { padding: 6px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer; transition: border-color .2s, background .2s, color .2s; }
+  .stream-btn:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .sources { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 22px; }
+  .sources-label { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 10px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13.5px; line-height: 1.55; color: var(--soft); }
+  .sources a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+  .sources a:hover { border-bottom-color: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) { h1.page-title { font-size: 30px; } .explainer { font-size: 15px; } h2 { font-size: 21px; } .fits-row { flex-wrap: wrap; } .fits-label { min-width: 0; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-user-experience.html"><span aria-hidden="true">&larr;</span> User Experience</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-user-experience.html">User Experience</a><span class="sep" aria-hidden="true">/</span><span class="here">How answers show up</span><span class="sep" aria-hidden="true">/</span><span class="here">Answers that stream word by word</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">User Experience &middot; How answers show up</span>
+  <h1 class="page-title">Answers that stream word by word</h1>
+  <p class="explainer">The reply appears as it is being written, instead of arriving as one finished block.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">Watching the answer <em>get written</em>.</h2>
+  <div class="what-card">
+    <p>Instead of waiting for the AI to finish thinking, the screen shows each word the moment it is produced. You see the reply growing in front of you, like someone typing. The first word arrives in a fraction of a second, so the wait feels much shorter, and you can start reading right away. If the answer is going wrong, you can stop it early.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Tap play to <em>watch it stream</em>.</h2>
+  <div class="stream-demo" role="region" aria-label="Streaming reply demo">
+    <div class="stream-demo-bar">
+      <span class="stream-bar-label">Your assistant</span>
+      <span class="stream-status" id="streamStatus">ready</span>
+    </div>
+    <div class="stream-body" id="streamBody" aria-live="polite" aria-label="Streaming reply">
+      <span id="streamText"></span><span class="stream-cursor" id="streamCursor" aria-hidden="true"></span>
+    </div>
+    <div class="stream-footer">
+      <span id="streamNote">Press play to see words appear one by one.</span>
+      <button class="stream-btn" id="streamBtn" aria-label="Play streaming demo">Play</button>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it sits next to <em>other pieces</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it is</div>
+      <div class="fits-desc">A look-and-feel choice for the reply. The words show up live, the moment they are ready.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">A quiet check on the words as they arrive, so a broken reply can be caught early. That check is a separate tool that lives under the hood.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Not this</div>
+      <div class="fits-desc">A loading spinner that hides everything until the answer is done. That is the opposite choice.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Chat-like products, where any delay over a second feels broken.</li>
+    <li>Long answers, where waiting in silence for the whole thing is painful.</li>
+    <li>Anywhere a stop button matters, so the person can cut a bad reply short.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="sources-heading">
+  <div class="section-label"><span class="num">05</span>Sources</div>
+  <h2 id="sources-heading" class="sr-only">Sources</h2>
+  <div class="sources">
+    <div class="sources-label">For the curious</div>
+    <ul>
+      <li>Nielsen Norman Group, <a href="https://www.nngroup.com/articles/response-times-3-important-limits/" target="_blank" rel="noopener noreferrer">Response Times: The 3 Important Limits</a>, on why anything over a second breaks the feeling of flow.</li>
+      <li>OpenAI Cookbook, <a href="https://cookbook.openai.com/examples/how_to_stream_completions" target="_blank" rel="noopener noreferrer">How to stream completions</a>, on the mechanics of word-by-word delivery.</li>
+      <li>Anthropic, <a href="https://docs.anthropic.com/en/api/messages-streaming" target="_blank" rel="noopener noreferrer">Streaming Messages</a>, on streaming as a default for chat experiences.</li>
+    </ul>
+  </div>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-user-experience.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">User Experience</div>
+    </div>
+  </a>
+</section>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  const textEl   = document.getElementById('streamText');
+  const cursor   = document.getElementById('streamCursor');
+  const statusEl = document.getElementById('streamStatus');
+  const noteEl   = document.getElementById('streamNote');
+  const btn      = document.getElementById('streamBtn');
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const fullText = "A short answer is best when the question is small. Tell me what you would like to do, and I will keep it simple.";
+  const words = fullText.split(' ');
+
+  let running = false;
+  let timer = null;
+
+  function reset() {
+    textEl.textContent = '';
+    cursor.style.display = 'inline-block';
+    statusEl.textContent = 'ready';
+    statusEl.className = 'stream-status';
+    noteEl.textContent = 'Press play to see words appear one by one.';
+    btn.textContent = 'Play';
+    btn.disabled = false;
+    running = false;
+  }
+
+  function run() {
+    if (running) return;
+    running = true;
+    btn.disabled = true;
+    textEl.textContent = '';
+    statusEl.textContent = 'streaming...';
+    statusEl.className = 'stream-status';
+    noteEl.textContent = 'Words arrive as the AI writes them.';
+
+    const delay = reduceMotion ? 10 : 130;
+    let i = 0;
+
+    function step() {
+      if (i >= words.length) {
+        cursor.style.display = 'none';
+        statusEl.textContent = 'done';
+        statusEl.className = 'stream-status ok';
+        noteEl.textContent = 'Done. The first word arrived almost instantly.';
+        btn.textContent = 'Replay';
+        btn.disabled = false;
+        btn.onclick = function () { reset(); setTimeout(run, 60); };
+        return;
+      }
+      textEl.textContent += (i === 0 ? '' : ' ') + words[i];
+      i++;
+      timer = setTimeout(step, delay);
+    }
+    step();
+  }
+
+  btn.onclick = run;
+}());
+</script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning from human ratings · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --green:#0E9F6E; --green-soft:#E7F7F0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* tap-to-pick example */
+  .pick-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; }
+  .pick-q { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text); padding: 12px 14px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 16px; }
+  .pick-q .q-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--faint); margin-bottom: 5px; }
+  .pick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .pick-opt {
+    cursor: pointer; padding: 14px 16px; border-radius: var(--radius-sm);
+    border: 2px solid var(--border); background: var(--surface);
+    text-align: left; font-family: 'Inter', sans-serif; transition: border-color .15s, background .15s, transform .15s;
+  }
+  .pick-opt:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .pick-opt.picked { border-color: var(--green); background: var(--green-soft); }
+  .pick-opt.not-picked { opacity: .55; }
+  .pick-opt h3 { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; font-family: 'Inter', sans-serif; display: flex; justify-content: space-between; align-items: center; }
+  .pick-opt h3 .badge { font-size: 11px; font-weight: 700; color: var(--green); display: none; }
+  .pick-opt.picked h3 .badge { display: inline; }
+  .pick-opt p { font-size: 13.5px; line-height: 1.6; color: var(--soft); }
+  .pick-cta { margin-top: 14px; padding: 11px 14px; background: var(--bg-subtle); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); font-size: 13px; color: var(--soft); line-height: 1.55; min-height: 44px; }
+  .pick-cta strong { color: var(--text); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .pick-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-training-adaptation.html"><span aria-hidden="true">&larr;</span> Training &amp; Adaptation</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-training-adaptation.html">Training &amp; Adaptation</a><span class="sep" aria-hidden="true">/</span><span>Tune to behave</span><span class="sep" aria-hidden="true">/</span><span class="here">Learning from human ratings</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Training &amp; Adaptation &middot; Tune to behave</span>
+  <h1 class="page-title">Learning from human ratings</h1>
+  <p class="explainer">Show people two model answers side by side, ask which one is better, and use those preferences to nudge the model toward the kind of reply humans actually like.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">"Which answer is better?" turned into <em>training signal</em>.</h2>
+  <div class="what-card">
+    <p>The model writes two answers to the same question; a person picks the one they prefer; that vote is fed back into training so the model leans toward producing answers like the winner next time. The recipe was originally called "reinforcement learning from human feedback," and newer methods (such as direct preference optimization) reach the same goal with less machinery.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Pick the answer <em>you would prefer</em>.</h2>
+  <div class="pick-card" role="region" aria-label="Pick the preferred answer">
+    <div class="pick-q">
+      <div class="q-label">User asks</div>
+      <div>I'm anxious about a job interview tomorrow. What can I do tonight?</div>
+    </div>
+    <div class="pick-grid" role="radiogroup" aria-label="Pick a preferred answer">
+      <button class="pick-opt" id="opt-a" role="radio" aria-checked="false">
+        <h3><span>Answer A</span><span class="badge" aria-hidden="true">&check; you picked</span></h3>
+        <p>Get a good night's sleep, lay out your clothes, and write down two stories you can lean on. A short walk before bed helps too.</p>
+      </button>
+      <button class="pick-opt" id="opt-b" role="radio" aria-checked="false">
+        <h3><span>Answer B</span><span class="badge" aria-hidden="true">&check; you picked</span></h3>
+        <p>To manage interview anxiety, candidates may employ several established techniques, including but not limited to preparatory rehearsal, cognitive reframing exercises, and ensuring an adequate sleep duration.</p>
+      </button>
+    </div>
+    <div class="pick-cta" id="pick-cta" aria-live="polite">
+      <strong>Tap one.</strong> The model collects thousands of these little votes and learns the pattern: warm, direct, useful beats stiff and corporate.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">Where it sits in the <em>training story</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">It comes after</div>
+      <div class="fits-desc">Copying ideal answers. You start from a model that already answers in roughly the right shape, then use ratings to shape taste, warmth, and refusals.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Not the same as</div>
+      <div class="fits-desc">Showing the model the "right" answer outright. Here it never sees a perfect answer, only that one option beat another.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>"Better" is easier to point at than to write out: tone, warmth, safety, taste.</li>
+    <li>You want the model to refuse the right requests and help with the others; ratings teach that line cleanly.</li>
+    <li>Two answers from the same model often differ in ways you can feel but cannot quite spec.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-training-adaptation.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Training &amp; Adaptation</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Christiano et al. (2017). <em>Deep Reinforcement Learning from Human Preferences.</em> arXiv:1706.03741. <span class="note">The foundational paper for training models using human side-by-side preferences.</span></li>
+    <li>Ouyang et al. (2022). <em>Training language models to follow instructions with human feedback.</em> arXiv:2203.02155. <span class="note">Applies the preference-rating recipe to language models, giving us the InstructGPT and ChatGPT line.</span></li>
+    <li>Rafailov et al. (2023). <em>Direct Preference Optimization: Your Language Model is Secretly a Reward Model.</em> arXiv:2305.18290. <span class="note">A lighter recipe that learns from the same preference data with much less moving machinery.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var optA = document.getElementById('opt-a');
+  var optB = document.getElementById('opt-b');
+  var cta = document.getElementById('pick-cta');
+  function pick(winner, loser, msg) {
+    winner.classList.add('picked'); winner.classList.remove('not-picked');
+    winner.setAttribute('aria-checked', 'true');
+    loser.classList.add('not-picked'); loser.classList.remove('picked');
+    loser.setAttribute('aria-checked', 'false');
+    cta.innerHTML = msg;
+  }
+  optA.addEventListener('click', function () {
+    pick(optA, optB, '<strong>You picked the warmer, more concrete answer.</strong> Most raters do too. Over thousands of votes the model learns to write more like Answer A.');
+  });
+  optB.addEventListener('click', function () {
+    pick(optB, optA, '<strong>You picked the more formal answer.</strong> Some raters prefer this. The model learns from the spread of votes, not any single one.');
+  });
+}());
+</script>
+</body>
+</html>

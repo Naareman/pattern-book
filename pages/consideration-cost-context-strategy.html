@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choosing what to pack into the prompt · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* three approach cards */
+  .approach-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .approach-tabs { display: flex; background: var(--bg-subtle); border-bottom: 1px solid var(--border); padding: 10px 14px; flex-wrap: wrap; }
+  .approach-tab { font-family: inherit; font-size: 13px; font-weight: 600; padding: 8px 14px; border: 1px solid var(--border-strong); background: #fff; border-radius: 20px; margin: 4px 6px 4px 0; cursor: pointer; color: var(--text); transition: border-color .15s, color .15s, background .15s; }
+  .approach-tab:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .approach-tab.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .approach-body { padding: 22px; }
+  .approach-flow { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; justify-content: center; }
+  .ap-step { padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--bg-subtle); font-size: 12px; font-weight: 600; color: var(--text); }
+  .ap-step.lit { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .ap-arrow { font-family: 'Fraunces', serif; font-size: 18px; color: var(--faint); }
+  .approach-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+  .ap-stat { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+  .ap-stat .l { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
+  .ap-stat .v { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 500; color: var(--accent-hover); }
+  .approach-take { padding: 12px 14px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13.5px; color: var(--soft); line-height: 1.55; }
+  .approach-take strong { color: var(--text); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .approach-stats { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-cost.html"><span aria-hidden="true">&larr;</span> Cost, Latency &amp; Reliability</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-cost.html">Cost, Latency &amp; Reliability</a><span class="sep" aria-hidden="true">/</span><span class="here">Set the budget</span><span class="sep" aria-hidden="true">/</span><span class="here">Choosing what to pack into the prompt</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Cost, Latency &amp; Reliability &middot; Set the budget</span>
+  <h1 class="page-title">Choosing what to pack into the prompt</h1>
+  <p class="explainer">Stuff the whole library, retrieve a few pages, or do a bit of both. Each choice trades cost and speed for coverage.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What It Is</div>
+  <h2 id="what-heading">Three ways to feed the model what it <em>needs to know</em>.</h2>
+  <div class="what-card">
+    <p>The <strong style="color:var(--accent-hover)">context strategy</strong> is the decision of how much external text rides along with the question. Pack the whole corpus into a long context window: simple, costly, often slow. Retrieve only the relevant pages: cheap and fast, but a miss in retrieval is a miss in the answer. Mix the two: retrieve generously and let a long context handle the rest. The right pick depends on how big the corpus is, how often it changes, and how much you can spend per call.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">Same question, <em>three pack styles</em>.</h2>
+  <div class="approach-card" role="region" aria-label="Three context strategies for the same question">
+    <div class="approach-tabs" role="tablist" aria-label="Choose a context strategy">
+      <button type="button" class="approach-tab active" role="tab" aria-selected="true" data-ap="0">Pack it all</button>
+      <button type="button" class="approach-tab" role="tab" aria-selected="false" data-ap="1">Retrieve the few pages</button>
+      <button type="button" class="approach-tab" role="tab" aria-selected="false" data-ap="2">Mix the two</button>
+    </div>
+    <div class="approach-body">
+      <div class="approach-flow" id="flow">
+        <div class="ap-step lit">Question</div>
+        <span class="ap-arrow" aria-hidden="true">&rarr;</span>
+        <div class="ap-step lit">Whole corpus in prompt</div>
+        <span class="ap-arrow" aria-hidden="true">&rarr;</span>
+        <div class="ap-step lit">Answer</div>
+      </div>
+      <div class="approach-stats">
+        <div class="ap-stat"><div class="l">Tokens per call</div><div class="v" id="ap-tok">~200k</div></div>
+        <div class="ap-stat"><div class="l">Cost per call</div><div class="v" id="ap-cost">$0.60</div></div>
+        <div class="ap-stat"><div class="l">Time to first word</div><div class="v" id="ap-time">8s</div></div>
+      </div>
+      <div class="approach-take" id="ap-take">
+        <strong>The take:</strong> simple to build and always sees the full picture, but every question pays for the whole library.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Sits next to</div>
+      <div class="fits-desc">Stateless retrieval. The retrieve and rerank chain is what fills the prompt when you choose anything other than packing it all.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Builds on</div>
+      <div class="fits-desc">Knowing what costs what. The choice usually swings on the cost per question once you can see it for each option.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>The knowledge base is large enough that paying to pack it all into every prompt would blow the budget.</li>
+    <li>Answers depend on niche or recent information, so the choice between long context and retrieval changes quality.</li>
+    <li>The team is debating long-context models versus retrieval pipelines, and the call has to be defended with real numbers.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-cost.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Cost, Latency &amp; Reliability</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Liu et al. (2023). <em>Lost in the middle: how language models use long contexts.</em> <span class="note">Models attend less to information buried in the middle of a long prompt, so bigger context can mean worse recall.</span></li>
+    <li>Lewis et al. (2020). <em>Retrieval-augmented generation for knowledge-intensive tasks.</em> <span class="note">The original case for retrieving a few relevant chunks instead of asking the model to remember everything.</span></li>
+    <li>Anthropic (2024). <em>Long context prompting tips.</em> <span class="note">Practical guidance on when long context wins, when retrieval wins, and how to combine them.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function(){
+  var data = [
+    { flow: ['Question','Whole corpus in prompt','Answer'], tok: '~200k', cost: '$0.60', time: '8s', take: '<strong>The take:</strong> simple to build and always sees the full picture, but every question pays for the whole library.' },
+    { flow: ['Question','Find top 5 pages','Pages in prompt','Answer'], tok: '~3k', cost: '$0.01', time: '1.5s', take: '<strong>The take:</strong> cheap and fast. Works if retrieval finds the right pages. A miss in retrieval is a miss in the answer.' },
+    { flow: ['Question','Find top 30 pages','Pages in prompt','Answer'], tok: '~25k', cost: '$0.08', time: '3s', take: '<strong>The take:</strong> a wider net with room to spare. A middle ground when retrieval alone misses too much and packing it all is too costly.' }
+  ];
+  var tabs = document.querySelectorAll('.approach-tab');
+  var flow = document.getElementById('flow');
+  var tok = document.getElementById('ap-tok'), cost = document.getElementById('ap-cost'), time = document.getElementById('ap-time'), take = document.getElementById('ap-take');
+
+  function render(i){
+    var d = data[i];
+    var html = '';
+    d.flow.forEach(function(s, idx){
+      html += '<div class="ap-step lit">' + s + '</div>';
+      if(idx < d.flow.length - 1) html += '<span class="ap-arrow" aria-hidden="true">&rarr;</span>';
+    });
+    flow.innerHTML = html;
+    tok.textContent = d.tok;
+    cost.textContent = d.cost;
+    time.textContent = d.time;
+    take.innerHTML = d.take;
+  }
+
+  tabs.forEach(function(tab, i){
+    tab.addEventListener('click', function(){
+      tabs.forEach(function(t){ t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      render(parseInt(tab.getAttribute('data-ap'), 10));
+    });
+  });
+}());
+</script>
+</body>
+</html>

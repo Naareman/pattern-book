@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keep data in the right country &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --green:#0E9F6E; --red:#D92D20;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 760px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 760px; margin: 0 auto; padding: 44px 24px 10px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  h1.page-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 600px; margin-top: 14px; }
+
+  section { max-width: 760px; margin: 0 auto; padding: 20px 24px 36px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .prose-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 26px;
+  }
+  .prose-card p { font-size: 16px; line-height: 1.7; color: var(--soft); }
+  .prose-card p strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* router demo */
+  .route-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+  }
+  .route-lede { font-size: 14px; color: var(--soft); line-height: 1.6; margin-bottom: 16px; }
+  .users {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px; margin-bottom: 18px;
+  }
+  .user-btn {
+    text-align: left; font-family: 'Inter', sans-serif;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 14px;
+    cursor: pointer; transition: border-color .2s, background .2s, transform .15s;
+  }
+  .user-btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .user-btn.active { background: var(--accent-soft); border-color: var(--accent); }
+  .user-flag { font-size: 18px; line-height: 1; margin-bottom: 4px; display: block; }
+  .user-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.2; }
+  .user-loc { font-size: 11.5px; color: var(--faint); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+
+  .route-pipe {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 14px 16px; background: var(--bg-subtle);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+  }
+  .route-node {
+    flex: 1 1 auto; min-width: 0;
+    background: #fff; border: 1px solid var(--border-strong);
+    border-radius: 10px; padding: 10px 12px;
+  }
+  .route-node-label { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
+  .route-node-value { font-size: 13px; font-weight: 600; color: var(--text); font-family: 'JetBrains Mono', monospace; }
+  .route-arrow { font-size: 18px; color: var(--accent); flex: none; }
+
+  .route-status {
+    margin-top: 14px; padding: 12px 14px;
+    border-radius: var(--radius-sm); font-size: 13.5px; line-height: 1.5;
+    background: rgba(14,159,110,0.08); border: 1px solid rgba(14,159,110,0.3); color: var(--green);
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .route-status strong { font-weight: 600; }
+  .route-status .icon { font-family: 'Fraunces', serif; font-weight: 600; font-size: 16px; line-height: 1; flex: none; margin-top: 1px; }
+
+  .fits-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .fits-row { display: flex; gap: 12px; align-items: flex-start; }
+  .fits-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 5px; }
+  .fits-text { font-size: 15px; color: var(--soft); line-height: 1.65; }
+  .fits-text strong { color: var(--text); font-weight: 600; }
+  .filing-box {
+    margin-top: 6px; padding: 12px 16px;
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px; color: var(--soft); line-height: 1.6;
+  }
+  .filing-box strong { color: var(--text); font-weight: 600; }
+
+  .matters-list {
+    list-style: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .matters-list li {
+    position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .matters-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 16px 18px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 24px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 760px; margin: 0 auto; padding: 0 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 10px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer {
+    max-width: 760px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .users { grid-template-columns: 1fr; }
+    .route-pipe { flex-direction: column; align-items: stretch; }
+    .route-arrow { transform: rotate(90deg); align-self: center; }
+    .fits-row { flex-direction: column; gap: 6px; }
+    .fits-dot { display: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-privacy.html"><span aria-hidden="true">&larr;</span> Privacy, Security &amp; Governance</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-privacy.html">Privacy, Security &amp; Governance</a><span class="sep" aria-hidden="true">/</span><span class="here">Keep personal data private</span><span class="sep" aria-hidden="true">/</span><span class="here">Keep data in the right country</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Privacy, Security &amp; Governance &middot; Keep personal data private</span>
+  <h1 class="page-title">Keep data in the right country</h1>
+  <p class="explainer">A user in Germany should be served by storage and models inside the European Union. A user in India by ones inside India. The rule travels with the data.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">What <em>is it?</em></h2>
+  <div class="prose-card">
+    <p><strong>Data residency</strong> is the rule that personal data stays inside a chosen region while it lives and while it is being used. The system reads the user's home region, then picks storage, models, and logs that all sit inside that region. The data is sent there, processed there, and the trail of that processing also stays there.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Tap a user. See <em>where their request goes</em>.</h2>
+  <div class="route-card" role="region" aria-label="Routing demo by region">
+    <p class="route-lede">Three users from three regions. The router reads the home region on the user's account and sends the call to a matching region.</p>
+
+    <div class="users" role="tablist" aria-label="Pick a user">
+      <button type="button" class="user-btn active" data-region="eu" data-store="postgres-fra" data-model="gpt-4o-eu" data-log="logs-fra" role="tab">
+        <span class="user-flag" aria-hidden="true">EU</span>
+        <span class="user-name">Lena</span>
+        <span class="user-loc">Berlin</span>
+      </button>
+      <button type="button" class="user-btn" data-region="in" data-store="postgres-bom" data-model="gpt-4o-in" data-log="logs-bom" role="tab">
+        <span class="user-flag" aria-hidden="true">IN</span>
+        <span class="user-name">Priya</span>
+        <span class="user-loc">Mumbai</span>
+      </button>
+      <button type="button" class="user-btn" data-region="us" data-store="postgres-iad" data-model="gpt-4o-us" data-log="logs-iad" role="tab">
+        <span class="user-flag" aria-hidden="true">US</span>
+        <span class="user-name">Ana</span>
+        <span class="user-loc">Austin</span>
+      </button>
+    </div>
+
+    <div class="route-pipe" aria-live="polite">
+      <div class="route-node">
+        <div class="route-node-label">Storage</div>
+        <div class="route-node-value" id="node-store">postgres-fra</div>
+      </div>
+      <span class="route-arrow" aria-hidden="true">&rarr;</span>
+      <div class="route-node">
+        <div class="route-node-label">Model</div>
+        <div class="route-node-value" id="node-model">gpt-4o-eu</div>
+      </div>
+      <span class="route-arrow" aria-hidden="true">&rarr;</span>
+      <div class="route-node">
+        <div class="route-node-label">Logs</div>
+        <div class="route-node-value" id="node-log">logs-fra</div>
+      </div>
+    </div>
+
+    <div class="route-status" aria-live="polite">
+      <span class="icon" aria-hidden="true">&#10003;</span>
+      <span><strong>In region:</strong> <span id="status-text">all three stops sit inside the European Union, matching Lena's home region.</span></span>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-dot" aria-hidden="true"></div>
+      <div class="fits-text">
+        <strong>What it covers:</strong> the choice of region for each piece of the pipeline (where data is stored, where the model runs, where the logs land) tied to who the user is.
+      </div>
+    </div>
+    <div class="fits-row">
+      <div class="fits-dot" aria-hidden="true"></div>
+      <div class="fits-text">
+        <strong>Sits next to:</strong> hiding personal details strips fields out of the payload. Residency is about the whole payload going to the right place. The two work together: scrub first, then route.
+      </div>
+    </div>
+    <div class="filing-box">
+      <strong>Quick test:</strong> if a regulator asked "where physically did this user's request and reply sit while they happened?", can you point to one region for every stop? That is the residency promise.
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>You sell to customers in regions with strong residency rules: the European Union, the United Kingdom, the Gulf, India, China.</li>
+    <li>You work in regulated sectors like banking or health, where the contract pins data to a country.</li>
+    <li>Your enterprise buyers ask "where does our data live?" during procurement and want a clean, regional answer.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 12px; padding-bottom: 44px;">
+  <a href="consideration-privacy.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Privacy, Security &amp; Governance</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Court of Justice of the European Union (2020). <em>Schrems II ruling (C-311/18).</em> <span class="note">The court that pushed European companies to keep personal data inside the region or use heavy safeguards.</span></li>
+    <li>OpenAI (2024). <em>European Union data residency for ChatGPT Enterprise and the API.</em> <span class="note">Worked example of a major model provider offering region-pinned processing and storage.</span></li>
+    <li>AWS (2025). <em>AWS Digital Sovereignty: regions, sovereign clouds, and data residency.</em> <span class="note">Vendor reference for the infrastructure-side knobs (region, sovereign cloud) that residency relies on.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  var buttons = document.querySelectorAll('.user-btn');
+  var nodeStore = document.getElementById('node-store');
+  var nodeModel = document.getElementById('node-model');
+  var nodeLog = document.getElementById('node-log');
+  var statusText = document.getElementById('status-text');
+
+  var copy = {
+    eu: 'all three stops sit inside the European Union, matching Lena’s home region.',
+    in: 'all three stops sit inside India, matching Priya’s home region.',
+    us: 'all three stops sit inside the United States, matching Ana’s home region.'
+  };
+
+  buttons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      buttons.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      nodeStore.textContent = btn.getAttribute('data-store');
+      nodeModel.textContent = btn.getAttribute('data-model');
+      nodeLog.textContent = btn.getAttribute('data-log');
+      statusText.textContent = copy[btn.getAttribute('data-region')];
+    });
+  });
+}());
+</script>
+</body>
+</html>

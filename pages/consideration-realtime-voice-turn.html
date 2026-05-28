@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice turn-taking and interrupting &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px; --bg-subtle:#F6F7F9;
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.10);
+    --orange:#E8882A; --orange-soft:rgba(232,136,42,0.10);
+    --red:#D92D20; --red-soft:rgba(217,45,32,0.10);
+    --blue:#3367D6; --blue-soft:rgba(51,103,214,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* voice timeline demo */
+  .vc-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .vc-bar { padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--bg-subtle); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .vc-bar-label { font-size: 12px; font-weight: 600; color: var(--soft); text-transform: uppercase; letter-spacing: .06em; }
+  .vc-status { font-size: 12px; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--faint); }
+  .vc-status.user { color: var(--blue); }
+  .vc-status.ai { color: var(--accent-hover); }
+  .vc-status.cut { color: var(--red); }
+  .vc-body { padding: 22px; }
+  .vc-lane { margin-bottom: 14px; }
+  .vc-lane-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .vc-lane-label .who { color: var(--text); }
+  .vc-track { height: 44px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; position: relative; overflow: hidden; }
+  .vc-bars { display: flex; align-items: center; height: 100%; padding: 0 8px; gap: 2px; opacity: 0; transition: opacity .2s; }
+  .vc-bars.live { opacity: 1; }
+  .vc-bars span { display: block; width: 3px; background: var(--accent); border-radius: 2px; height: 8px; animation: pulse .9s ease-in-out infinite; }
+  .vc-bars.user span { background: var(--blue); }
+  @keyframes pulse {
+    0%, 100% { height: 8px; }
+    50% { height: 26px; }
+  }
+  .vc-bars span:nth-child(1) { animation-delay: 0s; }
+  .vc-bars span:nth-child(2) { animation-delay: .12s; }
+  .vc-bars span:nth-child(3) { animation-delay: .04s; }
+  .vc-bars span:nth-child(4) { animation-delay: .18s; }
+  .vc-bars span:nth-child(5) { animation-delay: .08s; }
+  .vc-bars span:nth-child(6) { animation-delay: .22s; }
+  .vc-bars span:nth-child(7) { animation-delay: .14s; }
+  .vc-bars span:nth-child(8) { animation-delay: .26s; }
+  .vc-bars span:nth-child(9) { animation-delay: .06s; }
+  .vc-bars span:nth-child(10) { animation-delay: .19s; }
+  .vc-bars span:nth-child(11) { animation-delay: .03s; }
+  .vc-bars span:nth-child(12) { animation-delay: .24s; }
+  .vc-cut { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--red); opacity: 0; transition: opacity .2s; }
+  .vc-cut.show { opacity: 1; }
+  .vc-script { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-top: 4px; font-size: 14px; line-height: 1.7; }
+  .vc-line { display: flex; gap: 10px; align-items: baseline; padding: 4px 0; opacity: .25; transition: opacity .25s; }
+  .vc-line.live { opacity: 1; }
+  .vc-line .role { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--faint); flex: none; width: 56px; }
+  .vc-line.user .role { color: var(--blue); }
+  .vc-line.ai .role { color: var(--accent-hover); }
+  .vc-line.sys .role { color: var(--red); }
+  .vc-line .said { color: var(--text); font-style: italic; }
+  .vc-line.sys .said { color: var(--red); font-style: normal; font-size: 13px; }
+  .vc-footer { padding: 12px 20px; border-top: 1px solid var(--border); background: var(--bg-subtle); font-size: 13px; color: var(--soft); line-height: 1.6; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .vc-btn { padding: 6px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer; transition: all .2s; }
+  .vc-btn:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) { h1.page-title { font-size: 30px; } .explainer { font-size: 15px; } h2 { font-size: 21px; } .fits-row { flex-wrap: wrap; } .fits-label { min-width: 0; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-real-time.html"><span aria-hidden="true">&larr;</span> Real-time / Streaming</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-real-time.html">Real-time / Streaming</a><span class="sep" aria-hidden="true">/</span><span>Handle interruptions</span><span class="sep" aria-hidden="true">/</span><span class="here">Voice turn-taking and interrupting</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Real-time / Streaming &middot; Handle interruptions</span>
+  <h1 class="page-title">Voice turn-taking and interrupting</h1>
+  <p class="explainer">In a voice call, two people share one channel. The system has to know whose turn it is, and stop talking the moment the user starts.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">Spoken turns are <em>negotiated live</em>.</h2>
+  <div class="what-card">
+    <p>Text chat has a clear handoff: I send, you send. Voice does not. A voice assistant has to listen and speak at the same time, and decide in milliseconds when its turn is up. <strong style="color:var(--accent-hover)">Turn-taking</strong> is the moment-by-moment dance of figuring out who holds the floor: detecting when the user has stopped talking, detecting when they have started talking again, and choosing whether their new audio is a question, a quick yes, or an interruption. <strong style="color:var(--accent-hover)">Interruption handling</strong> (sometimes called <em>barge-in</em>) is the action that follows: cut the spoken reply, drop the audio that has not been played yet, save what was said so far, and start listening properly. Done well, it feels like a normal conversation. Done badly, the bot talks over the user or stays silent for an awkward beat.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">User cuts in <em>mid-answer</em>.</h2>
+  <div class="vc-card" role="region" aria-label="Voice turn-taking demo">
+    <div class="vc-bar">
+      <span class="vc-bar-label">Voice timeline: assistant speaking, user cuts in</span>
+      <span class="vc-status" id="vcStatus">idle</span>
+    </div>
+    <div class="vc-body">
+      <div class="vc-lane">
+        <div class="vc-lane-label"><span class="who">Assistant audio</span></div>
+        <div class="vc-track">
+          <div class="vc-bars" id="aiBars">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span class="vc-cut" id="aiCut">cut</span>
+        </div>
+      </div>
+      <div class="vc-lane">
+        <div class="vc-lane-label"><span class="who">User microphone</span></div>
+        <div class="vc-track">
+          <div class="vc-bars user" id="userBars">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+      <div class="vc-script" id="vcScript" aria-live="polite">
+        <div class="vc-line user" data-step="1"><span class="role">User</span><span class="said">"What is the weather in Cairo today?"</span></div>
+        <div class="vc-line ai" data-step="2"><span class="role">Assistant</span><span class="said">"Right now in Cairo it is 31 degrees and sunny, with a light..."</span></div>
+        <div class="vc-line user" data-step="3"><span class="role">User</span><span class="said">"Actually, just give me tomorrow."</span></div>
+        <div class="vc-line sys" data-step="4"><span class="role">System</span><span class="said">Heard user, cut audio playback, dropped the rest of the spoken reply.</span></div>
+        <div class="vc-line ai" data-step="5"><span class="role">Assistant</span><span class="said">"Tomorrow looks 28 and cloudy."</span></div>
+      </div>
+    </div>
+    <div class="vc-footer">
+      <span id="vcNote">Press play. Watch the assistant stop the moment the user's bars light up.</span>
+      <button class="vc-btn" id="vcBtn">Play</button>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it sits next to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it does</div>
+      <div class="fits-desc">Decides whose turn it is on a shared voice channel and acts on a barge-in: cut the audio, drop the unread tail, switch to listening.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">Sits on top of clean stopping (the cut sequence) and first-word time (so the next reply starts fast). Voice activity detection feeds the turn decision.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Not this</div>
+      <div class="fits-desc">It is not just speech-to-text. The transcript is one input; deciding when the user has the floor is a separate, ongoing call.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Any voice product where the user expects to talk over the assistant the way they would a person.</li>
+    <li>Customer support, accessibility, and hands-free use, where a wrong-turn moment frustrates fast.</li>
+    <li>Phone calls and headsets, where audio cannot be unsaid once it plays.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-real-time.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Real-time / Streaming</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Skantze, G. (2021). <em>Turn-taking in conversational systems and human-robot interaction: a review.</em> Computer Speech & Language, 67. <span class="note">Survey of the turn-taking problem from classic dialogue systems through modern voice agents.</span></li>
+    <li>OpenAI. (2024). <em>Realtime API: voice activity detection, server VAD, and interruption.</em> Documentation. <span class="note">Reference implementation showing the listening-and-speaking loop and the interrupt path in production.</span></li>
+    <li>Sacks, H., Schegloff, E. & Jefferson, G. (1974). <em>A simplest systematics for the organization of turn-taking for conversation.</em> Language, 50(4). <span class="note">Classic paper that frames the problem of turn allocation that voice agents now solve in software.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  const btn = document.getElementById('vcBtn');
+  const status = document.getElementById('vcStatus');
+  const note = document.getElementById('vcNote');
+  const aiBars = document.getElementById('aiBars');
+  const userBars = document.getElementById('userBars');
+  const aiCut = document.getElementById('aiCut');
+  const lines = document.querySelectorAll('.vc-line');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const steps = [
+    { time: 0, who: 'user', stat: 'user speaking', note: 'User asks their question.', show: [1] },
+    { time: 1100, who: 'ai', stat: 'assistant speaking', note: 'Assistant starts the reply, audio playing.', show: [1, 2] },
+    { time: 3100, who: 'both', stat: 'user cutting in', note: 'User starts talking again. The system detects it within a fraction of a second.', show: [1, 2, 3] },
+    { time: 3500, who: 'cut', stat: 'audio cut', note: 'Cut: assistant audio stops, the tail is dropped.', show: [1, 2, 3, 4] },
+    { time: 4400, who: 'ai', stat: 'assistant replies', note: 'Assistant answers the new question with a tight reply.', show: [1, 2, 3, 4, 5] },
+    { time: 5800, who: 'done', stat: 'finished', note: 'Done. The conversation kept moving without anyone talking over anyone else.', show: [1, 2, 3, 4, 5] }
+  ];
+
+  let timers = [];
+  function clear() { timers.forEach(function (t) { clearTimeout(t); }); timers = []; }
+  function reset() {
+    clear();
+    aiBars.classList.remove('live');
+    userBars.classList.remove('live');
+    aiCut.classList.remove('show');
+    status.textContent = 'idle';
+    status.className = 'vc-status';
+    note.textContent = 'Press play. Watch the assistant stop the moment the user\'s bars light up.';
+    lines.forEach(function (l) { l.classList.remove('live'); });
+    btn.disabled = false;
+    btn.textContent = 'Play';
+  }
+  function applyStep(s) {
+    status.textContent = s.stat;
+    status.className = 'vc-status ' + (s.who === 'user' ? 'user' : s.who === 'ai' ? 'ai' : s.who === 'cut' ? 'cut' : '');
+    note.textContent = s.note;
+    if (s.who === 'user') { userBars.classList.add('live'); aiBars.classList.remove('live'); aiCut.classList.remove('show'); }
+    else if (s.who === 'ai') { aiBars.classList.add('live'); userBars.classList.remove('live'); aiCut.classList.remove('show'); }
+    else if (s.who === 'both') { aiBars.classList.add('live'); userBars.classList.add('live'); }
+    else if (s.who === 'cut') { aiBars.classList.remove('live'); aiCut.classList.add('show'); userBars.classList.add('live'); }
+    else { aiBars.classList.remove('live'); userBars.classList.remove('live'); aiCut.classList.remove('show'); }
+    lines.forEach(function (l) { l.classList.remove('live'); });
+    s.show.forEach(function (n) {
+      const el = document.querySelector('.vc-line[data-step="' + n + '"]');
+      if (el) el.classList.add('live');
+    });
+  }
+  function play() {
+    reset();
+    btn.disabled = true;
+    btn.textContent = 'Playing...';
+    const scale = reduce ? 0.02 : 1;
+    steps.forEach(function (s) {
+      timers.push(setTimeout(function () { applyStep(s); }, s.time * scale));
+    });
+    timers.push(setTimeout(function () {
+      btn.disabled = false;
+      btn.textContent = 'Replay';
+      btn.onclick = function () { reset(); setTimeout(play, 60); };
+    }, (steps[steps.length - 1].time + 400) * scale));
+  }
+  btn.onclick = play;
+}());
+</script>
+</body>
+</html>

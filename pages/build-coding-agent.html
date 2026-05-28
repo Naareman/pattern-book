@@ -251,21 +251,51 @@
   .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
   .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 
-  /* ========== REAL EXAMPLE ========== */
-  .example-card {
+  /* ========== PATTERNS IT USES chips ========== */
+  .piu-grid {
+    display: flex; flex-wrap: wrap; gap: 10px;
+  }
+  .piu-chip {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    padding: 8px 14px;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+    line-height: 1.4;
+  }
+  .piu-chip:hover { border-color: var(--accent); background: #e4dcfe; }
+  .piu-chip .chip-name { font-size: 13px; font-weight: 600; color: var(--accent-hover); white-space: nowrap; }
+  .piu-chip .chip-clause { font-size: 12px; font-weight: 400; color: var(--soft); }
+  .piu-chip:hover .chip-name { color: var(--accent); }
+
+  /* ========== TAP-THROUGH step sequence ========== */
+  .step-seq {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
   }
-  .example-row { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 16px; }
-  .example-row:last-child { margin-bottom: 0; }
-  .example-num {
-    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
-    background: var(--accent-soft); border: 1px solid var(--accent);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700; color: var(--accent-hover);
+  .step-pills {
+    display: flex; gap: 0; border-bottom: 1px solid var(--border);
+    overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
   }
-  .example-text { font-size: 15px; line-height: 1.55; color: var(--soft); padding-top: 2px; }
-  .example-text strong { color: var(--text); font-weight: 600; }
+  .step-pills::-webkit-scrollbar { display: none; }
+  .step-pill {
+    flex: 1; min-width: 0; padding: 12px 10px;
+    border: none; border-right: 1px solid var(--border);
+    background: var(--bg-subtle); cursor: pointer;
+    font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+    color: var(--faint); text-align: center; white-space: nowrap;
+    transition: background .18s ease, color .18s ease;
+  }
+  .step-pill:last-child { border-right: none; }
+  .step-pill[aria-selected="true"] {
+    background: var(--accent-soft); color: var(--accent-hover);
+    border-bottom: 2px solid var(--accent);
+  }
+  .step-pill:hover:not([aria-selected="true"]) { background: var(--bg); color: var(--soft); }
+  .step-card { padding: 24px 26px; }
+  .step-card-name { font-weight: 600; font-size: 15px; color: var(--text); margin-bottom: 8px; }
+  .step-card-text { font-size: 14px; line-height: 1.65; color: var(--soft); }
+  .step-card-text strong { color: var(--accent-hover); font-weight: 600; }
 
   /* ========== TRADEOFFS ========== */
   .tradeoffs-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
@@ -469,33 +499,47 @@
   </div>
 </section>
 
-<!-- 03 A REAL EXAMPLE -->
+<!-- 03 PATTERNS IT USES -->
 <section>
-  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <div class="section-label"><span class="num">03</span>Patterns It Uses</div>
+  <h2>The <em>pieces</em> inside.</h2>
+  <div class="piu-grid" role="list" aria-label="Patterns used by this build">
+    <a class="piu-chip" href="layer-orchestration-agents.html" role="listitem">
+      <span class="chip-name">Orchestration &amp; Agents</span>
+      <span class="chip-clause">drives the plan-edit-run loop</span>
+    </a>
+    <a class="piu-chip" href="layer-single-call-control.html" role="listitem">
+      <span class="chip-name">Single-Call Control</span>
+      <span class="chip-clause">builds each edit prompt</span>
+    </a>
+    <a class="piu-chip" href="layer-stateless-retrieval.html" role="listitem">
+      <span class="chip-name">Stateless Retrieval</span>
+      <span class="chip-clause">reads the relevant code files</span>
+    </a>
+  </div>
+</section>
+
+<!-- 04 A REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">04</span>A Real Example</div>
   <h2>What it looks like <em>in practice</em>.</h2>
-  <div class="example-card">
-    <div class="example-row">
-      <div class="example-num" aria-hidden="true">1</div>
-      <div class="example-text">You tell GitHub Copilot Workspace: <strong>"Refactor the login handler to use the new auth library."</strong> No more instructions needed.</div>
+  <div class="step-seq" role="region" aria-label="Step-by-step coding agent example">
+    <div class="step-pills" role="tablist" aria-label="Agent steps" id="codePills">
+      <button class="step-pill" role="tab" aria-selected="true" aria-controls="codeCard" data-step="0" tabindex="0">Step 1</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="codeCard" data-step="1" tabindex="-1">Step 2</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="codeCard" data-step="2" tabindex="-1">Step 3</button>
+      <button class="step-pill" role="tab" aria-selected="false" aria-controls="codeCard" data-step="3" tabindex="-1">Step 4</button>
     </div>
-    <div class="example-row">
-      <div class="example-num" aria-hidden="true">2</div>
-      <div class="example-text">The agent reads the current login code, finds every place that calls the old auth API, and writes a plan listing each file it will touch.</div>
-    </div>
-    <div class="example-row">
-      <div class="example-num" aria-hidden="true">3</div>
-      <div class="example-text">It edits each file, then runs the existing tests. Two fail. It reads the error messages, patches the two calls it missed, and runs again.</div>
-    </div>
-    <div class="example-row">
-      <div class="example-num" aria-hidden="true">4</div>
-      <div class="example-text">All tests pass. It opens a pull request with a description of every change it made. You review and merge.</div>
+    <div class="step-card" id="codeCard" role="tabpanel" aria-live="polite">
+      <div class="step-card-name" id="codeCardName">You give one task</div>
+      <div class="step-card-text" id="codeCardText">You tell GitHub Copilot Workspace: <strong>"Refactor the login handler to use the new auth library."</strong> No more instructions needed.</div>
     </div>
   </div>
 </section>
 
-<!-- 04 TRADEOFFS -->
+<!-- 05 TRADEOFFS -->
 <section>
-  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <div class="section-label"><span class="num">05</span>Tradeoffs</div>
   <h2>The <em>price</em> you pay.</h2>
   <div class="tradeoffs-stage">
     <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
@@ -772,6 +816,44 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // start clean
 demoReset();
+
+// ============ TAP-THROUGH: real example ============
+const codeSteps = [
+  { name: 'You give one task',          text: 'You tell GitHub Copilot Workspace: <strong>"Refactor the login handler to use the new auth library."</strong> No more instructions needed.' },
+  { name: 'Agent reads and plans',      text: 'The agent reads the current login code, finds every place that calls the old auth API, and writes a plan listing each file it will touch.' },
+  { name: 'Edit, run, fix',             text: 'It edits each file, then runs the existing tests. Two fail. It reads the error messages, patches the two calls it missed, and runs again.' },
+  { name: 'All tests pass',             text: 'All tests pass. It opens a pull request with a description of every change it made. You review and merge.' },
+];
+const codePillEls  = document.querySelectorAll('#codePills .step-pill');
+const codeCardName = document.getElementById('codeCardName');
+const codeCardText = document.getElementById('codeCardText');
+
+function showCodeStep(idx) {
+  codePillEls.forEach((p, i) => {
+    const active = i === idx;
+    p.setAttribute('aria-selected', active ? 'true' : 'false');
+    p.tabIndex = active ? 0 : -1;
+  });
+  codeCardName.textContent = codeSteps[idx].name;
+  codeCardText.innerHTML   = codeSteps[idx].text;
+}
+
+codePillEls.forEach((pill, idx) => {
+  pill.addEventListener('click', () => showCodeStep(idx));
+  pill.addEventListener('keydown', (e) => {
+    let next = idx;
+    if (e.key === 'ArrowRight') next = Math.min(idx + 1, codeSteps.length - 1);
+    else if (e.key === 'ArrowLeft') next = Math.max(idx - 1, 0);
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = codeSteps.length - 1;
+    else return;
+    e.preventDefault();
+    showCodeStep(next);
+    codePillEls[next].focus();
+  });
+});
+
+showCodeStep(0);
 </script>
 </body>
 </html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playbook for when things go wrong · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --bg-subtle:#F6F7F9;
+    --green:#0E9F6E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* timeline runbook */
+  .runbook-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .runbook-header { padding: 12px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); display: flex; align-items: center; justify-content: space-between; }
+  .runbook-clock { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text); letter-spacing: 0; text-transform: none; }
+  .runbook-body { padding: 22px 24px; }
+  .runbook-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .runbook-tab { font-family: inherit; font-size: 12.5px; font-weight: 600; padding: 7px 12px; border: 1px solid var(--border-strong); background: var(--bg-subtle); border-radius: 18px; cursor: pointer; color: var(--text); transition: border-color .15s, color .15s, background .15s; }
+  .runbook-tab:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .runbook-tab.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .runbook-step { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; }
+  .runbook-step .who { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--accent-hover); margin-bottom: 6px; }
+  .runbook-step .what { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 500; color: var(--text); line-height: 1.2; margin-bottom: 8px; }
+  .runbook-step .how { font-size: 14px; color: var(--soft); line-height: 1.6; }
+  .runbook-rail { display: flex; gap: 6px; margin-top: 16px; }
+  .runbook-dot { flex: 1; height: 6px; border-radius: 3px; background: var(--border-strong); transition: background .2s ease; }
+  .runbook-dot.active { background: var(--accent); }
+  .runbook-dot.past { background: var(--accent-soft); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-cost.html"><span aria-hidden="true">&larr;</span> Cost, Latency &amp; Reliability</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-cost.html">Cost, Latency &amp; Reliability</a><span class="sep" aria-hidden="true">/</span><span class="here">Hold the line when things break</span><span class="sep" aria-hidden="true">/</span><span class="here">Playbook for when things go wrong</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Cost, Latency &amp; Reliability &middot; Hold the line when things break</span>
+  <h1 class="page-title">Playbook for when things go wrong</h1>
+  <p class="explainer">A written sequence the team runs the moment the service starts to misbehave: who calls it, who fixes it, who tells the customer.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What It Is</div>
+  <h2 id="what-heading">A page everyone reads <em>at 3 a.m.</em></h2>
+  <div class="what-card">
+    <p>An <strong style="color:var(--accent-hover)">incident playbook</strong> is the short, plain document the team reaches for when a target starts slipping. It names the roles (someone runs the response, someone fixes the system, someone talks to customers), the first three checks to run, the fallbacks to flip, and the way to write down what happened after. The aim is to move the team from panic to method in the first five minutes.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">A model provider goes down. <em>Step through it.</em></h2>
+  <div class="runbook-card" role="region" aria-label="Incident playbook step through">
+    <div class="runbook-header">
+      <span>Model provider outage</span>
+      <span class="runbook-clock" id="rb-clock">00:00</span>
+    </div>
+    <div class="runbook-body">
+      <div class="runbook-tabs" role="tablist" aria-label="Step through the playbook">
+        <button type="button" class="runbook-tab active" role="tab" aria-selected="true" data-s="0">1. Detect</button>
+        <button type="button" class="runbook-tab" role="tab" aria-selected="false" data-s="1">2. Declare</button>
+        <button type="button" class="runbook-tab" role="tab" aria-selected="false" data-s="2">3. Fall back</button>
+        <button type="button" class="runbook-tab" role="tab" aria-selected="false" data-s="3">4. Communicate</button>
+        <button type="button" class="runbook-tab" role="tab" aria-selected="false" data-s="4">5. Resolve</button>
+        <button type="button" class="runbook-tab" role="tab" aria-selected="false" data-s="5">6. Learn</button>
+      </div>
+      <div class="runbook-step">
+        <div class="who" id="rb-who">Monitoring</div>
+        <div class="what" id="rb-what">Errors spike past the alert line.</div>
+        <div class="how" id="rb-how">Alert fires when the error rate stays above 2% for two minutes. On-call pager wakes up.</div>
+      </div>
+      <div class="runbook-rail" aria-hidden="true" id="rb-rail">
+        <span class="runbook-dot active"></span>
+        <span class="runbook-dot"></span>
+        <span class="runbook-dot"></span>
+        <span class="runbook-dot"></span>
+        <span class="runbook-dot"></span>
+        <span class="runbook-dot"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">How much can break before you act. The budget tells the team to reach for the playbook. The playbook says what to do once they reach for it.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Feeds it</div>
+      <div class="fits-desc">Traces and metrics from the observability layer. A playbook with no live data is a script the team cannot follow.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>The service is live for paying customers and a bad hour is felt by the business.</li>
+    <li>The team is on call and the on-call rotation includes people who joined this quarter.</li>
+    <li>You depend on outside model providers and you need a rehearsed move for when one goes down.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-cost.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Cost, Latency &amp; Reliability</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Beyer et al. (2016). <em>Site Reliability Engineering, incident management chapter.</em> <span class="note">The standard structure: incident commander, operations lead, communications lead.</span></li>
+    <li>PagerDuty (2024). <em>Incident response documentation.</em> <span class="note">Open-source playbooks for severity levels, declaration, and postmortems.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function(){
+  var steps = [
+    { clock: '00:00', who: 'Monitoring', what: 'Errors spike past the alert line.', how: 'Alert fires when the error rate stays above 2% for two minutes. On-call pager wakes up.' },
+    { clock: '00:02', who: 'On-call engineer', what: 'Open the incident.', how: 'Start a shared room. Name a commander, an operations lead, and a comms lead. The clock is now ticking and visible to the team.' },
+    { clock: '00:05', who: 'Operations lead', what: 'Flip the fallback model.', how: 'Route traffic to the secondary model. Quality drops a little, the service stays up. Cached answers serve the most common requests.' },
+    { clock: '00:10', who: 'Comms lead', what: 'Post the first update.', how: 'A short note on the status page and in the customer channel: what is happening, who is on it, when the next update lands.' },
+    { clock: '00:35', who: 'On-call engineer', what: 'Primary back online.', how: 'Traffic rolls back to the primary model in stages, watched the whole time. The status page closes the incident.' },
+    { clock: '+1 day', who: 'Whole team', what: 'Write down what we learned.', how: 'A blameless review: timeline, what worked, what to change. Two or three concrete follow-ups land in the backlog.' }
+  ];
+  var tabs = document.querySelectorAll('.runbook-tab');
+  var dots = document.querySelectorAll('.runbook-dot');
+  var clk = document.getElementById('rb-clock'), who = document.getElementById('rb-who'), what = document.getElementById('rb-what'), how = document.getElementById('rb-how');
+
+  function render(i){
+    var s = steps[i];
+    clk.textContent = s.clock;
+    who.textContent = s.who;
+    what.textContent = s.what;
+    how.textContent = s.how;
+    dots.forEach(function(d, idx){
+      d.classList.remove('active', 'past');
+      if(idx < i) d.classList.add('past');
+      else if(idx === i) d.classList.add('active');
+    });
+  }
+
+  tabs.forEach(function(tab, i){
+    tab.addEventListener('click', function(){
+      tabs.forEach(function(t){ t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      render(parseInt(tab.getAttribute('data-s'), 10));
+    });
+  });
+}());
+</script>
+</body>
+</html>

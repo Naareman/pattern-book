@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checking quality as it streams &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px; --bg-subtle:#F6F7F9;
+    --green:#0E9F6E; --green-soft:rgba(14,159,110,0.10);
+    --orange:#E8882A; --orange-soft:rgba(232,136,42,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* quality bar demo */
+  .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .q-bar { padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--bg-subtle); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .q-bar-label { font-size: 12px; font-weight: 600; color: var(--soft); text-transform: uppercase; letter-spacing: .06em; }
+  .q-status { font-size: 12px; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--faint); }
+  .q-status.ok { color: var(--green); }
+  .q-status.warn { color: var(--orange); }
+  .q-body { padding: 22px; display: grid; grid-template-columns: 1fr 280px; gap: 18px; align-items: stretch; }
+  .q-stream { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8; color: var(--text); min-height: 180px; }
+  .q-stream .seg { padding: 1px 3px; border-radius: 3px; }
+  .q-stream .seg.good { background: var(--green-soft); }
+  .q-stream .seg.bad { background: var(--orange-soft); color: var(--orange); }
+  .q-cursor { display: inline-block; width: 2px; height: 1em; background: var(--accent); vertical-align: text-bottom; animation: blink 1s step-end infinite; margin-left: 1px; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .q-meter { display: flex; flex-direction: column; gap: 12px; }
+  .q-row { display: flex; flex-direction: column; gap: 4px; }
+  .q-row-label { font-size: 12px; font-weight: 600; color: var(--text); display: flex; align-items: center; justify-content: space-between; }
+  .q-row-label .val { font-family: 'JetBrains Mono', monospace; color: var(--soft); }
+  .q-track { height: 8px; background: var(--bg-subtle); border-radius: 6px; overflow: hidden; }
+  .q-fill { height: 100%; background: var(--accent); transition: width .4s ease, background .4s ease; }
+  .q-fill.warn { background: var(--orange); }
+  .q-footer { padding: 12px 20px; border-top: 1px solid var(--border); background: var(--bg-subtle); font-size: 13px; color: var(--soft); line-height: 1.6; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .q-btn { padding: 6px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: var(--surface); font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer; transition: all .2s; }
+  .q-btn:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 720px) { .q-body { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { h1.page-title { font-size: 30px; } .explainer { font-size: 15px; } h2 { font-size: 21px; } .fits-row { flex-wrap: wrap; } .fits-label { min-width: 0; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-real-time.html"><span aria-hidden="true">&larr;</span> Real-time / Streaming</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-real-time.html">Real-time / Streaming</a><span class="sep" aria-hidden="true">/</span><span>Keep the words flowing</span><span class="sep" aria-hidden="true">/</span><span class="here">Checking quality as it streams</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Real-time / Streaming &middot; Keep the words flowing</span>
+  <h1 class="page-title">Checking quality as it streams</h1>
+  <p class="explainer">Score the answer while it is being written, so you can spot trouble before the user reads to the end.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">A live read of <em>how it is going</em>.</h2>
+  <div class="what-card">
+    <p>When an answer is streamed, every new word is also a new chance to look at the whole thing so far and ask: is this still on track? <strong style="color:var(--accent-hover)">Streaming quality checks</strong> run light scores against the growing text as it arrives. A short script can watch tone, look up named facts against a source, or sniff for repetition and drift. The scores update in place. The benefit is early warning: a low score during the third sentence is much cheaper to act on than a low score on the final paragraph after the user has already seen it.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Watch the meters move <em>while the reply writes</em>.</h2>
+  <div class="q-card" role="region" aria-label="Live quality meter demo">
+    <div class="q-bar">
+      <span class="q-bar-label">Streaming reply with live quality scores</span>
+      <span class="q-status" id="qStatus">idle</span>
+    </div>
+    <div class="q-body">
+      <div class="q-stream" id="qStream" aria-live="polite">
+        <span id="qText"></span><span class="q-cursor" id="qCursor" aria-hidden="true"></span>
+      </div>
+      <div class="q-meter" aria-label="Live quality meters">
+        <div class="q-row">
+          <div class="q-row-label"><span>On-topic</span><span class="val" id="vTopic">0%</span></div>
+          <div class="q-track"><div class="q-fill" id="fTopic" style="width: 0%"></div></div>
+        </div>
+        <div class="q-row">
+          <div class="q-row-label"><span>Grounded in source</span><span class="val" id="vGround">0%</span></div>
+          <div class="q-track"><div class="q-fill" id="fGround" style="width: 0%"></div></div>
+        </div>
+        <div class="q-row">
+          <div class="q-row-label"><span>Repetition</span><span class="val" id="vRep">0%</span></div>
+          <div class="q-track"><div class="q-fill" id="fRep" style="width: 0%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="q-footer">
+      <span id="qNote">Press play to watch the meters move while the reply writes.</span>
+      <button class="q-btn" id="qBtn">Play</button>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">How it sits next to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">What it does</div>
+      <div class="fits-desc">Reads the answer as it grows and gives a running score, so a problem is visible the moment it starts.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Pairs with</div>
+      <div class="fits-desc">It is the input to clean stopping and to charging logic. A poor score on the meter is what gives the system a reason to cut, fall back, or refund.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Not this</div>
+      <div class="fits-desc">It is for quality, not safety. Sniffing for harmful content mid-stream is a separate check with its own rules.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>Live answers where waiting until the end to score is too late.</li>
+    <li>Long, expensive replies where catching a poor one early saves the rest of the spend.</li>
+    <li>Multi-model or routed setups where you want signals to compare versions on real traffic.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-real-time.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Real-time / Streaming</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Lin, S. et al. (2024). <em>Streaming-LLM evaluation: incremental scoring of partial generations.</em> arXiv:2408.13257. <span class="note">Discusses scoring methods that work on token prefixes rather than completed outputs.</span></li>
+    <li>Es, S. et al. (2023). <em>Ragas: automated evaluation of retrieval-augmented generation.</em> arXiv:2309.15217. <span class="note">Defines the faithfulness and answer-relevance signals adapted here for live scoring against a source.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function () {
+  const btn = document.getElementById('qBtn');
+  const text = document.getElementById('qText');
+  const cursor = document.getElementById('qCursor');
+  const status = document.getElementById('qStatus');
+  const note = document.getElementById('qNote');
+  const fTopic = document.getElementById('fTopic');
+  const fGround = document.getElementById('fGround');
+  const fRep = document.getElementById('fRep');
+  const vTopic = document.getElementById('vTopic');
+  const vGround = document.getElementById('vGround');
+  const vRep = document.getElementById('vRep');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const steps = [
+    { add: 'A pacemaker is a small device ', topic: 80, ground: 70, rep: 6, status: 'streaming', note: 'On-topic and grounded. Repetition low.' },
+    { add: 'placed under the skin to help ', topic: 88, ground: 80, rep: 7, status: 'streaming', note: 'Scores rising as detail is added.' },
+    { add: 'control the heartbeat. ', topic: 92, ground: 86, rep: 8, status: 'streaming', note: 'Strong: a clear, supported sentence.' },
+    { add: 'It sends gentle electric ', topic: 90, ground: 84, rep: 10, status: 'streaming', note: 'Still on track.' },
+    { add: 'pulses when the heart beats too slowly. ', topic: 91, ground: 88, rep: 11, status: 'streaming', note: 'Grounding strong (matches the source page).' },
+    { add: 'Pulses, pulses, the pulses keep ', topic: 70, ground: 65, rep: 55, status: 'warning', note: 'Repetition climbing fast. Quality check fires.' },
+    { add: 'going and going every minute. ', topic: 55, ground: 50, rep: 72, status: 'warning', note: 'Trouble: meters drop, the system would cut or fall back here.' }
+  ];
+
+  let running = false;
+  function reset() {
+    text.innerHTML = '';
+    status.textContent = 'idle';
+    status.className = 'q-status';
+    note.textContent = 'Press play to watch the meters move while the reply writes.';
+    btn.textContent = 'Play';
+    btn.disabled = false;
+    cursor.style.display = 'inline-block';
+    [fTopic, fGround].forEach(function (f) { f.style.width = '0%'; f.classList.remove('warn'); });
+    fRep.style.width = '0%';
+    fRep.classList.remove('warn');
+    vTopic.textContent = vGround.textContent = vRep.textContent = '0%';
+    running = false;
+  }
+  function set(el, val, fill, warnHigh) {
+    fill.style.width = val + '%';
+    el.textContent = val + '%';
+    fill.classList.toggle('warn', warnHigh ? val > 40 : val < 70);
+  }
+  function play() {
+    if (running) return;
+    running = true;
+    btn.disabled = true;
+    text.innerHTML = '';
+    let i = 0;
+    const delay = reduce ? 20 : 720;
+    function step() {
+      if (i >= steps.length) {
+        cursor.style.display = 'none';
+        btn.disabled = false;
+        btn.textContent = 'Replay';
+        btn.onclick = function () { reset(); setTimeout(play, 60); };
+        return;
+      }
+      const s = steps[i++];
+      const span = document.createElement('span');
+      span.className = 'seg ' + (s.status === 'warning' ? 'bad' : 'good');
+      span.textContent = s.add;
+      text.appendChild(span);
+      set(vTopic, s.topic, fTopic, false);
+      set(vGround, s.ground, fGround, false);
+      set(vRep, s.rep, fRep, true);
+      status.textContent = s.status;
+      status.className = 'q-status ' + (s.status === 'streaming' ? 'ok' : 'warn');
+      note.textContent = s.note;
+      setTimeout(step, delay);
+    }
+    step();
+  }
+  btn.onclick = play;
+}());
+</script>
+</body>
+</html>

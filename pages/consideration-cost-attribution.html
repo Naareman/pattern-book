@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knowing what costs what · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* stacked-bar receipt */
+  .bill-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .bill-header { padding: 12px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); }
+  .bill-total { color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0; text-transform: none; }
+  .bill-body { padding: 20px 22px; }
+  .bill-bar { display: flex; height: 22px; border-radius: 11px; overflow: hidden; border: 1px solid var(--border); }
+  .bill-seg { height: 100%; cursor: pointer; transition: filter .15s ease; }
+  .bill-seg:hover, .bill-seg:focus { filter: brightness(.92); outline: none; }
+  .bill-seg.s1 { background: #C9BBFB; }
+  .bill-seg.s2 { background: #9F86F4; }
+  .bill-seg.s3 { background: #7C5CF6; }
+  .bill-seg.s4 { background: #5536D8; }
+  .bill-legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; margin-top: 16px; }
+  .bill-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--soft); }
+  .bill-dot { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+  .bill-item strong { color: var(--text); font-weight: 600; }
+  .bill-item .pct { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--faint); margin-left: auto; }
+  .bill-note { margin-top: 16px; padding: 12px 14px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; color: var(--soft); line-height: 1.55; }
+  .bill-note strong { color: var(--text); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-list { list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 24px; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+    .bill-legend { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-cost.html"><span aria-hidden="true">&larr;</span> Cost, Latency &amp; Reliability</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="considerations.html">Considerations</a><span class="sep" aria-hidden="true">/</span><a href="consideration-cost.html">Cost, Latency &amp; Reliability</a><span class="sep" aria-hidden="true">/</span><span class="here">Set the budget</span><span class="sep" aria-hidden="true">/</span><span class="here">Knowing what costs what</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Cost, Latency &amp; Reliability &middot; Set the budget</span>
+  <h1 class="page-title">Knowing what costs what</h1>
+  <p class="explainer">Trace each dollar back to the part of the system that spent it: a model, a step, a feature, a customer.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What It Is</div>
+  <h2 id="what-heading">Itemize the <em>bill</em>.</h2>
+  <div class="what-card">
+    <p><strong style="color:var(--accent-hover)">Cost attribution</strong> is the habit of tagging every call so the bill at the end of the month tells you a story. Each request carries labels (which model, which feature, which user tier, which step). The platform groups spend by those labels. Then a spike becomes a question you can answer: which feature, which model, which customer.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An Example</div>
+  <h2 id="example-heading">One month of spend, <em>broken down</em>.</h2>
+  <div class="bill-card" role="region" aria-label="Monthly cost breakdown by feature">
+    <div class="bill-header">
+      <span>Monthly bill by feature</span>
+      <span class="bill-total">$ 8,420</span>
+    </div>
+    <div class="bill-body">
+      <div class="bill-bar" role="img" aria-label="Stacked bar showing feature share of monthly spend">
+        <div class="bill-seg s4" style="width: 46%;" data-id="chat" tabindex="0" aria-label="Chat assistant, 46 percent"></div>
+        <div class="bill-seg s3" style="width: 28%;" data-id="search" tabindex="0" aria-label="Document search, 28 percent"></div>
+        <div class="bill-seg s2" style="width: 17%;" data-id="summary" tabindex="0" aria-label="Daily summaries, 17 percent"></div>
+        <div class="bill-seg s1" style="width: 9%;" data-id="other" tabindex="0" aria-label="Other, 9 percent"></div>
+      </div>
+      <div class="bill-legend">
+        <div class="bill-item"><span class="bill-dot" style="background:#5536D8"></span><strong>Chat assistant</strong><span class="pct">46%</span></div>
+        <div class="bill-item"><span class="bill-dot" style="background:#7C5CF6"></span><strong>Document search</strong><span class="pct">28%</span></div>
+        <div class="bill-item"><span class="bill-dot" style="background:#9F86F4"></span><strong>Daily summaries</strong><span class="pct">17%</span></div>
+        <div class="bill-item"><span class="bill-dot" style="background:#C9BBFB"></span><strong>Other</strong><span class="pct">9%</span></div>
+      </div>
+      <div class="bill-note" id="bill-note">
+        <strong>Reading the bar:</strong> chat is almost half the spend. If the team wants to save money, that is the first place to look.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where It Fits</div>
+  <h2 id="fits-heading">How it relates to <em>nearby ideas</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Feeds it</div>
+      <div class="fits-desc">The runtime emits a trace for every call. Attribution reads those traces, groups the cost, and shows the total by label.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Sits next to</div>
+      <div class="fits-desc">The cost and quality choice. Once you see where the money goes, you can ask whether each feature deserves the model it is using.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When It Matters</div>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
+  <ul class="matters-list">
+    <li>The monthly bill jumped and the team needs to point to a cause within an hour.</li>
+    <li>Different customer tiers pay different prices, so you need per-tier margin to make pricing calls.</li>
+    <li>One team owns the platform, many teams ship features, and each team should own the cost of what they ship.</li>
+  </ul>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-cost.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Cost, Latency &amp; Reliability</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>FinOps Foundation (2024). <em>FinOps for AI: cost allocation and tagging.</em> <span class="note">Treats LLM spend like cloud spend: tag every call, allocate by team, surface unit economics.</span></li>
+    <li>OpenAI (2024). <em>Usage tracking and project-level billing.</em> <span class="note">Projects and API keys give the labels that group spend by feature or customer.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function(){
+  var notes = {
+    chat: '<strong>Chat assistant:</strong> almost half the spend. Long conversations and large models drive the cost.',
+    search: '<strong>Document search:</strong> a quarter of the bill. Embedding and rerank calls add up at scale.',
+    summary: '<strong>Daily summaries:</strong> a steady share that runs in the background for every active account.',
+    other: '<strong>Other:</strong> small experiments and internal tools.'
+  };
+  var defaultNote = document.getElementById('bill-note').innerHTML;
+  document.querySelectorAll('.bill-seg').forEach(function(seg){
+    function setNote(){
+      var id = seg.getAttribute('data-id');
+      document.getElementById('bill-note').innerHTML = notes[id] || defaultNote;
+    }
+    seg.addEventListener('click', setNote);
+    seg.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); setNote(); }});
+  });
+}());
+</script>
+</body>
+</html>

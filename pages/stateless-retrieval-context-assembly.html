@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pack the pieces into the prompt &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .what-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .what-card p { font-size: 16px; line-height: 1.7; color: var(--text); }
+
+  /* assembly visual: stacked prompt blocks */
+  .pack-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .pack-header { padding: 12px 18px; background: var(--bg-subtle); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .pack-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+  .pack-block { padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: #fff; display: flex; flex-direction: column; gap: 4px; }
+  .pack-block .tag { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: .05em; }
+  .pack-block .body { font-size: 13.5px; color: var(--soft); line-height: 1.55; }
+  .pack-block.instr { border-left: 3px solid var(--accent); }
+  .pack-block.piece { background: var(--bg-subtle); }
+  .pack-block.q { border: 1px solid var(--accent); background: var(--accent-soft); }
+  .pack-block.q .body { color: var(--text); font-weight: 500; }
+  .pack-note { padding: 12px 14px; background: var(--bg-subtle); border-top: 1px solid var(--border); font-size: 13px; color: var(--soft); line-height: 1.55; }
+  .pack-note strong { color: var(--text); }
+
+  .fits-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .fits-row { display: flex; align-items: baseline; gap: 12px; }
+  .fits-label { font-size: 14px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 120px; }
+  .fits-desc { font-size: 14px; color: var(--soft); line-height: 1.55; }
+  .fits-divider { height: 1px; background: var(--border); }
+
+  .matters-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .fits-row { flex-wrap: wrap; }
+    .fits-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="layer-stateless-retrieval.html"><span aria-hidden="true">&larr;</span> Stateless Retrieval</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-stateless-retrieval.html">Stateless Retrieval</a><span class="sep" aria-hidden="true">/</span><span class="here">Feed it in well &middot; Pack the pieces into the prompt</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Stateless Retrieval &middot; Feed it in well</span>
+  <h1 class="page-title">Pack the pieces into the prompt</h1>
+  <p class="explainer">Once the right pieces are found, they have to be laid into the prompt in a clear shape: instructions on top, pieces in the middle, the actual question at the end.</p>
+</header>
+
+<section aria-labelledby="what-heading">
+  <div class="section-label"><span class="num">01</span>What is it?</div>
+  <h2 id="what-heading">A clear <em>shape</em> for the prompt the model reads.</h2>
+  <div class="what-card">
+    <p>Assembly is the step that builds the actual text sent to the model. You write a short instruction (use only the passages below), paste the matched pieces in a clean list with their source labels, then put the user's question at the very end. The exact order, the labels, and what gets cut to stay under the size limit all live here.</p>
+  </div>
+</section>
+
+<section aria-labelledby="example-heading">
+  <div class="section-label"><span class="num">02</span>An example</div>
+  <h2 id="example-heading">Inside one packed <em>prompt</em>.</h2>
+  <div class="pack-card" role="region" aria-label="Assembled prompt example">
+    <div class="pack-header">
+      <span>Prompt sent to the model</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:1px solid rgba(124,92,246,0.2);border-radius:8px;padding:2px 10px;">about 1,200 words</span>
+    </div>
+    <div class="pack-body">
+      <div class="pack-block instr">
+        <span class="tag">Instruction</span>
+        <span class="body">Answer the user's question using only the passages below. If the passages do not cover it, say so. Cite the source name after each fact.</span>
+      </div>
+      <div class="pack-block piece">
+        <span class="tag">Passage 1 &middot; Handbook page 12</span>
+        <span class="body">Full-time staff receive 22 paid leave days per year, granted in half-day units, refreshed on each work anniversary.</span>
+      </div>
+      <div class="pack-block piece">
+        <span class="tag">Passage 2 &middot; Handbook page 14</span>
+        <span class="body">Leave must be requested through the manager portal at least seven days in advance for any block longer than two days.</span>
+      </div>
+      <div class="pack-block piece">
+        <span class="tag">Passage 3 &middot; Holiday calendar 2026</span>
+        <span class="body">The office closes from December 24 to January 2; those days do not count against personal leave.</span>
+      </div>
+      <div class="pack-block q">
+        <span class="tag">User question (last)</span>
+        <span class="body">How many vacation days do I get, and how do I book them?</span>
+      </div>
+    </div>
+    <div class="pack-note"><strong>Why this shape:</strong> instructions first set the rule, source-labeled passages give the model something to cite, and putting the question last keeps it fresh in the model's mind right before it answers.</div>
+  </div>
+</section>
+
+<section aria-labelledby="fits-heading">
+  <div class="section-label"><span class="num">03</span>Where it fits</div>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
+  <div class="fits-card">
+    <div class="fits-row">
+      <div class="fits-label">Runs after</div>
+      <div class="fits-desc">Search and rerank. By the time assembly runs, the shortlist of pieces is already chosen; this step decides how to lay them out.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Hands off to</div>
+      <div class="fits-desc">The model call itself. The packed prompt is the exact text the model will read in one go.</div>
+    </div>
+    <div class="fits-divider" role="separator"></div>
+    <div class="fits-row">
+      <div class="fits-label">Watch for</div>
+      <div class="fits-desc">Long prompts where the key passage lands in the middle. Models tend to skim the middle, so put the most important passages near the start or the end.</div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="matters-heading">
+  <div class="section-label"><span class="num">04</span>When it matters</div>
+  <h2 id="matters-heading">When to <em>tune it</em>.</h2>
+  <div class="matters-card">
+    <ul class="matters-list">
+      <li>Retrieved pieces look correct in isolation, yet the answer is muddled or skips the obvious point.</li>
+      <li>The prompt is bumping against the size limit and pieces are getting silently dropped.</li>
+      <li>Users ask for sources and the answer cannot tell them which passage a fact came from.</li>
+    </ul>
+  </div>
+</section>
+
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-stateless-retrieval.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Stateless Retrieval</div>
+    </div>
+  </a>
+</section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Liu et al. (2023). <em>Lost in the Middle: How Language Models Use Long Contexts.</em> TACL 2024 (arXiv:2307.03172). <span class="note">Shows models recall information best at the start and end of a long prompt, and worst in the middle.</span></li>
+    <li>Gao et al. (2024). <em>Retrieval-Augmented Generation for Large Language Models: A Survey.</em> arXiv:2312.10997. <span class="note">A wide overview of how passages, instructions, and the question are arranged in modern RAG prompts.</span></li>
+    <li>Anthropic (2024). <em>Long context prompting tips.</em> docs.anthropic.com. <span class="note">Practical patterns for ordering passages and placing the question.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+</body>
+</html>
