@@ -155,7 +155,7 @@
 
   .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  /* wrapping chip grid */
   .chips { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; }
   .chip {
     flex: none; display: inline-flex; align-items: center; gap: 3px;
@@ -163,20 +163,20 @@
     line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
+  /* anchor chip */
+  a.chip { border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; position: relative; z-index: 1; }
+  a.chip:hover { background: #E3DBFD; }
+  a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
+  a.chip:hover .arr { transform: translate(1px,-1px); }
+  @media (prefers-reduced-motion:reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
 
 
-  /* see-how pill on each card */
-  .see-how {
-    display: inline-flex; align-items: center; gap: 5px;
-    margin-top: auto; padding-top: 16px;
-    font-size: 13px; font-weight: 600;
-    color: var(--accent-hover); text-decoration: none;
-    transition: color .15s ease;
-  }
-  .see-how:hover { color: var(--accent); }
+  /* see-how link at card bottom (canonical plain-text-link style) */
+  .see-how { display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 12px; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
   .see-how .arr { display: inline-block; transition: transform .18s ease; }
-  .see-how:hover .arr { transform: translateX(3px); }
-  @media (prefers-reduced-motion:reduce) { .see-how, .see-how .arr { transition: none; } .see-how:hover .arr { transform: none; } }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion:reduce) { .see-how, .see-how .arr { transition: none; } .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; } }
 
   /* card-door: the whole card is a link; the anchor sits behind everything */
   .stage-card { position: relative; }
@@ -273,9 +273,9 @@
       </div>
       <p class="stage-lead">Name the harms and rank how bad each is.</p>
       <div class="chips">
-        <span class="chip">Where to draw the line</span>
-        <span class="chip">Name and rank the harms</span>
-        <span class="chip">Values, not just rules</span>
+        <a class="chip" href="consideration-safety-line.html">Where to draw the line<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-safety-harms-ranking.html">Name and rank the harms<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-safety-principles.html">Values, not just rules<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
       <a class="see-how" href="consideration-safety-off-limits.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
@@ -293,8 +293,8 @@
       </div>
       <p class="stage-lead">Attack your own system, then fix what breaks.</p>
       <div class="chips">
-        <span class="chip">Attack your own system</span>
-        <span class="chip">Stand up to clever tricks</span>
+        <a class="chip" href="consideration-safety-red-teaming.html">Attack your own system<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-safety-jailbreaks.html">Stand up to clever tricks<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
       <a class="see-how" href="consideration-safety-break.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
@@ -312,8 +312,8 @@
       </div>
       <p class="stage-lead">Tune refusals so honest users still get answers.</p>
       <div class="chips">
-        <span class="chip">Tune the refusal dial</span>
-        <span class="chip">Useful but risky requests</span>
+        <a class="chip" href="consideration-safety-refusal-helpfulness.html">Tune the refusal dial<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-safety-dual-use.html">Useful but risky requests<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
       <a class="see-how" href="consideration-safety-balance.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>

@@ -80,10 +80,12 @@
   .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
   .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 
-  .sources { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 22px; }
-  .sources-label { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 10px; }
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
   .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .sources li { font-size: 13.5px; line-height: 1.55; color: var(--soft); }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
   .sources a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
   .sources a:hover { border-bottom-color: var(--accent); }
 
@@ -105,9 +107,9 @@
 
 <nav class="topbar" aria-label="Site navigation">
   <div class="topbar-inner">
-    <a class="back" href="layer-user-experience.html"><span aria-hidden="true">&larr;</span> User Experience</a>
+    <a class="back" href="user-experience-how-answers.html"><span aria-hidden="true">&larr;</span> How answers show up</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-user-experience.html">User Experience</a><span class="sep" aria-hidden="true">/</span><span class="here">How answers show up</span><span class="sep" aria-hidden="true">/</span><span class="here">A follow-up question when it is unsure</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-user-experience.html">User Experience</a><span class="sep" aria-hidden="true">/</span><a href="user-experience-how-answers.html">How answers show up</a><span class="sep" aria-hidden="true">/</span><span class="here">A follow-up question when it is unsure</span>
     </nav>
   </div>
 </nav>
@@ -188,19 +190,6 @@
   </ul>
 </section>
 
-<section aria-labelledby="sources-heading">
-  <div class="section-label"><span class="num">05</span>Sources</div>
-  <h2 id="sources-heading" class="sr-only">Sources</h2>
-  <div class="sources">
-    <div class="sources-label">For the curious</div>
-    <ul>
-      <li>Microsoft, <a href="https://www.microsoft.com/en-us/haxtoolkit/library/" target="_blank" rel="noopener noreferrer">Guidelines for Human-AI Interaction</a>, on asking for clarification only when it carries its weight.</li>
-      <li>Google, <a href="https://pair.withgoogle.com/guidebook/" target="_blank" rel="noopener noreferrer">People + AI Guidebook</a>, on handling ambiguous input gracefully.</li>
-      <li>Aliannejadi et al., <a href="https://arxiv.org/abs/1907.06554" target="_blank" rel="noopener noreferrer">Asking Clarifying Questions in Open-Domain Information-Seeking Conversations</a>, on when a clarifying question genuinely helps.</li>
-    </ul>
-  </div>
-</section>
-
 <section style="padding-top: 20px; padding-bottom: 40px;">
   <a href="layer-user-experience.html" class="back-link">
     <div class="back-arrow" aria-hidden="true">&larr;</div>
@@ -210,6 +199,15 @@
     </div>
   </a>
 </section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Microsoft (2019). <em><a href="https://www.microsoft.com/en-us/haxtoolkit/library/" target="_blank" rel="noopener noreferrer">Guidelines for Human-AI Interaction.</a></em> <span class="note">Practical patterns for when to ask for clarification and when to act on a best guess.</span></li>
+    <li>Google (2019). <em><a href="https://pair.withgoogle.com/guidebook/" target="_blank" rel="noopener noreferrer">People + AI Guidebook.</a></em> <span class="note">Design playbook for handling ambiguous user input gracefully.</span></li>
+    <li>Aliannejadi et al. (2019). <em><a href="https://arxiv.org/abs/1907.06554" target="_blank" rel="noopener noreferrer">Asking Clarifying Questions in Open-Domain Information-Seeking Conversations.</a></em> <span class="note">Empirical study of when a clarifying question genuinely helps versus hurts the user.</span></li>
+  </ul>
+</div>
 
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.

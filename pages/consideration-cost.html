@@ -155,7 +155,7 @@
 
   .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  /* wrapping chip grid */
   .chips { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; }
   .chip {
     flex: none; display: inline-flex; align-items: center; gap: 3px;
@@ -163,27 +163,26 @@
     line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
+  /* anchor chip */
+  a.chip { border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; }
+  a.chip:hover { background: #E3DBFD; }
+  a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
+  a.chip:hover .arr { transform: translate(1px,-1px); }
+  @media (prefers-reduced-motion:reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
 
-  /* see-how link at bottom of each card */
-  .see-how {
-    display: inline-flex; align-items: center; gap: 5px;
-    margin-top: auto; padding-top: 16px; font-size: 13px; font-weight: 600;
-    color: var(--accent-hover); text-decoration: none;
-    transition: color .15s ease;
-  }
-  .see-how:hover { color: var(--accent); }
+  /* see-how link at card bottom (canonical plain-text-link style) */
+  .see-how { display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 12px; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
   .see-how .arr { display: inline-block; transition: transform .18s ease; }
-  .see-how:hover .arr { transform: translateX(3px); }
-  @media (prefers-reduced-motion: reduce) { .see-how .arr { transition: none; } .see-how:hover .arr { transform: none; } }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion:reduce) { .see-how, .see-how .arr { transition: none; } .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; } }
 
   /* card-door: whole card navigates */
-  a.stage-card {
-    cursor: pointer; text-decoration: none; color: var(--text);
-  }
-  a.stage-card:hover {
-    box-shadow: 0 0 0 2px var(--accent-soft), var(--shadow-lg);
-    border-color: var(--accent);
-  }
+  .stage-card.clickable { cursor: pointer; transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease; }
+  .stage-card.clickable:hover { box-shadow: 0 0 0 2px var(--accent-soft), var(--shadow-lg); border-color: var(--accent); }
+  @media (prefers-reduced-motion: reduce) { .stage-card.clickable { transition: none; } }
+  a.stage-name { transition: color .15s ease; }
+  a.stage-name:hover { color: var(--accent-hover); }
 
 
   /* back link */
@@ -261,60 +260,60 @@
   <div class="stages">
 
     <!-- SET THE BUDGET -->
-    <a class="stage-card" id="card-budget" href="consideration-cost-budget.html" aria-labelledby="g-budget">
+    <section class="stage-card clickable" id="card-budget" aria-labelledby="g-budget">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-1.7 2.5-1.7s2.5.6 2.5 1.9c0 2.6-5 1.4-5 4 0 1.3 1.1 2 2.5 2s2.5-.5 2.5-1.7"/>
           </svg>
         </span>
-        <h2 id="g-budget"><span class="stage-name">Set the budget</span></h2>
+        <h2 id="g-budget"><a class="stage-name" href="consideration-cost-budget.html">Set the budget</a></h2>
       </div>
       <p class="stage-lead">Decide what you will pay and where the money goes.</p>
       <div class="chips">
-        <span class="chip">Knowing what costs what</span>
-        <span class="chip">Spending more for better answers</span>
-        <span class="chip">Choosing what to pack into the prompt</span>
+        <a class="chip" href="consideration-cost-attribution.html">Knowing what costs what<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-cost-quality-tradeoff.html">Spending more for better answers<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-cost-context-strategy.html">Choosing what to pack into the prompt<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <span class="see-how" aria-hidden="true">See how <span class="arr">&rarr;</span></span>
-    </a>
+      <a class="see-how" href="consideration-cost-budget.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
     <!-- SET THE SPEED AND UPTIME TARGETS -->
-    <a class="stage-card" id="card-targets" href="consideration-cost-targets.html" aria-labelledby="g-targets">
+    <section class="stage-card clickable" id="card-targets" aria-labelledby="g-targets">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
           </svg>
         </span>
-        <h2 id="g-targets"><span class="stage-name">Set the speed and uptime targets</span></h2>
+        <h2 id="g-targets"><a class="stage-name" href="consideration-cost-targets.html">Set the speed and uptime targets</a></h2>
       </div>
       <p class="stage-lead">Decide how fast each step can take and how steady the service must be.</p>
       <div class="chips">
-        <span class="chip">Splitting the wait across each step</span>
-        <span class="chip">Trading time for quality</span>
-        <span class="chip">Setting speed and uptime targets</span>
+        <a class="chip" href="consideration-cost-latency-budgets.html">Splitting the wait across each step<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-cost-latency-quality.html">Trading time for quality<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-cost-slo-design.html">Setting speed and uptime targets<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <span class="see-how" aria-hidden="true">See how <span class="arr">&rarr;</span></span>
-    </a>
+      <a class="see-how" href="consideration-cost-targets.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
     <!-- HOLD THE LINE WHEN THINGS BREAK -->
-    <a class="stage-card" id="card-failure" href="consideration-cost-hold.html" aria-labelledby="g-failure">
+    <section class="stage-card clickable" id="card-failure" aria-labelledby="g-failure">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>
           </svg>
         </span>
-        <h2 id="g-failure"><span class="stage-name">Hold the line when things break</span></h2>
+        <h2 id="g-failure"><a class="stage-name" href="consideration-cost-hold.html">Hold the line when things break</a></h2>
       </div>
       <p class="stage-lead">Plan what gives way and who acts before the service falls over.</p>
       <div class="chips">
-        <span class="chip">How much can break before you act</span>
-        <span class="chip">Playbook for when things go wrong</span>
+        <a class="chip" href="consideration-cost-error-budgets.html">How much can break before you act<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-cost-incident-response.html">Playbook for when things go wrong<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <span class="see-how" aria-hidden="true">See how <span class="arr">&rarr;</span></span>
-    </a>
+      <a class="see-how" href="consideration-cost-hold.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
   </div>
 </section>
@@ -378,6 +377,24 @@
     }
     window.setTimeout(tour, 350);
   }
+
+  // card-door: clicking anywhere on a stage card opens its guide,
+  // except on inner anchors (chips, see-how, stage-name) which handle their own navigation
+  var doors = {
+    'card-budget':  'consideration-cost-budget.html',
+    'card-targets': 'consideration-cost-targets.html',
+    'card-failure': 'consideration-cost-hold.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('.chip')) return;
+      if(e.target.closest('a')) return;
+      window.location.href = doorHref;
+    });
+  });
 
 })();
 </script>

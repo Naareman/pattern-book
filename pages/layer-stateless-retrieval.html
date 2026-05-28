@@ -154,7 +154,7 @@
 
   .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  /* wrapping chip grid */
   .chips { display: flex; flex-wrap: wrap; gap: 7px; }
   .chip {
     flex: none; display: inline-flex; align-items: center; gap: 3px;
@@ -162,32 +162,24 @@
     line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
+  /* anchor chip */
+  a.chip { border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; }
+  a.chip:hover { background: #E3DBFD; }
+  a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
+  a.chip:hover .arr { transform: translate(1px,-1px); }
+  @media (prefers-reduced-motion:reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
 
   /* card-door: whole card is clickable to its guide */
-  .stage-card {
-    cursor: pointer;
-    text-decoration: none;
-  }
-  a.stage-card:hover {
-    box-shadow: var(--shadow-lg);
-    border-color: var(--accent);
-  }
+  .stage-card.clickable { cursor: pointer; transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease; }
+  .stage-card.clickable:hover { box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  @media (prefers-reduced-motion: reduce) { .stage-card.clickable { transition: none; } }
 
-  /* see-how link inside the card */
-  .see-how {
-    display: inline-flex; align-items: center; gap: 6px;
-    margin-top: auto; padding-top: 16px;
-    font-size: 13px; font-weight: 600;
-    color: var(--accent-hover); text-decoration: none;
-    transition: color .15s ease;
-  }
-  .see-how:hover { color: var(--accent); }
-  .see-how .arr { display: inline-block; transition: transform .18s ease; font-size: 12px; }
-  .see-how:hover .arr { transform: translateX(3px); }
-  @media (prefers-reduced-motion: reduce) {
-    .see-how, .see-how .arr { transition: none; }
-    .see-how:hover .arr { transform: none; }
-  }
+  /* see-how link at card bottom (canonical plain-text-link style) */
+  .see-how { display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 12px; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion: reduce) { .see-how, .see-how .arr { transition: none; } .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; } }
 
 
   /* back link */
@@ -265,60 +257,60 @@
   <div class="stages">
 
     <!-- FIND -->
-    <a class="stage-card" id="card-find" aria-labelledby="g-find" href="stateless-retrieval-find.html">
+    <section class="stage-card clickable" id="card-find" aria-labelledby="g-find">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
           </svg>
         </span>
-        <h2 id="g-find"><span class="stage-name">Find</span></h2>
+        <h2 id="g-find"><a class="stage-name" href="stateless-retrieval-find.html">Find</a></h2>
       </div>
       <p class="stage-lead">Pull the right pieces from a pile.</p>
       <div class="chips">
-        <span class="chip">Prepare the documents</span>
-        <span class="chip">Search by meaning or words</span>
-        <span class="chip">Rerank the best matches</span>
+        <a class="chip" href="stateless-retrieval-document-prep.html">Prepare the documents<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="stateless-retrieval-search.html">Search by meaning or words<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="stateless-retrieval-reranking.html">Rerank the best matches<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <span class="see-how" aria-label="See how Find works" tabindex="-1">See how <span class="arr" aria-hidden="true">&rarr;</span></span>
-    </a>
+      <a class="see-how" href="stateless-retrieval-find.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
     <!-- FEED IT IN WELL -->
-    <a class="stage-card" id="card-feed" aria-labelledby="g-feed" href="stateless-retrieval-feed.html">
+    <section class="stage-card clickable" id="card-feed" aria-labelledby="g-feed">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 19h16M6 19V9l6-5 6 5v10"/><path d="M9 13h6M9 16h6"/>
           </svg>
         </span>
-        <h2 id="g-feed"><span class="stage-name">Feed it in well</span></h2>
+        <h2 id="g-feed"><a class="stage-name" href="stateless-retrieval-feed.html">Feed it in well</a></h2>
       </div>
       <p class="stage-lead">Hand the model only what it needs.</p>
       <div class="chips">
-        <span class="chip">Pack the pieces into the prompt</span>
-        <span class="chip">Pull from a live source</span>
-        <span class="chip">Show where the answer came from</span>
+        <a class="chip" href="stateless-retrieval-context-assembly.html">Pack the pieces into the prompt<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="stateless-retrieval-live-source.html">Pull from a live source<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="stateless-retrieval-citations.html">Show where the answer came from<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <span class="see-how" aria-label="See how Feed it in well works" tabindex="-1">See how <span class="arr" aria-hidden="true">&rarr;</span></span>
-    </a>
+      <a class="see-how" href="stateless-retrieval-feed.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
     <!-- KEEP IT FRESH -->
-    <a class="stage-card" id="card-fresh" aria-labelledby="g-fresh" href="stateless-retrieval-fresh.html">
+    <section class="stage-card clickable" id="card-fresh" aria-labelledby="g-fresh">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><path d="M3 21v-5h5"/>
           </svg>
         </span>
-        <h2 id="g-fresh"><span class="stage-name">Keep it fresh</span></h2>
+        <h2 id="g-fresh"><a class="stage-name" href="stateless-retrieval-fresh.html">Keep it fresh</a></h2>
       </div>
       <p class="stage-lead">Skip repeat work; never serve stale answers.</p>
       <div class="chips">
-        <span class="chip">Reuse recent lookups</span>
-        <span class="chip">Notice when content is old</span>
+        <a class="chip" href="stateless-retrieval-caching.html">Reuse recent lookups<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="stateless-retrieval-freshness.html">Notice when content is old<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <span class="see-how" aria-label="See how Keep it fresh works" tabindex="-1">See how <span class="arr" aria-hidden="true">&rarr;</span></span>
-    </a>
+      <a class="see-how" href="stateless-retrieval-fresh.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
   </div>
 </section>
@@ -382,6 +374,24 @@
     }
     window.setTimeout(tour, 350);
   }
+
+  // card-door: clicking anywhere on a stage card opens its guide,
+  // except on inner anchors (chips, see-how, stage-name) which handle their own navigation
+  var doors = {
+    'card-find':  'stateless-retrieval-find.html',
+    'card-feed':  'stateless-retrieval-feed.html',
+    'card-fresh': 'stateless-retrieval-fresh.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('.chip')) return;
+      if(e.target.closest('a')) return;
+      window.location.href = doorHref;
+    });
+  });
 
 })();
 </script>

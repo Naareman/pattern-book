@@ -174,17 +174,12 @@
   .stage-card.clickable { cursor: pointer; }
   .stage-card.clickable:hover { box-shadow: var(--shadow-lg); border-color: var(--border-strong); }
 
-  /* see-how link at card bottom */
-  .see-how {
-    display: inline-flex; align-items: center; gap: 5px;
-    margin-top: 14px; font-size: 12.5px; font-weight: 600;
-    color: var(--accent-hover); text-decoration: none; letter-spacing: .01em;
-    transition: color .15s ease;
-  }
-  .see-how:hover { color: var(--accent); }
-  .see-how .arr { font-size: 12px; display: inline-block; transition: transform .18s ease; }
-  .see-how:hover .arr { transform: translateX(3px); }
-  @media (prefers-reduced-motion:reduce) { .see-how, .see-how .arr { transition: none; } .see-how:hover .arr { transform: none; } }
+  /* see-how link at card bottom (canonical plain-text-link style) */
+  .see-how { display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 12px; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion:reduce) { .see-how, .see-how .arr { transition: none; } .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; } }
 
 
   /* back link */
@@ -310,9 +305,9 @@
       </div>
       <p class="stage-lead">Re-run the checks every time something changes.</p>
       <div class="chips">
-        <span class="chip">Regression testing</span>
-        <span class="chip">Eval-driven development</span>
-        <span class="chip">Prompt lifecycle thinking</span>
+        <a class="chip" href="consideration-eval-regression.html">Regression testing<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-eval-driven-development.html">Eval-driven development<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-eval-prompt-lifecycle.html">Prompt lifecycle thinking<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
       <a class="see-how" href="consideration-evaluation-honest.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>

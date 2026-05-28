@@ -154,7 +154,7 @@
 
   .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  /* wrapping chip grid */
   .chips { display: flex; flex-wrap: wrap; gap: 7px; }
   .chip {
     flex: none; display: inline-flex; align-items: center; gap: 3px;
@@ -162,6 +162,26 @@
     line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
+  /* anchor chip */
+  a.chip { border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; }
+  a.chip:hover { background: #E3DBFD; }
+  a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
+  a.chip:hover .arr { transform: translate(1px,-1px); }
+  @media (prefers-reduced-motion:reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
+
+  /* clickable card door */
+  .stage-card.clickable { cursor: pointer; transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease; }
+  .stage-card.clickable:hover { box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  @media (prefers-reduced-motion: reduce) { .stage-card.clickable { transition: none; } }
+  a.stage-name { transition: color .15s ease; }
+  a.stage-name:hover { color: var(--accent-hover); }
+
+  /* see-how link at card bottom (canonical plain-text-link style) */
+  .see-how { display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 12px; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion:reduce) { .see-how, .see-how .arr { transition: none; } .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; } }
 
 
   /* back link */
@@ -237,40 +257,42 @@
   <div class="stages">
 
     <!-- WORK WITH WHAT'S THERE -->
-    <a class="stage-card" id="card-work" aria-labelledby="g-work" href="application-patterns-work-with.html" style="text-decoration:none;color:inherit">
+    <section class="stage-card clickable" id="card-work" aria-labelledby="g-work">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5"/>
           </svg>
         </span>
-        <h2 id="g-work"><span class="stage-name">Work with what's there</span></h2>
+        <h2 id="g-work"><a class="stage-name" href="application-patterns-work-with.html">Work with what's there</a></h2>
       </div>
       <p class="stage-lead">Find, reshape, or pull facts from what you have.</p>
       <div class="chips">
-        <span class="chip">Retrieval and Q&amp;A</span>
-        <span class="chip">Transformation</span>
-        <span class="chip">Extraction and classification</span>
+        <a class="chip" href="application-patterns-retrieval-qa.html">Retrieval and Q&amp;A<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="application-patterns-transformation.html">Transformation<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="application-patterns-extraction-classification.html">Extraction and classification<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-    </a>
+      <a class="see-how" href="application-patterns-work-with.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
     <!-- MAKE OR DO SOMETHING NEW -->
-    <a class="stage-card" id="card-make" aria-labelledby="g-make" href="application-patterns-make-new.html" style="text-decoration:none;color:inherit">
+    <section class="stage-card clickable" id="card-make" aria-labelledby="g-make">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/>
           </svg>
         </span>
-        <h2 id="g-make"><span class="stage-name">Make or do something new</span></h2>
+        <h2 id="g-make"><a class="stage-name" href="application-patterns-make-new.html">Make or do something new</a></h2>
       </div>
       <p class="stage-lead">Create, choose, or run a real task.</p>
       <div class="chips">
-        <span class="chip">Generation</span>
-        <span class="chip">Decision and recommendation</span>
-        <span class="chip">Automation and workflow execution</span>
+        <a class="chip" href="application-patterns-generation.html">Generation<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="application-patterns-decision-recommendation.html">Decision and recommendation<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="application-patterns-automation.html">Automation and workflow execution<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-    </a>
+      <a class="see-how" href="application-patterns-make-new.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
   </div>
 </section>
@@ -334,6 +356,23 @@
     }
     window.setTimeout(tour, 350);
   }
+
+  // card-door: clicking anywhere on a stage card opens its guide,
+  // except on inner anchors (chips, see-how, stage-name) which handle their own navigation
+  var doors = {
+    'card-work': 'application-patterns-work-with.html',
+    'card-make': 'application-patterns-make-new.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('.chip')) return;
+      if(e.target.closest('a')) return;
+      window.location.href = doorHref;
+    });
+  });
 
 })();
 </script>

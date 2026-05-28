@@ -154,7 +154,7 @@
 
   .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  /* wrapping chip grid */
   .chips { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; }
   .chip {
     flex: none; display: inline-flex; align-items: center; gap: 3px;
@@ -162,21 +162,20 @@
     line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
+  /* anchor chip */
+  a.chip { border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; }
+  a.chip:hover { background: #E3DBFD; }
+  a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
+  a.chip:hover .arr { transform: translate(1px,-1px); }
+  @media (prefers-reduced-motion:reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
 
 
-  /* see-how pill inside each stage card */
-  .see-how {
-    display: inline-flex; align-items: center; gap: 6px;
-    margin-top: 14px; padding: 6px 13px;
-    font-size: 12.5px; font-weight: 600; color: var(--accent-hover);
-    background: var(--accent-soft); border: 1px solid var(--accent);
-    border-radius: 20px; text-decoration: none;
-    transition: background .15s ease, transform .15s ease;
-  }
-  .see-how:hover { background: #E3DBFD; transform: translateY(-1px); }
+  /* see-how link at card bottom (canonical plain-text-link style) */
+  .see-how { display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 12px; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
   .see-how .arr { display: inline-block; transition: transform .18s ease; }
-  .see-how:hover .arr { transform: translateX(3px); }
-  @media (prefers-reduced-motion: reduce) { .see-how, .see-how .arr { transition: none; } .see-how:hover, .see-how:hover .arr { transform: none; } }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion: reduce) { .see-how, .see-how .arr { transition: none; } .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; } }
 
   /* card-door: makes the whole card a navigable link */
   .stage-card.card-door { cursor: pointer; }
@@ -270,11 +269,11 @@
       </div>
       <p class="stage-lead">Pick how each input reaches the model.</p>
       <div class="chips">
-        <span class="chip">Pick how to handle each input</span>
-        <span class="chip">Decide when to blend the inputs</span>
-        <span class="chip">Switch input types mid-conversation</span>
+        <a class="chip" href="consideration-multimodal-modality-selection.html">Pick how to handle each input<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-multimodal-fusion-strategy.html">Decide when to blend the inputs<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-multimodal-handoff.html">Switch input types mid-conversation<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <a class="see-how" href="consideration-multimodal-input.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="consideration-multimodal-input.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
     <!-- KEEP THE ANSWER TIED TO WHAT WAS SENT -->
@@ -289,10 +288,10 @@
       </div>
       <p class="stage-lead">Keep answers tied to the real input.</p>
       <div class="chips">
-        <span class="chip">Stay tied to what was actually shown or said</span>
-        <span class="chip">Catch harm in images and audio, not just text</span>
+        <a class="chip" href="consideration-multimodal-grounding.html">Stay tied to what was actually shown or said<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-multimodal-safety.html">Catch harm in images and audio, not just text<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <a class="see-how" href="consideration-multimodal-tied.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="consideration-multimodal-tied.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
     <!-- MEASURE WHAT IT COSTS AND HOW WELL IT WORKS -->
@@ -307,11 +306,11 @@
       </div>
       <p class="stage-lead">Score quality and track what each input costs.</p>
       <div class="chips">
-        <span class="chip">Score image and audio answers, where text-matching fails</span>
-        <span class="chip">Budget for the extra wait each input adds</span>
-        <span class="chip">Track cost per input type</span>
+        <a class="chip" href="consideration-multimodal-eval.html">Score image and audio answers, where text-matching fails<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-multimodal-latency.html">Budget for the extra wait each input adds<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-multimodal-cost-attribution.html">Track cost per input type<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <a class="see-how" href="consideration-multimodal-measure.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="consideration-multimodal-measure.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
   </div>

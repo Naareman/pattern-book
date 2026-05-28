@@ -164,18 +164,19 @@
     line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
-  a.chip { cursor: pointer; text-decoration: none; color: var(--accent-hover); border-color: var(--accent); background: var(--accent-soft); }
+  /* anchor chip (canonical) */
+  a.chip { border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; }
   a.chip:hover { background: #E3DBFD; }
-  .arr { font-size: 11px; }
+  a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
+  a.chip:hover .arr { transform: translate(1px,-1px); }
+  @media (prefers-reduced-motion:reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
 
-  /* see-how link at the bottom of each card */
-  .see-how {
-    display: inline-flex; align-items: center; gap: 5px; margin-top: auto;
-    font-size: 13px; font-weight: 600; color: var(--accent-hover);
-    text-decoration: none; padding: 0; border: none; background: none;
-    transition: gap .15s ease;
-  }
-  .see-how:hover { color: var(--accent); gap: 8px; }
+  /* see-how link at card bottom (canonical plain-text-link style) */
+  .see-how { display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 12px; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion:reduce) { .see-how, .see-how .arr { transition: none; } .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; } }
 
 
   /* back link */

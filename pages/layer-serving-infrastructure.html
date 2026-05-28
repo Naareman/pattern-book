@@ -166,7 +166,7 @@
 
   .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  /* wrapping chip grid */
   .chips { display: flex; flex-wrap: wrap; gap: 7px; }
   .chip {
     flex: none; display: inline-flex; align-items: center; gap: 3px;
@@ -174,6 +174,12 @@
     line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
+  /* anchor chip */
+  a.chip { border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; }
+  a.chip:hover { background: #E3DBFD; }
+  a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
+  a.chip:hover .arr { transform: translate(1px,-1px); }
+  @media (prefers-reduced-motion:reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
 
 
   /* back link */
@@ -262,11 +268,11 @@
       </div>
       <p class="stage-lead">Answer quickly, even under heavy load.</p>
       <div class="chips">
-        <span class="chip">Answering many at once</span>
-        <span class="chip">Reusing work within an answer</span>
-        <span class="chip">Smart memory layout</span>
-        <span class="chip">Drafting fast, then checking</span>
-        <span class="chip">Slimming the model to fit</span>
+        <a class="chip" href="serving-infrastructure-batching.html">Answering many at once<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="serving-infrastructure-kv-cache.html">Reusing work within an answer<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="serving-infrastructure-paged-attention.html">Smart memory layout<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="serving-infrastructure-speculative-decoding.html">Drafting fast, then checking<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="serving-infrastructure-quantization.html">Slimming the model to fit<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
       <a class="see-how" href="serving-infrastructure-run-fast.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
@@ -283,10 +289,10 @@
       </div>
       <p class="stage-lead">Stay online when machines fail.</p>
       <div class="chips">
-        <span class="chip">Spreading the load across machines</span>
-        <span class="chip">Switching to a backup model</span>
-        <span class="chip">Pausing a failing service</span>
-        <span class="chip">Retrying safely</span>
+        <a class="chip" href="serving-infrastructure-load-balancing.html">Spreading the load across machines<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="serving-infrastructure-fallback-chains.html">Switching to a backup model<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="serving-infrastructure-circuit-breakers.html">Pausing a failing service<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="serving-infrastructure-retries.html">Retrying safely<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
       <a class="see-how" href="serving-infrastructure-keep-it-up.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
@@ -303,9 +309,9 @@
       </div>
       <p class="stage-lead">Skip work, pick the cheapest path.</p>
       <div class="chips">
-        <span class="chip">Reusing stored answers</span>
-        <span class="chip">Picking the cheapest model that fits</span>
-        <span class="chip">Tracking speed and cost</span>
+        <a class="chip" href="serving-infrastructure-response-caching.html">Reusing stored answers<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="serving-infrastructure-model-selection.html">Picking the cheapest model that fits<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="serving-infrastructure-observability-hooks.html">Tracking speed and cost<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
       <a class="see-how" href="serving-infrastructure-save-money.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>

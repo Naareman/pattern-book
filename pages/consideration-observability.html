@@ -155,7 +155,7 @@
 
   .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  /* wrapping chip grid */
   .chips { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; }
   .chip {
     flex: none; display: inline-flex; align-items: center; gap: 3px;
@@ -163,17 +163,20 @@
     line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
+  /* anchor chip */
+  a.chip { border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; }
+  a.chip:hover { background: #E3DBFD; }
+  a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
+  a.chip:hover .arr { transform: translate(1px,-1px); }
+  @media (prefers-reduced-motion:reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
 
 
-  /* see-how link inside stage cards */
-  .see-how {
-    display: inline-flex; align-items: center; gap: 5px;
-    margin-top: auto; padding-top: 14px;
-    font-size: 13px; font-weight: 600; color: var(--accent-hover);
-    text-decoration: none; transition: color .15s ease;
-  }
-  .see-how:hover { color: var(--accent); }
-  @media (prefers-reduced-motion:reduce) { .see-how { transition: none; } }
+  /* see-how link at card bottom (canonical plain-text-link style) */
+  .see-how { display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 12px; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion:reduce) { .see-how, .see-how .arr { transition: none; } .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; } }
 
   /* card-door: whole card is clickable */
   .stage-card { cursor: pointer; }
@@ -265,10 +268,10 @@
       </div>
       <p class="stage-lead">Log every step so you can replay any answer.</p>
       <div class="chips">
-        <span class="chip">Recording every step the AI took</span>
-        <span class="chip">Re-running a past request exactly as it happened</span>
+        <a class="chip" href="consideration-observability-tracing.html">Recording every step the AI took<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-observability-replay.html">Re-running a past request exactly as it happened<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <a class="see-how" href="consideration-observability-see.html" aria-label="See how: See what it did">See how &rarr;</a>
+      <a class="see-how" href="consideration-observability-see.html" aria-label="See how: See what it did">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
     <!-- FIND WHAT WENT WRONG -->
@@ -283,11 +286,11 @@
       </div>
       <p class="stage-lead">Trace a bad answer back to the cause.</p>
       <div class="chips">
-        <span class="chip">Tracing why it answered the way it did</span>
-        <span class="chip">Spotting when behavior shifts over time</span>
-        <span class="chip">Finding the real cause of a failure</span>
+        <a class="chip" href="consideration-observability-attribution.html">Tracing why it answered the way it did<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-observability-drift.html">Spotting when behavior shifts over time<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-observability-causal-analysis.html">Finding the real cause of a failure<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <a class="see-how" href="consideration-observability-wrong.html" aria-label="See how: Find what went wrong">See how &rarr;</a>
+      <a class="see-how" href="consideration-observability-wrong.html" aria-label="See how: Find what went wrong">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
     <!-- LEARN SO IT DOES NOT REPEAT -->
@@ -302,9 +305,9 @@
       </div>
       <p class="stage-lead">Turn each incident into a lasting fix.</p>
       <div class="chips">
-        <span class="chip">Writing up incidents in a way that leads to real fixes</span>
+        <a class="chip" href="consideration-observability-postmortem.html">Writing up incidents in a way that leads to real fixes<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <a class="see-how" href="consideration-observability-learn.html" aria-label="See how: Learn so it does not repeat">See how &rarr;</a>
+      <a class="see-how" href="consideration-observability-learn.html" aria-label="See how: Learn so it does not repeat">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
   </div>

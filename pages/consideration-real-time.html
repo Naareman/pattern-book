@@ -155,7 +155,7 @@
 
   .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  /* wrapping chip grid */
   .chips { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; }
   .chip {
     flex: none; display: inline-flex; align-items: center; gap: 3px;
@@ -163,21 +163,23 @@
     line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
+  /* anchor chip */
+  a.chip { border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; }
+  a.chip:hover { background: #E3DBFD; }
+  a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
+  a.chip:hover .arr { transform: translate(1px,-1px); }
+  @media (prefers-reduced-motion:reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
 
   /* card door: entire stage card is clickable */
   .stage-card.card-door { cursor: pointer; }
   .stage-card.card-door:hover { box-shadow: var(--shadow-lg); border-color: var(--accent); }
 
-  /* see-how link at bottom of stage card */
-  .see-how {
-    display: inline-flex; align-items: center; gap: 5px; margin-top: auto; padding-top: 14px;
-    font-size: 13px; font-weight: 600; color: var(--accent-hover);
-    text-decoration: none; transition: color .15s ease;
-  }
-  .see-how:hover { color: var(--accent); }
+  /* see-how link at card bottom (canonical plain-text-link style) */
+  .see-how { display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 12px; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
   .see-how .arr { display: inline-block; transition: transform .18s ease; }
-  .see-how:hover .arr { transform: translateX(3px); }
-  @media (prefers-reduced-motion: reduce) { .see-how, .see-how .arr { transition: none; } .see-how:hover .arr { transform: none; } }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion: reduce) { .see-how, .see-how .arr { transition: none; } .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; } }
 
 
   /* back link */
@@ -266,10 +268,10 @@
       </div>
       <p class="stage-lead">First-token wait is what users feel.</p>
       <div class="chips">
-        <span class="chip">Time to first word</span>
-        <span class="chip">Streaming as a strategy</span>
+        <a class="chip" href="consideration-realtime-ttfw.html">Time to first word<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-realtime-streaming.html">Streaming as a strategy<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <a class="see-how" href="consideration-realtime-fast.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="consideration-realtime-fast.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
     <!-- KEEP THE WORDS FLOWING -->
@@ -284,13 +286,13 @@
       </div>
       <p class="stage-lead">Check what's streaming and stop cleanly if needed.</p>
       <div class="chips">
-        <span class="chip">Checking quality as it streams</span>
-        <span class="chip">Catching harm mid-stream</span>
-        <span class="chip">Checking partial answers</span>
-        <span class="chip">Stopping cleanly mid-stream</span>
-        <span class="chip">Charging for partial answers</span>
+        <a class="chip" href="consideration-realtime-stream-quality.html">Checking quality as it streams<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-realtime-stream-safety.html">Catching harm mid-stream<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-realtime-partial-answers.html">Checking partial answers<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-realtime-stop-cleanly.html">Stopping cleanly mid-stream<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-realtime-charging.html">Charging for partial answers<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <a class="see-how" href="consideration-realtime-flowing.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="consideration-realtime-flowing.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
     <!-- HANDLE INTERRUPTIONS -->
@@ -305,10 +307,10 @@
       </div>
       <p class="stage-lead">Voice users cut in; the system must stop and listen.</p>
       <div class="chips">
-        <span class="chip">Voice turn-taking</span>
-        <span class="chip">Interrupting mid-answer</span>
+        <a class="chip" href="consideration-realtime-voice-turn.html">Voice turn-taking<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-realtime-interruptions.html">Interrupting mid-answer<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
-      <a class="see-how" href="consideration-realtime-interruptions.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="consideration-realtime-interruptions.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
   </div>

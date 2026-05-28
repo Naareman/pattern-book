@@ -154,7 +154,7 @@
 
   .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  /* wrapping chip grid */
   .chips { display: flex; flex-wrap: wrap; gap: 7px; }
   .chip {
     flex: none; display: inline-flex; align-items: center; gap: 3px;
@@ -162,18 +162,19 @@
     line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
+  /* anchor chip */
+  a.chip { border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; }
+  a.chip:hover { background: #E3DBFD; }
+  a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
+  a.chip:hover .arr { transform: translate(1px,-1px); }
+  @media (prefers-reduced-motion:reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
 
-  /* see-how link at the bottom of each stage card */
-  .see-how {
-    display: inline-flex; align-items: center; gap: 5px;
-    margin-top: auto; padding-top: 16px;
-    font-size: 13px; font-weight: 600; color: var(--accent-hover);
-    text-decoration: none; transition: color .15s ease;
-  }
-  .see-how:hover { color: var(--accent); }
+  /* see-how link at card bottom (canonical plain-text-link style) */
+  .see-how { display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 12px; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
   .see-how .arr { display: inline-block; transition: transform .18s ease; }
-  .see-how:hover .arr { transform: translateX(3px); }
-  @media (prefers-reduced-motion:reduce) { .see-how, .see-how .arr { transition: none; } .see-how:hover .arr { transform: none; } }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion:reduce) { .see-how, .see-how .arr { transition: none; } .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; } }
 
   /* card-door: whole card is clickable */
   .stage-card[data-href] { cursor: pointer; }
@@ -266,9 +267,9 @@
       </div>
       <p class="stage-lead">Learn language from a huge pile of text.</p>
       <div class="chips">
-        <span class="chip">Reading the whole internet</span>
-        <span class="chip">Topping it up on new material</span>
-        <span class="chip">Checking progress along the way</span>
+        <a class="chip" href="training-adaptation-pretraining.html">Reading the whole internet<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="training-adaptation-continued-pretraining.html">Topping it up on new material<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="training-adaptation-eval-during-training.html">Checking progress along the way<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
       <a class="see-how" href="training-adaptation-build-base.html" tabindex="0">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
@@ -285,9 +286,9 @@
       </div>
       <p class="stage-lead">Teach what a good answer looks like.</p>
       <div class="chips">
-        <span class="chip">Copying ideal answers</span>
-        <span class="chip">Learning from human ratings</span>
-        <span class="chip">Training it to reason step by step</span>
+        <a class="chip" href="training-adaptation-supervised-finetuning.html">Copying ideal answers<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="training-adaptation-preference-optimization.html">Learning from human ratings<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="training-adaptation-reasoning-training.html">Training it to reason step by step<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
       <a class="see-how" href="training-adaptation-tune.html" tabindex="0">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
@@ -304,9 +305,9 @@
       </div>
       <p class="stage-lead">Shrink the model to run it cheaper.</p>
       <div class="chips">
-        <span class="chip">Adjusting only a tiny piece</span>
-        <span class="chip">Teaching a small model from a big one</span>
-        <span class="chip">Blending two trained models</span>
+        <a class="chip" href="training-adaptation-peft.html">Adjusting only a tiny piece<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="training-adaptation-distillation.html">Teaching a small model from a big one<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="training-adaptation-model-merging.html">Blending two trained models<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
       <a class="see-how" href="training-adaptation-make-smaller.html" tabindex="0">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>

@@ -155,7 +155,7 @@
 
   .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* wrapping chip grid: plain non-clickable chips */
+  /* wrapping chip grid */
   .chips { display: flex; flex-wrap: wrap; gap: 7px; min-width: 0; }
   .chip {
     flex: none; display: inline-flex; align-items: center; gap: 3px;
@@ -163,6 +163,12 @@
     line-height: 1.2; white-space: normal; word-break: break-word; max-width: 100%;
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
+  /* anchor chip */
+  a.chip { border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; }
+  a.chip:hover { background: #E3DBFD; }
+  a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
+  a.chip:hover .arr { transform: translate(1px,-1px); }
+  @media (prefers-reduced-motion:reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
 
   /* "see how" at the bottom of each card */
   .see-how {
@@ -266,8 +272,8 @@
       </div>
       <p class="stage-lead">Hide personal bits before storage or use.</p>
       <div class="chips">
-        <span class="chip">Hide personal details before the AI sees them</span>
-        <span class="chip">Keep data in the right country</span>
+        <a class="chip" href="consideration-privacy-pii.html">Hide personal details before the AI sees them<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-privacy-residency.html">Keep data in the right country<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
       <a class="see-how" href="consideration-privacy-private.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
@@ -287,8 +293,8 @@
       </div>
       <p class="stage-lead">One person's data never reaches another.</p>
       <div class="chips">
-        <span class="chip">One customer's data never reaches another</span>
-        <span class="chip">Decide who can see and do what</span>
+        <a class="chip" href="consideration-privacy-tenant-isolation.html">One customer's data never reaches another<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-privacy-access-control.html">Decide who can see and do what<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
       <a class="see-how" href="consideration-privacy-apart.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
@@ -306,9 +312,9 @@
       </div>
       <p class="stage-lead">Keep receipts: who, what, when, which rule.</p>
       <div class="chips">
-        <span class="chip">Record who did what, when</span>
-        <span class="chip">Turn the law into checklist items</span>
-        <span class="chip">Mark AI-made output so you can trace it</span>
+        <a class="chip" href="consideration-privacy-audit.html">Record who did what, when<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-privacy-compliance.html">Turn the law into checklist items<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <a class="chip" href="consideration-privacy-provenance.html">Mark AI-made output so you can trace it<span class="arr" aria-hidden="true">&#8599;</span></a>
       </div>
       <a class="see-how" href="consideration-privacy-prove.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
