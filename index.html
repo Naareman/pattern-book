@@ -153,13 +153,16 @@
   .foot strong{color:var(--soft);font-weight:500}
 
   @media(max-width:720px){
-    /* ---- canvas + top grid: stack all 3 pillars vertically ---- */
+    /* ---- canvas + top grid: stack all 3 pillars vertically with breathing room ---- */
     .canvas{width:100%}
     .top{
       display:flex;
       flex-direction:column;
-      gap:0;
+      gap:14px;   /* visible separation between Layers and Builds (the "produces" sits in between) */
     }
+    /* gap between top group and the Considerations box below
+       (the .across element sits between .top and .concerns in the DOM but is display:none on mobile) */
+    .box.concerns{margin-top:14px}
 
     /* ---- box-head: grid so title/subtitle stack left, CTA sits right ---- */
     /*
@@ -209,59 +212,103 @@
       font-size:11px;
     }
 
-    /* ---- Layers: remove the side-by-side axis panel ---- */
-    .layers .body{
-      display:block; /* drop the 2-column grid */
+    /* ---- Layers: drop the side axis entirely, replace with two tiny meta-lines ---- */
+    /* The desktop rail is meaningless when stacked; the bottom-up numbering (1 at bottom -> 10 at top)
+       already conveys foundation -> user-facing. We add a subtle "User-facing" hint above the list
+       and "Foundation" hint below, using the existing .axis .cap content via pseudo-elements so we
+       don't touch markup. The actual .axis element is hidden (but kept in DOM so the tour JS that
+       animates rail.style.transform can still target it without errors). */
+    .layers .body{display:block}
+    .layers .items{position:relative;padding:8px 8px 8px 8px}
+    /* meta-line above the list: top end of the axis */
+    .layers .items::before{
+      content:"User-facing";
+      display:block;
+      font-size:10.5px;
+      font-weight:600;
+      color:var(--faint);
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      padding:4px 6px 8px;
     }
-    .axis{
-      /* rotate to a thin horizontal bar at the bottom of the layer list */
-      flex-direction:row;
-      align-items:center;
-      justify-content:space-between;
-      border-left:none;
+    /* meta-line below the list: foundation end of the axis */
+    .layers .items::after{
+      content:"Foundation";
+      display:block;
+      font-size:10.5px;
+      font-weight:600;
+      color:var(--faint);
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      padding:10px 6px 4px;
       border-top:1px solid var(--border);
-      padding:10px 14px;
+      margin-top:6px;
     }
-    .axis .rail{
-      flex:1;
-      min-height:auto;
-      height:4px;
-      width:auto;
-      min-width:40px;
-      margin:0 10px;
-      transform-origin:left center;
-    }
-    /* hide the upward arrow on the horizontal rail (it points left, looks odd) */
-    .axis .rail::after{display:none}
-    .axis .cap{font-size:10px;line-height:1.2;text-align:center;min-width:60px}
+    /* hide the rotated rail panel completely -- it's a thin meaningless sliver on phone.
+       Kept in DOM so the tour's rail.style.transform writes don't error. */
+    .axis{display:none}
 
-    /* ---- "produces" connector between Layers and Builds ---- */
+    /* ---- "produces" connector between Layers and Builds: tiny vertical hint ---- */
+    /* A stretched horizontal arrow makes no sense when the boxes are stacked vertically.
+       We convert the connector into a small centered caption with a down chevron,
+       sitting in the gap between the two cards. */
     .produces{
-      flex-direction:row;
+      flex-direction:column;
       align-items:center;
       justify-content:center;
-      gap:6px;
-      padding:10px 16px;
+      gap:4px;
+      padding:0;            /* the .top { gap:14px } already provides the spacing */
       color:var(--faint);
-      font-size:12px;
+      font-size:11px;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      font-weight:600;
     }
-    .flow-x{width:28px}
+    /* repurpose the horizontal flow line as a short vertical line + downward chevron */
+    .produces .flow-x{
+      width:1.5px;
+      height:14px;
+      background:var(--border-strong);
+      opacity:1;
+      border-radius:2px;
+      position:relative;
+    }
+    .produces .flow-x::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:-1px;
+      transform:translateX(-50%);
+      border-left:4px solid transparent;
+      border-right:4px solid transparent;
+      border-top:6px solid var(--border-strong);
+      /* override the desktop horizontal-arrow rule */
+      right:auto;top:auto;
+    }
+    /* the ambient spark animates left->right; pointless on a 14px vertical line. Hide it. */
+    .produces .flow-x .spark{display:none}
+    /* tour "glow" state on .produces: keep the color shift but no horizontal spark */
+    .produces.glow .flow-x{background:var(--accent);height:18px}
+    .produces.glow .flow-x::after{border-top-color:var(--accent)}
 
-    /* ---- "applies to every layer" across bracket: hide on mobile ---- */
+    /* ---- "applies to every layer" across bracket: stays hidden on mobile ---- */
     /* The bracket spans Layers width minus the Builds column (calc(100%-394px))
-       which collapses to nearly zero on phone. Hide it; the heading already
-       communicates "applies to every layer" via the Considerations box title. */
+       which collapses to nearly zero on phone. The Considerations title +
+       subtitle ("what every layer must get right") communicates the same idea. */
     .across{display:none}
 
     /* ---- Builds: full-width when stacked ---- */
     .builds{width:100%;align-self:auto}
 
-    /* ---- Considerations chips: wrap cleanly ---- */
+    /* ---- Considerations chips: wrap cleanly, comfortable tap targets ---- */
     .concerns .items{
       gap:7px;
       padding:12px;
       justify-content:flex-start;
     }
+    /* clear the inherited ::before/::after rules from the layers list */
+    .concerns .items::before,.concerns .items::after,
+    .builds .items::before,.builds .items::after{content:none;display:none;border:none;padding:0;margin:0}
     .concerns .item{
       padding:9px 14px;
       min-height:40px;
@@ -273,6 +320,9 @@
       padding:10px 11px;
     }
     .items{padding:6px}
+    /* ensure the (1)-(10) number badges stay legible: keep 22px circles, tabular numerals */
+    .layers .item .num{width:22px;height:22px;font-size:11.5px}
+    /* tour "lit" glow on a layer row still reads well at mobile (accent-soft fill + accent border) */
 
     /* ---- Tour bar: wrap aux controls if screen is narrow ---- */
     .tour-bar{
