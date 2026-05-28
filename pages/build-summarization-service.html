@@ -348,7 +348,7 @@
   <div class="section-label"><span class="num">01</span>The Idea</div>
   <h2>What <em>is</em> it?</h2>
   <div class="idea-card">
-    <p>The AI works in <strong style="color:var(--accent-hover)">tokens</strong> (a token is a small piece it processes: roughly a word, or a short slice of text). Every AI model has a limit on how many tokens it can read at once. A long report, transcript, or legal document usually exceeds that limit. The solution: split the document into <strong style="color:var(--accent-hover)">chunks</strong> (fixed-size text segments, each small enough to fit one call), summarize each chunk independently in parallel, then combine those mini-summaries into one final summary. This is called <strong style="color:var(--accent-hover)">map-reduce</strong>: map a task over every chunk, then reduce the results into one answer.</p>
+    <p>When a document is too long to read in one go, you split it into smaller pieces, summarize each piece in parallel, then summarize those summaries into one final answer.</p>
   </div>
   <div class="layer-badges" aria-label="Layers used by this build">
     <a class="layer-badge" href="layer-application-patterns.html">

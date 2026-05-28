@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluation &middot; How it works &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0; --error:#C2554F; --error-soft:#FBECEB;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --warn:#B45309; --warn-soft:#FEF3C7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; white-space: nowrap;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px;
+    line-height: 1.5; color: var(--text);
+  }
+
+  /* 02 DEMO (ported verbatim from the original hub) */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+
+  .eval-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* score counter */
+  .score-bar {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 18px;
+    padding-bottom: 16px; border-bottom: 1px solid var(--border);
+  }
+  .score-label { font-size: 13px; font-weight: 600; color: var(--faint); white-space: nowrap; }
+  .score-track {
+    flex: 1; height: 10px; background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  .score-fill {
+    height: 100%; width: 0%; background: var(--accent); border-radius: 10px;
+    transition: width 0.5s cubic-bezier(.22,1,.36,1), background 0.4s ease;
+  }
+  .score-num {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px;
+    color: var(--text); min-width: 44px; text-align: right;
+    transition: color 0.3s ease;
+  }
+
+  /* answer cards */
+  .answer-stack { display: flex; flex-direction: column; gap: 11px; }
+  .answer-card {
+    background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px; cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    box-shadow: var(--shadow-sm);
+    position: relative; overflow: hidden;
+  }
+  .answer-card:not(.checked):hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .answer-card.checked { cursor: default; }
+  .answer-card .q-label { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .answer-card .q-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px; line-height: 1.35; color: var(--text); margin-bottom: 10px; }
+  .answer-card .ai-answer {
+    font-size: 14px; line-height: 1.5; color: var(--soft);
+    padding: 10px 12px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 8px;
+  }
+  .answer-card .ai-answer .conf {
+    display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .03em;
+    text-transform: uppercase; color: var(--warn); background: var(--warn-soft);
+    border-radius: 4px; padding: 1px 5px; margin-left: 6px; vertical-align: middle;
+  }
+  .answer-card .tap-hint {
+    font-size: 12px; font-weight: 500; color: var(--accent-hover);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .answer-card .tap-hint svg { width: 13px; height: 13px; flex-shrink: 0; }
+  /* verdict reveal */
+  .verdict-row {
+    display: flex; align-items: flex-start; gap: 10px; margin-top: 10px;
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.4s ease, margin 0.3s ease, opacity 0.35s ease;
+    opacity: 0;
+  }
+  .answer-card.checked .verdict-row { max-height: 120px; opacity: 1; }
+  .verdict-badge {
+    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; margin-top: 1px;
+  }
+  .verdict-badge.pass { background: var(--success-soft); color: var(--success); }
+  .verdict-badge.fail { background: var(--error-soft); color: var(--error); }
+  .verdict-text { font-size: 13px; line-height: 1.5; color: var(--soft); }
+  .verdict-text strong { font-weight: 600; color: var(--text); }
+  /* card state colors */
+  .answer-card.pass { background: var(--success-soft); border-color: var(--success); }
+  .answer-card.fail { background: var(--error-soft); border-color: var(--error); }
+  .answer-card.fail .q-label { color: var(--error); }
+  .answer-card.pass .q-label { color: var(--success); }
+
+  /* status line below cards */
+  .eval-status {
+    margin-top: 16px; padding: 11px 14px; text-align: center;
+    font-size: 13px; font-weight: 500; color: var(--faint);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    transition: all 0.35s ease;
+  }
+  .eval-status.done { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); font-weight: 600; }
+
+  /* controls */
+  .board-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong); background: var(--surface);
+    border-radius: var(--radius-sm); cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* 03 real example: method list (ported from the original hub) */
+  .example-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 22px 24px;
+  }
+  .example-card p { font-size: 15px; line-height: 1.65; color: var(--soft); }
+  .example-card p + p { margin-top: 10px; }
+  .example-card p strong { color: var(--text); font-weight: 600; }
+  .method-list { list-style: none; display: flex; flex-direction: column; gap: 13px; margin-top: 16px; }
+  .method-item { display: flex; gap: 12px; align-items: flex-start; }
+  .method-dot {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--accent-hover); margin-top: 1px;
+  }
+  .method-body { flex: 1; }
+  .method-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .method-desc { font-size: 14px; color: var(--soft); line-height: 1.5; }
+
+  /* 04 tradeoffs */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 200px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 200px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources + footer */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  .sources a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+  .sources a:hover { border-bottom-color: var(--accent); }
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .idea-card { padding: 18px 16px; }
+    .idea-card p { font-size: 16px; }
+    .board-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+  }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; width: auto; }
+    .tradeoff-scale .spacer { display: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-evaluation.html"><span aria-hidden="true">&larr;</span> Evaluation</a>
+    <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><a href="consideration-evaluation.html">Evaluation</a><span class="sep">/</span><span class="here">How it works</span></nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+    </span>Consideration &middot; Evaluation
+  </span>
+  <h1 class="pattern-title">Evaluation</h1>
+  <p class="explainer">Checking that the AI is actually right, not just sounding certain.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>An AI can say the wrong thing in a very confident voice. <span style="color:var(--accent-hover);font-weight:500">Evaluation</span> is the practice of testing it on questions where you already know the correct answer, then counting how often it gets them right. Without it, you are trusting the AI's tone instead of its accuracy.</p>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>An AI being <em>checked</em>.</h2>
+
+  <p class="demo-lede">Tap each answer to check it against the known-correct answer. Watch the score update.</p>
+
+  <div class="eval-stage">
+    <!-- score counter -->
+    <div class="score-bar" aria-live="polite" aria-atomic="true">
+      <span class="score-label">Score</span>
+      <div class="score-track" role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0" id="scoreTrack">
+        <div class="score-fill" id="scoreFill"></div>
+      </div>
+      <span class="score-num" id="scoreNum">0 / 4</span>
+    </div>
+
+    <!-- answer cards -->
+    <div class="answer-stack" id="answerStack">
+
+      <div class="answer-card" data-verdict="pass"
+        data-known="Water boils at 100 °C at sea level."
+        data-ai="Water boils at 100 degrees Celsius at standard atmospheric pressure."
+        data-why="Same fact, different phrasing. The meaning matches the known answer exactly.">
+        <div class="q-label">Question 1</div>
+        <div class="q-text">At what temperature does water boil?</div>
+        <div class="ai-answer">
+          AI says: "Water boils at 100 degrees Celsius at standard atmospheric pressure."
+        </div>
+        <div class="tap-hint" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M6 14c0 2.5 1.5 6 6 6s6-4 6-6v-2.5"/></svg>
+          Tap to check
+        </div>
+        <div class="verdict-row" aria-live="polite">
+          <div class="verdict-badge pass" aria-hidden="true">&#10003;</div>
+          <div class="verdict-text"><strong>Pass.</strong> <span id="why0"></span></div>
+        </div>
+      </div>
+
+      <div class="answer-card" data-verdict="fail"
+        data-known="The French Revolution began in 1789."
+        data-ai="The French Revolution began in 1799."
+        data-why='Wrong by 10 years. The AI sounds certain, but the known answer is 1789. Confidence is not a substitute for correctness.'>
+        <div class="q-label">Question 2</div>
+        <div class="q-text">When did the French Revolution begin?</div>
+        <div class="ai-answer">
+          AI says: "The French Revolution began in 1799." <span class="conf">confident</span>
+        </div>
+        <div class="tap-hint" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M6 14c0 2.5 1.5 6 6 6s6-4 6-6v-2.5"/></svg>
+          Tap to check
+        </div>
+        <div class="verdict-row" aria-live="polite">
+          <div class="verdict-badge fail" aria-hidden="true">&#10007;</div>
+          <div class="verdict-text"><strong>Fail.</strong> <span id="why1"></span></div>
+        </div>
+      </div>
+
+      <div class="answer-card" data-verdict="fail"
+        data-known="Python uses indentation to define code blocks."
+        data-ai="Python uses curly braces to define code blocks, just like JavaScript."
+        data-why="Incorrect. Python uses indentation, not curly braces. A confident but wrong answer like this could mislead a beginner.">
+        <div class="q-label">Question 3</div>
+        <div class="q-text">How does Python define code blocks?</div>
+        <div class="ai-answer">
+          AI says: "Python uses curly braces to define code blocks, just like JavaScript." <span class="conf">confident</span>
+        </div>
+        <div class="tap-hint" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M6 14c0 2.5 1.5 6 6 6s6-4 6-6v-2.5"/></svg>
+          Tap to check
+        </div>
+        <div class="verdict-row" aria-live="polite">
+          <div class="verdict-badge fail" aria-hidden="true">&#10007;</div>
+          <div class="verdict-text"><strong>Fail.</strong> <span id="why2"></span></div>
+        </div>
+      </div>
+
+      <div class="answer-card" data-verdict="pass"
+        data-known="The speed of light is approximately 299,792 km/s."
+        data-ai="The speed of light is approximately 300,000 km/s."
+        data-why="Close enough. The known answer is 299,792 km/s. A rounding difference this small is acceptable for general knowledge questions.">
+        <div class="q-label">Question 4</div>
+        <div class="q-text">What is the speed of light?</div>
+        <div class="ai-answer">
+          AI says: "The speed of light is approximately 300,000 km/s."
+        </div>
+        <div class="tap-hint" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M6 14c0 2.5 1.5 6 6 6s6-4 6-6v-2.5"/></svg>
+          Tap to check
+        </div>
+        <div class="verdict-row" aria-live="polite">
+          <div class="verdict-badge pass" aria-hidden="true">&#10003;</div>
+          <div class="verdict-text"><strong>Pass.</strong> <span id="why3"></span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="eval-status" id="evalStatus" aria-live="polite">0 / 4 checked</div>
+
+    <div class="board-controls">
+      <button class="diagram-btn primary" id="runAllBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetEvalBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>Four ways to <em>catch</em> a wrong answer.</h2>
+  <div class="example-card">
+    <p>Real evaluation combines several methods. Each covers something the others miss.</p>
+    <ul class="method-list">
+      <li class="method-item">
+        <div class="method-dot">A</div>
+        <div class="method-body">
+          <div class="method-name">Test set with known answers</div>
+          <div class="method-desc">A fixed set of questions where the right answer is already written down. Run the AI through them, count how many it gets right. This is the baseline.</div>
+        </div>
+      </li>
+      <li class="method-item">
+        <div class="method-dot">B</div>
+        <div class="method-body">
+          <div class="method-name">Scoring functions</div>
+          <div class="method-desc">Code that checks answers automatically: exact match, substring match, or a numeric score like BLEU for translation. Fast, cheap, consistent.</div>
+        </div>
+      </li>
+      <li class="method-item">
+        <div class="method-dot">C</div>
+        <div class="method-body">
+          <div class="method-name">Human review</div>
+          <div class="method-desc">A person reads a sample of answers and rates them. Catches subtle errors that code misses, like a technically correct but misleading phrasing. Slow and expensive, so used on a sample, not everything.</div>
+        </div>
+      </li>
+      <li class="method-item">
+        <div class="method-dot">D</div>
+        <div class="method-body">
+          <div class="method-name">LLM (large language model) as judge</div>
+          <div class="method-desc">A second AI reads the answer and rates it against the known-correct answer. Scales better than human review and catches more nuance than code. It can still be fooled by confident-sounding errors, so it works best alongside a test set.</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Code scoring: speed and cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Code scoring: catching nuance</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Human review: trust in the verdict</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Human review: cost per answer</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">LLM-as-judge: scale and nuance</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">LLM-as-judge: risk of being fooled</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">More questions: confidence in the score</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">More questions: total bill to run</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      No single method is enough. Code is cheap but blunt. Humans are sharp but slow and expensive. An AI judge sits in the middle: fast and flexible, but can be fooled by the same confident-but-wrong answers a human would catch. The strong programs mix all three and only spend on humans where the other two disagree.
+    </div>
+  </div>
+</section>
+
+<!-- BACK LINK -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-evaluation.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Evaluation</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Zheng et al. (2023). <em>Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena.</em> <span class="note">Introduced and validated the LLM-as-judge evaluation approach.</span></li>
+    <li>Guo et al. (2017). <em>A Survey on Evaluation of NLP Systems.</em> <span class="note">Overview of automatic metrics versus human evaluation for language tasks.</span></li>
+    <li><a href="https://huggingface.co/docs/evaluate/index" target="_blank" rel="noopener">Hugging Face Evaluate library</a>. <span class="note">Practical open-source toolkit for running evaluations: BLEU, ROUGE, exact match, and more.</span></li>
+    <li>OpenAI. <a href="https://platform.openai.com/docs/guides/evals" target="_blank" rel="noopener">Evals framework documentation.</a> <span class="note">Real-world example of a test-set-based evaluation system built for production LLMs.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ EVALUATION DEMO ============
+const cards = document.querySelectorAll('.answer-card');
+const scoreFill = document.getElementById('scoreFill');
+const scoreNum = document.getElementById('scoreNum');
+const scoreTrack = document.getElementById('scoreTrack');
+const evalStatus = document.getElementById('evalStatus');
+const runAllBtn = document.getElementById('runAllBtn');
+const resetEvalBtn = document.getElementById('resetEvalBtn');
+
+const whySpans = [
+  document.getElementById('why0'),
+  document.getElementById('why1'),
+  document.getElementById('why2'),
+  document.getElementById('why3'),
+];
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let passed = 0;
+let checked = 0;
+
+function updateScore() {
+  const total = cards.length;
+  const pct = (passed / total) * 100;
+  scoreFill.style.width = pct + '%';
+  scoreNum.textContent = passed + ' / ' + total;
+  scoreTrack.setAttribute('aria-valuenow', passed);
+
+  // color the fill: green when all pass, red-ish when fails accumulate
+  if (passed === total) {
+    scoreFill.style.background = 'var(--success)';
+  } else if (passed === 0 && checked > 0) {
+    scoreFill.style.background = 'var(--error)';
+  } else {
+    scoreFill.style.background = 'var(--accent)';
+  }
+
+  if (checked === total) {
+    const failCount = total - passed;
+    if (failCount === 0) {
+      evalStatus.textContent = 'All 4 correct. Perfect score. A real eval set has hundreds of questions.';
+    } else {
+      evalStatus.textContent = failCount + ' of 4 caught wrong. That’s why you test before you ship.';
+    }
+    evalStatus.classList.add('done');
+  } else {
+    evalStatus.textContent = checked + ' / ' + total + ' checked';
+    evalStatus.classList.remove('done');
+  }
+}
+
+function revealCard(card, i, animate) {
+  if (card.classList.contains('checked')) return;
+  const verdict = card.dataset.verdict;
+  const why = card.dataset.why;
+
+  card.classList.add('checked', verdict);
+  whySpans[i].textContent = why;
+
+  // hide the tap hint
+  const hint = card.querySelector('.tap-hint');
+  if (hint) hint.style.display = 'none';
+
+  checked++;
+  if (verdict === 'pass') passed++;
+  updateScore();
+}
+
+// tap to check individual cards
+cards.forEach((card, i) => {
+  card.addEventListener('click', () => revealCard(card, i, true));
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('aria-label', 'Check answer for question ' + (i + 1));
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      revealCard(card, i, true);
+    }
+  });
+});
+
+// run all: reveal cards one by one with a stagger
+runAllBtn.addEventListener('click', async () => {
+  runAllBtn.disabled = true;
+  for (let i = 0; i < cards.length; i++) {
+    revealCard(cards[i], i, true);
+    if (!reduceMotion) await sleep(480);
+  }
+  runAllBtn.disabled = false;
+});
+
+// reset
+resetEvalBtn.addEventListener('click', () => {
+  cards.forEach((card, i) => {
+    card.classList.remove('checked', 'pass', 'fail');
+    whySpans[i].textContent = '';
+    const hint = card.querySelector('.tap-hint');
+    if (hint) hint.style.display = '';
+  });
+  passed = 0;
+  checked = 0;
+  scoreFill.style.width = '0%';
+  scoreFill.style.background = 'var(--accent)';
+  scoreNum.textContent = '0 / 4';
+  scoreTrack.setAttribute('aria-valuenow', 0);
+  evalStatus.textContent = '0 / 4 checked';
+  evalStatus.classList.remove('done');
+  runAllBtn.disabled = false;
+});
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+
+</body>
+</html>
