@@ -184,6 +184,9 @@
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
     font-size: 15px; line-height: 1.7; color: var(--soft);
   }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
 
   /* back link */
   .back-link {
@@ -251,7 +254,7 @@
   <div class="section-label"><span class="num">01</span>What It Is</div>
   <h2 id="what-heading">Both sides, <em>then</em> a verdict.</h2>
   <div class="what-card">
-    <p>The model is prompted to act as its own devil's advocate: generate the strongest case for one position, then generate the strongest case against it, and only then produce a final judgment. Because both arguments must be stated in full, the model is forced to surface the considerations it might otherwise skip over. The key concept is <strong style="color:var(--accent-hover)">single-model debate</strong>: the same model runs both sides within one call, rather than using two separate agents or calls. This keeps the pattern in L4 and avoids the latency and coordination cost of a multi-model setup.</p>
+    <p>The model is asked to argue against itself: make the strongest case for one option, then the strongest case against it, and only then decide. Because it has to spell out both sides in full, it surfaces points it would otherwise skip. The key idea is <strong style="color:var(--accent-hover)">one model, both sides</strong>: the same model runs the whole debate in a single call, instead of two separate models or calls. That keeps it simple and avoids the delay and coordination of a multi-model setup.</p>
   </div>
 </section>
 
@@ -292,35 +295,32 @@
 <!-- 03 WHERE IT FITS -->
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
   <div class="fits-card">
 
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home layer</div>
-      <div class="fits-desc">Self-Verification sub-axis of Single-Call Control. Both sides of the debate and the final verdict are generated inside one call to one model. No second call, no second model.</div>
+      <div class="fits-label">Home</div>
+      <div class="fits-desc">A way of getting the model to check its own thinking. Both sides of the debate and the final verdict come from one call to one model. No second call, no second model.</div>
     </div>
 
     <div class="fits-divider" role="separator"></div>
 
     <div class="fits-row">
-      <div class="fits-layer">L5</div>
       <div class="fits-label">Not this</div>
-      <div class="fits-desc">If two separate agents are instantiated (one per side) and their outputs are reconciled by an orchestrator, that is L5 Coordination, not L4. The single-call boundary is the filing rule.</div>
+      <div class="fits-desc">Spin up two separate agents (one per side) and have something else reconcile them, and you have moved to a different layer (orchestration). The line is the single call.</div>
     </div>
 
     <div class="fits-divider" role="separator"></div>
 
     <div class="fits-row">
-      <div class="fits-layer">L2</div>
       <div class="fits-label">Not this</div>
-      <div class="fits-desc">If a separate judge model scores or selects between two independently generated outputs, that is L2 Verify. A verdict written by the same model inside the same call is L4.</div>
+      <div class="fits-desc">Have a separate judge model score or pick between two outputs and that is a different layer too. A verdict the same model writes inside the same call stays here.</div>
     </div>
 
     <div class="fits-divider" role="separator"></div>
 
     <div class="filing-note">
-      <strong>Filing rule:</strong> Self-checking inside one call to one model = L4 Self-Verification. A separate verifier call or a different model = L2 Verify.
+      <strong>In short:</strong> the model checks itself inside one call. A separate checker call or a different model moves it to another layer.
     </div>
   </div>
 </section>
@@ -328,9 +328,13 @@
 <!-- 04 WHEN IT MATTERS -->
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <div class="matters-card">
-    Best suited to decisions where the first plausible answer is often the wrong one: architectural trade-offs, policy choices, product prioritization. It is especially useful when the model has an implicit prior toward one option (for example, a bias toward action over inaction) and needs a prompt to genuinely articulate the opposing case. The output also serves as documentation: the "for" and "against" sections give reviewers a transparent record of the reasoning behind the decision.
+    <ul class="matters-list">
+      <li>The first plausible answer is often wrong: design trade-offs, policy calls, what to build next.</li>
+      <li>The model leans one way (say, toward acting) and needs a push to argue the other side honestly.</li>
+      <li>The "for" and "against" sections double as a clear record of why the decision was made.</li>
+    </ul>
   </div>
 </section>
 

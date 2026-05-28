@@ -79,6 +79,9 @@
   .filing-note strong { color: var(--text); }
 
   .matters-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; font-size: 15px; line-height: 1.7; color: var(--soft); }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
 
   .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
@@ -159,37 +162,38 @@ data["year"] = int(data["year"])  # "2024" &#8594; 2024</div>
 
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home layer</div>
-      <div class="fits-desc">Output Shape &amp; Decoding sub-axis. Coercion acts on the output of a single model call. It is code running after decoding, not a second model call.</div>
+      <div class="fits-label">Home</div>
+      <div class="fits-desc">A way of shaping the output, applied after the answer comes back. It is your own code tidying up the reply from one model call, not a second model call.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
       <div class="fits-label">Neighbor</div>
-      <div class="fits-desc">Schema Enforcement prevents the problem before it occurs; Format Coercion cleans it up afterward. In practice both are used together: enforce a schema where possible, coerce edge cases that slip through.</div>
+      <div class="fits-desc">Schema Enforcement stops the problem before it happens; Format Coercion cleans it up after. In practice you use both: enforce the shape where you can, fix the odd case that slips through.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L2</div>
-      <div class="fits-label">Cross-reference</div>
-      <div class="fits-desc">If the fix requires another model call (asking the model to reformat its own output), that moves to L2 Verify or L5 if it triggers a retry loop. Pure code transformation stays in L4.</div>
+      <div class="fits-label">Not this</div>
+      <div class="fits-desc">If the fix needs another model call (asking the model to reformat itself), that is a different layer, and a retry loop is another one again. Plain code cleanup stays here.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="filing-note">
-      <strong>Filing rule:</strong> Deterministic code operating on a single call's output. No new model call, no second actor. L4 Output Shape &amp; Decoding.
+      <strong>In short:</strong> plain code working on the output of one call. No new model call, no second actor.
     </div>
   </div>
 </section>
 
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <div class="matters-card">
-    Any team integrating with third-party models where you cannot control the decoding parameters, or where the model occasionally wraps JSON in markdown, uses smart quotes instead of straight quotes, or returns numbers as strings. Format coercion is the defensive layer that makes the pipeline robust to minor model inconsistencies without adding latency or cost from a retry or a second call.
+    <ul class="matters-list">
+      <li>You use someone else's model and cannot control how it generates text.</li>
+      <li>The model sometimes wraps JSON in markdown, uses curly quotes, or returns numbers as text.</li>
+      <li>You want to shrug off these small slip-ups without the delay or cost of a retry or a second call.</li>
+    </ul>
   </div>
 </section>
 

@@ -147,6 +147,9 @@
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
     font-size: 15px; line-height: 1.7; color: var(--soft);
   }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
 
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
@@ -200,7 +203,7 @@
   <div class="section-label"><span class="num">01</span>What It Is</div>
   <h2 id="what-heading">Load the whole <em>corpus</em>.</h2>
   <div class="what-card">
-    <p><strong style="color:var(--accent-hover)">Context packing</strong> is the strategy of stuffing all relevant information directly into the prompt when your data fits within the model's context window. Instead of building a retrieval pipeline, you concatenate documents, conversation history, schemas, and instructions into one long prompt and send it in a single call. This collapses the L3a retrieval stack entirely. It works well when the corpus is bounded and fits the window; it fails (by cost, latency, or recall) when the corpus grows beyond it.</p>
+    <p><strong style="color:var(--accent-hover)">Context packing</strong> means putting all the relevant information straight into the prompt, as long as it fits in what the model can read at once. Instead of building a separate search step, you paste the documents, the conversation so far, and the instructions into one long prompt and send it in a single call. It works well when the material is small and fixed; it breaks down (on cost, speed, or what the model can recall) once there is too much to fit.</p>
   </div>
 </section>
 
@@ -240,37 +243,38 @@
 
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home layer</div>
-      <div class="fits-desc">Input Shape sub-axis. Context packing decides what text goes into the prompt. The entire strategy is about constructing the input to one model call.</div>
+      <div class="fits-label">Home</div>
+      <div class="fits-desc">A way of writing your prompt: deciding what text goes into it. The whole idea is about building the input for one call to one model.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L3a</div>
       <div class="fits-label">Replaces</div>
-      <div class="fits-desc">When context packing is viable, it collapses the Stateless Retrieval layer. The taxonomy notes this explicitly: "when the corpus fits the context window, the L3a stack collapses into L4 Input Shape."</div>
+      <div class="fits-desc">When everything fits in the prompt, packing removes the need for a separate search step (retrieval) altogether. You hand the model the whole set of documents at once instead of fetching the relevant parts on demand.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">C5</div>
       <div class="fits-label">Cross-reference</div>
-      <div class="fits-desc">The decision between context packing and RAG (cost, latency, recall, precision tradeoffs) is a C5 Cost &amp; Performance framework question.</div>
+      <div class="fits-desc">Choosing between packing everything in and using retrieval (RAG) comes down to cost, speed, and how much the model can recall. That is a cost-and-performance call.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="filing-note">
-      <strong>Filing rule:</strong> The information is placed inside one prompt, consumed by one model call. That is Input Shape. If a retrieval step selected what to include, that step would be L3a; the packing of the result is still L4.
+      <strong>In short:</strong> the information goes into one prompt, read by one call. If a separate search step picked what to include, that step would be a different layer; packing the result still lives here.
     </div>
   </div>
 </section>
 
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <div class="matters-card">
-    Teams whose corpus is bounded and stable: a fixed product catalog, a set of internal policy documents, a codebase small enough to fit. Context packing is the fastest path to a working prototype because it eliminates the retrieval engineering entirely. Switch to RAG when cost per call becomes significant or when the corpus outgrows the window.
+    <ul class="matters-list">
+      <li>Your material is small and stable: a fixed product list, a set of policy docs, a small codebase.</li>
+      <li>It is the fastest way to a working prototype, since there is no search step to build.</li>
+      <li>Switch to retrieval (RAG) once the cost per call adds up or there is too much to fit.</li>
+    </ul>
   </div>
 </section>
 

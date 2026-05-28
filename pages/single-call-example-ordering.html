@@ -147,6 +147,16 @@
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
     font-size: 15px; line-height: 1.7; color: var(--soft);
   }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
 
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
@@ -231,31 +241,33 @@
 
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home layer</div>
-      <div class="fits-desc">Input Shape sub-axis. Ordering is applied to the prompt text before the single model call. It is a structural property of the input, not a separate call or tool.</div>
+      <div class="fits-label">Home</div>
+      <div class="fits-desc">A way of writing your prompt. You set the order of the examples before sending, so it shapes the input to one call. It is not a separate call or tool.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
       <div class="fits-label">Neighbor</div>
-      <div class="fits-desc">Example Selection picks which demonstrations to include. Example Ordering decides their sequence once selected. Both live in Input Shape and are typically applied together.</div>
+      <div class="fits-desc">Example Selection picks which examples to include. Example Ordering decides their sequence once picked. Both shape the prompt and usually go together.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="filing-note">
-      <strong>Filing rule:</strong> The ordering of text within a single prompt is an Input Shape decision. It requires no second call, no decoding strategy, no tool. That keeps it squarely in L4.
+      <strong>In short:</strong> ordering the text in one prompt is a writing decision. It needs no second call, no special decoding, no tool, so it stays in one call to one model.
     </div>
   </div>
 </section>
 
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <div class="matters-card">
-    Teams already using few-shot prompting who see inconsistent results and have not yet tuned ordering. Especially relevant for classification tasks where the model can be biased toward the label of the last example seen. A quick experiment: run evals with random order vs. recency-sorted order. The gap is often surprising.
+    <ul class="matters-list">
+      <li>You already use examples in your prompt and get inconsistent results without having tuned their order.</li>
+      <li>Especially for sorting tasks, where the model can lean toward the label of the last example it saw.</li>
+      <li>Quick test: compare random order against ordering by relevance. The gap is often bigger than expected.</li>
+    </ul>
   </div>
 </section>
 
@@ -268,6 +280,13 @@
     </div>
   </a>
 </section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Lu et al. (2022). <em>Fantastically Ordered Prompts and Where to Find Them: Overcoming Few-Shot Prompt Order Sensitivity.</em> ACL 2022. <span class="note">Shows that example order alone can swing accuracy widely, and offers a way to pick good orderings.</span></li>
+  </ul>
+</div>
 
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.

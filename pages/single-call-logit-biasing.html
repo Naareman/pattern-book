@@ -82,6 +82,9 @@
   .filing-note strong { color: var(--text); }
 
   .matters-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; font-size: 15px; line-height: 1.7; color: var(--soft); }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
 
   .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
@@ -142,31 +145,33 @@
 
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home layer</div>
-      <div class="fits-desc">Output Shape &amp; Decoding sub-axis. The bias is applied inside the decoding step of a single call, before sampling. It is a call-time parameter, not a prompt instruction.</div>
+      <div class="fits-label">Home</div>
+      <div class="fits-desc">A way of shaping the output as the model writes it. The nudge is applied while the answer is generated, inside one call. It is a setting you pass with the call, not an instruction in the prompt.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Neighbors</div>
-      <div class="fits-desc">Temperature operates on the full distribution by rescaling it. Logit biasing targets specific tokens. Constrained Decoding uses a grammar to set whole classes of tokens to zero. All three are decoding-time levers inside one call.</div>
+      <div class="fits-label">Neighbor</div>
+      <div class="fits-desc">Temperature dials the overall randomness up or down. Logit biasing nudges specific words. Constrained Decoding rules out whole groups of words. All three steer the model as it writes, inside one call.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="filing-note">
-      <strong>Filing rule:</strong> Modifies token probabilities inside a single call's decoding step. No second call, no grammar, just targeted numeric adjustments. L4 Output Shape &amp; Decoding.
+      <strong>In short:</strong> it adjusts the odds of specific words as the answer is written. No second call, no rule set, just targeted nudges, inside one call.
     </div>
   </div>
 </section>
 
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <div class="matters-card">
-    Classification tasks with a small, fixed label set are the clearest fit: zero out every token except your labels and the model is guaranteed to pick one of them. Also useful for content policy: hard-banning specific tokens is more reliable than prompt instructions alone, particularly for models running at high volume where even a 1-in-10,000 failure rate produces real incidents. Note that most hosted APIs expose logit bias; open-model serving with libraries like vLLM or llama.cpp supports it natively.
+    <ul class="matters-list">
+      <li>Sorting into a small, fixed set of labels: block every word except your labels and the model has to pick one of them.</li>
+      <li>Hard-banning specific words is more reliable than asking in the prompt, which matters at high volume where even rare slip-ups add up.</li>
+      <li>Most hosted services offer it, and the common open-model serving tools support it directly.</li>
+    </ul>
   </div>
 </section>
 

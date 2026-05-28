@@ -149,6 +149,9 @@
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
     font-size: 15px; line-height: 1.7; color: var(--soft);
   }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
 
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
@@ -194,7 +197,7 @@
   <div class="topbar-inner">
     <a class="back" href="single-call-guide-its-thinking.html"><span aria-hidden="true">&larr;</span> Guide its thinking</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep" aria-hidden="true">/</span><a href="single-call-guide-its-thinking.html">Guide its thinking</a><span class="sep" aria-hidden="true">/</span><span class="here">Least-to-Most</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep" aria-hidden="true">/</span><a href="single-call-guide-its-thinking.html">Guide its thinking</a><span class="sep" aria-hidden="true">/</span><span class="here">Least-to-Most</span>
     </nav>
   </div>
 </nav>
@@ -244,31 +247,33 @@
 
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
       <div class="fits-label">Home</div>
-      <div class="fits-desc">Single-Call Control, Cognitive Strategy sub-axis, in-prompt tier. Both decomposition and solution happen as text within the model's response to a structured prompt.</div>
+      <div class="fits-desc">A way of steering how the model reasons. Both the breakdown and the answers happen as text inside one call to one model.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
       <div class="fits-label">Neighbor</div>
-      <div class="fits-desc">Plan-and-Solve also builds a list before answering, but it plans arbitrarily while Least-to-Most explicitly orders sub-problems by difficulty. Step-Back abstracts upward rather than decomposing downward.</div>
+      <div class="fits-desc">Plan-and-Solve also lists steps before answering, but it plans freely while Least-to-Most orders the steps from easiest to hardest. Step-Back zooms out to the big picture instead of breaking the problem down.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="filing-note">
-      <strong>Filing rule:</strong> Cognitive Strategy, in-prompt. The decompose-then-solve loop is authored as prompt instructions, not an orchestration loop across multiple model calls.
+      <strong>In short:</strong> the break-it-down-then-solve loop is written into your prompt. It stays in one call to one model. Spreading the steps across separate calls would be a different layer (orchestration).
     </div>
   </div>
 </section>
 
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <div class="matters-card">
-    Use Least-to-Most when your task requires compositional reasoning: tasks where you must combine several inferences in a specific order. It shines on math word problems, multi-hop QA, and coding tasks where the final answer is only reachable by correctly answering a chain of prerequisites. If Chain-of-Thought still makes leaps and gets the wrong answer, Least-to-Most forces the slow, step-by-step path.
+    <ul class="matters-list">
+      <li>The answer only comes out right if earlier parts are solved first, in order.</li>
+      <li>Good for math word problems, multi-step questions, and coding where each part depends on the last.</li>
+      <li>Reach for it when step-by-step reasoning still skips ahead and gets the wrong answer.</li>
+    </ul>
   </div>
 </section>
 

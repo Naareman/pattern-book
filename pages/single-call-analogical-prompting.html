@@ -147,6 +147,9 @@
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
     font-size: 15px; line-height: 1.7; color: var(--soft);
   }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
 
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
@@ -193,7 +196,7 @@
   <div class="topbar-inner">
     <a class="back" href="single-call-guide-its-thinking.html"><span aria-hidden="true">&larr;</span> Guide its thinking</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep" aria-hidden="true">/</span><a href="single-call-guide-its-thinking.html">Guide its thinking</a><span class="sep" aria-hidden="true">/</span><span class="here">Analogical Prompting</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep" aria-hidden="true">/</span><a href="layers.html">Layers</a><span class="sep" aria-hidden="true">/</span><a href="layer-single-call-control.html">Single-Call Control</a><span class="sep" aria-hidden="true">/</span><a href="single-call-guide-its-thinking.html">Guide its thinking</a><span class="sep" aria-hidden="true">/</span><span class="here">Analogical Prompting</span>
     </nav>
   </div>
 </nav>
@@ -236,31 +239,33 @@
 
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
       <div class="fits-label">Home</div>
-      <div class="fits-desc">Single-Call Control, Cognitive Strategy sub-axis, "Try a different angle" cluster. The analogy recall and reasoning happen inside the model's response to a single prompt.</div>
+      <div class="fits-desc">A way of steering how the model reasons. It recalls a similar example and reasons from it, all inside one call to one model.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
       <div class="fits-label">Neighbor</div>
-      <div class="fits-desc">Few-Shot prompting (an anchor) also uses examples, but you provide them. Analogical Prompting delegates example selection to the model itself, which is what distinguishes it here.</div>
+      <div class="fits-desc">Few-Shot prompting also uses examples, but you write them. Analogical Prompting lets the model come up with its own, which is the key difference.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="filing-note">
-      <strong>Filing rule:</strong> Cognitive Strategy, in-prompt. The model generates its own reasoning scaffold as text within the response; no separate retrieval system or external example database is involved.
+      <strong>In short:</strong> the model writes its own examples as text in its reply. There is no separate search step or outside example store, so it stays in one call to one model.
     </div>
   </div>
 </section>
 
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <div class="matters-card">
-    Use Analogical Prompting when you want the benefits of few-shot examples but cannot curate them for every problem type, or when your tasks are diverse enough that fixed examples miss. It is particularly effective on math and coding tasks where structural similarity matters more than surface similarity.
+    <ul class="matters-list">
+      <li>You want the lift of worked examples but cannot hand-write them for every kind of problem.</li>
+      <li>Your tasks vary so much that a fixed set of examples would miss most of them.</li>
+      <li>Best on math and coding, where matching the shape of the problem matters more than matching the words.</li>
+    </ul>
   </div>
 </section>
 

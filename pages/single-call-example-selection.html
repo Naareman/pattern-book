@@ -144,6 +144,16 @@
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
     font-size: 15px; line-height: 1.7; color: var(--soft);
   }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
 
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
@@ -232,7 +242,7 @@
         </div>
         <div class="sel-ex">
           <div class="sel-dot match" aria-hidden="true"></div>
-          <div><div class="sel-text">Example 2: "Battery lasts all day, very impressed." &#8594; Positive (battery praise)</div><div class="sel-note">Same feature, opposite sentiment — shows contrast</div></div>
+          <div><div class="sel-text">Example 2: "Battery lasts all day, very impressed." &#8594; Positive (battery praise)</div><div class="sel-note">Same feature, opposite sentiment: shows contrast</div></div>
         </div>
         <div class="sel-ex">
           <div class="sel-dot match" aria-hidden="true"></div>
@@ -245,31 +255,33 @@
 
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home layer</div>
-      <div class="fits-desc">Input Shape sub-axis. Example selection decides what enters the prompt before the single model call. Whether selection is static or dynamic, the result is text included in the prompt.</div>
+      <div class="fits-label">Home</div>
+      <div class="fits-desc">A way of writing your prompt: choosing which examples go into it. Whether you pick a fixed set or pick fresh ones each time, the result is text in the prompt.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L3a</div>
       <div class="fits-label">Cross-reference</div>
-      <div class="fits-desc">Dynamic selection that retrieves examples from a store at runtime overlaps with Stateless Retrieval (L3a). When retrieval exists to build a better prompt, the pattern still lives in L4; the mechanism that fetches examples is L3a.</div>
+      <div class="fits-desc">Picking examples fresh each time by pulling them from a store is a search step (retrieval). The pattern still lives here; the search that fetches the examples belongs to a different layer.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="filing-note">
-      <strong>Filing rule:</strong> The result of example selection is examples included in the prompt input. That makes it Input Shape. The neighbor, Example Ordering, handles the sequence of the chosen examples.
+      <strong>In short:</strong> the result of selecting examples is examples in the prompt, so it is part of writing the prompt. Its neighbor, Example Ordering, sets the sequence of the chosen examples.
     </div>
   </div>
 </section>
 
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <div class="matters-card">
-    Any team using few-shot prompting at scale. Fixed example sets work for narrow tasks with predictable input; dynamic selection matters when inputs vary widely (different topics, lengths, styles) and a single fixed set cannot cover the distribution. It becomes critical when the example pool is large enough that random sampling produces clearly wrong demonstrations.
+    <ul class="matters-list">
+      <li>A fixed set of examples is fine for narrow tasks with predictable input.</li>
+      <li>Picking examples fresh each time matters when inputs vary widely (different topics, lengths, styles) and no single set covers them.</li>
+      <li>It becomes essential once the example pool is so large that grabbing examples at random pulls in clearly wrong ones.</li>
+    </ul>
   </div>
 </section>
 
@@ -282,6 +294,13 @@
     </div>
   </a>
 </section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Liu et al. (2022). <em>What Makes Good In-Context Examples for GPT-3?</em> DeeLIO 2022. <span class="note">Finds that choosing examples close to the input (by similarity) beats random selection.</span></li>
+  </ul>
+</div>
 
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.

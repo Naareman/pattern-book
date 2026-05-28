@@ -175,6 +175,9 @@
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px;
     font-size: 15px; line-height: 1.7; color: var(--soft);
   }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
 
   /* back link */
   .back-link {
@@ -280,7 +283,7 @@
       <div class="cov-cell" role="cell">
         <span class="cov-q">When was Marie Curie born?</span><br>
         Answer: 7 November 1867, not 1868.
-        <div><span class="cov-status status-flag">Mismatch &mdash; revise</span></div>
+        <div><span class="cov-status status-flag">Mismatch: revise</span></div>
       </div>
     </div>
 
@@ -291,27 +294,25 @@
 <!-- 03 WHERE IT FITS -->
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
   <div class="fits-card">
 
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home layer</div>
-      <div class="fits-desc">Self-Verification sub-axis of Single-Call Control. Everything happens inside one call to one model: draft, claim extraction, questioning, and correction.</div>
+      <div class="fits-label">Home</div>
+      <div class="fits-desc">A way of getting the model to check its own work. Everything happens inside one call to one model: the draft, pulling out the claims, the questions, and the fix.</div>
     </div>
 
     <div class="fits-divider" role="separator"></div>
 
     <div class="fits-row">
-      <div class="fits-layer">L2</div>
       <div class="fits-label">Not this</div>
-      <div class="fits-desc">If a second model call (or a separate verifier model) checks the claims, that is L2 Verify, not L4. The boundary is call count: one call stays here, two calls move to L2.</div>
+      <div class="fits-desc">If a second call (or a separate checker model) reviews the claims, that is a different layer. The line is the number of calls: one call stays here, two calls move on.</div>
     </div>
 
     <div class="fits-divider" role="separator"></div>
 
     <div class="filing-note">
-      <strong>Filing rule:</strong> Self-checking inside one call to one model = L4 Self-Verification. A separate verifier call or a different model = L2 Verify.
+      <strong>In short:</strong> the model checks itself inside one call. Bring in a separate checker call or a different model and you have moved to a different layer.
     </div>
   </div>
 </section>
@@ -319,9 +320,13 @@
 <!-- 04 WHEN IT MATTERS -->
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <div class="matters-card">
-    Useful when factual precision matters and adding a second model call is too expensive or too slow. It helps most in knowledge-dense tasks (biography, science, legal citations) where a plausible-sounding draft may contain off-by-one errors the model would otherwise miss. It does not catch knowledge gaps the model has entirely; for that, a retrieval step at L3a is the right tool.
+    <ul class="matters-list">
+      <li>Facts must be exact, and a second model call would be too slow or too costly.</li>
+      <li>Best on fact-heavy work (biography, science, legal citations) where a confident draft can still slip a detail.</li>
+      <li>It will not fill gaps the model never knew. For that, add a step that looks information up first.</li>
+    </ul>
   </div>
 </section>
 

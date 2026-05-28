@@ -78,6 +78,16 @@
   .filing-note strong { color: var(--text); }
 
   .matters-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; font-size: 15px; line-height: 1.7; color: var(--soft); }
+  .matters-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .matters-list li { position: relative; padding-left: 22px; font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .matters-list li::before { content: ""; position: absolute; left: 4px; top: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
 
   .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
@@ -114,7 +124,7 @@
   <div class="section-label"><span class="num">01</span>What It Is</div>
   <h2 id="what-heading">Race <em>N beams</em> to the finish.</h2>
   <div class="what-card">
-    <p>Standard sampling picks one token at each step. <strong style="color:var(--accent-hover)">Beam search</strong> keeps multiple partial sequences, called beams, alive simultaneously. At each step each beam is extended with its top candidate tokens, and only the best-scoring N sequences overall survive into the next step. When generation ends, the beam with the highest cumulative log-probability wins. With beam width 1, beam search reduces to greedy decoding (always pick the single best token). With width 4 or 5 it explores paths that might start slightly worse but end better. The cost is proportional to beam width: 4 beams means roughly 4x the decoding compute. Beam search is most common in machine translation and speech recognition where sentence-level fluency matters more than token-level speed.</p>
+    <p>Instead of committing to one word at each step, <strong style="color:var(--accent-hover)">beam search</strong> keeps the best few half-finished answers alive at once and only commits at the end, to the one with the best overall score. The demo below shows it in action. The cost: keeping N answers alive means roughly N times the work.</p>
   </div>
 </section>
 
@@ -174,37 +184,38 @@
 
 <section aria-labelledby="fits-heading">
   <div class="section-label"><span class="num">03</span>Where It Fits</div>
-  <h2 id="fits-heading">Its place in the <em>taxonomy</em>.</h2>
+  <h2 id="fits-heading">Where it <em>fits</em>.</h2>
   <div class="fits-card">
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
-      <div class="fits-label">Home layer</div>
-      <div class="fits-desc">Output Shape &amp; Decoding sub-axis. Beam search is a decoding algorithm that runs inside a single call to one model, shaping which token sequence is ultimately returned.</div>
+      <div class="fits-label">Home</div>
+      <div class="fits-desc">A way of shaping the output as the model writes it. The search runs inside one call to one model and decides which wording comes back.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L4</div>
       <div class="fits-label">Neighbor</div>
-      <div class="fits-desc">Self-Consistency (same model, same prompt, N sampled outputs, majority vote) is also L4 in-decoding when all samples come from the same call. The difference: beam search tracks cumulative probability; self-consistency samples randomly and votes on the final answers.</div>
+      <div class="fits-desc">Self-Consistency also produces several answers from one model and picks a winner. The difference: beam search tracks an overall score; self-consistency samples at random and takes the most common answer.</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="fits-row">
-      <div class="fits-layer">L2</div>
-      <div class="fits-label">Cross-reference</div>
-      <div class="fits-desc">Self-Consistency moves to L2 Combine (Ensembling) when different models or prompts generate the candidates. The jump from one call to many is the boundary between L4 and L2.</div>
+      <div class="fits-label">Not this</div>
+      <div class="fits-desc">Once different models or different prompts generate the candidates and the results are merged, you have left a single call and moved to a different layer (combining outputs).</div>
     </div>
     <div class="fits-divider" role="separator"></div>
     <div class="filing-note">
-      <strong>Filing rule:</strong> Multiple candidate sequences, all inside one call. Decoding-time search, single model. L4 Output Shape &amp; Decoding.
+      <strong>In short:</strong> several candidate wordings, all inside one call to one model, with the search happening as the answer is written.
     </div>
   </div>
 </section>
 
 <section aria-labelledby="matters-heading">
   <div class="section-label"><span class="num">04</span>When It Matters</div>
-  <h2 id="matters-heading"><em>Who</em> needs this.</h2>
+  <h2 id="matters-heading">When to <em>reach for it</em>.</h2>
   <div class="matters-card">
-    Teams running open models on structured, short-output tasks where sentence-level quality matters more than diversity: machine translation, speech-to-text transcription, mathematical expression generation. For long creative or conversational output, beam search often produces repetitive, "safe" text because it optimizes cumulative probability; sampling with temperature is usually better there. The compute cost means beam search is rarely the default for large hosted models, but it is widely available in open-model serving frameworks.
+    <ul class="matters-list">
+      <li>Best for short, structured outputs where getting the whole phrase right matters: translation, speech-to-text, math expressions.</li>
+      <li>Skip it for long or creative writing: it tends to produce repetitive, "safe" text, where sampling with some randomness reads better.</li>
+      <li>The extra compute means it is rarely the default on big hosted models, but it is common in open-model serving tools.</li>
+    </ul>
   </div>
 </section>
 
@@ -217,6 +228,14 @@
     </div>
   </a>
 </section>
+
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Graves (2012). <em>Sequence Transduction with Recurrent Neural Networks.</em> arXiv:1211.3711. <span class="note">An early use of beam search for neural sequence decoding.</span></li>
+    <li>Freitag &amp; Al-Onaizan (2017). <em>Beam Search Strategies for Neural Machine Translation.</em> arXiv:1702.01806. <span class="note">Surveys beam width and length-normalization choices in translation.</span></li>
+  </ul>
+</div>
 
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
