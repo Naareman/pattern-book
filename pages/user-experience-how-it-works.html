@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Experience &middot; How it works &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* TOP BAR */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; white-space: nowrap;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* HEADER */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* SECTIONS */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* 01 IDEA CARD */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
+
+  /* 02 DEMO: MINI CHAT */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+
+  .chat-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  /* Chat header bar */
+  .chat-header {
+    background: var(--bg-subtle); border-bottom: 1px solid var(--border);
+    padding: 12px 18px; display: flex; align-items: center; gap: 10px;
+  }
+  .chat-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--accent); display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .chat-avatar svg { width: 16px; height: 16px; color: #fff; }
+  .chat-title { font-weight: 600; font-size: 14px; }
+  .chat-subtitle { font-size: 12px; color: var(--faint); }
+
+  /* Chat messages area */
+  .chat-messages { padding: 20px 18px 12px; min-height: 200px; display: flex; flex-direction: column; gap: 14px; }
+
+  .chat-bubble-user {
+    align-self: flex-end;
+    background: var(--accent); color: #fff;
+    border-radius: 18px 18px 4px 18px;
+    padding: 10px 16px;
+    font-size: 15px; line-height: 1.5; max-width: 80%;
+  }
+  .chat-bubble-ai {
+    align-self: flex-start; max-width: 92%;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 4px 18px 18px 18px;
+    padding: 14px 16px;
+    font-size: 15px; line-height: 1.65;
+  }
+  .chat-bubble-ai .stream-text { color: var(--text); }
+  .chat-cursor {
+    display: inline-block; width: 2px; height: 1em;
+    background: var(--accent); vertical-align: text-bottom;
+    animation: blink 0.9s step-end infinite;
+    margin-left: 1px;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .chat-cursor.hidden { display: none; }
+
+  /* Citations */
+  .chat-citations {
+    margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px;
+    opacity: 0; transition: opacity 0.4s ease; pointer-events: none;
+  }
+  .chat-citations.visible { opacity: 1; pointer-events: auto; }
+  .citation-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 10px;
+    font-size: 12px; font-weight: 600; color: var(--accent-hover);
+    cursor: pointer; transition: background .15s, border-color .15s, transform .15s;
+    text-decoration: none;
+  }
+  .citation-pill:hover, .citation-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); transform: translateY(-1px); }
+  .citation-pill svg { width: 11px; height: 11px; }
+
+  .citation-preview {
+    margin-top: 8px; display: none;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 14px;
+    font-size: 13px; color: var(--soft); line-height: 1.5;
+  }
+  .citation-preview.shown { display: block; }
+
+  /* Action bar: copy + retry */
+  .chat-actions {
+    display: flex; gap: 8px; margin-top: 12px;
+    opacity: 0; transition: opacity 0.4s ease; pointer-events: none;
+    flex-wrap: wrap;
+  }
+  .chat-actions.visible { opacity: 1; pointer-events: auto; }
+  .action-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border: 1px solid var(--border-strong);
+    border-radius: 8px; background: var(--surface);
+    font-size: 13px; font-weight: 500; color: var(--soft);
+    cursor: pointer; transition: background .15s, border-color .15s, color .15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .action-btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .action-btn.done { background: var(--success-soft); border-color: var(--success); color: var(--success); }
+  .action-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+  /* Feedback row */
+  .chat-feedback {
+    display: flex; align-items: center; gap: 10px; margin-top: 12px;
+    opacity: 0; transition: opacity 0.4s ease; pointer-events: none;
+  }
+  .chat-feedback.visible { opacity: 1; pointer-events: auto; }
+  .feedback-label { font-size: 12px; color: var(--faint); }
+  .thumb-btn {
+    width: 30px; height: 30px; border-radius: 8px;
+    border: 1px solid var(--border-strong); background: var(--surface);
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 15px; transition: background .15s, border-color .15s, transform .18s;
+    font-family: 'Inter', sans-serif;
+  }
+  .thumb-btn:hover { background: var(--accent-soft); border-color: var(--accent); transform: scale(1.12); }
+  .thumb-btn.pressed { background: var(--accent-soft); border-color: var(--accent); transform: scale(1.18); }
+  .feedback-thanks { font-size: 12px; color: var(--accent-hover); font-weight: 500; display: none; }
+  .feedback-thanks.shown { display: block; }
+
+  /* Chat controls */
+  .chat-controls {
+    border-top: 1px solid var(--border); padding: 14px 18px;
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .diagram-btn {
+    padding: 9px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s, box-shadow .18s, background .18s, border-color .18s;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* 03 REAL EXAMPLE */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .example-row {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .example-row:last-child { border-bottom: 0; }
+  .example-label {
+    flex: 0 0 130px; padding: 16px 18px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--faint); background: var(--bg-subtle);
+    border-right: 1px solid var(--border); display: flex; align-items: flex-start;
+  }
+  .example-content {
+    flex: 1; padding: 16px 18px;
+    font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+  .example-content strong { color: var(--text); font-weight: 600; }
+
+  /* 04 TRADEOFFS -- canonical monochrome meter with 170px label baseline */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-scale {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 14px;
+  }
+  .tradeoff-scale .spacer { width: 170px; flex: none; }
+  .scale-track {
+    flex: 1; display: flex; justify-content: space-between;
+    font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--faint);
+  }
+  .tradeoff-row {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 12px;
+  }
+  .tradeoff-label {
+    width: 170px; flex: none; font-size: 13px; font-weight: 600; color: var(--text);
+  }
+  .tradeoff-bars { display: flex; gap: 4px; flex: 1; }
+  .seg {
+    height: 8px; flex: 1; border-radius: 3px;
+    background: var(--border-strong);
+  }
+  .seg.on { background: var(--accent); }
+  .tradeoff-quote {
+    font-size: 13px; color: var(--soft); line-height: 1.5; margin-top: 16px;
+    border-top: 1px solid var(--border); padding-top: 14px;
+  }
+  @media(max-width:480px){
+    .tradeoff-row{flex-direction:column;align-items:stretch}
+    .tradeoff-label{min-width:0}
+    .tradeoff-scale .spacer { display: none; }
+  }
+
+  /* BACK LINK */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform .18s, box-shadow .18s, border-color .18s;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* SOURCES */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* FOOTER */
+  footer {
+    max-width: 920px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* RESPONSIVE */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .example-label { flex: 0 0 90px; font-size: 11px; }
+    .chat-bubble-user { max-width: 95%; }
+  }
+  @media (max-width: 420px) {
+    .example-row { flex-direction: column; }
+    .example-label { border-right: none; border-bottom: 1px solid var(--border); flex: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="layer-user-experience.html"><span aria-hidden="true">&larr;</span> User Experience</a>
+    <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-user-experience.html">User Experience</a><span class="sep">/</span><span class="here">How it works</span></nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 5h16v11H4zM2 20h20M9.5 16v4M14.5 16v4"/>
+      </svg>
+    </span>Layer &middot; 10
+  </span>
+  <h1 class="pattern-title">User Experience</h1>
+  <p class="explainer">Everything the person actually sees, taps, and steers: where you meet the AI, how the answer shows up, and how you stay in control of what it does.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>The <span style="color:var(--accent-hover);font-weight:500">user experience layer</span> is everything between the AI's raw output and the person reading it. The answer does not just appear all at once: it <strong>streams in word by word</strong>, so it feels alive and fast. Alongside the answer, the interface shows <strong>where the information came from</strong>, lets you <strong>copy or try again</strong> in one tap, and gives you a way to say whether it helped. Each of those pieces is a deliberate design choice, not an accident.</p>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>A <em>mini chat</em> in your hands.</h2>
+  <p class="demo-lede">Press Play to watch the answer stream in word by word. Then tap a source to see where it came from, or give feedback with thumbs up or down.</p>
+
+  <div class="chat-stage">
+    <!-- Chat header -->
+    <div class="chat-header">
+      <div class="chat-avatar" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </div>
+      <div>
+        <div class="chat-title">AI Assistant</div>
+        <div class="chat-subtitle" id="chatStatus">Ready</div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-messages" id="chatMessages" aria-live="polite">
+      <div class="chat-bubble-user">Why is the sky blue?</div>
+
+      <div class="chat-bubble-ai" id="aiBubble" style="display:none">
+        <div class="stream-text" id="streamText"></div><span class="chat-cursor hidden" id="chatCursor" aria-hidden="true"></span>
+
+        <!-- Citations (appear after streaming) -->
+        <div class="chat-citations" id="chatCitations">
+          <button class="citation-pill" data-cite="0" aria-label="Source 1: NASA Science">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            NASA Science
+          </button>
+          <button class="citation-pill" data-cite="1" aria-label="Source 2: Physics Today">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Physics Today
+          </button>
+        </div>
+        <div class="citation-preview" id="citePreview"></div>
+
+        <!-- Action buttons -->
+        <div class="chat-actions" id="chatActions">
+          <button class="action-btn" id="copyBtn" aria-label="Copy answer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+          <button class="action-btn" id="retryBtn" aria-label="Try again: ask the same question">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+            Try again
+          </button>
+        </div>
+
+        <!-- Feedback -->
+        <div class="chat-feedback" id="chatFeedback">
+          <span class="feedback-label">Was this helpful?</span>
+          <button class="thumb-btn" id="thumbUp" aria-label="Thumbs up, helpful">&#128077;</button>
+          <button class="thumb-btn" id="thumbDown" aria-label="Thumbs down, not helpful">&#128078;</button>
+          <span class="feedback-thanks" id="feedbackThanks">Thanks for the feedback!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="chat-controls">
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>What each piece <em>actually does</em>.</h2>
+  <div class="example-stage" role="list">
+    <div class="example-row" role="listitem">
+      <div class="example-label">Streaming</div>
+      <div class="example-content">ChatGPT, Claude, and Gemini all stream: they send the answer word by word the moment each one is ready, instead of waiting until the full reply is done. This makes a 10-second reply feel like a conversation, not a page load.</div>
+    </div>
+    <div class="example-row" role="listitem">
+      <div class="example-label">Sources</div>
+      <div class="example-content">Perplexity shows small numbered source pills next to each sentence. Tap one and it opens the exact page. This lets you check the answer and builds trust, because you can see where it came from.</div>
+    </div>
+    <div class="example-row" role="listitem">
+      <div class="example-label">Copy / Try again</div>
+      <div class="example-content"><strong>Copy</strong> puts the answer on the clipboard in one tap. <strong>Try again</strong> sends the same question once more to get a different attempt, useful when the first answer missed the point.</div>
+    </div>
+    <div class="example-row" role="listitem">
+      <div class="example-label">Thumbs Up / Down</div>
+      <div class="example-content">Every AI product collects this signal. Teams use it to find answers people disliked, where it feeds the work that shapes future answers. One tap turns into a data point teams can act on.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Perceived speed</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">User control</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Build complexity</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Feedback signal</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Streaming the answer word by word raises the feeling of speed a lot, but the connection has to stay open the whole time. Thumbs feedback is sparse and noisy: most people never press it, and a thumbs-down could mean wrong answer, wrong tone, or just frustration. Showing sources looks simple but needs a system underneath that tracks where every claim came from, which adds work to build.
+    </div>
+  </div>
+</section>
+
+<!-- BACK LINK -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-user-experience.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">User Experience</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>OpenAI (2022). <em>ChatGPT: Optimizing Language Models for Dialogue.</em> <span class="note">Brought the chat interface, streaming, and thumbs feedback loop to a broad audience.</span></li>
+    <li>Perplexity AI (2023). <em>Perplexity product documentation.</em> <span class="note">Source-linked answers: each claim links to a numbered page.</span></li>
+    <li>Ouyang et al. (2022). <em>Training language models to follow instructions with human feedback.</em> <span class="note">Shows how thumbs feedback shapes how a model answers next time.</span></li>
+    <li>Vaswani et al. (2017). <em>Attention Is All You Need.</em> <span class="note">The architecture that makes word-by-word generation possible.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ STREAMING DEMO ============
+const ANSWER_TOKENS = [
+  'Sunlight', 'looks', 'white,', 'but', 'it', 'is', 'really', 'a', 'mix', 'of',
+  'every', 'color.', 'When', 'sunlight', 'hits', 'air,', 'the', 'tiny', 'gas',
+  'molecules', 'scatter', 'it.', 'Blue', 'light', 'has', 'a', 'short', 'wavelength,',
+  'so', 'it', 'scatters', 'the', 'most', 'in', 'all', 'directions', 'and', 'fills',
+  'the', 'sky.', 'Red', 'light', 'has', 'a', 'long', 'wavelength', 'and', 'passes',
+  'straight', 'through', 'to', 'your', 'eyes,', 'which', 'is', 'why', 'sunsets',
+  'are', 'red.'
+];
+
+const CITE_DATA = [
+  { title: 'NASA Science: Why is the Sky Blue?', text: 'Shorter blue wavelengths scatter in all directions when sunlight hits the air, which is why the sky looks blue.' },
+  { title: 'Physics Today: Light Scattering', text: 'Lord Rayleigh described in 1871 why the sky is blue: blue light scatters roughly 5.5 times more than red light.' }
+];
+
+const playBtn   = document.getElementById('playBtn');
+const resetBtn  = document.getElementById('resetBtn');
+const aiBubble  = document.getElementById('aiBubble');
+const streamText = document.getElementById('streamText');
+const chatCursor = document.getElementById('chatCursor');
+const chatStatus = document.getElementById('chatStatus');
+const chatCitations = document.getElementById('chatCitations');
+const citePreview   = document.getElementById('citePreview');
+const chatActions   = document.getElementById('chatActions');
+const chatFeedback  = document.getElementById('chatFeedback');
+const copyBtn   = document.getElementById('copyBtn');
+const retryBtn  = document.getElementById('retryBtn');
+const thumbUp   = document.getElementById('thumbUp');
+const thumbDown = document.getElementById('thumbDown');
+const feedbackThanks = document.getElementById('feedbackThanks');
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let playing = false;
+let activeCite = null;
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function resetDemo() {
+  playing = false;
+  streamText.textContent = '';
+  chatCursor.classList.add('hidden');
+  aiBubble.style.display = 'none';
+  chatCitations.classList.remove('visible');
+  chatActions.classList.remove('visible');
+  chatFeedback.classList.remove('visible');
+  citePreview.classList.remove('shown');
+  citePreview.textContent = '';
+  activeCite = null;
+  copyBtn.classList.remove('done');
+  copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+  thumbUp.classList.remove('pressed');
+  thumbDown.classList.remove('pressed');
+  feedbackThanks.classList.remove('shown');
+  chatStatus.textContent = 'Ready';
+  playBtn.disabled = false;
+  document.querySelectorAll('.citation-pill').forEach(p => p.classList.remove('active'));
+}
+
+async function runDemo() {
+  if (playing) return;
+  playing = true;
+  playBtn.disabled = true;
+  chatStatus.textContent = 'Thinking...';
+
+  aiBubble.style.display = 'block';
+  streamText.textContent = '';
+  chatCursor.classList.remove('hidden');
+
+  await sleep(reduceMotion ? 0 : 600);
+
+  chatStatus.textContent = 'Writing...';
+
+  if (reduceMotion) {
+    streamText.textContent = ANSWER_TOKENS.join(' ');
+  } else {
+    for (let i = 0; i < ANSWER_TOKENS.length; i++) {
+      const tok = ANSWER_TOKENS[i];
+      const space = i > 0 ? ' ' : '';
+      streamText.textContent += space + tok;
+      await sleep(55 + Math.random() * 30);
+    }
+  }
+
+  chatCursor.classList.add('hidden');
+  chatStatus.textContent = 'Done';
+
+  await sleep(reduceMotion ? 0 : 250);
+  chatCitations.classList.add('visible');
+  await sleep(reduceMotion ? 0 : 180);
+  chatActions.classList.add('visible');
+  await sleep(reduceMotion ? 0 : 180);
+  chatFeedback.classList.add('visible');
+
+  playing = false;
+  playBtn.disabled = false;
+}
+
+playBtn.addEventListener('click', runDemo);
+resetBtn.addEventListener('click', resetDemo);
+
+// Citation pills
+document.querySelectorAll('.citation-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    const idx = parseInt(pill.dataset.cite);
+    const data = CITE_DATA[idx];
+    const wasActive = pill.classList.contains('active');
+
+    document.querySelectorAll('.citation-pill').forEach(p => p.classList.remove('active'));
+    citePreview.classList.remove('shown');
+
+    if (!wasActive) {
+      pill.classList.add('active');
+      citePreview.innerHTML = '<strong>' + data.title + '</strong><br>' + data.text;
+      citePreview.classList.add('shown');
+      activeCite = idx;
+    } else {
+      activeCite = null;
+    }
+  });
+});
+
+// Copy button
+copyBtn.addEventListener('click', () => {
+  const text = streamText.textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).catch(() => {});
+  copyBtn.classList.add('done');
+  copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+  setTimeout(() => {
+    copyBtn.classList.remove('done');
+    copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+  }, 2000);
+});
+
+// Try again button
+retryBtn.addEventListener('click', () => {
+  if (playing) return;
+  resetDemo();
+  setTimeout(runDemo, 150);
+});
+
+// Thumbs
+function pressFeedback(btn) {
+  if (feedbackThanks.classList.contains('shown')) return;
+  thumbUp.classList.remove('pressed');
+  thumbDown.classList.remove('pressed');
+  btn.classList.add('pressed');
+  feedbackThanks.classList.add('shown');
+}
+thumbUp.addEventListener('click', () => pressFeedback(thumbUp));
+thumbDown.addEventListener('click', () => pressFeedback(thumbDown));
+</script>
+</body>
+</html>

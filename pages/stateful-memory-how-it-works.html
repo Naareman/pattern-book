@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stateful Memory &middot; How it works &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; white-space: nowrap;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px;
+    line-height: 1.5; color: var(--text);
+  }
+
+  /* ======== MEMORY DEMO STAGE ======== */
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+
+  /* prompt-window visualization */
+  .prompt-window {
+    background: var(--bg-subtle); border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-sm); padding: 10px 13px; margin-bottom: 14px;
+    font-size: 12.5px; color: var(--soft); line-height: 1.55;
+  }
+  .prompt-window .pw-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 6px;
+  }
+  .prompt-window .pw-entry {
+    display: flex; align-items: flex-start; gap: 8px; margin-bottom: 5px;
+    opacity: 0; transition: opacity .3s ease;
+  }
+  .prompt-window .pw-entry.visible { opacity: 1; }
+  .prompt-window .pw-entry:last-child { margin-bottom: 0; }
+  .pw-tag {
+    flex-shrink: 0; font-size: 10px; font-weight: 700; letter-spacing: .04em;
+    padding: 2px 7px; border-radius: 20px; text-transform: uppercase;
+  }
+  .pw-tag.user { background: var(--accent-soft); color: var(--accent-hover); }
+  .pw-tag.ai { background: var(--bg-subtle); color: var(--soft); border: 1px solid var(--border); }
+  .pw-text { flex: 1; color: var(--text); }
+
+  /* conversation turns */
+  .memory-turns { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .turn {
+    display: flex; gap: 10px; align-items: flex-start;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .turn.shown { opacity: 1; transform: translateY(0); }
+  .turn-role {
+    flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .turn-role.user { background: var(--accent-soft); color: var(--accent-hover); }
+  .turn-role.ai { background: var(--bg-subtle); color: var(--soft); border: 1px solid var(--border); }
+  .turn-body {
+    flex: 1; background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 13px;
+    font-size: 14px; line-height: 1.55; color: var(--text);
+  }
+  .turn-body.memory-highlight {
+    background: var(--accent-soft); border-color: var(--accent);
+  }
+  .turn-body strong { color: var(--accent-hover); font-weight: 600; }
+  .memory-note {
+    font-size: 13px; color: var(--soft); line-height: 1.6;
+    padding-top: 14px; border-top: 1px solid var(--border);
+    min-height: 42px;
+  }
+  .memory-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px;
+    font-weight: 600; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ======== SECTION 03: TAP CARDS ======== */
+  .cards-grid { display: flex; flex-direction: column; gap: 12px; }
+  .flip-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    cursor: pointer; box-shadow: var(--shadow-sm);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  }
+  .flip-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .flip-card .q {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px;
+    line-height: 1.3; color: var(--text); display: flex; align-items: center; gap: 10px;
+  }
+  .flip-card .q .qico {
+    flex-shrink: 0; width: 20px; height: 20px; color: var(--accent); display: flex; align-items: center; justify-content: center;
+  }
+  .flip-card .q .qico svg { width: 20px; height: 20px; display: block; }
+  .flip-card .body {
+    font-size: 13.5px; color: var(--soft); line-height: 1.55;
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.35s ease, margin 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+  }
+  .flip-card.open .body { max-height: 200px; margin-top: 12px; opacity: 1; }
+  .flip-card .tap-hint { font-size: 11px; color: var(--faint); margin-top: 5px; }
+  .flip-card.open .tap-hint { display: none; }
+
+  /* ======== TRADEOFFS ======== */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 170px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources + footer */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+  }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+    .memory-controls { flex-direction: column; align-items: stretch; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="layer-stateful-memory.html"><span aria-hidden="true">&larr;</span> Stateful Memory</a>
+    <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-stateful-memory.html">Stateful Memory</a><span class="sep">/</span><span class="here">How it works</span></nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.5V20a2 2 0 0 1-4 0V9.5A4 4 0 0 1 8 6a4 4 0 0 1 4-4z"/><path d="M10 14h4"/>
+      </svg>
+    </span>Layer &middot; 6
+  </span>
+  <h1 class="pattern-title">Stateful Memory</h1>
+  <p class="explainer">How an AI remembers what was said and what you prefer, across this chat and across future ones.</p>
+</header>
+
+<!-- 01 · THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>
+      An AI has no built-in memory between conversations. Each request starts fresh.
+      <strong style="color:var(--accent-hover)">Stateful memory</strong> is what adds persistence: the system
+      <strong style="color:var(--accent-hover)">stores</strong> what was said, what you prefer, or what happened in a past session,
+      then <strong style="color:var(--accent-hover)">writes that context back</strong> into the message you send the AI when it is useful.
+      Every remembered piece costs a token (a small piece the AI reads, roughly a word), so good memory systems are careful about what they keep, what they shrink, and what they drop.
+    </p>
+  </div>
+</section>
+
+<!-- 02 · SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Watch memory <em>carry context forward</em>.</h2>
+
+  <div class="demo-stage">
+    <p class="demo-lede">
+      Step through this conversation. The second question uses the word "it" without saying what "it" is.
+      Memory works because the earlier turns are still in the message when the AI reads the new question.
+    </p>
+
+    <!-- Prompt window visualization -->
+    <div class="prompt-window" aria-label="What the AI sees in its message" aria-live="polite">
+      <div class="pw-label">What the AI sees in its message right now</div>
+      <div class="pw-entry" id="pw0">
+        <span class="pw-tag user">You</span>
+        <span class="pw-text" id="pw0text"></span>
+      </div>
+      <div class="pw-entry" id="pw1">
+        <span class="pw-tag ai">AI</span>
+        <span class="pw-text" id="pw1text"></span>
+      </div>
+      <div class="pw-entry" id="pw2">
+        <span class="pw-tag user">You</span>
+        <span class="pw-text" id="pw2text"></span>
+      </div>
+    </div>
+
+    <!-- Conversation turns -->
+    <div class="memory-turns" id="memoryTurns" aria-live="polite" aria-label="Conversation turns"></div>
+
+    <div class="memory-note" id="memoryNote" aria-live="polite"></div>
+
+    <div class="memory-controls">
+      <button class="diagram-btn primary" id="memNextBtn">&#8594; Step</button>
+      <button class="diagram-btn" id="memPlayBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="memResetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 · REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>Where you've <em>felt</em> this.</h2>
+
+  <div class="cards-grid">
+    <div class="flip-card" tabindex="0" role="button" aria-expanded="false">
+      <div class="q"><span class="qico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>The chatbot answers your "and what about it?" without missing a beat</div>
+      <div class="tap-hint">Tap to see why</div>
+      <div class="body">Every time you send a message, the whole back-and-forth so far is sent with it. The word "it" makes sense because the earlier exchange is right there in front of the AI as it reads your new line.</div>
+    </div>
+    <div class="flip-card" tabindex="0" role="button" aria-expanded="false">
+      <div class="q"><span class="qico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>It remembers your name and your style from weeks ago</div>
+      <div class="tap-hint">Tap to see why</div>
+      <div class="body">A separate store keeps facts you have shared (your name, what you like, your tone). When a new chat starts, the system quietly looks up what is on file for you and slips the relevant bits into the message before the AI reads it.</div>
+    </div>
+    <div class="flip-card" tabindex="0" role="button" aria-expanded="false">
+      <div class="q"><span class="qico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>You can ask "what did we decide about the logo last week?" and it knows</div>
+      <div class="tap-hint">Tap to see why</div>
+      <div class="body">Past sessions are saved as small, searchable notes. When you mention something from before, the system finds the matching note, pulls the relevant lines, and hands them to the AI alongside your current question.</div>
+    </div>
+    <div class="flip-card" tabindex="0" role="button" aria-expanded="false">
+      <div class="q"><span class="qico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></span>You delete a fact, and the AI stops bringing it up</div>
+      <div class="tap-hint">Tap to see why</div>
+      <div class="body">Memory has a delete button on purpose. When you remove an item, the system drops it from the store, so it is never pulled in again. Good memory systems also let stale or low-value facts quietly fade on their own.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 · TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Feels personal</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Message gets longer</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost per answer</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Private info to manage</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Stale or wrong recall</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Memory makes the AI feel personal and continuous. Every remembered turn and stored fact also lengthens the message, raising cost and slowing the reply. Longer memory builds up private information that has to be cared for. Good systems shrink old memories, drop what is no longer useful, and let you delete what you want.
+    </div>
+  </div>
+</section>
+
+<!-- BACK LINK -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-stateful-memory.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Stateful Memory</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Xu et al. (2023). <em>A Comprehensive Survey of Memory in Large Language Model based Agents.</em> <span class="note">Covers short-term, long-term, and episodic memory patterns in agent systems.</span></li>
+    <li>Park et al. (2023). <em>Generative Agents: Interactive Simulacra of Human Behavior.</em> <span class="note">Stanford. Memory streams, retrieval, reflection, and planning in persistent agents.</span></li>
+    <li>Zhong et al. (2024). <em>MemoryBank: Enhancing Large Language Models with Long-Term Memory.</em> <span class="note">Memory consolidation, eviction, and cross-session continuity.</span></li>
+    <li>OpenAI. <em>Memory and new controls for ChatGPT.</em> <span class="note">openai.com. Practical design of long-term user memory and forgetting controls.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ MEMORY DEMO ============
+// The demo shows four conversation steps; each step reveals the next turn
+// and updates the message window to show what the AI currently sees.
+
+const TURNS = [
+  {
+    role: 'user',
+    text: 'What is backpropagation?',
+    note: 'Turn 1: you ask a new question. The message sent to the AI contains only this question.',
+    promptEntries: [0]
+  },
+  {
+    role: 'ai',
+    text: 'Backpropagation is how a neural network learns. It compares its predicted output to the correct answer, then works backwards to nudge the parts that caused the error.',
+    note: 'The AI answers. That answer is now added to the running history, ready to be included in the next message.',
+    promptEntries: [0, 1]
+  },
+  {
+    role: 'user',
+    text: 'And how fast does <strong>it</strong> converge?',
+    highlight: true,
+    note: 'Turn 2: the follow-up uses "it" without saying what "it" is. The message now contains <strong>the earlier exchange plus this new question</strong>. The AI knows "it" means backpropagation because that exchange is still right there.',
+    promptEntries: [0, 1, 2]
+  },
+  {
+    role: 'ai',
+    text: 'It depends on the learning rate and the size of the problem. Simple networks can converge in a few hundred steps; deeper ones can take thousands.',
+    note: 'The AI answers correctly. It knew what "it" referred to because the memory of the first exchange was carried into this message.',
+    promptEntries: [0, 1, 2]
+  }
+];
+
+const PW_TEXTS = [
+  'What is backpropagation?',
+  'Backpropagation is how a neural network learns...',
+  'And how fast does it converge?'
+];
+
+const memoryTurns = document.getElementById('memoryTurns');
+const memoryNote = document.getElementById('memoryNote');
+const memNextBtn = document.getElementById('memNextBtn');
+const memPlayBtn = document.getElementById('memPlayBtn');
+const memResetBtn = document.getElementById('memResetBtn');
+
+let memStep = -1;
+let playing = false;
+let playTimer = null;
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function updatePromptWindow(entries) {
+  for (let i = 0; i < 3; i++) {
+    const el = document.getElementById('pw' + i);
+    if (entries.includes(i)) {
+      document.getElementById('pw' + i + 'text').textContent = PW_TEXTS[i];
+      el.classList.add('visible');
+    } else {
+      el.classList.remove('visible');
+    }
+  }
+}
+
+function renderTurn(t) {
+  const turn = document.createElement('div');
+  turn.className = 'turn';
+  turn.setAttribute('aria-label', (t.role === 'user' ? 'User' : 'AI') + ': ' + t.text.replace(/<[^>]+>/g, ''));
+  turn.innerHTML = `
+    <div class="turn-role ${t.role}" aria-hidden="true">${t.role === 'user' ? 'You' : 'AI'}</div>
+    <div class="turn-body ${t.highlight ? 'memory-highlight' : ''}">${t.text}</div>
+  `;
+  memoryTurns.appendChild(turn);
+  if (!reduceMotion) {
+    requestAnimationFrame(() => requestAnimationFrame(() => turn.classList.add('shown')));
+  } else {
+    turn.classList.add('shown');
+  }
+}
+
+function advanceMem() {
+  if (memStep >= TURNS.length - 1) return;
+  memStep++;
+  const t = TURNS[memStep];
+  renderTurn(t);
+  memoryNote.innerHTML = t.note;
+  updatePromptWindow(t.promptEntries);
+  if (memStep >= TURNS.length - 1) {
+    memNextBtn.disabled = true;
+    memPlayBtn.disabled = true;
+  }
+}
+
+function resetMem() {
+  if (playTimer) { clearTimeout(playTimer); playTimer = null; }
+  playing = false;
+  memoryTurns.innerHTML = '';
+  memoryNote.innerHTML = '';
+  memStep = -1;
+  memNextBtn.disabled = false;
+  memPlayBtn.disabled = false;
+  updatePromptWindow([]);
+}
+
+async function playAll() {
+  if (playing) return;
+  playing = true;
+  memNextBtn.disabled = true;
+  memPlayBtn.disabled = true;
+  const delay = reduceMotion ? 0 : 900;
+  while (memStep < TURNS.length - 1) {
+    advanceMem();
+    if (memStep < TURNS.length - 1) await sleep(delay);
+  }
+  playing = false;
+}
+
+memNextBtn.addEventListener('click', () => { if (!playing) advanceMem(); });
+memPlayBtn.addEventListener('click', playAll);
+memResetBtn.addEventListener('click', resetMem);
+
+// On reduced motion, show all turns immediately
+if (reduceMotion) {
+  TURNS.forEach(() => advanceMem());
+}
+
+// ============ FLIP CARDS ============
+const flipCards = document.querySelectorAll('.flip-card');
+flipCards.forEach(card => {
+  function toggle() {
+    const open = card.classList.toggle('open');
+    card.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  card.addEventListener('click', toggle);
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      toggle();
+    }
+  });
+});
+</script>
+</body>
+</html>

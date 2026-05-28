@@ -3,21 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stateful Memory · L3b · The Pattern Book</title>
+<title>Stateful Memory &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
     --border:#E8EAEE; --border-strong:#D5D9E0;
     --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
-    --radius:16px;
-    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.10);
+    --radius:16px; --radius-sm:11px;
     --success:#0E9F6E; --success-soft:#E7F7F0;
-    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
-    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-padding-top: 80px; }
@@ -29,15 +28,31 @@
     -webkit-font-smoothing: antialiased;
   }
   body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
 
   /* a11y */
-  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
   .skip-link:focus { top: 8px; }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 
-  /* TOP BAR */
+  /* top bar */
   .topbar {
     position: sticky; top: 0; z-index: 200;
     background: rgba(252,252,253,.86);
@@ -46,14 +61,15 @@
     border-bottom: 1px solid var(--border);
   }
   .topbar-inner {
-    max-width: 920px; margin: 0 auto; padding: 11px 24px;
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
   }
   .back {
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none;
-    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
-    transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
   }
   .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
   .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -62,195 +78,147 @@
   .crumb .sep { margin: 0 7px; color: var(--border-strong); }
   .crumb .here { color: var(--soft); }
 
-  /* HEADER */
-  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
   .eyebrow {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-    color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border);
-    border-radius: 20px; padding: 5px 12px;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
   }
   .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
   .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
   h1.pattern-title {
-    scroll-margin-top: 80px;
     font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
     line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
   }
   .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
-  /* SECTIONS */
+  /* title row + see-it-in-action pill */
+  .title-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:16px 0 0}
+  .title-row .pattern-title{margin:0;flex:1 1 auto;min-width:240px}
+  .how-pill{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--accent);border-radius:22px;padding:8px 15px;box-shadow:var(--shadow);transition:background .15s ease,transform .15s ease}
+  .how-pill:hover{background:#E3DBFD;transform:translateY(-1px)}
+  .how-pill .arr{display:inline-block;transition:transform .18s ease}
+  .how-pill:hover .arr{transform:translateX(3px)}
+  @media (prefers-reduced-motion:reduce){.how-pill,.how-pill .arr{transition:none}.how-pill:hover,.how-pill:hover .arr{transform:none}}
+  @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
+
+  /* flow legend (stage pills + arrows) */
+  .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
+  .flow-chip {
+    font-family: inherit; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; box-shadow: var(--shadow); padding: 7px 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--soft); white-space: nowrap;
+    letter-spacing: .01em; cursor: pointer;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .flow-chip:hover { color: var(--accent-hover); border-color: var(--border-strong); }
+  .flow-chip.lit { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); }
+  .flow-arrow { flex: none; color: var(--accent); font-size: 15px; line-height: 1; }
+  .flow-caption { text-align: center; color: var(--faint); font-size: 13px; line-height: 1.5; margin-top: 12px; }
+
+  /* sections */
   section {
-    max-width: 920px; margin: 0 auto; padding: 18px 24px 34px;
-    position: relative; scroll-margin-top: 80px;
+    max-width: 920px; margin: 0 auto;
+    padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px;
   }
-  .section-label {
-    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
-    color: var(--faint); margin-bottom: 9px;
-  }
-  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
   h2 {
     font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
     line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
   }
   h2 em { font-style: italic; color: var(--accent); }
 
-  /* IDEA CARD */
-  .idea-card {
+  /* ============ STAGE CARDS ============ */
+  .stages { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 6px; }
+
+  .stage-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
+    scroll-margin-top: 80px;
+    transition: box-shadow .55s ease, border-color .55s ease;
+    display: flex; flex-direction: column;
   }
-  .idea-card p {
-    font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.5; color: var(--text);
+  .stage-card.glow {
+    box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42);
+    border-color: var(--accent);
+  }
+  @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
+
+  .stage-card.clickable {
+    cursor: pointer;
+    transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
+  @media (prefers-reduced-motion: reduce) {
+    .stage-card.clickable { transition: none; }
+    .stage-card.clickable:hover { transform: none; }
   }
 
-  /* DEMO STAGE - Memory */
-  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
-  .memory-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
-  }
-  .memory-turns { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-  .turn {
-    display: flex; gap: 10px; align-items: flex-start;
-    opacity: 0; transform: translateY(6px);
-    transition: opacity .35s ease, transform .35s ease;
-  }
-  .turn.shown { opacity: 1; transform: translateY(0); }
-  .turn-role {
-    flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700;
-  }
-  .turn-role.user { background: var(--accent-soft); color: var(--accent-hover); }
-  .turn-role.ai { background: var(--bg-subtle); color: var(--soft); border: 1px solid var(--border); }
-  .turn-body {
-    flex: 1; background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 10px 13px;
-    font-size: 14px; line-height: 1.55; color: var(--text);
-  }
-  .turn-body.memory-highlight {
-    background: var(--accent-soft); border-color: var(--accent);
-  }
-  .turn-body strong { color: var(--accent-hover); font-weight: 600; }
-  .memory-note {
-    font-size: 13px; color: var(--soft); line-height: 1.6;
-    padding-top: 14px; border-top: 1px solid var(--border);
-    min-height: 42px;
-  }
-  .memory-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; }
+  /* de-squeezed: icon + name share a full-width row of their own */
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; }
+  .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
+  .stage-head .sico svg { width: 18px; height: 18px; display: block; }
+  .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
 
-  /* prompt-window visualization */
-  .prompt-window {
-    background: var(--bg-subtle); border: 1px dashed var(--border-strong);
-    border-radius: var(--radius-sm); padding: 10px 13px; margin-bottom: 14px;
-    font-size: 12.5px; color: var(--soft); line-height: 1.55;
-  }
-  .prompt-window .pw-label {
-    font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-    color: var(--faint); margin-bottom: 6px;
-  }
-  .prompt-window .pw-entry {
-    display: flex; align-items: flex-start; gap: 8px; margin-bottom: 5px;
-    opacity: 0; transition: opacity .3s ease;
-  }
-  .prompt-window .pw-entry.visible { opacity: 1; }
-  .prompt-window .pw-entry:last-child { margin-bottom: 0; }
-  .pw-tag {
-    flex-shrink: 0; font-size: 10px; font-weight: 700; letter-spacing: .04em;
-    padding: 2px 7px; border-radius: 20px; text-transform: uppercase;
-  }
-  .pw-tag.user { background: var(--accent-soft); color: var(--accent-hover); }
-  .pw-tag.ai { background: var(--bg-subtle); color: var(--soft); border: 1px solid var(--border); }
-  .pw-text { flex: 1; color: var(--text); }
+  .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* GUIDE (goal-first, in-place) */
-  .guide { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
-  .guide-row { display: flex; align-items: baseline; justify-content: flex-start; flex-wrap: wrap; gap: 4px 10px; padding: 17px 22px; border-top: 1px solid var(--border); }
-  .guide-row:first-child { border-top: none; }
-  .want { font-size: 15px; line-height: 1.4; color: var(--text); }
-  .resolve { display: inline-flex; align-items: baseline; gap: 8px; flex: none; }
-  .connect { color: var(--faint); font-size: 15px; line-height: 1.4; }
-  .tech { font-family: 'Fraunces', serif; font-size: 16px; color: var(--text); line-height: 1.4; }
-  a.tech { color: var(--accent-hover); transition: color .15s ease; }
-  a.tech:hover { color: var(--accent); }
-  a.tech .ext { font-size: 11px; color: var(--accent); margin-left: 2px; vertical-align: baseline; }
-  @media (prefers-reduced-motion: reduce) { a.tech { transition: none; } }
-  .cluster-head { padding: 16px 22px 8px; }
-  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
-  .cluster-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text); line-height: 1.3; }
-  .cluster-head + .guide-row { border-top: none; }
-  .cluster-head ~ .guide-row { padding-left: 40px; }
-
-  /* DIAGRAM BUTTONS */
-  .diagram-btn {
-    padding: 10px 16px; border: 1px solid var(--border-strong); background: var(--surface);
-    border-radius: var(--radius-sm); cursor: pointer;
-    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text);
-    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
-    white-space: nowrap;
+  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    flex: none; display: inline-flex; align-items: center; gap: 3px;
+    padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    line-height: 1.2; white-space: nowrap;
+    border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
-  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
-  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-  .diagram-btn:disabled { opacity: .45; cursor: default; transform: none; box-shadow: none; }
 
-  /* TRADEOFFS */
-  .tradeoffs-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  /* "see how" lives at the bottom of each card, pushed down by margin-top:auto */
+  .see-how {
+    display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--accent-hover);
+    transition: color .15s ease;
   }
-  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
-  .tradeoff-scale .spacer { width: 170px; flex: none; }
-  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
-  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
-  .tradeoff-row:last-of-type { margin-bottom: 0; }
-  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
-  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
-  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
-  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
-  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion: reduce) {
+    .see-how, .see-how .arr { transition: none; }
+    .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; }
+  }
 
-  /* BACK LINK */
+  /* back link */
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
-    padding: 14px 16px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none;
-    color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-    cursor: pointer;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; cursor: pointer;
   }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
-  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s; }
   .back-link:hover .back-arrow { transform: translateX(-3px); }
   .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
   .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
 
-  /* SOURCES */
-  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
-  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
-  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
-  .sources li em { font-style: italic; color: var(--text); }
-  .sources li .note { color: var(--faint); }
-
-  /* FOOTER */
+  /* footer */
   footer {
-    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
-    text-align: center; border-top: 1px solid var(--border);
+    max-width: 920px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
     font-size: 12px; color: var(--faint); line-height: 1.8;
   }
   footer strong { color: var(--soft); font-weight: 500; }
 
-  /* RESPONSIVE */
+  /* responsive */
+  @media (max-width: 720px) {
+    .stages { grid-template-columns: 1fr; gap: 14px; }
+  }
   @media (max-width: 560px) {
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-  }
-  @media (max-width: 480px) {
-    .tradeoff-row { flex-direction: column; align-items: stretch; }
-    .tradeoff-label { min-width: 0; }
-    .memory-controls { flex-direction: column; }
+    .flow-chip { font-size: 12px; padding: 6px 12px; }
   }
 </style>
 </head>
@@ -272,182 +240,68 @@
   <span class="eyebrow">
     <span class="ico" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 2a8 8 0 0 1 8 8c0 5-8 12-8 12S4 15 4 10a8 8 0 0 1 8-8z"/>
-        <circle cx="12" cy="10" r="3"/>
+        <path d="M12 2a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.5V20a2 2 0 0 1-4 0V9.5A4 4 0 0 1 8 6a4 4 0 0 1 4-4z"/><path d="M10 14h4"/>
       </svg>
-    </span>
-    Layer &middot; L3b
+    </span>Layer &middot; 6
   </span>
-  <h1 class="pattern-title">Stateful Memory</h1>
-  <p class="explainer">How an AI remembers things across turns and across sessions.</p>
+  <div class="title-row"><h1 class="pattern-title">Stateful Memory</h1><a class="how-pill" href="stateful-memory-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
+  <p class="explainer">How an AI remembers what was said and what you prefer, across this chat and across future ones.</p>
+
+  <div class="flow" aria-label="Jump to a part of stateful memory">
+    <button type="button" class="flow-chip" data-target="card-remember">What it remembers</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-manage">Managing the memory</button>
+  </div>
+  <p class="flow-caption">Two halves: the things memory holds, and the work of keeping it useful.</p>
 </header>
 
-<!-- 01: THE IDEA -->
+<!-- STAGE CARDS -->
 <section>
-  <div class="section-label"><span class="num">01</span>The Idea</div>
-  <h2>What <em>is</em> it?</h2>
-  <div class="idea-card">
-    <p>An AI model has no built-in memory between conversations. Each request starts fresh. Stateful Memory is the layer that adds persistence: the system stores what was said, what the user prefers, or what happened in a past session, then writes that context back into the prompt (the text you send the AI) when it is needed. A token (a small piece the AI works in: roughly a word, or a slice of an image or sound) costs something, so memory systems have to be selective about what they keep, what they compress, and what they let go.</p>
-  </div>
-</section>
+  <div class="stages">
 
-<!-- 02: SEE IT WORK -->
-<section>
-  <div class="section-label"><span class="num">02</span>See It Work</div>
-  <h2>Watch memory <em>carry context forward</em>.</h2>
-  <p class="demo-lede">Step through this conversation. The second question uses the pronoun "it" without saying what "it" is. Memory works because earlier turns are still in the prompt when the AI reads the new question.</p>
-
-  <div class="memory-stage">
-    <!-- Prompt window visualization -->
-    <div class="prompt-window" aria-label="What the AI sees in its prompt" aria-live="polite">
-      <div class="pw-label">What the AI sees in its prompt right now</div>
-      <div class="pw-entry" id="pw0">
-        <span class="pw-tag user">You</span>
-        <span class="pw-text" id="pw0text"></span>
+    <!-- WHAT IT REMEMBERS -->
+    <section class="stage-card clickable" id="card-remember" aria-labelledby="g-remember">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </span>
+        <h2 id="g-remember"><span class="stage-name">What it remembers</span></h2>
       </div>
-      <div class="pw-entry" id="pw1">
-        <span class="pw-tag ai">AI</span>
-        <span class="pw-text" id="pw1text"></span>
+      <p class="stage-lead">The kinds of things memory can hold for you.</p>
+      <div class="chips">
+        <span class="chip">This conversation so far</span>
+        <span class="chip">Your name, preferences, habits</span>
+        <span class="chip">Specific past events</span>
       </div>
-      <div class="pw-entry" id="pw2">
-        <span class="pw-tag user">You</span>
-        <span class="pw-text" id="pw2text"></span>
+      <a class="see-how" href="stateful-memory-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
+
+    <!-- MANAGING THE MEMORY -->
+    <section class="stage-card clickable" id="card-manage" aria-labelledby="g-manage">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </span>
+        <h2 id="g-manage"><span class="stage-name">Managing the memory</span></h2>
       </div>
-    </div>
-
-    <!-- Conversation turns -->
-    <div class="memory-turns" id="memoryTurns" aria-live="polite" aria-label="Conversation turns"></div>
-
-    <div class="memory-note" id="memoryNote" aria-live="polite"></div>
-
-    <div class="memory-controls">
-      <button class="diagram-btn primary" id="memNextBtn">&#8594; Step</button>
-      <button class="diagram-btn" id="memPlayBtn">&#9654; Play</button>
-      <button class="diagram-btn" id="memResetBtn">&#8635; Reset</button>
-    </div>
-  </div>
-</section>
-
-<!-- 03: INSIDE THIS LAYER -->
-<section>
-  <div class="section-label"><span class="num">03</span>Inside This Layer</div>
-  <h2>What do you want <em>memory to do</em>?</h2>
-
-  <div class="guide">
-
-    <div class="cluster-head">
-      <h3 class="cluster-label">What it remembers</h3>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want to keep track of what was said earlier in this conversation?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Conversation Memory</span>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want to remember a user's name, preferences, or habits across sessions?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Long-Term User Memory</span>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want to recall a specific past event, like a bug you fixed together last week?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Episodic Memory</span>
-      </span>
-    </div>
-
-    <div class="cluster-head cluster-break">
-      <h3 class="cluster-label">Managing the memory</h3>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want to compress old memories so the store does not grow forever?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Memory Consolidation</span>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want to decide when the right moment is to surface a stored memory?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Memory Retrieval Triggers</span>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want to drop old or low-value memories, or let users delete what the AI knows?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Memory Eviction &amp; Forgetting</span>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want the AI to recognize the same user across separate sessions and pick up where they left off?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Cross-Session Identity &amp; Continuity</span>
-      </span>
-    </div>
+      <p class="stage-lead">The work that keeps the store useful, current, and yours.</p>
+      <div class="chips">
+        <span class="chip">Shrinking old memories</span>
+        <span class="chip">Deciding when to surface one</span>
+        <span class="chip">Dropping or deleting what is no longer useful</span>
+        <span class="chip">Recognizing you across sessions</span>
+      </div>
+      <a class="see-how" href="stateful-memory-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
   </div>
 </section>
 
-<!-- 04: TRADEOFFS -->
-<section>
-  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
-  <h2>What you <em>gain and pay</em>.</h2>
-  <div class="tradeoffs-stage">
-    <div class="tradeoff-scale">
-      <span class="spacer"></span>
-      <div class="scale-track"><span>low</span><span>high</span></div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Coherence</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Prompt size</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Cost per turn</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Privacy risk</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Complexity</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-quote">
-      Stateful memory makes conversations feel natural and personal. The cost is real: every remembered turn and stored fact adds tokens to the prompt, which increases latency and cost. Longer memory also accumulates private information that must be managed carefully. Good systems consolidate aggressively and evict what is no longer useful.
-    </div>
-  </div>
-</section>
-
-<!-- BACK NAV -->
+<!-- BACK LINK -->
 <section style="padding-top: 20px; padding-bottom: 40px;">
   <a href="layers.html" class="back-link">
     <div class="back-arrow">&larr;</div>
@@ -458,148 +312,71 @@
   </a>
 </section>
 
-<!-- SOURCES -->
-<div class="sources">
-  <div class="sources-title">Sources</div>
-  <ul>
-    <li>Xu et al. (2023). <em>A Comprehensive Survey of Memory in LLM-Based Agents.</em> <span class="note">Covers short-term, long-term, and episodic memory patterns in agent systems.</span></li>
-    <li>Park et al. (2023). <em>Generative Agents: Interactive Simulacra of Human Behavior.</em> <span class="note">Stanford. Memory streams, retrieval, reflection, and planning in persistent agents.</span></li>
-    <li>Zhong et al. (2024). <em>MemoryBank: Enhancing Large Language Models with Long-Term Memory.</em> <span class="note">Covers memory consolidation, eviction, and cross-session continuity.</span></li>
-    <li>OpenAI. <em>Memory and new controls for ChatGPT.</em> <span class="note">openai.com. Practical design of long-term user memory and forgetting controls.</span></li>
-  </ul>
-</div>
-
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
 </footer>
 
 <script>
-// ============ MEMORY DEMO ============
-// Token and prompt are glossed in the "Idea" section above.
-// The demo shows four conversation steps; each step reveals the next turn
-// and updates the prompt-window to show what the AI currently sees.
+// flow legend: scroll + glow on card click, one-time load sweep, card-door click guard
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var stages = ['card-remember','card-manage'];
+  var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
 
-const TURNS = [
-  {
-    role: 'user',
-    text: 'What is backpropagation?',
-    note: 'Turn 1: the user asks a new question. The prompt (the text you send the AI) contains only this question.',
-    promptEntries: [0] // which pw-entries become visible
-  },
-  {
-    role: 'ai',
-    text: 'Backpropagation is how a neural network learns. It compares its predicted output to the correct answer, then works backwards to nudge the weights that caused the error.',
-    note: 'The AI answers. Its response is now added to the conversation history, ready to be included in the next prompt.',
-    promptEntries: [0, 1]
-  },
-  {
-    role: 'user',
-    text: 'And how fast does <strong>it</strong> converge?',
-    highlight: true,
-    note: 'Turn 2: the follow-up uses "it" without saying what "it" is. The prompt now contains <strong>the earlier Q&amp;A plus this new question</strong>. The AI knows "it" means backpropagation because that exchange is still in the prompt.',
-    promptEntries: [0, 1, 2]
-  },
-  {
-    role: 'ai',
-    text: 'It depends on the learning rate and the size of the problem. Simple networks can converge in a few hundred steps; deeper ones can take thousands.',
-    note: 'The AI answers correctly. It knew what "it" referred to because the memory of the first exchange was carried into this prompt.',
-    promptEntries: [0, 1, 2]
+  function pillFor(cardId){
+    for(var i=0;i<pills.length;i++){ if(pills[i].getAttribute('data-target')===cardId) return pills[i]; }
+    return null;
   }
-];
 
-const PW_TEXTS = [
-  'What is backpropagation?',
-  'Backpropagation is how a neural network learns...',
-  'And how fast does it converge?'
-];
+  // nav buttons: smooth-scroll to the stage card + brief glow
+  pills.forEach(function(btn){
+    var target = btn.getAttribute('data-target');
+    var card = document.getElementById(target);
+    btn.addEventListener('click', function(){
+      if(!card) return;
+      card.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+      card.classList.add('glow');
+      window.setTimeout(function(){ card.classList.remove('glow'); }, 1200);
+    });
+  });
 
-const memoryTurns = document.getElementById('memoryTurns');
-const memoryNote = document.getElementById('memoryNote');
-const memNextBtn = document.getElementById('memNextBtn');
-const memPlayBtn = document.getElementById('memPlayBtn');
-const memResetBtn = document.getElementById('memResetBtn');
-
-let memStep = -1;
-let playing = false;
-let playTimer = null;
-
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-function updatePromptWindow(entries) {
-  for (let i = 0; i < 3; i++) {
-    const el = document.getElementById('pw' + i);
-    if (entries.includes(i)) {
-      document.getElementById('pw' + i + 'text').textContent = PW_TEXTS[i];
-      el.classList.add('visible');
-    } else {
-      el.classList.remove('visible');
+  // one-time load sweep: highlight each card in order, lighting the matching pill
+  if(!reduce){
+    var step = 0;
+    function tour(){
+      if(step > 0){
+        var prevCard = document.getElementById(stages[step-1]);
+        var prevPill = pillFor(stages[step-1]);
+        if(prevCard) prevCard.classList.remove('glow');
+        if(prevPill) prevPill.classList.remove('lit');
+      }
+      if(step >= stages.length) return;
+      var curCard = document.getElementById(stages[step]);
+      var curPill = pillFor(stages[step]);
+      if(curCard) curCard.classList.add('glow');
+      if(curPill) curPill.classList.add('lit');
+      step++;
+      window.setTimeout(tour, 900);
     }
+    window.setTimeout(tour, 350);
   }
-}
 
-function renderTurn(t) {
-  const turn = document.createElement('div');
-  turn.className = 'turn';
-  turn.setAttribute('aria-label', (t.role === 'user' ? 'User' : 'AI') + ': ' + t.text.replace(/<[^>]+>/g, ''));
-  turn.innerHTML = `
-    <div class="turn-role ${t.role}" aria-hidden="true">${t.role === 'user' ? 'You' : 'AI'}</div>
-    <div class="turn-body ${t.highlight ? 'memory-highlight' : ''}">${t.text}</div>
-  `;
-  memoryTurns.appendChild(turn);
-  if (!reduceMotion) {
-    requestAnimationFrame(() => requestAnimationFrame(() => turn.classList.add('shown')));
-  } else {
-    turn.classList.add('shown');
-  }
-}
-
-function advanceMem() {
-  if (memStep >= TURNS.length - 1) return;
-  memStep++;
-  const t = TURNS[memStep];
-  renderTurn(t);
-  memoryNote.innerHTML = t.note;
-  updatePromptWindow(t.promptEntries);
-  if (memStep >= TURNS.length - 1) {
-    memNextBtn.disabled = true;
-    memPlayBtn.disabled = true;
-  }
-}
-
-function resetMem() {
-  if (playTimer) { clearTimeout(playTimer); playTimer = null; }
-  playing = false;
-  memoryTurns.innerHTML = '';
-  memoryNote.innerHTML = '';
-  memStep = -1;
-  memNextBtn.disabled = false;
-  memPlayBtn.disabled = false;
-  updatePromptWindow([]);
-}
-
-async function playAll() {
-  if (playing) return;
-  playing = true;
-  memNextBtn.disabled = true;
-  memPlayBtn.disabled = true;
-  const delay = reduceMotion ? 0 : 900;
-  while (memStep < TURNS.length - 1) {
-    advanceMem();
-    if (memStep < TURNS.length - 1) await sleep(delay);
-  }
-  playing = false;
-}
-
-memNextBtn.addEventListener('click', () => { if (!playing) advanceMem(); });
-memPlayBtn.addEventListener('click', playAll);
-memResetBtn.addEventListener('click', resetMem);
-
-// On reduced motion, show all turns immediately
-if (reduceMotion) {
-  TURNS.forEach(() => advanceMem());
-}
+  // each stage card is a door to the how-it-works page; chip clicks are ignored
+  var doors = {
+    'card-remember': 'stateful-memory-how-it-works.html',
+    'card-manage': 'stateful-memory-how-it-works.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('.chip')) return; // chip clicks never trigger the card door
+      if(e.target.closest('a')) return; // let real links handle their own clicks
+      window.location.href = doorHref;
+    });
+  });
+})();
 </script>
 </body>
 </html>

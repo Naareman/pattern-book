@@ -3,21 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stateless Retrieval · The Pattern Book</title>
+<title>Stateless Retrieval &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
     --border:#E8EAEE; --border-strong:#D5D9E0;
     --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
-    --radius:16px;
-    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.10);
+    --radius:16px; --radius-sm:11px;
     --success:#0E9F6E; --success-soft:#E7F7F0;
-    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
-    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-padding-top: 80px; }
@@ -29,15 +28,31 @@
     -webkit-font-smoothing: antialiased;
   }
   body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
 
   /* a11y */
-  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
   .skip-link:focus { top: 8px; }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 
-  /* TOP BAR */
+  /* top bar */
   .topbar {
     position: sticky; top: 0; z-index: 200;
     background: rgba(252,252,253,.86);
@@ -46,14 +61,15 @@
     border-bottom: 1px solid var(--border);
   }
   .topbar-inner {
-    max-width: 920px; margin: 0 auto; padding: 11px 24px;
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
   }
   .back {
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none;
-    padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
-    transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
   }
   .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
   .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -62,240 +78,147 @@
   .crumb .sep { margin: 0 7px; color: var(--border-strong); }
   .crumb .here { color: var(--soft); }
 
-  /* HEADER */
-  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
   .eyebrow {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-    color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border);
-    border-radius: 20px; padding: 5px 12px;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
   }
   .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
   .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
   h1.pattern-title {
-    scroll-margin-top: 80px;
     font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
     line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
   }
   .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
-  /* SECTIONS */
+  /* title row + see-it-in-action pill */
+  .title-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:16px 0 0}
+  .title-row .pattern-title{margin:0;flex:1 1 auto;min-width:240px}
+  .how-pill{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--accent);border-radius:22px;padding:8px 15px;box-shadow:var(--shadow);transition:background .15s ease,transform .15s ease}
+  .how-pill:hover{background:#E3DBFD;transform:translateY(-1px)}
+  .how-pill .arr{display:inline-block;transition:transform .18s ease}
+  .how-pill:hover .arr{transform:translateX(3px)}
+  @media (prefers-reduced-motion:reduce){.how-pill,.how-pill .arr{transition:none}.how-pill:hover,.how-pill:hover .arr{transform:none}}
+  @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
+
+  /* flow legend (stage pills + arrows) */
+  .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
+  .flow-chip {
+    font-family: inherit; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; box-shadow: var(--shadow); padding: 7px 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--soft); white-space: nowrap;
+    letter-spacing: .01em; cursor: pointer;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .flow-chip:hover { color: var(--accent-hover); border-color: var(--border-strong); }
+  .flow-chip.lit { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); }
+  .flow-arrow { flex: none; color: var(--accent); font-size: 15px; line-height: 1; }
+  .flow-caption { text-align: center; color: var(--faint); font-size: 13px; line-height: 1.5; margin-top: 12px; }
+
+  /* sections */
   section {
-    max-width: 920px; margin: 0 auto; padding: 18px 24px 34px;
-    position: relative; scroll-margin-top: 80px;
+    max-width: 920px; margin: 0 auto;
+    padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px;
   }
-  .section-label {
-    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
-    color: var(--faint); margin-bottom: 9px;
-  }
-  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
   h2 {
     font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
     line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
   }
   h2 em { font-style: italic; color: var(--accent); }
 
-  /* IDEA CARD */
-  .idea-card {
+  /* ============ STAGE CARDS ============ */
+  .stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 6px; }
+
+  .stage-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
+    scroll-margin-top: 80px;
+    transition: box-shadow .55s ease, border-color .55s ease;
+    display: flex; flex-direction: column;
   }
-  .idea-card p {
-    font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.5; color: var(--text);
+  .stage-card.glow {
+    box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42);
+    border-color: var(--accent);
   }
-  .idea-card p + p { margin-top: 14px; }
+  @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
 
-  /* DEMO STAGE */
-  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
-  .demo-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  .stage-card.clickable {
+    cursor: pointer;
+    transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
+  @media (prefers-reduced-motion: reduce) {
+    .stage-card.clickable { transition: none; }
+    .stage-card.clickable:hover { transform: none; }
   }
 
-  /* Query input row */
-  .query-row { display: flex; gap: 10px; margin-bottom: 18px; }
-  .query-input {
-    flex: 1; padding: 11px 14px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
-    font-family: 'Inter', sans-serif; font-size: 14px; color: var(--text); background: var(--bg-subtle);
-    outline: none; transition: border-color .2s;
-  }
-  .query-input:focus { border-color: var(--accent); background: var(--surface); }
-  .diagram-btn {
-    padding: 10px 16px; border: 1px solid var(--border-strong); background: var(--surface);
-    border-radius: var(--radius-sm); cursor: pointer;
-    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text);
-    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
-    white-space: nowrap;
-  }
-  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
-  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-  .diagram-btn:disabled { opacity: .45; cursor: default; transform: none; box-shadow: none; }
+  /* de-squeezed: icon + name share a full-width row of their own */
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; }
+  .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
+  .stage-head .sico svg { width: 18px; height: 18px; display: block; }
+  .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
 
-  /* Document chunks panel */
-  .panel-label {
-    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
-    color: var(--faint); margin-bottom: 9px;
-  }
-  .docs-panel {
-    background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 14px; margin-bottom: 14px;
-    display: flex; flex-direction: column; gap: 8px;
-  }
-  .doc-chunk {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 9px;
-    padding: 12px 14px; font-size: 13.5px; line-height: 1.55; color: var(--soft);
-    position: relative; transition: border-color .3s ease, background .3s ease, box-shadow .3s ease;
-  }
-  .doc-chunk .chunk-label {
-    display: block; font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
-    color: var(--faint); margin-bottom: 5px;
-  }
-  .doc-chunk .chunk-text { color: var(--text); }
-  .doc-chunk mark {
-    background: var(--accent-soft); color: var(--accent-hover);
-    border-radius: 3px; padding: 0 2px; font-weight: 500;
-    transition: background .3s ease;
-  }
-  .doc-chunk.scanning {
-    border-color: var(--border-strong); box-shadow: 0 0 0 2px rgba(124,92,246,.08);
-  }
-  .doc-chunk.matched {
-    border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 2px rgba(124,92,246,.12);
-  }
-  .doc-chunk.matched .chunk-label { color: var(--accent-hover); }
-  .doc-chunk.matched mark { background: rgba(124,92,246,.22); }
-  .doc-chunk.faded { opacity: .35; }
+  .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
 
-  /* Score badge */
-  .score-badge {
-    position: absolute; top: 10px; right: 10px;
-    font-size: 11px; font-weight: 700; letter-spacing: .03em;
-    background: var(--accent); color: #fff;
-    border-radius: 20px; padding: 2px 8px;
-    opacity: 0; transform: scale(.8);
-    transition: opacity .3s ease, transform .3s ease;
+  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    flex: none; display: inline-flex; align-items: center; gap: 3px;
+    padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    line-height: 1.2; white-space: nowrap;
+    border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
-  .doc-chunk.matched .score-badge { opacity: 1; transform: scale(1); }
 
-  /* Pipeline flow */
-  .pipeline {
-    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-    margin-bottom: 14px;
+  /* "see how" lives at the bottom of each card, pushed down by margin-top:auto */
+  .see-how {
+    display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--accent-hover);
+    transition: color .15s ease;
   }
-  .pipe-step {
-    display: flex; align-items: center; gap: 5px;
-    padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border);
-    font-size: 12px; font-weight: 600; color: var(--soft); background: var(--surface);
-    transition: border-color .3s ease, color .3s ease, background .3s ease;
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion: reduce) {
+    .see-how, .see-how .arr { transition: none; }
+    .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; }
   }
-  .pipe-step.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
-  .pipe-step.done { background: var(--success-soft); border-color: var(--success); color: var(--success); }
-  .pipe-arrow { color: var(--border-strong); font-size: 14px; transition: color .3s ease; }
-  .pipe-arrow.lit { color: var(--accent); }
 
-  /* Answer box */
-  .answer-box {
-    background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 14px 16px;
-    min-height: 60px;
-    transition: border-color .4s ease, background .4s ease;
-  }
-  .answer-box.ready { border-color: var(--accent); background: var(--surface); }
-  .answer-label {
-    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
-    color: var(--faint); margin-bottom: 6px;
-  }
-  .answer-text {
-    font-family: 'Fraunces', serif; font-weight: 400; font-size: 16px;
-    line-height: 1.5; color: var(--text); min-height: 24px;
-  }
-  .answer-hint { font-size: 13px; color: var(--faint); font-family: 'Inter', sans-serif; font-weight: 500; }
-
-  /* INSIDE THIS LAYER: goal-first guide (in-place, no sub-axes) */
-  .guide { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
-  .guide-row { display: flex; align-items: baseline; justify-content: flex-start; flex-wrap: wrap; gap: 4px 10px; padding: 17px 22px; border-top: 1px solid var(--border); }
-  .guide-row:first-child { border-top: none; }
-  .want { font-size: 15px; line-height: 1.4; color: var(--text); }
-  .resolve { display: inline-flex; align-items: baseline; gap: 8px; flex: none; }
-  .connect { color: var(--faint); font-size: 15px; line-height: 1.4; }
-  .tech { font-family: 'Fraunces', serif; font-size: 16px; color: var(--text); line-height: 1.4; }
-  a.tech { color: var(--accent-hover); transition: color .15s ease; }
-  a.tech:hover { color: var(--accent); }
-  a.tech .ext { font-size: 11px; color: var(--accent); margin-left: 2px; vertical-align: baseline; }
-  @media (prefers-reduced-motion: reduce) { a.tech { transition: none; } }
-  .cluster-head { padding: 16px 22px 8px; }
-  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
-  .cluster-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text); line-height: 1.3; }
-  .cluster-head + .guide-row { border-top: none; }
-  .cluster-head ~ .guide-row { padding-left: 40px; }
-  /* notes below guide */
-  .guide-note { margin-top: 14px; background: var(--bg-subtle); border-left: 3px solid var(--accent); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 13px 16px; font-size: 13.5px; color: var(--soft); line-height: 1.6; }
-  .guide-note strong { color: var(--text); }
-  .guide-aside { margin-top: 10px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 13px 16px; font-size: 13.5px; color: var(--soft); line-height: 1.6; }
-  .guide-aside strong { color: var(--text); }
-
-  /* TRADEOFFS */
-  .tradeoffs-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
-  }
-  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
-  .tradeoff-scale .spacer { width: 170px; flex: none; }
-  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
-  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
-  .tradeoff-row:last-of-type { margin-bottom: 0; }
-  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
-  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
-  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
-  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
-  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
-
-  /* BACK LINK */
+  /* back link */
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
-    padding: 14px 16px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none;
-    color: var(--text); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-    cursor: pointer;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; cursor: pointer;
   }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
-  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s; }
   .back-link:hover .back-arrow { transform: translateX(-3px); }
   .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
   .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
 
-  /* SOURCES */
-  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
-  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
-  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
-  .sources li em { font-style: italic; color: var(--text); }
-  .sources li .note { color: var(--faint); }
-
-  /* FOOTER */
+  /* footer */
   footer {
-    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
-    text-align: center; border-top: 1px solid var(--border);
+    max-width: 920px; margin: 30px auto 48px;
+    padding: 16px 24px 0; text-align: center;
+    border-top: 1px solid var(--border);
     font-size: 12px; color: var(--faint); line-height: 1.8;
   }
   footer strong { color: var(--soft); font-weight: 500; }
 
-  /* RESPONSIVE */
-  @media (max-width: 600px) {
-    .guide-row { padding-left: 18px !important; }
+  /* responsive */
+  @media (max-width: 720px) {
+    .stages { grid-template-columns: 1fr; gap: 14px; }
   }
   @media (max-width: 560px) {
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .query-row { flex-direction: column; }
-    .pipeline { gap: 4px; }
-    .pipe-step { font-size: 11px; padding: 4px 9px; }
-  }
-  @media (max-width: 480px) {
-    .tradeoff-row { flex-direction: column; align-items: stretch; }
-    .tradeoff-label { min-width: 0; }
+    .flow-chip { font-size: 12px; padding: 6px 12px; }
   }
 </style>
 </head>
@@ -303,7 +226,7 @@
 <a class="skip-link" href="#main">Skip to content</a>
 
 <!-- TOP BAR -->
-<nav class="topbar" aria-label="Site navigation">
+<nav class="topbar">
   <div class="topbar-inner">
     <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
     <nav class="crumb" aria-label="Breadcrumb">
@@ -317,225 +240,87 @@
   <span class="eyebrow">
     <span class="ico" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        <path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4"/>
       </svg>
-    </span>
-    Layer &middot; L3a
+    </span>Layer &middot; 5
   </span>
-  <h1 class="pattern-title">Stateless Retrieval</h1>
-  <p class="explainer">How an AI looks things up fresh for a single answer, like RAG (Retrieval-Augmented Generation).</p>
+  <div class="title-row"><h1 class="pattern-title">Stateless Retrieval</h1><a class="how-pill" href="stateless-retrieval-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
+  <p class="explainer">How the AI looks something up right when you ask, uses it to answer, then forgets it.</p>
+
+  <div class="flow" aria-label="Jump to a part of stateless retrieval">
+    <button type="button" class="flow-chip" data-target="card-find">Find</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-feed">Feed it in well</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-fresh">Keep it fresh</button>
+  </div>
+  <p class="flow-caption">Three jobs the system does every time you ask.</p>
 </header>
 
-<!-- 01: THE IDEA -->
+<!-- STAGE CARDS -->
 <section>
-  <div class="section-label"><span class="num">01</span>The Idea</div>
-  <h2>What <em>is</em> it?</h2>
-  <div class="idea-card">
-    <p>An AI can only work with what is in its prompt (the text you send the AI). When you ask about your own documents, the system first searches a store of text for the most relevant passages, then places those passages into the prompt. That is <strong style="color:var(--accent-hover)">retrieval</strong>.</p>
-    <p>A chunk is a small piece of a document: a paragraph, a page section, or a few sentences. The retrieval system finds the chunks that best match your question and hands them to the AI. This pattern is called <strong style="color:var(--accent-hover)">RAG (Retrieval-Augmented Generation)</strong> because it augments the AI's answer with retrieved content. Crucially, nothing is remembered after the call ends. Every request starts fresh with a new search. That is what makes this layer "stateless".</p>
+  <div class="stages">
+
+    <!-- FIND -->
+    <section class="stage-card clickable" id="card-find" aria-labelledby="g-find">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+          </svg>
+        </span>
+        <h2 id="g-find"><span class="stage-name">Find</span></h2>
+      </div>
+      <p class="stage-lead">Search the right pieces out of a pile of documents.</p>
+      <div class="chips">
+        <span class="chip">Prepare the documents</span>
+        <span class="chip">Search by meaning or words</span>
+        <span class="chip">Rerank the best matches</span>
+      </div>
+      <a class="see-how" href="stateless-retrieval-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
+
+    <!-- FEED IT IN WELL -->
+    <section class="stage-card clickable" id="card-feed" aria-labelledby="g-feed">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19h16M6 19V9l6-5 6 5v10"/><path d="M9 13h6M9 16h6"/>
+          </svg>
+        </span>
+        <h2 id="g-feed"><span class="stage-name">Feed it in well</span></h2>
+      </div>
+      <p class="stage-lead">Hand the model only what it needs, in a form it can use.</p>
+      <div class="chips">
+        <span class="chip">Pack the pieces into the prompt</span>
+        <span class="chip">Pull from a live source</span>
+        <span class="chip">Show where the answer came from</span>
+      </div>
+      <a class="see-how" href="stateless-retrieval-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
+
+    <!-- KEEP IT FRESH -->
+    <section class="stage-card clickable" id="card-fresh" aria-labelledby="g-fresh">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><path d="M3 21v-5h5"/>
+          </svg>
+        </span>
+        <h2 id="g-fresh"><span class="stage-name">Keep it fresh</span></h2>
+      </div>
+      <p class="stage-lead">Skip repeat work, but never serve a stale answer.</p>
+      <div class="chips">
+        <span class="chip">Reuse recent lookups</span>
+        <span class="chip">Notice when content is old</span>
+      </div>
+      <a class="see-how" href="stateless-retrieval-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
+
   </div>
 </section>
 
-<!-- 02: SEE IT WORK -->
-<section>
-  <div class="section-label"><span class="num">02</span>See It Work</div>
-  <h2>Type a question. Watch it <em>find</em> the answer.</h2>
-  <p class="demo-lede">The system searches three document chunks (small pieces of documents) for the ones that match your question. Matching chunks get highlighted and pulled into the answer. Each search is independent: nothing carries over from previous runs.</p>
-
-  <div class="demo-stage">
-    <!-- Pipeline flow indicator -->
-    <div class="pipeline" aria-label="Retrieval pipeline steps" role="list">
-      <div class="pipe-step" id="pipeQuery" role="listitem">1. Question</div>
-      <div class="pipe-arrow" id="arrow1" aria-hidden="true">&rarr;</div>
-      <div class="pipe-step" id="pipeSearch" role="listitem">2. Search chunks</div>
-      <div class="pipe-arrow" id="arrow2" aria-hidden="true">&rarr;</div>
-      <div class="pipe-step" id="pipeRetrieve" role="listitem">3. Retrieve matches</div>
-      <div class="pipe-arrow" id="arrow3" aria-hidden="true">&rarr;</div>
-      <div class="pipe-step" id="pipeAnswer" role="listitem">4. Answer</div>
-    </div>
-
-    <!-- Query input -->
-    <div class="query-row">
-      <label for="queryInput" class="sr-only">Type your question</label>
-      <input id="queryInput" class="query-input" type="text" placeholder="e.g. How do neural networks learn?" maxlength="100" aria-label="Ask a question about the documents" />
-      <button class="diagram-btn primary" id="searchBtn">&#9654; Play</button>
-      <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
-      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
-    </div>
-
-    <!-- Document chunks -->
-    <div class="panel-label">Document store (3 chunks, each a small passage from a different document)</div>
-    <div class="docs-panel" id="docsPanel" aria-live="polite" aria-label="Document chunks">
-      <div class="doc-chunk" id="chunk0">
-        <span class="chunk-label">Chunk A</span>
-        <span class="chunk-text">Neural networks learn by adjusting their internal weights. They compare their output to the correct answer and nudge the weights to reduce the error, a process called <mark>backpropagation</mark>.</span>
-        <span class="score-badge" aria-hidden="true">Best match</span>
-      </div>
-      <div class="doc-chunk" id="chunk1">
-        <span class="chunk-label">Chunk B</span>
-        <span class="chunk-text">A <mark>transformer</mark> model processes all tokens (small pieces the AI works in: roughly a word, or a slice of an image) in a sequence at once using self-attention, which lets it weigh the importance of each word relative to every other word.</span>
-        <span class="score-badge" aria-hidden="true">Partial match</span>
-      </div>
-      <div class="doc-chunk" id="chunk2">
-        <span class="chunk-label">Chunk C</span>
-        <span class="chunk-text">The history of deep learning stretches back to the 1980s, but practical breakthroughs came after 2012 when large datasets and fast GPUs (the chips that do the heavy computing) became widely available.</span>
-        <span class="score-badge" aria-hidden="true">No match</span>
-      </div>
-    </div>
-
-    <!-- Answer box -->
-    <div class="answer-box" id="answerBox">
-      <div class="answer-label">Answer (assembled from matched chunks)</div>
-      <div class="answer-text" id="answerText" aria-live="polite">
-        <span class="answer-hint">Run a search to see the answer appear here.</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 03: INSIDE THIS LAYER -->
-<section>
-  <div class="section-label"><span class="num">03</span>Inside This Layer</div>
-  <h2>What do you want to <em>do</em>?</h2>
-
-  <div class="guide" role="list" aria-label="Goal-first guide to Stateless Retrieval">
-
-    <!-- Cluster 1 -->
-    <div class="cluster-head" role="listitem">
-      <h3 class="cluster-label">Find the right information</h3>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to prepare your documents so they can be searched?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Indexing and Embedding</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to search by meaning, by keywords, or both at once?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Retrieval (dense, sparse, hybrid)</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want a second pass to surface the most useful chunks before they enter the prompt?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Reranking</span>
-      </span>
-    </div>
-
-    <!-- Cluster 2 -->
-    <div class="cluster-head cluster-break" role="listitem">
-      <h3 class="cluster-label">Feed it in well</h3>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to decide which chunks to include, in what order, and how to format them for the model?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Context Assembly</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to call an external source (a database, a file, a live search) without changing anything?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Knowledge Tool Invocation (read-only)</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want the answer to say where each piece of information came from?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Citation and Provenance</span>
-      </span>
-    </div>
-
-    <!-- Cluster 3 -->
-    <div class="cluster-head cluster-break" role="listitem">
-      <h3 class="cluster-label">Keep it fresh</h3>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to avoid repeating the same retrieval work for repeated questions?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Caching of Knowledge Results</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to decide when cached or indexed content is stale and needs refreshing?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Freshness and Invalidation</span>
-      </span>
-    </div>
-
-  </div>
-
-  <div class="guide-note">
-    <strong>Common filing mistake:</strong> the L3a vs L5 boundary is read-only vs side-effectful, not who does the work. A live web search by an agent is still L3a because it only reads. Writing or changing something in the world is L5 Action.
-  </div>
-
-  <div class="guide-aside">
-    <strong>When everything fits in the prompt:</strong> if the entire corpus fits inside the context window, the retrieval stack collapses. You can skip L3a entirely and pack the content in directly. Whether to use RAG or long-context is a cost and latency question, covered under Cost, Latency and Reliability (C5).
-  </div>
-</section>
-
-<!-- 04: TRADEOFFS -->
-<section>
-  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
-  <h2>What you <em>gain and pay</em>.</h2>
-  <div class="tradeoffs-stage">
-    <div class="tradeoff-scale">
-      <span class="spacer"></span>
-      <div class="scale-track"><span>low</span><span>high</span></div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Accuracy gain</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Prompt size</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Latency added</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Cost</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Complexity</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-    </div>
-    <div class="tradeoff-quote">
-      Retrieval lets the AI answer questions about your documents without retraining. Each retrieved chunk adds tokens (small pieces the AI works in: roughly a word) to the prompt, which increases latency and cost. Good systems rank carefully so only the most useful context goes in. Reranking and caching help reduce the overhead. The tradeoff between RAG and packing the whole corpus into a long context is a cost and latency question, covered under Cost, Latency and Reliability (C5).
-    </div>
-  </div>
-</section>
-
-<!-- BACK NAV -->
+<!-- BACK LINK -->
 <section style="padding-top: 20px; padding-bottom: 40px;">
   <a href="layers.html" class="back-link">
     <div class="back-arrow">&larr;</div>
@@ -546,268 +331,72 @@
   </a>
 </section>
 
-<!-- SOURCES -->
-<div class="sources">
-  <div class="sources-title">Sources</div>
-  <ul>
-    <li>Lewis et al. (2020). <em>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.</em> <span class="note">NeurIPS. The paper that named RAG.</span></li>
-    <li>Guu et al. (2020). <em>REALM: Retrieval-Augmented Language Model Pre-Training.</em> <span class="note">Google Research. Retrieval integrated into pre-training.</span></li>
-    <li>Robertson and Zaragoza (2009). <em>The Probabilistic Relevance Framework: BM25 and Beyond.</em> <span class="note">Foundations and Trends in Information Retrieval. The canonical sparse-retrieval algorithm.</span></li>
-    <li>Nogueira and Cho (2019). <em>Passage Re-ranking with BERT.</em> <span class="note">Cross-encoder reranking applied to the retrieval stack.</span></li>
-    <li>OpenAI. <em>Best Practices for RAG.</em> <span class="note">openai.com/docs. Practical guidance on chunk size and retrieval strategies.</span></li>
-  </ul>
-</div>
-
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
 </footer>
 
 <script>
-// ============ RETRIEVAL DEMO ============
-// Keywords that each chunk "matches" on, for illustrative scoring.
-// Real RAG uses vector similarity; this demo uses keyword overlap to teach the same idea.
-const CHUNKS = [
-  {
-    id: 'chunk0',
-    keywords: ['neural', 'network', 'learn', 'weight', 'backprop', 'train', 'adjust', 'error'],
-    bestLabel: 'Best match',
-    answer: 'Neural networks learn by adjusting their internal weights through backpropagation: the network compares its output to the correct answer and nudges its weights to reduce the error.'
-  },
-  {
-    id: 'chunk1',
-    keywords: ['transformer', 'attention', 'token', 'sequence', 'self-attention', 'bert', 'gpt', 'model'],
-    bestLabel: 'Partial match',
-    answer: 'A transformer processes all tokens at once using self-attention, letting it weigh each word against every other.'
-  },
-  {
-    id: 'chunk2',
-    keywords: ['history', 'gpu', 'dataset', '1980', '2012', 'breakthrough', 'deep learning', 'timeline'],
-    bestLabel: 'No match',
-    answer: null
+// flow legend: scroll + glow on card click, one-time load sweep, card-door click guard
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var stages = ['card-find','card-feed','card-fresh'];
+  var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
+
+  function pillFor(cardId){
+    for(var i=0;i<pills.length;i++){ if(pills[i].getAttribute('data-target')===cardId) return pills[i]; }
+    return null;
   }
-];
 
-const PRESET_QUERIES = [
-  'How do neural networks learn?',
-  'What is a transformer model?',
-  'History of deep learning'
-];
-
-const queryInput = document.getElementById('queryInput');
-const searchBtn  = document.getElementById('searchBtn');
-const stepBtn    = document.getElementById('stepBtn');
-const resetBtn   = document.getElementById('resetBtn');
-const answerText = document.getElementById('answerText');
-const answerBox  = document.getElementById('answerBox');
-
-const pipeSteps = {
-  query:   document.getElementById('pipeQuery'),
-  search:  document.getElementById('pipeSearch'),
-  retrieve:document.getElementById('pipeRetrieve'),
-  answer:  document.getElementById('pipeAnswer'),
-  arrow1:  document.getElementById('arrow1'),
-  arrow2:  document.getElementById('arrow2'),
-  arrow3:  document.getElementById('arrow3'),
-};
-
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-// Step-through state
-let stepPhase = 0; // 0=idle, 1=query, 2=search, 3=retrieve, 4=answer, 5=done
-let running   = false;
-let scores    = [];
-
-function sleep(ms) { return new Promise(r => setTimeout(r, reduceMotion ? 0 : r => setTimeout(r, 0), ms)); }
-// simplified sleep
-function wait(ms) { return new Promise(r => setTimeout(r, reduceMotion ? 0 : ms)); }
-
-function activatePipe(step) {
-  ['query','search','retrieve','answer'].forEach(s => pipeSteps[s].classList.remove('active','done'));
-  ['arrow1','arrow2','arrow3'].forEach(a => pipeSteps[a].classList.remove('lit'));
-  const order = ['query','search','retrieve','answer'];
-  const idx   = order.indexOf(step);
-  order.forEach((s, i) => {
-    if (i < idx)  pipeSteps[s].classList.add('done');
-    if (i === idx) pipeSteps[s].classList.add('active');
+  // nav buttons: smooth-scroll to the stage card + brief glow
+  pills.forEach(function(btn){
+    var target = btn.getAttribute('data-target');
+    var card = document.getElementById(target);
+    btn.addEventListener('click', function(){
+      if(!card) return;
+      card.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+      card.classList.add('glow');
+      window.setTimeout(function(){ card.classList.remove('glow'); }, 1200);
+    });
   });
-  if (idx >= 1) pipeSteps.arrow1.classList.add('lit');
-  if (idx >= 2) pipeSteps.arrow2.classList.add('lit');
-  if (idx >= 3) pipeSteps.arrow3.classList.add('lit');
-  if (step === 'done') {
-    order.forEach(s => pipeSteps[s].classList.add('done'));
-    ['arrow1','arrow2','arrow3'].forEach(a => pipeSteps[a].classList.add('lit'));
-  }
-}
 
-function resetChunks() {
-  CHUNKS.forEach(c => {
-    const el = document.getElementById(c.id);
-    el.classList.remove('matched','faded','scanning');
-    el.style.opacity = '';
-  });
-}
-
-function resetDemo() {
-  resetChunks();
-  answerBox.classList.remove('ready');
-  answerText.innerHTML = '<span class="answer-hint">Run a search to see the answer appear here.</span>';
-  activatePipe('');
-  stepPhase = 0;
-  running = false;
-  scores = [];
-  searchBtn.disabled = false;
-  stepBtn.disabled   = false;
-}
-
-function scoreQuery(q) {
-  const words = q.toLowerCase().split(/\s+/);
-  return CHUNKS.map(chunk => {
-    const hits = words.filter(w => chunk.keywords.some(k => k.includes(w) || w.includes(k))).length;
-    return { chunk, score: hits };
-  });
-}
-
-function applyScores() {
-  const maxScore = Math.max(...scores.map(s => s.score));
-  if (maxScore === 0) {
-    CHUNKS.forEach(c => document.getElementById(c.id).classList.add('faded'));
-    return false;
-  }
-  scores.forEach(({ chunk, score }) => {
-    const el = document.getElementById(chunk.id);
-    const badge = el.querySelector('.score-badge');
-    if (score === maxScore) {
-      el.classList.add('matched');
-      badge.textContent = 'Best match';
-    } else if (score > 0) {
-      el.classList.add('matched');
-      el.style.opacity = '0.75';
-      badge.textContent = 'Partial match';
-    } else {
-      el.classList.add('faded');
+  // one-time load sweep: highlight each card in order, lighting the matching pill
+  if(!reduce){
+    var step = 0;
+    function tour(){
+      if(step > 0){
+        var prevCard = document.getElementById(stages[step-1]);
+        var prevPill = pillFor(stages[step-1]);
+        if(prevCard) prevCard.classList.remove('glow');
+        if(prevPill) prevPill.classList.remove('lit');
+      }
+      if(step >= stages.length) return;
+      var curCard = document.getElementById(stages[step]);
+      var curPill = pillFor(stages[step]);
+      if(curCard) curCard.classList.add('glow');
+      if(curPill) curPill.classList.add('lit');
+      step++;
+      window.setTimeout(tour, 900);
     }
+    window.setTimeout(tour, 350);
+  }
+
+  // each stage card is a door to the how-it-works page; chip clicks are ignored
+  var doors = {
+    'card-find': 'stateless-retrieval-how-it-works.html',
+    'card-feed': 'stateless-retrieval-how-it-works.html',
+    'card-fresh': 'stateless-retrieval-how-it-works.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('.chip')) return; // chip clicks never trigger the card door
+      if(e.target.closest('a')) return; // let real links handle their own clicks
+      window.location.href = doorHref;
+    });
   });
-  return true;
-}
-
-function buildAnswer() {
-  const maxScore = Math.max(...scores.map(s => s.score));
-  if (maxScore === 0) {
-    answerBox.classList.add('ready');
-    answerText.textContent = 'No closely matching chunks found. The AI would answer from general knowledge, which may be less accurate.';
-    return;
-  }
-  const matched = scores.filter(s => s.score > 0 && s.chunk.answer).sort((a,b) => b.score - a.score);
-  answerBox.classList.add('ready');
-  if (matched.length > 0) {
-    answerText.textContent = matched[0].chunk.answer;
-  } else {
-    answerText.textContent = 'No closely matching chunks found.';
-  }
-}
-
-// Full auto-play
-async function runSearch() {
-  if (running) return;
-  const q = queryInput.value.trim();
-  if (!q) { queryInput.focus(); return; }
-
-  running = true;
-  searchBtn.disabled = true;
-  stepBtn.disabled   = true;
-
-  resetChunks();
-  answerBox.classList.remove('ready');
-  answerText.innerHTML = '<span class="answer-hint">Searching...</span>';
-  stepPhase = 1;
-
-  activatePipe('query');
-  await wait(500);
-
-  activatePipe('search');
-  for (let i = 0; i < CHUNKS.length; i++) {
-    const el = document.getElementById(CHUNKS[i].id);
-    el.classList.add('scanning');
-    await wait(350);
-    el.classList.remove('scanning');
-  }
-
-  await wait(300);
-  activatePipe('retrieve');
-  scores = scoreQuery(q);
-  applyScores();
-
-  await wait(400);
-  activatePipe('answer');
-  await wait(300);
-  activatePipe('done');
-  buildAnswer();
-
-  stepPhase = 5;
-  running = false;
-  searchBtn.disabled = false;
-  stepBtn.disabled   = false;
-}
-
-// Step-through mode
-async function runStep() {
-  if (running) return;
-  const q = queryInput.value.trim();
-  if (!q) { queryInput.focus(); return; }
-
-  if (stepPhase === 5) { resetDemo(); return; }
-
-  running = true;
-  stepBtn.disabled = true;
-
-  if (stepPhase === 0) {
-    resetChunks();
-    answerBox.classList.remove('ready');
-    answerText.innerHTML = '<span class="answer-hint">Searching...</span>';
-    activatePipe('query');
-    stepPhase = 1;
-  } else if (stepPhase === 1) {
-    activatePipe('search');
-    for (let i = 0; i < CHUNKS.length; i++) {
-      const el = document.getElementById(CHUNKS[i].id);
-      el.classList.add('scanning');
-      await wait(reduceMotion ? 0 : 300);
-      el.classList.remove('scanning');
-    }
-    stepPhase = 2;
-  } else if (stepPhase === 2) {
-    activatePipe('retrieve');
-    scores = scoreQuery(q);
-    applyScores();
-    stepPhase = 3;
-  } else if (stepPhase === 3) {
-    activatePipe('done');
-    buildAnswer();
-    stepPhase = 5;
-  }
-
-  running = false;
-  stepBtn.disabled = false;
-}
-
-searchBtn.addEventListener('click', runSearch);
-stepBtn.addEventListener('click', runStep);
-resetBtn.addEventListener('click', () => { if (!running) { resetDemo(); queryInput.value = ''; } });
-queryInput.addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(); });
-
-// Cycle preset queries on focus
-let presetIdx = 0;
-queryInput.addEventListener('focus', () => {
-  if (!queryInput.value) {
-    queryInput.placeholder = PRESET_QUERIES[presetIdx % PRESET_QUERIES.length];
-    presetIdx++;
-  }
-});
-
-// Reduced motion: skip to final state immediately
-if (reduceMotion) {
-  // no animation; demo still works on click
-}
+})();
 </script>
 </body>
 </html>

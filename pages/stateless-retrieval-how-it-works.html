@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stateless Retrieval &middot; How it works &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff; white-space: nowrap;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px;
+    line-height: 1.5; color: var(--text);
+  }
+  .idea-card p + p { margin-top: 14px; }
+
+  /* ======== DEMO STAGE (carried verbatim from prior page) ======== */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* Query input row */
+  .query-row { display: flex; gap: 10px; margin-bottom: 18px; }
+  .query-input {
+    flex: 1; padding: 11px 14px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif; font-size: 14px; color: var(--text); background: var(--bg-subtle);
+    outline: none; transition: border-color .2s;
+  }
+  .query-input:focus { border-color: var(--accent); background: var(--surface); }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong); background: var(--surface);
+    border-radius: var(--radius-sm); cursor: pointer;
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+    white-space: nowrap;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .diagram-btn:disabled { opacity: .45; cursor: default; transform: none; box-shadow: none; }
+
+  /* Document chunks panel */
+  .panel-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 9px;
+  }
+  .docs-panel {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px; margin-bottom: 14px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .doc-chunk {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 9px;
+    padding: 12px 14px; font-size: 13.5px; line-height: 1.55; color: var(--soft);
+    position: relative; transition: border-color .3s ease, background .3s ease, box-shadow .3s ease;
+  }
+  .doc-chunk .chunk-label {
+    display: block; font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 5px;
+  }
+  .doc-chunk .chunk-text { color: var(--text); }
+  .doc-chunk mark {
+    background: var(--accent-soft); color: var(--accent-hover);
+    border-radius: 3px; padding: 0 2px; font-weight: 500;
+    transition: background .3s ease;
+  }
+  .doc-chunk.scanning {
+    border-color: var(--border-strong); box-shadow: 0 0 0 2px rgba(124,92,246,.08);
+  }
+  .doc-chunk.matched {
+    border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 2px rgba(124,92,246,.12);
+  }
+  .doc-chunk.matched .chunk-label { color: var(--accent-hover); }
+  .doc-chunk.matched mark { background: rgba(124,92,246,.22); }
+  .doc-chunk.faded { opacity: .35; }
+
+  /* Score badge */
+  .score-badge {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 11px; font-weight: 700; letter-spacing: .03em;
+    background: var(--accent); color: #fff;
+    border-radius: 20px; padding: 2px 8px;
+    opacity: 0; transform: scale(.8);
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .doc-chunk.matched .score-badge { opacity: 1; transform: scale(1); }
+
+  /* Pipeline flow */
+  .pipeline {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .pipe-step {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border);
+    font-size: 12px; font-weight: 600; color: var(--soft); background: var(--surface);
+    transition: border-color .3s ease, color .3s ease, background .3s ease;
+  }
+  .pipe-step.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .pipe-step.done { background: var(--success-soft); border-color: var(--success); color: var(--success); }
+  .pipe-arrow { color: var(--border-strong); font-size: 14px; transition: color .3s ease; }
+  .pipe-arrow.lit { color: var(--accent); }
+
+  /* Answer box */
+  .answer-box {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    min-height: 60px;
+    transition: border-color .4s ease, background .4s ease;
+  }
+  .answer-box.ready { border-color: var(--accent); background: var(--surface); }
+  .answer-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 6px;
+  }
+  .answer-text {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 16px;
+    line-height: 1.5; color: var(--text); min-height: 24px;
+  }
+  .answer-hint { font-size: 13px; color: var(--faint); font-family: 'Inter', sans-serif; font-weight: 500; }
+
+  /* ======== SECTION 03: TAP CARDS ======== */
+  .cards-grid { display: flex; flex-direction: column; gap: 12px; }
+  .flip-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    cursor: pointer; box-shadow: var(--shadow-sm);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  }
+  .flip-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .flip-card .q {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px;
+    line-height: 1.3; color: var(--text); display: flex; align-items: center; gap: 10px;
+  }
+  .flip-card .q .qico {
+    flex-shrink: 0; width: 20px; height: 20px; color: var(--accent); display: flex; align-items: center; justify-content: center;
+  }
+  .flip-card .q .qico svg { width: 20px; height: 20px; display: block; }
+  .flip-card .body {
+    font-size: 13.5px; color: var(--soft); line-height: 1.55;
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.35s ease, margin 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+  }
+  .flip-card.open .body { max-height: 200px; margin-top: 12px; opacity: 1; }
+  .flip-card .tap-hint { font-size: 11px; color: var(--faint); margin-top: 5px; }
+  .flip-card.open .tap-hint { display: none; }
+
+  /* ======== TRADEOFFS ======== */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+  }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 170px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources + footer */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .query-row { flex-direction: column; }
+    .pipeline { gap: 4px; }
+    .pipe-step { font-size: 11px; padding: 4px 9px; }
+  }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="layer-stateless-retrieval.html"><span aria-hidden="true">&larr;</span> Stateless Retrieval</a>
+    <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-stateless-retrieval.html">Stateless Retrieval</a><span class="sep">/</span><span class="here">How it works</span></nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4"/>
+      </svg>
+    </span>Layer &middot; 5
+  </span>
+  <h1 class="pattern-title">Stateless Retrieval</h1>
+  <p class="explainer">How the AI looks something up right when you ask, uses it to answer, then forgets it.</p>
+</header>
+
+<!-- 01 &middot; THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>An AI can only work with the words you send in. When you ask about your own documents, the system first <strong style="color:var(--accent-hover)">searches</strong> a pile of text for the small pieces that match your question, then drops those pieces into the prompt before the model answers.</p>
+    <p>A piece (a "chunk") is just a paragraph or a few sentences from a document. Nothing is remembered after the answer. Every question starts a fresh search. That is what makes this layer stateless.</p>
+  </div>
+</section>
+
+<!-- 02 &middot; SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Type a question. Watch it <em>find</em> the answer.</h2>
+  <p class="demo-lede">The system searches three pieces of text for the ones that match your question. Matching pieces light up and feed into the answer. Each search is independent: nothing carries over from previous runs.</p>
+
+  <div class="demo-stage">
+    <!-- Pipeline flow indicator -->
+    <div class="pipeline" aria-label="Retrieval pipeline steps" role="list">
+      <div class="pipe-step" id="pipeQuery" role="listitem">1. Question</div>
+      <div class="pipe-arrow" id="arrow1" aria-hidden="true">&rarr;</div>
+      <div class="pipe-step" id="pipeSearch" role="listitem">2. Search pieces</div>
+      <div class="pipe-arrow" id="arrow2" aria-hidden="true">&rarr;</div>
+      <div class="pipe-step" id="pipeRetrieve" role="listitem">3. Pull matches</div>
+      <div class="pipe-arrow" id="arrow3" aria-hidden="true">&rarr;</div>
+      <div class="pipe-step" id="pipeAnswer" role="listitem">4. Answer</div>
+    </div>
+
+    <!-- Query input -->
+    <div class="query-row">
+      <label for="queryInput" class="sr-only">Type your question</label>
+      <input id="queryInput" class="query-input" type="text" placeholder="e.g. How do neural networks learn?" maxlength="100" aria-label="Ask a question about the documents" />
+      <button class="diagram-btn primary" id="searchBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+
+    <!-- Document chunks -->
+    <div class="panel-label">Documents (three small pieces, each from a different document)</div>
+    <div class="docs-panel" id="docsPanel" aria-live="polite" aria-label="Document pieces">
+      <div class="doc-chunk" id="chunk0">
+        <span class="chunk-label">Piece A</span>
+        <span class="chunk-text">Neural networks learn by adjusting their internal weights. They compare their output to the correct answer and nudge the weights to reduce the error, a process called <mark>backpropagation</mark>.</span>
+        <span class="score-badge" aria-hidden="true">Best match</span>
+      </div>
+      <div class="doc-chunk" id="chunk1">
+        <span class="chunk-label">Piece B</span>
+        <span class="chunk-text">A <mark>transformer</mark> model processes all tokens (small pieces the AI works in: roughly a word, or a slice of an image) in a sequence at once using self-attention, which lets it weigh the importance of each word relative to every other word.</span>
+        <span class="score-badge" aria-hidden="true">Partial match</span>
+      </div>
+      <div class="doc-chunk" id="chunk2">
+        <span class="chunk-label">Piece C</span>
+        <span class="chunk-text">The history of deep learning stretches back to the 1980s, but practical breakthroughs came after 2012 when large datasets and fast GPUs (the chips that do the heavy computing) became widely available.</span>
+        <span class="score-badge" aria-hidden="true">No match</span>
+      </div>
+    </div>
+
+    <!-- Answer box -->
+    <div class="answer-box" id="answerBox">
+      <div class="answer-label">Answer (built from matched pieces)</div>
+      <div class="answer-text" id="answerText" aria-live="polite">
+        <span class="answer-hint">Run a search to see the answer appear here.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 &middot; REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>Where you've <em>felt</em> this.</h2>
+
+  <div class="cards-grid">
+    <div class="flip-card" tabindex="0" role="button" aria-expanded="false">
+      <div class="q"><span class="qico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>A help-desk bot answers from your company's own documents</div>
+      <div class="tap-hint">Tap to see why</div>
+      <div class="body">Your handbook, policies, and product docs are split into small pieces and stored. When you ask a question, the system pulls the few pieces that match and feeds them to the model with your question. The model writes an answer grounded in your own text, not made-up trivia.</div>
+    </div>
+    <div class="flip-card" tabindex="0" role="button" aria-expanded="false">
+      <div class="q"><span class="qico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>An AI search shows you exactly which page each line came from</div>
+      <div class="tap-hint">Tap to see why</div>
+      <div class="body">Because the system knows which pieces it pulled, it can show those sources next to the answer. You can tap any line and see the exact passage it came from. That is how an answer earns trust: you can check it.</div>
+    </div>
+    <div class="flip-card" tabindex="0" role="button" aria-expanded="false">
+      <div class="q"><span class="qico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><path d="M3 21v-5h5"/></svg></span>An assistant answers about today's news without being retrained</div>
+      <div class="tap-hint">Tap to see why</div>
+      <div class="body">The model itself was trained months ago, but a fresh search runs at the moment you ask. It pulls today's articles, hands them to the model, and the answer comes back current. The model never had to relearn anything.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 &middot; TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Accuracy gain</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Prompt size</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Added wait</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost per answer</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Setup work</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Searching lets the model answer from your own content without retraining it. Each piece pulled in adds words to the prompt, which adds a little wait and a little cost. Good systems rank carefully so only the most useful pieces go in, then reuse recent searches to skip the rest.
+    </div>
+  </div>
+</section>
+
+<!-- BACK LINK -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="layer-stateless-retrieval.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Stateless Retrieval</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Lewis et al. (2020). <em>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.</em> <span class="note">NeurIPS. The paper that named RAG.</span></li>
+    <li>Guu et al. (2020). <em>REALM: Retrieval-Augmented Language Model Pre-Training.</em> <span class="note">Google Research. Retrieval integrated into pre-training.</span></li>
+    <li>Robertson and Zaragoza (2009). <em>The Probabilistic Relevance Framework: BM25 and Beyond.</em> <span class="note">Foundations and Trends in Information Retrieval. The canonical keyword-search algorithm.</span></li>
+    <li>Nogueira and Cho (2019). <em>Passage Re-ranking with BERT.</em> <span class="note">A second pass that reorders the top results before they go to the model.</span></li>
+    <li>OpenAI. <em>Best Practices for RAG.</em> <span class="note">openai.com/docs. Practical guidance on piece size and search strategies.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ RETRIEVAL DEMO (carried over) ============
+// Keywords that each piece "matches" on, for illustrative scoring.
+// Real search uses vector similarity; this demo uses keyword overlap to teach the same idea.
+const CHUNKS = [
+  {
+    id: 'chunk0',
+    keywords: ['neural', 'network', 'learn', 'weight', 'backprop', 'train', 'adjust', 'error'],
+    bestLabel: 'Best match',
+    answer: 'Neural networks learn by adjusting their internal weights through backpropagation: the network compares its output to the correct answer and nudges its weights to reduce the error.'
+  },
+  {
+    id: 'chunk1',
+    keywords: ['transformer', 'attention', 'token', 'sequence', 'self-attention', 'bert', 'gpt', 'model'],
+    bestLabel: 'Partial match',
+    answer: 'A transformer processes all tokens at once using self-attention, letting it weigh each word against every other.'
+  },
+  {
+    id: 'chunk2',
+    keywords: ['history', 'gpu', 'dataset', '1980', '2012', 'breakthrough', 'deep learning', 'timeline'],
+    bestLabel: 'No match',
+    answer: null
+  }
+];
+
+const PRESET_QUERIES = [
+  'How do neural networks learn?',
+  'What is a transformer model?',
+  'History of deep learning'
+];
+
+const queryInput = document.getElementById('queryInput');
+const searchBtn  = document.getElementById('searchBtn');
+const stepBtn    = document.getElementById('stepBtn');
+const resetBtn   = document.getElementById('resetBtn');
+const answerText = document.getElementById('answerText');
+const answerBox  = document.getElementById('answerBox');
+
+const pipeSteps = {
+  query:   document.getElementById('pipeQuery'),
+  search:  document.getElementById('pipeSearch'),
+  retrieve:document.getElementById('pipeRetrieve'),
+  answer:  document.getElementById('pipeAnswer'),
+  arrow1:  document.getElementById('arrow1'),
+  arrow2:  document.getElementById('arrow2'),
+  arrow3:  document.getElementById('arrow3'),
+};
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Step-through state
+let stepPhase = 0; // 0=idle, 1=query, 2=search, 3=retrieve, 4=answer, 5=done
+let running   = false;
+let scores    = [];
+
+function wait(ms) { return new Promise(r => setTimeout(r, reduceMotion ? 0 : ms)); }
+
+function activatePipe(step) {
+  ['query','search','retrieve','answer'].forEach(s => pipeSteps[s].classList.remove('active','done'));
+  ['arrow1','arrow2','arrow3'].forEach(a => pipeSteps[a].classList.remove('lit'));
+  const order = ['query','search','retrieve','answer'];
+  const idx   = order.indexOf(step);
+  order.forEach((s, i) => {
+    if (i < idx)  pipeSteps[s].classList.add('done');
+    if (i === idx) pipeSteps[s].classList.add('active');
+  });
+  if (idx >= 1) pipeSteps.arrow1.classList.add('lit');
+  if (idx >= 2) pipeSteps.arrow2.classList.add('lit');
+  if (idx >= 3) pipeSteps.arrow3.classList.add('lit');
+  if (step === 'done') {
+    order.forEach(s => pipeSteps[s].classList.add('done'));
+    ['arrow1','arrow2','arrow3'].forEach(a => pipeSteps[a].classList.add('lit'));
+  }
+}
+
+function resetChunks() {
+  CHUNKS.forEach(c => {
+    const el = document.getElementById(c.id);
+    el.classList.remove('matched','faded','scanning');
+    el.style.opacity = '';
+  });
+}
+
+function resetDemo() {
+  resetChunks();
+  answerBox.classList.remove('ready');
+  answerText.innerHTML = '<span class="answer-hint">Run a search to see the answer appear here.</span>';
+  activatePipe('');
+  stepPhase = 0;
+  running = false;
+  scores = [];
+  searchBtn.disabled = false;
+  stepBtn.disabled   = false;
+}
+
+function scoreQuery(q) {
+  const words = q.toLowerCase().split(/\s+/);
+  return CHUNKS.map(chunk => {
+    const hits = words.filter(w => chunk.keywords.some(k => k.includes(w) || w.includes(k))).length;
+    return { chunk, score: hits };
+  });
+}
+
+function applyScores() {
+  const maxScore = Math.max(...scores.map(s => s.score));
+  if (maxScore === 0) {
+    CHUNKS.forEach(c => document.getElementById(c.id).classList.add('faded'));
+    return false;
+  }
+  scores.forEach(({ chunk, score }) => {
+    const el = document.getElementById(chunk.id);
+    const badge = el.querySelector('.score-badge');
+    if (score === maxScore) {
+      el.classList.add('matched');
+      badge.textContent = 'Best match';
+    } else if (score > 0) {
+      el.classList.add('matched');
+      el.style.opacity = '0.75';
+      badge.textContent = 'Partial match';
+    } else {
+      el.classList.add('faded');
+    }
+  });
+  return true;
+}
+
+function buildAnswer() {
+  const maxScore = Math.max(...scores.map(s => s.score));
+  if (maxScore === 0) {
+    answerBox.classList.add('ready');
+    answerText.textContent = 'No closely matching pieces found. The AI would answer from general knowledge, which may be less accurate.';
+    return;
+  }
+  const matched = scores.filter(s => s.score > 0 && s.chunk.answer).sort((a,b) => b.score - a.score);
+  answerBox.classList.add('ready');
+  if (matched.length > 0) {
+    answerText.textContent = matched[0].chunk.answer;
+  } else {
+    answerText.textContent = 'No closely matching pieces found.';
+  }
+}
+
+// Full auto-play
+async function runSearch() {
+  if (running) return;
+  const q = queryInput.value.trim();
+  if (!q) { queryInput.focus(); return; }
+
+  running = true;
+  searchBtn.disabled = true;
+  stepBtn.disabled   = true;
+
+  resetChunks();
+  answerBox.classList.remove('ready');
+  answerText.innerHTML = '<span class="answer-hint">Searching...</span>';
+  stepPhase = 1;
+
+  activatePipe('query');
+  await wait(500);
+
+  activatePipe('search');
+  for (let i = 0; i < CHUNKS.length; i++) {
+    const el = document.getElementById(CHUNKS[i].id);
+    el.classList.add('scanning');
+    await wait(350);
+    el.classList.remove('scanning');
+  }
+
+  await wait(300);
+  activatePipe('retrieve');
+  scores = scoreQuery(q);
+  applyScores();
+
+  await wait(400);
+  activatePipe('answer');
+  await wait(300);
+  activatePipe('done');
+  buildAnswer();
+
+  stepPhase = 5;
+  running = false;
+  searchBtn.disabled = false;
+  stepBtn.disabled   = false;
+}
+
+// Step-through mode
+async function runStep() {
+  if (running) return;
+  const q = queryInput.value.trim();
+  if (!q) { queryInput.focus(); return; }
+
+  if (stepPhase === 5) { resetDemo(); return; }
+
+  running = true;
+  stepBtn.disabled = true;
+
+  if (stepPhase === 0) {
+    resetChunks();
+    answerBox.classList.remove('ready');
+    answerText.innerHTML = '<span class="answer-hint">Searching...</span>';
+    activatePipe('query');
+    stepPhase = 1;
+  } else if (stepPhase === 1) {
+    activatePipe('search');
+    for (let i = 0; i < CHUNKS.length; i++) {
+      const el = document.getElementById(CHUNKS[i].id);
+      el.classList.add('scanning');
+      await wait(reduceMotion ? 0 : 300);
+      el.classList.remove('scanning');
+    }
+    stepPhase = 2;
+  } else if (stepPhase === 2) {
+    activatePipe('retrieve');
+    scores = scoreQuery(q);
+    applyScores();
+    stepPhase = 3;
+  } else if (stepPhase === 3) {
+    activatePipe('done');
+    buildAnswer();
+    stepPhase = 5;
+  }
+
+  running = false;
+  stepBtn.disabled = false;
+}
+
+searchBtn.addEventListener('click', runSearch);
+stepBtn.addEventListener('click', runStep);
+resetBtn.addEventListener('click', () => { if (!running) { resetDemo(); queryInput.value = ''; } });
+queryInput.addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(); });
+
+// Cycle preset queries on focus
+let presetIdx = 0;
+queryInput.addEventListener('focus', () => {
+  if (!queryInput.value) {
+    queryInput.placeholder = PRESET_QUERIES[presetIdx % PRESET_QUERIES.length];
+    presetIdx++;
+  }
+});
+
+// ============ FLIP CARDS ============
+const flipCards = document.querySelectorAll('.flip-card');
+flipCards.forEach(card => {
+  function toggle() {
+    const open = card.classList.toggle('open');
+    card.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  card.addEventListener('click', toggle);
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      toggle();
+    }
+  });
+});
+</script>
+</body>
+</html>

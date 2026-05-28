@@ -3,21 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User Surface &amp; Agency · The Pattern Book</title>
+<title>User Experience &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
     --border:#E8EAEE; --border-strong:#D5D9E0;
     --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
     --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
-    --radius:16px;
-    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.10);
+    --radius:16px; --radius-sm:11px;
     --success:#0E9F6E; --success-soft:#E7F7F0;
-    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
-    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-padding-top: 80px; }
@@ -29,15 +28,31 @@
     -webkit-font-smoothing: antialiased;
   }
   body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
 
   /* a11y */
-  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px;
+  }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 300;
+    background: var(--surface); color: var(--accent-hover);
+    border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: top .15s ease;
+  }
   .skip-link:focus { top: 8px; }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 
-  /* TOP BAR */
+  /* top bar */
   .topbar {
     position: sticky; top: 0; z-index: 200;
     background: rgba(252,252,253,.86);
@@ -46,16 +61,15 @@
     border-bottom: 1px solid var(--border);
   }
   .topbar-inner {
-    max-width: 920px; margin: 0 auto; padding: 11px 24px;
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
   }
   .back {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 13px; font-weight: 500; color: var(--text);
     text-decoration: none; padding: 5px 11px;
-    border: 1px solid var(--border-strong); border-radius: 20px;
-    background: #fff; white-space: nowrap;
-    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s, color .2s, background .2s; white-space: nowrap;
   }
   .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
   .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
@@ -64,7 +78,7 @@
   .crumb .sep { margin: 0 7px; color: var(--border-strong); }
   .crumb .here { color: var(--soft); }
 
-  /* HEADER */
+  /* header */
   .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
   .eyebrow {
     display: inline-flex; align-items: center; gap: 8px;
@@ -75,282 +89,119 @@
   .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
   .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
   h1.pattern-title {
-    font-family: 'Fraunces', serif; font-weight: 500;
-    font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
   }
   .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
 
-  /* SECTIONS */
-  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; scroll-margin-top: 80px; }
-  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
-  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
-  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  /* title row + see-it-in-action pill */
+  .title-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:16px 0 0}
+  .title-row .pattern-title{margin:0;flex:1 1 auto;min-width:240px}
+  .how-pill{flex:none;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--accent);border-radius:22px;padding:8px 15px;box-shadow:var(--shadow);transition:background .15s ease,transform .15s ease}
+  .how-pill:hover{background:#E3DBFD;transform:translateY(-1px)}
+  .how-pill .arr{display:inline-block;transition:transform .18s ease}
+  .how-pill:hover .arr{transform:translateX(3px)}
+  @media (prefers-reduced-motion:reduce){.how-pill,.how-pill .arr{transition:none}.how-pill:hover,.how-pill:hover .arr{transform:none}}
+  @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
+
+  /* flow legend (stage pills + arrows) */
+  .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
+  .flow-chip {
+    font-family: inherit; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; box-shadow: var(--shadow); padding: 7px 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--soft); white-space: nowrap;
+    letter-spacing: .01em; cursor: pointer;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .flow-chip:hover { color: var(--accent-hover); border-color: var(--border-strong); }
+  .flow-chip.lit { background: var(--accent-soft); color: var(--accent-hover); border-color: var(--accent); }
+  .flow-arrow { flex: none; color: var(--accent); font-size: 15px; line-height: 1; }
+  .flow-caption { text-align: center; color: var(--faint); font-size: 13px; line-height: 1.5; margin-top: 12px; }
+
+  /* sections */
+  section {
+    max-width: 920px; margin: 0 auto;
+    padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px;
+  }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
+    line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
+  }
   h2 em { font-style: italic; color: var(--accent); }
 
-  /* 01 IDEA CARD */
-  .idea-card {
+  /* ============ STAGE CARDS ============ */
+  .stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 6px; }
+
+  .stage-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
+    scroll-margin-top: 80px;
+    transition: box-shadow .55s ease, border-color .55s ease;
+    display: flex; flex-direction: column;
   }
-  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
+  .stage-card.glow {
+    box-shadow: 0 0 0 3px var(--accent-soft), 0 0 22px 2px rgba(124,92,246,.42);
+    border-color: var(--accent);
+  }
+  @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
 
-  /* 02 DEMO: MINI CHAT */
-  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
-
-  .chat-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow);
-    overflow: hidden;
+  .stage-card.clickable {
+    cursor: pointer;
+    transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
   }
-  /* Chat header bar */
-  .chat-header {
-    background: var(--bg-subtle); border-bottom: 1px solid var(--border);
-    padding: 12px 18px; display: flex; align-items: center; gap: 10px;
-  }
-  .chat-avatar {
-    width: 30px; height: 30px; border-radius: 50%;
-    background: var(--accent); display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .chat-avatar svg { width: 16px; height: 16px; color: #fff; }
-  .chat-title { font-weight: 600; font-size: 14px; }
-  .chat-subtitle { font-size: 12px; color: var(--faint); }
-
-  /* Chat messages area */
-  .chat-messages { padding: 20px 18px 12px; min-height: 200px; display: flex; flex-direction: column; gap: 14px; }
-
-  .chat-bubble-user {
-    align-self: flex-end;
-    background: var(--accent); color: #fff;
-    border-radius: 18px 18px 4px 18px;
-    padding: 10px 16px;
-    font-size: 15px; line-height: 1.5; max-width: 80%;
-  }
-  .chat-bubble-ai {
-    align-self: flex-start; max-width: 92%;
-    background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: 4px 18px 18px 18px;
-    padding: 14px 16px;
-    font-size: 15px; line-height: 1.65;
-  }
-  .chat-bubble-ai .stream-text { color: var(--text); }
-  .chat-cursor {
-    display: inline-block; width: 2px; height: 1em;
-    background: var(--accent); vertical-align: text-bottom;
-    animation: blink 0.9s step-end infinite;
-    margin-left: 1px;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-  .chat-cursor.hidden { display: none; }
-
-  /* Citations */
-  .chat-citations {
-    margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px;
-    opacity: 0; transition: opacity 0.4s ease; pointer-events: none;
-  }
-  .chat-citations.visible { opacity: 1; pointer-events: auto; }
-  .citation-pill {
-    display: inline-flex; align-items: center; gap: 5px;
-    background: var(--accent-soft); border: 1px solid var(--border);
-    border-radius: 20px; padding: 4px 10px;
-    font-size: 12px; font-weight: 600; color: var(--accent-hover);
-    cursor: pointer; transition: background .15s, border-color .15s, transform .15s;
-    text-decoration: none;
-  }
-  .citation-pill:hover, .citation-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); transform: translateY(-1px); }
-  .citation-pill svg { width: 11px; height: 11px; }
-
-  .citation-preview {
-    margin-top: 8px; display: none;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 10px 14px;
-    font-size: 13px; color: var(--soft); line-height: 1.5;
-  }
-  .citation-preview.shown { display: block; }
-
-  /* Action bar: copy + retry */
-  .chat-actions {
-    display: flex; gap: 8px; margin-top: 12px;
-    opacity: 0; transition: opacity 0.4s ease; pointer-events: none;
-    flex-wrap: wrap;
-  }
-  .chat-actions.visible { opacity: 1; pointer-events: auto; }
-  .action-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 12px; border: 1px solid var(--border-strong);
-    border-radius: 8px; background: var(--surface);
-    font-size: 13px; font-weight: 500; color: var(--soft);
-    cursor: pointer; transition: background .15s, border-color .15s, color .15s;
-    font-family: 'Inter', sans-serif;
-  }
-  .action-btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
-  .action-btn.done { background: var(--success-soft); border-color: var(--success); color: var(--success); }
-  .action-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
-
-  /* Feedback row */
-  .chat-feedback {
-    display: flex; align-items: center; gap: 10px; margin-top: 12px;
-    opacity: 0; transition: opacity 0.4s ease; pointer-events: none;
-  }
-  .chat-feedback.visible { opacity: 1; pointer-events: auto; }
-  .feedback-label { font-size: 12px; color: var(--faint); }
-  .thumb-btn {
-    width: 30px; height: 30px; border-radius: 8px;
-    border: 1px solid var(--border-strong); background: var(--surface);
-    display: inline-flex; align-items: center; justify-content: center;
-    cursor: pointer; font-size: 15px; transition: background .15s, border-color .15s, transform .18s;
-    font-family: 'Inter', sans-serif;
-  }
-  .thumb-btn:hover { background: var(--accent-soft); border-color: var(--accent); transform: scale(1.12); }
-  .thumb-btn.pressed { background: var(--accent-soft); border-color: var(--accent); transform: scale(1.18); }
-  .feedback-thanks { font-size: 12px; color: var(--accent-hover); font-weight: 500; display: none; }
-  .feedback-thanks.shown { display: block; }
-
-  /* Chat controls */
-  .chat-controls {
-    border-top: 1px solid var(--border); padding: 14px 18px;
-    display: flex; gap: 8px; flex-wrap: wrap;
-  }
-  .diagram-btn {
-    padding: 9px 16px; border: 1px solid var(--border-strong);
-    background: var(--surface); border-radius: var(--radius-sm);
-    cursor: pointer; font-family: 'Inter', sans-serif;
-    font-size: 14px; font-weight: 600; color: var(--text);
-    transition: transform .18s, box-shadow .18s, background .18s, border-color .18s;
-  }
-  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
-  .diagram-btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
-  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-
-  /* 03 REAL EXAMPLE */
-  .example-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
-  }
-  .example-row {
-    display: flex; gap: 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .example-row:last-child { border-bottom: 0; }
-  .example-label {
-    flex: 0 0 130px; padding: 16px 18px;
-    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-    color: var(--faint); background: var(--bg-subtle);
-    border-right: 1px solid var(--border); display: flex; align-items: flex-start;
-  }
-  .example-content {
-    flex: 1; padding: 16px 18px;
-    font-size: 15px; line-height: 1.6; color: var(--soft);
-  }
-  .example-content strong { color: var(--text); font-weight: 600; }
-
-  /* 04 TRADEOFFS -- canonical monochrome meter */
-  .tradeoffs-stage {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
-  }
-  .tradeoff-scale {
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
-    color: var(--faint); margin-bottom: 14px;
-  }
-  .tradeoff-row {
-    display: flex; align-items: center; gap: 14px; margin-bottom: 12px;
-  }
-  .tradeoff-label {
-    width: 170px; flex: none; font-size: 13px; font-weight: 600; color: var(--text);
-  }
-  .tradeoff-bars { display: flex; gap: 4px; flex: 1; }
-  .seg {
-    height: 8px; flex: 1; border-radius: 3px;
-    background: var(--border-strong);
-  }
-  .seg.on { background: var(--accent); }
-  .tradeoff-quote {
-    font-size: 13px; color: var(--soft); line-height: 1.5; margin-top: 16px;
-    border-top: 1px solid var(--border); padding-top: 14px;
-  }
-  @media(max-width:480px){
-    .tradeoff-row{flex-direction:column;align-items:stretch}
-    .tradeoff-label{min-width:0}
+  .stage-card.clickable:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .stage-card.clickable:hover .stage-name { color: var(--accent-hover); }
+  @media (prefers-reduced-motion: reduce) {
+    .stage-card.clickable { transition: none; }
+    .stage-card.clickable:hover { transform: none; }
   }
 
-  /* 05 INSIDE THIS LAYER */
-  .layer-map {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
-  }
-  .layer-map-axis {
-    background: var(--bg-subtle); border-bottom: 1px solid var(--border);
-    padding: 14px 20px;
-    font-size: 13px; color: var(--soft); line-height: 1.5;
-  }
-  .layer-map-axis strong { color: var(--text); font-weight: 600; }
-  .layer-map-category {
-    display: flex; gap: 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .layer-map-category:last-of-type { border-bottom: none; }
-  .layer-map-name {
-    flex: 0 0 230px; padding: 14px 18px;
-    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
-    color: var(--text); background: var(--bg-subtle);
-    border-right: 1px solid var(--border); display: flex; align-items: flex-start;
-  }
-  .layer-map-desc {
-    flex: 1; padding: 14px 18px;
-    font-size: 14px; color: var(--soft); line-height: 1.55;
-  }
-  .layer-map-rule {
-    background: var(--accent-soft); border-top: 1px solid var(--border);
-    padding: 13px 20px;
-    font-size: 13px; color: var(--accent-hover); line-height: 1.5;
-    font-weight: 500;
-  }
-  @media(max-width:540px){
-    .layer-map-category{flex-direction:column}
-    .layer-map-name{flex:none;border-right:none;border-bottom:1px solid var(--border)}
+  /* de-squeezed: icon + name share a full-width row of their own */
+  .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; }
+  .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
+  .stage-head .sico svg { width: 18px; height: 18px; display: block; }
+  .stage-name { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
+
+  .stage-lead { color: var(--soft); font-size: 13.5px; line-height: 1.45; margin: 0 0 14px; }
+
+  /* wrapping chip grid: each item is just its plain name (no leaf page yet) */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    flex: none; display: inline-flex; align-items: center; gap: 3px;
+    padding: 6px 11px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    line-height: 1.2; white-space: nowrap;
+    border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
 
-  /* BACK LINK */
+  /* "see how" lives at the bottom of each card, pushed down by margin-top:auto */
+  .see-how {
+    display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 14px;
+    font-size: 12.5px; font-weight: 600; color: var(--accent-hover);
+    transition: color .15s ease;
+  }
+  .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .see-how .arr { display: inline-block; transition: transform .18s ease; }
+  .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
+  @media (prefers-reduced-motion: reduce) {
+    .see-how, .see-how .arr { transition: none; }
+    .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; }
+  }
+
+  /* back link */
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
     padding: 14px 16px; background: var(--surface);
     border: 1px solid var(--border); border-radius: var(--radius);
     box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
-    transition: transform .18s, box-shadow .18s, border-color .18s;
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; cursor: pointer;
   }
   .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
-  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s; }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s; }
   .back-link:hover .back-arrow { transform: translateX(-3px); }
   .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
   .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
 
-  /* 05 GOAL-FIRST GUIDE (in-place, no separate page) */
-  .guide { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
-  .guide-row { display: flex; align-items: baseline; justify-content: flex-start; flex-wrap: wrap; gap: 4px 10px; padding: 17px 22px; border-top: 1px solid var(--border); }
-  .guide-row:first-child { border-top: none; }
-  .want { font-size: 15px; line-height: 1.4; color: var(--text); }
-  .resolve { display: inline-flex; align-items: baseline; gap: 8px; flex: none; }
-  .connect { color: var(--faint); font-size: 15px; line-height: 1.4; }
-  .tech { font-family: 'Fraunces', serif; font-size: 16px; color: var(--text); line-height: 1.4; }
-  .cluster-head { padding: 16px 22px 8px; }
-  .cluster-head.cluster-break { padding-top: 26px; border-top: 1px solid var(--border); }
-  .cluster-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text); line-height: 1.3; }
-  .cluster-head + .guide-row { border-top: none; }
-  .cluster-head ~ .guide-row { padding-left: 40px; }
-  @media (max-width: 560px) { .guide-row { padding: 15px 18px; } .cluster-head ~ .guide-row { padding-left: 24px; } }
-
-  /* SOURCES */
-  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
-  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
-  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
-  .sources li em { font-style: italic; color: var(--text); }
-  .sources li .note { color: var(--faint); }
-
-  /* FOOTER */
+  /* footer */
   footer {
     max-width: 920px; margin: 30px auto 48px;
     padding: 16px 24px 0; text-align: center;
@@ -359,17 +210,15 @@
   }
   footer strong { color: var(--soft); font-weight: 500; }
 
-  /* RESPONSIVE */
+  /* responsive */
+  @media (max-width: 720px) {
+    .stages { grid-template-columns: 1fr; gap: 14px; }
+  }
   @media (max-width: 560px) {
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
-    .example-label { flex: 0 0 90px; font-size: 11px; }
-    .chat-bubble-user { max-width: 95%; }
-  }
-  @media (max-width: 420px) {
-    .example-row { flex-direction: column; }
-    .example-label { border-right: none; border-bottom: 1px solid var(--border); flex: none; }
+    .flow-chip { font-size: 12px; padding: 6px 12px; }
   }
 </style>
 </head>
@@ -381,7 +230,7 @@
   <div class="topbar-inner">
     <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> The Pattern Book</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">User Surface &amp; Agency</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><span class="here">User Experience</span>
     </nav>
   </div>
 </nav>
@@ -391,254 +240,90 @@
   <span class="eyebrow">
     <span class="ico" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="3"/>
-        <path d="M8 10h8M8 14h5"/>
+        <path d="M4 5h16v11H4zM2 20h20M9.5 16v4M14.5 16v4"/>
       </svg>
-    </span>
-    Layer &middot; L7
+    </span>Layer &middot; 10
   </span>
-  <h1 class="pattern-title">User Surface &amp; Agency</h1>
-  <p class="explainer">Everything the user actually sees, taps, and controls: how answers arrive, how much the AI does on its own, and how people push back or give direction.</p>
+  <div class="title-row"><h1 class="pattern-title">User Experience</h1><a class="how-pill" href="user-experience-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
+  <p class="explainer">Everything the person actually sees, taps, and steers: where you meet the AI, how the answer shows up, and how you stay in control of what it does.</p>
+
+  <div class="flow" aria-label="Jump to a part of user experience">
+    <button type="button" class="flow-chip" data-target="card-meet">Where you meet the AI</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-show">How answers show up</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-control">Staying in control</button>
+  </div>
+  <p class="flow-caption">Three sides of every AI you actually use.</p>
 </header>
 
-<!-- 01 THE IDEA -->
+<!-- STAGE CARDS -->
 <section>
-  <div class="section-label"><span class="num">01</span>The Idea</div>
-  <h2>What <em>is</em> it?</h2>
-  <div class="idea-card">
-    <p>The <span style="color:var(--accent-hover);font-weight:500">user surface and agency layer</span> is everything between the AI's raw output and the person reading it. The answer does not just appear all at once: it <strong>streams in token by token</strong> (a token is a small piece the AI works in: roughly a word, or a slice of an image or sound), so it feels alive and fast. Alongside the answer, the interface shows <strong>where the information came from</strong> (citations), lets you <strong>copy or retry</strong> with one tap, and gives you a way to say whether it helped. Each of those pieces is a deliberate design choice, not an accident.</p>
-  </div>
-</section>
+  <div class="stages">
 
-<!-- 02 SEE IT WORK -->
-<section>
-  <div class="section-label"><span class="num">02</span>See It Work</div>
-  <h2>A <em>mini chat</em> in your hands.</h2>
-  <p class="demo-lede">Press Play to watch the answer stream in word by word. Then tap a citation to see its source, or give feedback with thumbs up or down.</p>
-
-  <div class="chat-stage">
-    <!-- Chat header -->
-    <div class="chat-header">
-      <div class="chat-avatar" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    <!-- WHERE YOU MEET THE AI -->
+    <section class="stage-card clickable" id="card-meet" aria-labelledby="g-meet">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </span>
+        <h2 id="g-meet"><span class="stage-name">Where you meet the AI</span></h2>
       </div>
-      <div>
-        <div class="chat-title">AI Assistant</div>
-        <div class="chat-subtitle" id="chatStatus">Ready</div>
+      <p class="stage-lead">The kind of surface that delivers it: a chat, a sidebar inside another app, a voice line, or a quiet helper that just gets work done.</p>
+      <div class="chips">
+        <span class="chip">A chat window</span>
+        <span class="chip">A sidebar inside another app</span>
+        <span class="chip">A quiet helper working in the background</span>
+        <span class="chip">A voice you talk to</span>
+        <span class="chip">A camera that looks and answers</span>
       </div>
-    </div>
+      <a class="see-how" href="user-experience-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
-    <!-- Messages -->
-    <div class="chat-messages" id="chatMessages" aria-live="polite">
-      <div class="chat-bubble-user">Why is the sky blue?</div>
-
-      <div class="chat-bubble-ai" id="aiBubble" style="display:none">
-        <div class="stream-text" id="streamText"></div><span class="chat-cursor hidden" id="chatCursor" aria-hidden="true"></span>
-
-        <!-- Citations (appear after streaming) -->
-        <div class="chat-citations" id="chatCitations">
-          <button class="citation-pill" data-cite="0" aria-label="Source 1: NASA Science">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            NASA Science
-          </button>
-          <button class="citation-pill" data-cite="1" aria-label="Source 2: Physics Today">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            Physics Today
-          </button>
-        </div>
-        <div class="citation-preview" id="citePreview"></div>
-
-        <!-- Action buttons -->
-        <div class="chat-actions" id="chatActions">
-          <button class="action-btn" id="copyBtn" aria-label="Copy answer">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copy
-          </button>
-          <button class="action-btn" id="retryBtn" aria-label="Retry: ask again">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
-            Retry
-          </button>
-        </div>
-
-        <!-- Feedback -->
-        <div class="chat-feedback" id="chatFeedback">
-          <span class="feedback-label">Was this helpful?</span>
-          <button class="thumb-btn" id="thumbUp" aria-label="Thumbs up, helpful">&#128077;</button>
-          <button class="thumb-btn" id="thumbDown" aria-label="Thumbs down, not helpful">&#128078;</button>
-          <span class="feedback-thanks" id="feedbackThanks">Thanks for the feedback!</span>
-        </div>
+    <!-- HOW ANSWERS SHOW UP -->
+    <section class="stage-card clickable" id="card-show" aria-labelledby="g-show">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h16M4 12h10M4 18h7"/><path d="M18 14l3 3-3 3"/>
+          </svg>
+        </span>
+        <h2 id="g-show"><span class="stage-name">How answers show up</span></h2>
       </div>
-    </div>
-
-    <!-- Controls -->
-    <div class="chat-controls">
-      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
-      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
-    </div>
-  </div>
-</section>
-
-<!-- 03 A REAL EXAMPLE -->
-<section>
-  <div class="section-label"><span class="num">03</span>A Real Example</div>
-  <h2>What each piece <em>actually does</em>.</h2>
-  <div class="example-stage" role="list">
-    <div class="example-row" role="listitem">
-      <div class="example-label">Streaming</div>
-      <div class="example-content">ChatGPT, Claude, and Gemini all stream: they send the answer token by token the moment each word is ready, instead of waiting until the full reply is done. This makes a 10-second reply feel like a conversation, not a page load.</div>
-    </div>
-    <div class="example-row" role="listitem">
-      <div class="example-label">Citations</div>
-      <div class="example-content">Perplexity AI shows numbered source pills next to each sentence. Tap one and it opens the exact page. This lets you check the answer and builds trust, because you can see where it came from.</div>
-    </div>
-    <div class="example-row" role="listitem">
-      <div class="example-label">Copy / Retry</div>
-      <div class="example-content"><strong>Copy</strong> puts the answer on the clipboard in one tap. <strong>Retry</strong> sends the same question again to get a different attempt, useful when the first answer missed the point.</div>
-    </div>
-    <div class="example-row" role="listitem">
-      <div class="example-label">Thumbs Up / Down</div>
-      <div class="example-content">Every AI product collects this signal. Teams use it to find answers that users disliked, where it feeds into training and evaluation that shape future answers. One tap turns into a data point teams can act on.</div>
-    </div>
-  </div>
-</section>
-
-<!-- 04 TRADEOFFS -->
-<section>
-  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
-  <h2>Design choices, each with a <em>cost</em>.</h2>
-  <div class="tradeoffs-stage">
-    <div class="tradeoff-scale">
-      <span>Low</span>
-      <span>High</span>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">User control</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      <p class="stage-lead">The shape and rhythm of the reply: word-by-word streaming, a clarifying follow-up when the AI is unsure, and a quick way to say if it landed.</p>
+      <div class="chips">
+        <span class="chip">Answers that stream word by word</span>
+        <span class="chip">A follow-up question when it is unsure</span>
+        <span class="chip">A thumbs-up or thumbs-down on each answer</span>
       </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Build complexity</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      <a class="see-how" href="user-experience-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
+
+    <!-- STAYING IN CONTROL -->
+    <section class="stage-card clickable" id="card-control" aria-labelledby="g-control">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </span>
+        <h2 id="g-control"><span class="stage-name">Staying in control</span></h2>
       </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Feedback signal</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      <p class="stage-lead">The brakes and the steering wheel: a path to a real person, a pause before anything serious, and a dial for how much the AI may do on its own.</p>
+      <div class="chips">
+        <span class="chip">A path to a real person</span>
+        <span class="chip">A pause to ask before a big action</span>
+        <span class="chip">A dial for how much the AI may do on its own</span>
       </div>
-    </div>
-    <div class="tradeoff-row">
-      <div class="tradeoff-label">Perceived speed</div>
-      <div class="tradeoff-bars">
-        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
-      </div>
-    </div>
-    <div class="tradeoff-quote">
-      Streaming (progressive disclosure) dramatically raises perceived speed but requires a persistent connection. Feedback thumbs collect sparse, noisy signal: most users never press them, and a thumbs-down could mean "wrong answer," "wrong tone," or just "I am frustrated." Citations need a retrieval system (like RAG: Retrieval-Augmented Generation) that tracks sources, adding infrastructure cost.
-    </div>
-  </div>
-</section>
-
-<!-- 05 INSIDE THIS LAYER -->
-<section>
-  <div class="section-label"><span class="num">05</span>Inside This Layer</div>
-  <h2>What do you want to <em>build</em>?</h2>
-
-  <div class="guide" role="list" aria-label="L7 technique guide">
-
-    <!-- Cluster 1: Where you meet the AI -->
-    <div class="cluster-head" role="listitem">
-      <h3 class="cluster-label">Where you meet the AI</h3>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want a turn-by-turn chat window or voice interface?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Conversational Surfaces</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want AI to appear inside an existing tool without breaking flow?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Inline / Embedded Surfaces</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want the AI to work in the background and surface results when done?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Background / Agentic Surfaces</span>
-      </span>
-    </div>
-
-    <!-- Cluster 2: How answers show up -->
-    <div class="cluster-head cluster-break" role="listitem">
-      <h3 class="cluster-label">How answers show up</h3>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want the answer to appear word by word so it feels fast?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Streaming &amp; Progressive Disclosure</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want the AI to ask a follow-up when it is not sure what you meant?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Clarification &amp; Disambiguation Surfaces</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to collect thumbs, ratings, or corrections from users?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Feedback Capture Surfaces</span>
-      </span>
-    </div>
-
-    <!-- Cluster 3: Staying in control -->
-    <div class="cluster-head cluster-break" role="listitem">
-      <h3 class="cluster-label">Staying in control</h3>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want a graceful path from AI to a human agent?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Handoff &amp; Escalation</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want the AI to pause and ask before doing something consequential?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Approval Gates</span>
-      </span>
-    </div>
-
-    <div class="guide-row" role="listitem">
-      <span class="want">Want to set how much the AI can do without asking each time?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Autonomy Levels &amp; Guardrails</span>
-      </span>
-    </div>
+      <a class="see-how" href="user-experience-how-it-works.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
 
   </div>
 </section>
 
-<!-- BACK NAV -->
+<!-- BACK LINK -->
 <section style="padding-top: 20px; padding-bottom: 40px;">
   <a href="layers.html" class="back-link">
     <div class="back-arrow">&larr;</div>
@@ -649,176 +334,72 @@
   </a>
 </section>
 
-<!-- SOURCES -->
-<div class="sources">
-  <div class="sources-title">Sources</div>
-  <ul>
-    <li>OpenAI (2022). <em>ChatGPT: Optimizing Language Models for Dialogue.</em> <span class="note">Introduced the chat interface, streaming, and thumbs feedback loop to a broad audience.</span></li>
-    <li>Perplexity AI (2023). <em>Perplexity AI product documentation.</em> <span class="note">Citation-linked answers: each claim links to a numbered source.</span></li>
-    <li>Ouyang et al. (2022). <em>Training language models to follow instructions with human feedback (InstructGPT).</em> <span class="note">Shows how thumbs-up/down feedback (RLHF) shapes model behavior.</span></li>
-    <li>Vaswani et al. (2017). <em>Attention Is All You Need.</em> <span class="note">The transformer architecture that makes token-by-token generation possible.</span></li>
-  </ul>
-</div>
-
 <footer>
   <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
 </footer>
 
 <script>
-// ============ STREAMING DEMO ============
-const ANSWER_TOKENS = [
-  'Sunlight', 'looks', 'white,', 'but', 'it', 'is', 'really', 'a', 'mix', 'of',
-  'every', 'color.', 'When', 'sunlight', 'hits', 'air,', 'the', 'tiny', 'gas',
-  'molecules', 'scatter', 'it.', 'Blue', 'light', 'has', 'a', 'short', 'wavelength,',
-  'so', 'it', 'scatters', 'the', 'most', 'in', 'all', 'directions', 'and', 'fills',
-  'the', 'sky.', 'Red', 'light', 'has', 'a', 'long', 'wavelength', 'and', 'passes',
-  'straight', 'through', 'to', 'your', 'eyes,', 'which', 'is', 'why', 'sunsets',
-  'are', 'red.'
-];
+// flow legend: scroll + glow on card click, one-time load sweep, card-door click guard
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var stages = ['card-meet','card-show','card-control'];
+  var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
 
-const CITE_DATA = [
-  { title: 'NASA Science: Why is the Sky Blue?', text: 'Rayleigh scattering causes shorter blue wavelengths to scatter in all directions, making the sky appear blue.' },
-  { title: 'Physics Today: Light Scattering', text: 'Lord Rayleigh described in 1871 why the sky is blue: blue light scatters roughly 5.5x more than red light.' }
-];
-
-const playBtn   = document.getElementById('playBtn');
-const resetBtn  = document.getElementById('resetBtn');
-const aiBubble  = document.getElementById('aiBubble');
-const streamText = document.getElementById('streamText');
-const chatCursor = document.getElementById('chatCursor');
-const chatStatus = document.getElementById('chatStatus');
-const chatCitations = document.getElementById('chatCitations');
-const citePreview   = document.getElementById('citePreview');
-const chatActions   = document.getElementById('chatActions');
-const chatFeedback  = document.getElementById('chatFeedback');
-const copyBtn   = document.getElementById('copyBtn');
-const retryBtn  = document.getElementById('retryBtn');
-const thumbUp   = document.getElementById('thumbUp');
-const thumbDown = document.getElementById('thumbDown');
-const feedbackThanks = document.getElementById('feedbackThanks');
-
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-let playing = false;
-let activeCite = null;
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-function resetDemo() {
-  playing = false;
-  streamText.textContent = '';
-  chatCursor.classList.add('hidden');
-  aiBubble.style.display = 'none';
-  chatCitations.classList.remove('visible');
-  chatActions.classList.remove('visible');
-  chatFeedback.classList.remove('visible');
-  citePreview.classList.remove('shown');
-  citePreview.textContent = '';
-  activeCite = null;
-  copyBtn.classList.remove('done');
-  copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
-  thumbUp.classList.remove('pressed');
-  thumbDown.classList.remove('pressed');
-  feedbackThanks.classList.remove('shown');
-  chatStatus.textContent = 'Ready';
-  playBtn.disabled = false;
-  document.querySelectorAll('.citation-pill').forEach(p => p.classList.remove('active'));
-}
-
-async function runDemo() {
-  if (playing) return;
-  playing = true;
-  playBtn.disabled = true;
-  chatStatus.textContent = 'Thinking...';
-
-  aiBubble.style.display = 'block';
-  streamText.textContent = '';
-  chatCursor.classList.remove('hidden');
-
-  await sleep(reduceMotion ? 0 : 600);
-
-  chatStatus.textContent = 'Writing...';
-
-  if (reduceMotion) {
-    streamText.textContent = ANSWER_TOKENS.join(' ');
-  } else {
-    for (let i = 0; i < ANSWER_TOKENS.length; i++) {
-      const tok = ANSWER_TOKENS[i];
-      const space = i > 0 ? ' ' : '';
-      streamText.textContent += space + tok;
-      await sleep(55 + Math.random() * 30);
-    }
+  function pillFor(cardId){
+    for(var i=0;i<pills.length;i++){ if(pills[i].getAttribute('data-target')===cardId) return pills[i]; }
+    return null;
   }
 
-  chatCursor.classList.add('hidden');
-  chatStatus.textContent = 'Done';
-
-  await sleep(reduceMotion ? 0 : 250);
-  chatCitations.classList.add('visible');
-  await sleep(reduceMotion ? 0 : 180);
-  chatActions.classList.add('visible');
-  await sleep(reduceMotion ? 0 : 180);
-  chatFeedback.classList.add('visible');
-
-  playing = false;
-  playBtn.disabled = false;
-}
-
-playBtn.addEventListener('click', runDemo);
-resetBtn.addEventListener('click', resetDemo);
-
-// Citation pills
-document.querySelectorAll('.citation-pill').forEach(pill => {
-  pill.addEventListener('click', () => {
-    const idx = parseInt(pill.dataset.cite);
-    const data = CITE_DATA[idx];
-    const wasActive = pill.classList.contains('active');
-
-    document.querySelectorAll('.citation-pill').forEach(p => p.classList.remove('active'));
-    citePreview.classList.remove('shown');
-
-    if (!wasActive) {
-      pill.classList.add('active');
-      citePreview.innerHTML = '<strong>' + data.title + '</strong><br>' + data.text;
-      citePreview.classList.add('shown');
-      activeCite = idx;
-    } else {
-      activeCite = null;
-    }
+  // nav buttons: smooth-scroll to the stage card + brief glow
+  pills.forEach(function(btn){
+    var target = btn.getAttribute('data-target');
+    var card = document.getElementById(target);
+    btn.addEventListener('click', function(){
+      if(!card) return;
+      card.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+      card.classList.add('glow');
+      window.setTimeout(function(){ card.classList.remove('glow'); }, 1200);
+    });
   });
-});
 
-// Copy button
-copyBtn.addEventListener('click', () => {
-  const text = streamText.textContent;
-  if (!text) return;
-  navigator.clipboard.writeText(text).catch(() => {});
-  copyBtn.classList.add('done');
-  copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
-  setTimeout(() => {
-    copyBtn.classList.remove('done');
-    copyBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
-  }, 2000);
-});
+  // one-time load sweep: highlight each card in order, lighting the matching pill
+  if(!reduce){
+    var step = 0;
+    function tour(){
+      if(step > 0){
+        var prevCard = document.getElementById(stages[step-1]);
+        var prevPill = pillFor(stages[step-1]);
+        if(prevCard) prevCard.classList.remove('glow');
+        if(prevPill) prevPill.classList.remove('lit');
+      }
+      if(step >= stages.length) return;
+      var curCard = document.getElementById(stages[step]);
+      var curPill = pillFor(stages[step]);
+      if(curCard) curCard.classList.add('glow');
+      if(curPill) curPill.classList.add('lit');
+      step++;
+      window.setTimeout(tour, 900);
+    }
+    window.setTimeout(tour, 350);
+  }
 
-// Retry button
-retryBtn.addEventListener('click', () => {
-  if (playing) return;
-  resetDemo();
-  setTimeout(runDemo, 150);
-});
-
-// Thumbs
-function pressFeedback(btn) {
-  if (feedbackThanks.classList.contains('shown')) return;
-  thumbUp.classList.remove('pressed');
-  thumbDown.classList.remove('pressed');
-  btn.classList.add('pressed');
-  feedbackThanks.classList.add('shown');
-}
-thumbUp.addEventListener('click', () => pressFeedback(thumbUp));
-thumbDown.addEventListener('click', () => pressFeedback(thumbDown));
+  // each stage card is a door to the how-it-works page; chip clicks are ignored
+  var doors = {
+    'card-meet': 'user-experience-how-it-works.html',
+    'card-show': 'user-experience-how-it-works.html',
+    'card-control': 'user-experience-how-it-works.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('.chip')) return; // chip clicks never trigger the card door
+      if(e.target.closest('a')) return; // let real links handle their own clicks
+      window.location.href = doorHref;
+    });
+  });
+})();
 </script>
-
 </body>
 </html>
