@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1100, initial-scale=1, user-scalable=yes">
+<title>The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0; --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px}
+
+  a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+  .skip-link{position:absolute;left:8px;top:-48px;z-index:100;background:var(--surface);color:var(--accent-hover);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:top .15s ease}
+  .skip-link:focus{top:8px}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+  /* Prototype D: thin persistent top strip */
+  .top-strip{
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    height:36px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:0;
+  }
+  .top-strip-inner{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:12.5px;
+    color:var(--faint);
+    font-family:'Inter',system-ui,sans-serif;
+  }
+  .top-strip-label{
+    font-size:12.5px;
+    color:var(--faint);
+    white-space:nowrap;
+    margin-right:4px;
+  }
+  .top-strip-pill{
+    display:inline-flex;align-items:center;
+    background:var(--accent-soft);
+    color:var(--accent-hover);
+    font-size:12.5px;font-weight:500;
+    padding:4px 10px;
+    border-radius:20px;
+    text-decoration:none;
+    border:none;
+    font-family:'Inter',system-ui,sans-serif;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:background .14s ease,color .14s ease;
+  }
+  .top-strip-pill:hover{background:var(--accent);color:#fff}
+  .top-strip-pill:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:20px}
+
+  header{padding:26px 0 6px}
+  .brand{display:flex;align-items:center;gap:11px}
+  .brand-mark{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(145deg,var(--accent),var(--accent-hover));box-shadow:0 4px 14px rgba(124,92,246,.25);flex:none}
+  .brand-mark svg{width:17px;height:17px;display:block}
+  .wordmark{font-family:'Fraunces',serif;font-weight:500;font-size:25px;letter-spacing:-.01em}
+  .strap{color:var(--soft);font-size:15px;margin-top:4px;line-height:1.5;max-width:660px}
+  .strap b{color:var(--text);font-weight:600}
+
+  .tour-line{margin-top:8px;font-size:13px;color:var(--faint)}
+  .tour-link{display:inline;font-size:14px;font-weight:500;color:var(--accent-hover);background:none;border:none;padding:0;cursor:pointer;font-family:'Inter';text-decoration:none}
+  .tour-link .tri{font-size:9px;margin-right:3px}
+  .tour-link:hover{text-decoration:underline}
+  .tour-hint{color:var(--faint);font-size:13px}
+  .tour-aux{display:none;align-items:center;gap:6px;margin-left:10px}
+  body.touring .tour-aux{display:inline-flex}
+  .tour-aux-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:var(--accent-hover);background:none;border:1px solid var(--border-strong);border-radius:20px;padding:4px 10px;cursor:pointer;font-family:'Inter';white-space:nowrap;transition:background .14s ease,border-color .14s ease,color .14s ease}
+  .tour-aux-btn:hover{background:var(--accent-soft);border-color:var(--accent)}
+  .tour-aux-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:20px}
+  .tour-aux-ico{font-size:11px;line-height:1}
+
+  .stage{padding:24px 0 34px}
+  .tour-bar{text-align:center;margin:0 0 16px}
+  .tour-dots{display:none;justify-content:center;gap:7px;margin-top:9px}
+  body.touring .tour-dots{display:flex}
+  .tour-dots i{width:7px;height:7px;border-radius:50%;background:var(--border-strong);transition:background .35s ease,transform .35s ease}
+  .tour-dots i.on{background:var(--accent);transform:scale(1.25)}
+  .canvas{width:840px;max-width:100%;margin:0 auto}
+
+  .box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:border-color .25s ease,box-shadow .25s ease,transform .25s ease}
+  .box-head{display:flex;align-items:center;border-bottom:1px solid var(--border);background:#fff;transition:background .3s ease,border-color .3s ease}
+  @keyframes pop-in{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+  .concerns.queued .item,.builds.queued .item{opacity:0}
+  .concerns.appearing .item,.builds.appearing .item{animation:pop-in .45s ease both}
+  .head-link{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:13px 16px;border:none;background:none;cursor:pointer;text-align:left}
+  .head-link:hover{background:var(--accent-soft)}
+  .head-link .step{flex:none;width:18px;height:18px;border-radius:50%;background:var(--accent-soft);color:var(--accent-hover);font-size:10.5px;font-weight:600;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+  .head-link .name{font-family:'Fraunces',serif;font-weight:500;font-size:18px}
+  .head-link .what{font-size:12.5px;color:var(--soft);line-height:1.3;min-width:0}
+  .head-link .open{margin-left:auto;color:var(--faint);font-size:14px;padding-left:6px}
+  .head-link:hover .name{color:var(--accent-hover)} .head-link:hover .open{color:var(--accent)}
+  .head-play{flex:none;margin:0 12px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--accent-hover);background:var(--accent-soft);border:none;border-radius:20px;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:background .14s ease,color .14s ease}
+  .head-play:hover{background:var(--accent);color:#fff}
+  .head-play .tri{font-size:8px}
+
+  .box-cap{max-height:0;overflow:hidden;opacity:0;padding:0 16px;font-size:12.5px;line-height:1.4;color:var(--accent-hover);font-weight:500;border-bottom:1px solid transparent;background:var(--accent-soft);transition:max-height .35s ease,opacity .35s ease,padding .35s ease,border-color .35s ease}
+  .box-cap.show{max-height:64px;opacity:1;padding:10px 16px;border-bottom:1px solid var(--border)}
+  .box-cap .n{display:inline-block;margin-right:7px;color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+
+  .items{padding:8px}
+  .item{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:9px 11px;border-radius:9px;border:1px solid transparent;background:none;font-family:'Inter';font-size:14px;font-weight:500;color:var(--text);cursor:pointer;transition:background .25s ease,border-color .25s ease,opacity .5s ease,transform .5s ease}
+  .item + .item{margin-top:3px}
+  .item:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
+  .item .num{flex:none;width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent-hover);font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+  .item .ico{flex:none;width:18px;height:18px;color:var(--accent);display:block}
+  .item .ico svg{width:18px;height:18px;display:block}
+  .item.more{color:var(--faint);font-weight:500}
+  .item.more:hover{background:none;border-color:transparent;color:var(--accent)}
+  .layers .item.lit{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover);box-shadow:inset 0 0 0 1px var(--accent)}
+  .layers .item.dim{opacity:0;transform:translateY(10px)}
+  .builds .item.demo{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
+  .layers .item{position:relative;z-index:0}
+  .layers .item::before{content:"";position:absolute;left:0;top:0;height:100%;width:var(--fill,0);background:var(--accent-soft);border-radius:9px;z-index:-1;transition:width .55s ease}
+  body.snapping .item, body.snapping .layers .item::before, body.snapping .axis .rail{transition:none !important}
+
+  .top{display:grid;grid-template-columns:minmax(0,1fr) 64px 330px;align-items:start;column-gap:0}
+  .layers .body{display:grid;grid-template-columns:1fr 100px}
+  .axis{display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:16px 8px;text-align:center;border-left:1px solid var(--border)}
+  .axis .cap{font-size:10.5px;color:var(--soft);line-height:1.25}
+  .axis .cap b{display:block;color:var(--text);font-size:11.5px;font-weight:600;margin-bottom:1px}
+  .axis .rail{flex:1;min-height:70px;width:4px;background:var(--accent);opacity:.75;margin:10px 0;position:relative;border-radius:3px;transform-origin:bottom center}
+  .axis .rail::after{content:"";position:absolute;top:-3px;left:50%;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:11px solid var(--accent)}
+
+  .produces{align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--faint);font-size:12px;gap:4px}
+  .builds{align-self:center}
+  .box.glow{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft),0 0 22px 2px rgba(124,92,246,.42),0 12px 34px rgba(124,92,246,.22);transform:translateY(-3px)}
+  .produces.glow{color:var(--accent-hover);font-weight:700;transform:scale(1.1)}
+  .produces.glow .flow{opacity:1;height:3px;background:var(--accent)}
+  body.demoing .produces.glow .spark{display:block;width:8px;height:8px;box-shadow:0 0 12px 4px rgba(124,92,246,.9);animation:sparkX .9s linear infinite}
+  .across.glow .bar, .across.glow .bar::before, .across.glow .bar::after, .across.glow .stem{background:var(--accent)}
+  .across.glow .stem::after{border-top-color:var(--accent)}
+  .across.glow .lbl{color:var(--accent-hover);font-weight:600}
+  .flow{position:relative;background:var(--accent);opacity:.4;border-radius:2px}
+  .flow-x{width:40px;height:2px}
+  .flow-x::after{content:"";position:absolute;right:-1px;top:50%;transform:translateY(-50%);border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:7px solid var(--accent)}
+  .spark{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px 2px rgba(124,92,246,.75)}
+  .flow-x .spark{top:50%;transform:translateY(-50%);animation:sparkX 2.6s linear infinite}
+  @keyframes sparkX{0%{left:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{left:100%;opacity:0}}
+
+  .across{position:relative;width:calc(100% - 394px);margin:12px 0 0;height:52px}
+  .across .lbl{position:absolute;top:0;left:50%;transform:translateX(-50%);font-size:11px;color:var(--faint);white-space:nowrap}
+  .across .bar{position:absolute;top:21px;left:0;right:0;height:1.5px;background:var(--border-strong);border-radius:2px}
+  .across .bar::before,.across .bar::after{content:"";position:absolute;top:-6px;width:1.5px;height:7px;background:var(--border-strong)}
+  .across .bar::before{left:0}.across .bar::after{right:0}
+  .across .stem{position:absolute;left:50%;top:22px;transform:translateX(-50%);width:1.5px;height:28px;background:var(--border-strong)}
+  .across .stem::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);border-left:4px solid transparent;border-right:4px solid transparent;border-top:7px solid var(--border-strong)}
+  .across .spark{position:absolute;left:50%;margin-left:-3px;animation:sparkDown 2.4s linear infinite}
+  @keyframes sparkDown{0%{top:24px;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:48px;opacity:0}}
+  @media (prefers-reduced-motion:reduce){
+    .spark{display:none}
+    *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}
+  }
+  body.demoing .flow-x .spark, body.demoing .across .spark{display:none}
+
+  .concerns{width:100%;margin-top:2px}
+  .concerns.pulse{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--shadow)}
+  .concerns .items{display:flex;flex-wrap:wrap;gap:9px;padding:16px;justify-content:center}
+  .concerns .item{width:auto;border:1px solid var(--border-strong);border-radius:22px;padding:8px 16px}
+  .concerns .item:hover{border-color:var(--accent)}
+  .concerns .item.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-hover)}
+
+  body.touring .box.concerns, body.touring .box.builds, body.touring .across, body.touring .produces{opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .5s ease,visibility .5s ease,transform .5s ease}
+  body.touring .box.concerns.revealed, body.touring .box.builds.revealed, body.touring .across.revealed, body.touring .produces.revealed{opacity:1;visibility:visible;transform:none}
+
+  .foot{border-top:1px solid var(--border);padding:16px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
+  .foot strong{color:var(--soft);font-weight:500}
+
+  /* Prototype badge */
+  .prototype-badge{
+    position:fixed;top:14px;right:14px;z-index:9999;
+    background:var(--accent-soft);color:var(--accent-hover);
+    font-family:'Inter',system-ui,sans-serif;font-size:12px;font-weight:600;
+    padding:6px 10px;border-radius:8px;
+    text-decoration:none;
+    border:1px solid var(--accent);
+    transition:background .15s ease,color .15s ease;
+    white-space:nowrap;
+    line-height:1.4;
+  }
+  .prototype-badge:hover{background:var(--accent);color:#fff}
+  .prototype-badge:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+</style>
+</head>
+<body>
+  <a class="prototype-badge" href="/prototypes.html" aria-label="Prototype D: Thin top strip. Tap to return to prototype index.">Prototype D &mdash; Top strip</a>
+  <nav class="top-strip" aria-label="What brought you here?">
+    <div class="top-strip-inner">
+      <span class="top-strip-label">What brought you here?</span>
+      <a class="top-strip-pill" href="pages/builds.html">Build</a>
+      <a class="top-strip-pill" href="pages/layer-single-call-control.html">Improve</a>
+      <a class="top-strip-pill" href="#map" aria-label="Explore the map">Explore</a>
+    </div>
+  </nav>
+  <a class="skip-link" href="#main">Skip to the map</a>
+  <div class="wrap">
+    <header>
+      <h1 class="sr-only">The Pattern Book: how AI products are built, mapped in one picture.</h1>
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M12 3v18"/></svg></span>
+        <span class="wordmark" aria-hidden="true">The Pattern Book</span>
+      </div>
+      <div class="strap">How AI products are built, mapped in one picture.</div>
+    </header>
+
+    <div class="stage" id="main" role="main">
+      <div class="tour-bar"><button class="tour-link" id="tourBtn" type="button"><span class="tri" aria-hidden="true">▶</span> Take the 60-second tour</button><span class="tour-aux" id="tourAux" aria-hidden="true"><button class="tour-aux-btn" id="tourRestart" type="button" aria-label="Restart tour"><span class="tour-aux-ico" aria-hidden="true">↺</span> Restart</button><button class="tour-aux-btn" id="tourStop" type="button" aria-label="Stop tour"><span class="tour-aux-ico" aria-hidden="true">✕</span> Stop</button></span><div class="tour-dots" id="tourDots" aria-hidden="true"><i></i><i></i><i></i></div></div>
+      <div class="canvas" id="map">
+        <div class="top">
+          <div class="box layers">
+            <div class="box-head">
+              <button class="head-link" data-go="layers" data-href="pages/layers.html"><span class="name">Layers</span><span class="what">what an AI is built from</span><span class="open" aria-hidden="true">›</span></button>
+              <button class="head-play" data-play="stack" type="button" aria-label="Watch the layers build, foundation to user-facing"><span class="tri" aria-hidden="true">▶</span> Build it</button>
+            </div>
+            <div class="box-cap" id="capStack" aria-live="polite"></div>
+            <div class="body">
+              <div class="items">
+                <button class="item" data-go="layer" data-href="pages/layer-user-experience.html"><span class="num">10</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4zM2 20h20M9.5 16v4M14.5 16v4"/></svg></span>User experience</button>
+                <button class="item" data-go="layer" data-href="pages/layer-application-patterns.html"><span class="num">9</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span>Application patterns</button>
+                <button class="item" data-go="layer" data-href="pages/layer-orchestration-agents.html"><span class="num">8</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M10.5 7.5L7.5 16M13.5 7.5l3 8.5M8.5 18h7"/></svg></span>Orchestration &amp; agents</button>
+                <button class="item" data-go="layer" data-href="pages/layer-single-call-control.html"><span class="num">7</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a7 7 0 1 0 7 7"/><path d="M12 5v4l3 2M19 5l-3 1 1-3"/></svg></span>Single-call control</button>
+                <button class="item" data-go="layer" data-href="pages/layer-stateful-memory.html"><span class="num">6</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 4.5a3.5 3.5 0 0 0-3 5.3 3.5 3.5 0 0 0 1.2 6.4A3 3 0 0 0 12 19V5a2.5 2.5 0 0 0-2.5-2.5z"/><path d="M12 5a2.5 2.5 0 0 1 5 .5 3.5 3.5 0 0 1 1.5 6.3 3.5 3.5 0 0 1-1.7 6.2A3 3 0 0 1 12 19"/></svg></span>Stateful Memory</button>
+                <button class="item" data-go="layer" data-href="pages/layer-stateless-retrieval.html"><span class="num">5</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg></span>Stateless Retrieval</button>
+                <button class="item" data-go="layer" data-href="pages/layer-composition.html"><span class="num">4</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 3v18M4 7.5l8 4.5 8-4.5"/></svg></span>Composition</button>
+                <button class="item" data-go="layer" data-href="pages/layer-training-adaptation.html"><span class="num">3</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V9M12 19V5M19 19v-7"/><path d="M3 19h18"/></svg></span>Training &amp; adaptation</button>
+                <button class="item" data-go="layer" data-href="pages/layer-serving-infrastructure.html"><span class="num">2</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/><path d="M8 7h.01M8 17h.01"/></svg></span>Serving &amp; infrastructure</button>
+                <button class="item" data-go="layer" data-href="pages/layer-data-artifacts.html"><span class="num">1</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></span>Data &amp; artifacts</button>
+              </div>
+              <div class="axis">
+                <div class="cap"><b>User-facing</b>what people use</div>
+                <div class="rail" aria-hidden="true"></div>
+                <div class="cap"><b>Foundation</b>what it rests on</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="produces">
+            <div class="flow flow-x" aria-hidden="true"><span class="spark"></span></div>
+            <span>produces</span>
+          </div>
+
+          <div class="box builds">
+            <div class="box-head">
+              <button class="head-link" data-go="builds" data-href="pages/builds.html"><span class="name">Builds</span><span class="what">what layers make</span><span class="open" aria-hidden="true">›</span></button>
+              <button class="head-play" data-play="connect" type="button" aria-label="Watch how each build connects to layers"><span class="tri" aria-hidden="true">▶</span> Trace it</button>
+            </div>
+            <div class="box-cap" id="capBuilds" aria-live="polite"></div>
+            <div class="items">
+              <button class="item" data-go="build" data-href="pages/build-conversational-assistant.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Conversational Assistant</button>
+              <button class="item" data-go="build" data-href="pages/build-document-qa.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h4"/></svg></span>Document Q&amp;A</button>
+              <button class="item" data-go="build" data-href="pages/build-coding-agent.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 6l-2 12"/></svg></span>Coding Agent</button>
+              <button class="item" data-go="build" data-href="pages/build-research-agent.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg></span>Research Agent</button>
+              <button class="item" data-go="build" data-href="pages/build-browsing-agent.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg></span>Browsing Agent</button>
+              <button class="item" data-go="build" data-href="pages/build-customer-support-agent.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 0-3.2 6.9L21 20z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01"/></svg></span>Customer Support Agent</button>
+              <button class="item" data-go="build" data-href="pages/build-reasoning-code-execution.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg></span>Reasoning + Code (PAL)</button>
+              <button class="item" data-go="build" data-href="pages/build-summarization-service.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 10h16M4 14h10M4 18h6"/></svg></span>Summarization Service</button>
+              <button class="item" data-go="build" data-href="pages/build-voice-assistant.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>Voice Assistant</button>
+              <button class="item" data-go="build" data-href="pages/build-multi-agent-research-team.html"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M13 20a6 6 0 0 1 8-5.5"/></svg></span>Multi-Agent Research Team</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="across"><div class="bar" aria-hidden="true"></div><div class="lbl">applies to every layer</div><div class="stem" aria-hidden="true"></div><span class="spark" aria-hidden="true"></span></div>
+
+        <div class="box concerns">
+          <div class="box-head">
+            <button class="head-link" data-go="concerns" data-href="pages/considerations.html"><span class="name">Considerations</span><span class="what">what every layer must get right</span><span class="open" aria-hidden="true">›</span></button>
+            <button class="head-play" data-play="concern" type="button" aria-label="Watch how each concern weighs on the layers"><span class="tri" aria-hidden="true">▶</span> Weigh it</button>
+          </div>
+          <div class="box-cap" id="capConcerns" aria-live="polite"></div>
+          <div class="items">
+            <button class="item" data-go="concern"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13a9 9 0 0 1 18 0"/><path d="M12 13l4-3"/><circle cx="12" cy="13" r="1.3" fill="currentColor" stroke="none"/></svg></span>Evaluation</button>
+            <button class="item" data-go="concern"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/></svg></span>Safety</button>
+            <button class="item" data-go="concern"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>Privacy</button>
+            <button class="item" data-go="concern"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/></svg></span>Observability</button>
+            <button class="item" data-go="concern"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.2c0-1.2 1.1-1.7 2.5-1.7s2.5.6 2.5 1.9c0 2.6-5 1.4-5 4 0 1.3 1.1 2 2.5 2s2.5-.5 2.5-1.7"/></svg></span>Cost</button>
+            <button class="item" data-go="concern"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 16l-5-4-9 7"/></svg></span>Multimodal</button>
+            <button class="item" data-go="concern"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg></span>Real-time</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="foot"><strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.</footer>
+  </div>
+
+<script>
+  const layerItems = Array.from(document.querySelectorAll('.layers .item'));
+  const buildItems = Array.from(document.querySelectorAll('.builds .item')).filter(b=> !b.classList.contains('more'));
+  const concernItems = Array.from(document.querySelectorAll('.concerns .item'));
+  const concernsBox = document.querySelector('.box.concerns');
+  const rail = document.querySelector('.axis .rail');
+
+  const boxCaps = { stack:document.getElementById('capStack'), concerns:document.getElementById('capConcerns'), builds:document.getElementById('capBuilds') };
+  function showBoxCap(which, n, text){
+    Object.entries(boxCaps).forEach(([k,el])=>{ if(k!==which){ el.classList.remove('show'); } });
+    const el = boxCaps[which]; if(!el) return;
+    el.innerHTML = (n ? '<span class="n">'+n+'</span>' : '') + text;
+    el.classList.add('show');
+  }
+  function hideBoxCaps(){ Object.values(boxCaps).forEach(el=> el.classList.remove('show')); }
+  const tourDots = document.getElementById('tourDots');
+  function setTourPhase(n){ if(!tourDots) return; Array.from(tourDots.children).forEach((d,i)=> d.classList.toggle('on', i < n)); }
+  const layersBox = document.querySelector('.box.layers');
+  const buildsBox = document.querySelector('.box.builds');
+  const producesEl = document.querySelector('.produces');
+  const acrossEl = document.querySelector('.across');
+
+  const tourBtn = document.getElementById('tourBtn');
+  tourBtn.dataset.play = 'tour';
+  const playBtns = Array.from(document.querySelectorAll('.head-play')).concat(tourBtn);
+  playBtns.forEach(b=> b.dataset.cta = b.innerHTML);
+
+  let activeConcern = null;
+  let steps = [], elapsed = 0, startedAt = 0, activeTimers = [], demoState = 'idle', activeBtn = null, generation = 0;
+  function schedule(){
+    const gen = generation;
+    startedAt = performance.now();
+    activeTimers = [];
+    steps.forEach(s=>{
+      const d = s.at - elapsed;
+      if(d >= 0) activeTimers.push(setTimeout(()=>{ if(generation === gen) s.fn(); }, d));
+    });
+  }
+  function clearTimers(){ generation++; activeTimers.forEach(clearTimeout); activeTimers = []; }
+
+  function resetVisual(){
+    document.body.classList.add('snapping');
+    layerItems.forEach(el=>{ el.classList.remove('lit','dim'); el.style.setProperty('--fill','0'); });
+    buildItems.forEach(el=> el.classList.remove('demo'));
+    concernItems.forEach(c=> c.classList.remove('active'));
+    concernsBox.classList.remove('pulse');
+    layersBox.classList.remove('glow'); buildsBox.classList.remove('glow'); producesEl.classList.remove('glow'); acrossEl.classList.remove('glow');
+    concernsBox.classList.remove('revealed'); buildsBox.classList.remove('revealed'); producesEl.classList.remove('revealed'); acrossEl.classList.remove('revealed');
+    concernsBox.classList.remove('queued','appearing'); buildsBox.classList.remove('queued','appearing');
+    rail.style.transition='none'; rail.style.transform='scaleY(1)';
+    hideBoxCaps();
+    activeConcern = null;
+    requestAnimationFrame(()=> requestAnimationFrame(()=> document.body.classList.remove('snapping')));
+  }
+
+  const tourAux = document.getElementById('tourAux');
+  function setTourAuxVisible(on){ tourAux.setAttribute('aria-hidden', on ? 'false' : 'true'); }
+  function isTour(b){ return b && b.dataset.play === 'tour'; }
+  function endDemo(clearViz){ clearTimers(); document.body.classList.remove('demoing','touring'); hideBoxCaps(); setTourPhase(0); if(clearViz) resetVisual(); if(activeBtn) activeBtn.innerHTML = activeBtn.dataset.cta; demoState='idle'; activeBtn=null; steps=[]; elapsed=0; setTourAuxVisible(false); }
+  function pauseDemo(){ elapsed += performance.now()-startedAt; clearTimers(); demoState='paused'; if(activeBtn) activeBtn.innerHTML = isTour(activeBtn) ? '<span class="tri" aria-hidden="true">▶</span>Resume tour' : '<span class="tri" aria-hidden="true">▶</span> Resume'; }
+  function resumeDemo(){ demoState='playing'; if(activeBtn) activeBtn.innerHTML = isTour(activeBtn) ? '<span class="tri" aria-hidden="true">❚❚</span>Pause tour' : '<span class="tri" aria-hidden="true">❚❚</span> Pause'; schedule(); }
+
+  const importance = {
+    'Evaluation':[1,2,2,3,2,2,3,3,1,2],'Safety':[3,3,2,3,2,2,1,2,1,2],'Privacy':[2,2,1,1,3,3,1,2,2,3],
+    'Observability':[1,1,3,1,1,1,2,1,3,2],'Cost':[1,1,2,2,2,2,2,3,3,1],'Multimodal':[2,2,1,2,2,2,1,2,1,1],'Real-time':[2,1,2,1,1,1,1,1,3,1]
+  };
+  function showBars(name, chip){
+    layerItems.forEach(el=>{ el.classList.remove('lit'); el.style.setProperty('--fill','0'); });
+    buildItems.forEach(el=> el.classList.remove('demo'));
+    concernItems.forEach(c=> c.classList.remove('active'));
+    const v = importance[name]; if(!v) return;
+    if(chip) chip.classList.add('active'); concernsBox.classList.add('pulse');
+    layerItems.forEach((el,i)=> el.style.setProperty('--fill', ((v[i]||0)/3*100)+'%'));
+    activeConcern = name;
+  }
+
+  const buildLayers = [[0,4,3],[5,9],[2,3],[2,5],[2,5,3],[5,1],[3,5,2],[1,3,6],[3,8],[2,5,6]];
+  function buildSteps(kind){
+    const a=[];
+    if(kind==='stack'){
+      a.push({at:0, fn:()=>{ showBoxCap('stack', null, 'this is how an AI is built, from raw data at the bottom up to the screen people use'); layerItems.forEach(el=>el.classList.add('dim')); rail.style.transition='none'; rail.style.transform='scaleY(0)'; }});
+      let revealed=0, t=1800;
+      for(let i=layerItems.length-1;i>=0;i--){ const idx=i; a.push({at:t, fn:()=>{ layerItems[idx].classList.remove('dim'); revealed++; rail.style.transition='transform .3s ease'; rail.style.transform='scaleY('+(revealed/layerItems.length)+')'; }}); t+=560; }
+      a.push({at:t+300, fn:()=>{ hideBoxCaps(); endDemo(false); }});
+    } else if(kind==='concern'){
+      a.push({at:0,    fn:()=>{ showBoxCap('concerns', null, 'every layer has to handle all of these: a longer bar means it matters more there'); layersBox.classList.add('glow'); concernsBox.classList.add('queued'); }});
+      a.push({at:1800,  fn:()=>{ layersBox.classList.remove('glow'); acrossEl.classList.add('glow'); }});
+      a.push({at:2600, fn:()=>{ acrossEl.classList.remove('glow'); concernsBox.classList.add('glow'); concernsBox.classList.remove('queued'); concernsBox.classList.add('appearing'); }});
+      a.push({at:3400, fn:()=>{ concernsBox.classList.remove('glow'); }});
+      let t=3600; concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showBoxCap('concerns', null, 'every layer has to handle all of these: a longer bar means it matters more there'); showBars(cc.textContent.trim(), cc); }}); t+=1800; }); a.push({at:t, fn:()=> endDemo(true)});
+    } else if(kind==='connect'){
+      a.push({at:0,    fn:()=>{ showBoxCap('builds', null, 'each product lights up the layers it uses'); layersBox.classList.add('glow'); buildsBox.classList.add('queued'); }});
+      a.push({at:1800,  fn:()=>{ layersBox.classList.remove('glow'); producesEl.classList.add('glow'); }});
+      a.push({at:2600, fn:()=>{ producesEl.classList.remove('glow'); buildsBox.classList.add('glow'); buildsBox.classList.remove('queued'); buildsBox.classList.add('appearing'); }});
+      a.push({at:3400, fn:()=>{ buildsBox.classList.remove('glow'); }});
+      let t=3600; buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ showBoxCap('builds', null, 'each product lights up the layers it uses'); layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1100; }); a.push({at:t, fn:()=> endDemo(true)});
+    } else if(kind==='tour'){
+      let t=0;
+      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('stack', '1 / 3', 'this is how an AI is built, from raw data at the bottom up to the screen people use'); setTourPhase(1); layerItems.forEach(el=>el.classList.add('dim')); rail.style.transition='none'; rail.style.transform='scaleY(0)'; }});
+      t+=1800; let revealed=0;
+      for(let i=layerItems.length-1;i>=0;i--){ const idx=i; a.push({at:t, fn:()=>{ layerItems[idx].classList.remove('dim'); revealed++; rail.style.transition='transform .3s ease'; rail.style.transform='scaleY('+(revealed/layerItems.length)+')'; }}); t+=560; }
+      t+=500;
+      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('concerns', '2 / 3', 'every layer has to handle all of these: a longer bar means it matters more there'); setTourPhase(2); concernsBox.classList.add('queued'); }});
+      t+=1800;  a.push({at:t, fn:()=>{ layersBox.classList.add('glow'); }});
+      t+=1200;  a.push({at:t, fn:()=>{ layersBox.classList.remove('glow'); acrossEl.classList.add('glow'); acrossEl.classList.add('revealed'); }});
+      t+=1200;  a.push({at:t, fn:()=>{ acrossEl.classList.remove('glow'); concernsBox.classList.add('glow'); concernsBox.classList.add('revealed'); concernsBox.classList.remove('queued'); concernsBox.classList.add('appearing'); }});
+      t+=1200;  a.push({at:t, fn:()=>{ concernsBox.classList.remove('glow'); }});
+      t+=200;  concernItems.forEach(c=>{ const cc=c; a.push({at:t, fn:()=>{ showBoxCap('concerns', '2 / 3', 'every layer has to handle all of these: a longer bar means it matters more there'); showBars(cc.textContent.trim(), cc); }}); t+=1800; });
+      t+=500;
+      a.push({at:t, fn:()=>{ resetVisual(); showBoxCap('builds', '3 / 3', 'each product lights up the layers it uses'); setTourPhase(3); buildsBox.classList.add('queued'); }});
+      t+=1800;  a.push({at:t, fn:()=>{ layersBox.classList.add('glow'); }});
+      t+=1200;  a.push({at:t, fn:()=>{ layersBox.classList.remove('glow'); producesEl.classList.add('glow'); producesEl.classList.add('revealed'); }});
+      t+=1200;  a.push({at:t, fn:()=>{ producesEl.classList.remove('glow'); buildsBox.classList.add('glow'); buildsBox.classList.add('revealed'); buildsBox.classList.remove('queued'); buildsBox.classList.add('appearing'); }});
+      t+=1200;  a.push({at:t, fn:()=>{ buildsBox.classList.remove('glow'); }});
+      t+=200;  buildItems.forEach((b,k)=>{ const bb=b, lk=buildLayers[k]||[]; a.push({at:t, fn:()=>{ showBoxCap('builds', '3 / 3', 'each product lights up the layers it uses'); layerItems.forEach(el=>el.classList.remove('lit')); buildItems.forEach(x=>x.classList.remove('demo')); bb.classList.add('demo'); lk.forEach(i=>layerItems[i].classList.add('lit')); }}); t+=1100; });
+      a.push({at:t+300, fn:()=> endDemo(true)});
+    }
+    return a;
+  }
+  function startDemo(btn, kind){
+    clearTimers();
+    if(activeBtn && activeBtn!==btn){ document.body.classList.remove('demoing','touring'); hideBoxCaps(); setTourPhase(0); if(activeBtn) activeBtn.innerHTML = activeBtn.dataset.cta; }
+    resetVisual();
+    document.body.classList.add('demoing');
+    activeBtn=btn; demoState='playing'; elapsed=0;
+    if(isTour(btn)){ document.body.classList.add('touring'); setTourAuxVisible(true); } else { document.body.classList.remove('touring'); setTourPhase(0); setTourAuxVisible(false); }
+    btn.innerHTML = isTour(btn) ? '<span class="tri" aria-hidden="true">❚❚</span>Pause tour' : '<span class="tri" aria-hidden="true">❚❚</span> Pause';
+    steps = buildSteps(kind);
+    schedule();
+  }
+
+  playBtns.forEach(b=>{
+    b.addEventListener('click',()=>{
+      if(activeBtn===b){ if(demoState==='playing') pauseDemo(); else if(demoState==='paused') resumeDemo(); return; }
+      startDemo(b, b.dataset.play);
+    });
+  });
+  document.getElementById('tourRestart').addEventListener('click',()=>{ startDemo(tourBtn, 'tour'); });
+  document.getElementById('tourStop').addEventListener('click',()=>{ endDemo(true); });
+  concernItems.forEach(c=>{
+    const name = c.textContent.trim();
+    c.addEventListener('click',()=>{ window.location.href = 'pages/consideration-' + name.toLowerCase() + '.html'; });
+  });
+  document.querySelectorAll('.head-link[data-go], .layers .item[data-go], .builds .item[data-go]').forEach(el=>{
+    el.addEventListener('click',()=>{ if(el.dataset.href) window.location.href = el.dataset.href; });
+  });
+</script>
+</body>
+</html>
