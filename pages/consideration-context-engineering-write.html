@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Structure the steps · Orchestration · The Pattern Book</title>
+<title>Write what's worth remembering &middot; Context Engineering &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -22,7 +22,6 @@
   html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   body{overflow-x:hidden;min-height:100vh}
   a{color:inherit;text-decoration:none}
-  .serif{font-family:'Fraunces',serif}
 
   a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
   .skip-link{position:absolute;left:8px;top:-48px;z-index:300;background:var(--surface);color:var(--accent-hover);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:top .15s ease}
@@ -60,12 +59,6 @@
   a.tech .ext{font-size:11px;color:var(--accent);margin-left:2px;vertical-align:baseline}
   @media (prefers-reduced-motion:reduce){a.tech{transition:none}}
 
-  .cluster-head{padding:16px 22px 8px}
-  .cluster-head.cluster-break{padding-top:26px;border-top:1px solid var(--border)}
-  .cluster-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text);line-height:1.3}
-  .cluster-head + .guide-row{border-top:none}
-  .cluster-head ~ .guide-row{padding-left:40px}
-
   .back-link{display:inline-flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);text-decoration:none;color:var(--text);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;cursor:pointer}
   .back-link:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
   .back-arrow{font-family:'Fraunces',serif;font-size:22px;color:var(--accent);line-height:1;transition:transform .2s ease}
@@ -76,125 +69,73 @@
   footer{max-width:920px;margin:30px auto 48px;padding:16px 24px 0;text-align:center;border-top:1px solid var(--border);font-size:12px;color:var(--faint);line-height:1.8}
   footer strong{color:var(--soft);font-weight:500}
 
-  @media (max-width:560px){
-    h1.title{font-size:30px}
-    .explainer{font-size:15px}
-    .guide-row{padding:15px 18px}
-    .cluster-head ~ .guide-row{padding-left:26px}
-  }
+  @media (max-width:560px){h1.title{font-size:30px}.explainer{font-size:15px}.guide-row{padding:15px 18px}}
 </style>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 
+<!-- TOP BAR -->
 <nav class="topbar">
   <div class="topbar-inner">
-    <a class="back" href="layer-orchestration-agents.html"><span aria-hidden="true">&larr;</span> Orchestration</a>
-    <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-orchestration-agents.html">Orchestration</a><span class="sep">/</span><span class="here">Structure the steps</span></nav>
+    <a class="back" href="consideration-context-engineering.html"><span aria-hidden="true">&larr;</span> Context Engineering</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><a href="consideration-context-engineering.html">Context Engineering</a><span class="sep">/</span><span class="here">Write</span>
+    </nav>
   </div>
 </nav>
 
+<!-- HEADER -->
 <header class="header" id="main">
-  <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></span>Orchestration &amp; Agents</span>
-  <h1 class="title">Structure the steps</h1>
-  <p class="explainer">How to decide what order and shape your system's calls take.</p>
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 19l7-7 2 2-7 7-3 1 1-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5 7.5 1.5z"/>
+      </svg>
+    </span>Context Engineering &middot; Write
+  </span>
+  <h1 class="title">Write what's worth remembering</h1>
+  <p class="explainer">Store information somewhere durable so the model can retrieve it next time, instead of losing it when the conversation ends.</p>
 </header>
 
+<!-- THE GUIDE -->
 <section>
   <div class="guide">
 
-    <div class="cluster-head">
-      <h2 class="cluster-label">Simple flows</h2>
-    </div>
-
     <div class="guide-row">
-      <span class="want">Want to answer in a single round trip to the model?</span>
+      <span class="want">Want to remember facts about a specific user across all their sessions?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-single-call-patterns.html">Single-call patterns<span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="tech">Long-term user memory</span>
       </span>
     </div>
 
     <div class="guide-row">
-      <span class="want">Want steps to run one after another in a fixed order?</span>
+      <span class="want">Want to keep track of what was said earlier in this same conversation?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-sequential-pipelines.html">Sequential pipelines<span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="tech">Conversation memory</span>
       </span>
     </div>
 
     <div class="guide-row">
-      <span class="want">Want multiple sub-tasks to run at the same time and merge their results?</span>
+      <span class="want">Want an agent to log every action it takes so it can re-plan if something fails?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-parallel-fan-out.html">Parallel / fan-out<span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="tech">Task ledger</span>
       </span>
     </div>
 
-    <div class="cluster-head cluster-break">
-      <h2 class="cluster-label">Loops and branches</h2>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want the model to think, act, see the result, and loop until it has enough?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-iterative-loops.html">Iterative loops (ReAct, reflection)<span class="ext" aria-hidden="true">&#8599;</span></a>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want an entry point that reads the request and sends it to the right specialist?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-router-dispatcher.html">Router / dispatcher<span class="ext" aria-hidden="true">&#8599;</span></a>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want a planner to break the goal into steps and hand each to an executor?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-hierarchical-planning.html">Hierarchical planning<span class="ext" aria-hidden="true">&#8599;</span></a>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want the path through your system to change based on what the model finds at runtime?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-conditional-branching.html">Conditional branching<span class="ext" aria-hidden="true">&#8599;</span></a>
-      </span>
-    </div>
-
-    <div class="cluster-head cluster-break">
-      <h2 class="cluster-label">Code and termination</h2>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want every tool call to be written as code and run in a sandbox, so the model sees exact output before deciding what to do next?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">CodeAct (code-as-action loop)</span>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want a loop that stops reliably when it runs too long, costs too much, or hits a step limit, regardless of what the model thinks?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Bounded execution</span>
-      </span>
-    </div>
   </div>
 </section>
 
+<!-- BACK NAV -->
 <section style="padding-top:20px;padding-bottom:40px">
-  <a href="layer-orchestration-agents.html" class="back-link">
+  <a href="consideration-context-engineering.html" class="back-link">
     <div class="back-arrow" aria-hidden="true">&larr;</div>
     <div class="back-text">
       <div class="back-hint">Back to</div>
-      <div class="back-name">Orchestration</div>
+      <div class="back-name">Context Engineering</div>
     </div>
   </a>
 </section>

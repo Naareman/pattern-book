@@ -130,7 +130,7 @@
   h2 em { font-style: italic; color: var(--accent); }
 
   /* ============ STAGE CARDS ============ */
-  .stages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 6px; align-items: stretch; }
+  .stages { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 6px; align-items: stretch; }
 
   .stage-card {
     background: var(--surface); border: 1px solid var(--border);
@@ -251,8 +251,10 @@
     <button type="button" class="flow-chip" data-target="card-apart">Keep people apart</button>
     <span class="flow-arrow" aria-hidden="true">&rarr;</span>
     <button type="button" class="flow-chip" data-target="card-prove">Prove it later</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-agent">Know your agent</button>
   </div>
-  <p class="flow-caption">Three jobs that turn a vague duty of care into controls you can point to.</p>
+  <p class="flow-caption">Four jobs that turn a vague duty of care into controls you can point to.</p>
 </header>
 
 <!-- STAGE CARDS -->
@@ -319,6 +321,30 @@
       <a class="see-how" href="consideration-privacy-prove.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
+    <!-- KNOW YOUR AGENT -->
+    <section class="stage-card" id="card-agent" aria-labelledby="g-agent">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+            <path d="M17 12l2 2 4-4"/>
+          </svg>
+        </span>
+        <h2 id="g-agent"><span class="stage-name">Know your agent</span></h2>
+      </div>
+      <p class="stage-lead">Verify who an agent is before trusting what it does.</p>
+      <div class="chips">
+        <span class="chip">Know Your Agent (KYA)</span>
+        <span class="chip">Verifiable credentials (W3C VC v2)</span>
+        <span class="chip">Agent Cards (A2A protocol)</span>
+        <span class="chip">Agent wallets</span>
+        <span class="chip">Signed agent manifests</span>
+        <span class="chip">Agent-as-principal vs user-as-principal</span>
+      </div>
+      <a class="see-how" href="consideration-privacy-agent-identity.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
+
   </div>
 </section>
 
@@ -341,14 +367,15 @@
 // flow legend: scroll + glow on chip click, one-time load sweep, card-door navigation
 (function(){
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  var stages = ['card-private','card-apart','card-prove'];
+  var stages = ['card-private','card-apart','card-prove','card-agent'];
   var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
 
   // card-door: clicking anywhere on a stage card navigates to its guide page
   var cardDoors = {
     'card-private': 'consideration-privacy-private.html',
     'card-apart':   'consideration-privacy-apart.html',
-    'card-prove':   'consideration-privacy-prove.html'
+    'card-prove':   'consideration-privacy-prove.html',
+    'card-agent':   'consideration-privacy-agent-identity.html'
   };
   stages.forEach(function(id){
     var card = document.getElementById(id);

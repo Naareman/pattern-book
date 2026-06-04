@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Safety, Alignment &amp; Refusal &middot; The Pattern Book</title>
+<title>Context Engineering &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -104,7 +104,7 @@
   @media (prefers-reduced-motion:reduce){.how-pill,.how-pill .arr{transition:none}.how-pill:hover,.how-pill:hover .arr{transform:none}}
   @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
 
-  /* flow legend (stage pills + arrows) */
+  /* flow legend */
   .flow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
   .flow-chip {
     font-family: inherit; background: var(--surface); border: 1px solid var(--border);
@@ -129,8 +129,8 @@
   }
   h2 em { font-style: italic; color: var(--accent); }
 
-  /* ============ STAGE CARDS ============ */
-  .stages { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 6px; align-items: stretch; }
+  /* STAGE CARDS */
+  .stages { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-top: 6px; align-items: stretch; }
 
   .stage-card {
     background: var(--surface); border: 1px solid var(--border);
@@ -146,8 +146,10 @@
   }
   @media (prefers-reduced-motion: reduce) { .stage-card { transition: none; } }
 
+  .stage-card.clickable { cursor: pointer; }
+  .stage-card.clickable:hover { box-shadow: var(--shadow-lg); border-color: var(--border-strong); }
 
-  /* de-squeezed: icon + name share a full-width row of their own */
+  /* de-squeezed: icon + name share a full-width row */
   .stage-head { display: flex; align-items: center; gap: 9px; margin: 0 0 6px; min-width: 0; }
   .stage-head .sico { flex: none; width: 18px; height: 18px; color: var(--accent); display: block; }
   .stage-head .sico svg { width: 18px; height: 18px; display: block; }
@@ -164,27 +166,18 @@
     border: 1px solid var(--border); color: var(--soft); background: transparent; cursor: default;
   }
   /* anchor chip */
-  a.chip { border: 1px solid transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; position: relative; z-index: 1; }
+  a.chip { border-color: transparent; color: var(--accent-hover); background: var(--accent-soft); cursor: pointer; transition: background .15s ease; }
   a.chip:hover { background: #E3DBFD; }
   a.chip .arr { font-size: 11px; display: inline-block; transition: transform .18s ease; }
   a.chip:hover .arr { transform: translate(1px,-1px); }
   @media (prefers-reduced-motion:reduce) { a.chip, a.chip .arr { transition: none; } a.chip:hover .arr { transform: none; } }
 
-
-  /* see-how link at card bottom (canonical plain-text-link style) */
+  /* see-how link */
   .see-how { display: inline-flex; align-items: center; gap: 3px; margin-top: auto; padding-top: 12px; font-size: 12.5px; font-weight: 600; color: var(--accent-hover); transition: color .15s ease; }
   .see-how:hover { text-decoration: underline; text-underline-offset: 2px; }
   .see-how .arr { display: inline-block; transition: transform .18s ease; }
   .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
   @media (prefers-reduced-motion:reduce) { .see-how, .see-how .arr { transition: none; } .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; } }
-
-  /* card-door: the whole card is a link; the anchor sits behind everything */
-  .stage-card { position: relative; }
-  .card-door {
-    position: absolute; inset: 0; border-radius: var(--radius);
-    z-index: 0; cursor: pointer;
-  }
-  .stage-head, .stage-lead, .chips, .see-how { position: relative; z-index: 1; }
 
   /* back link */
   .back-link {
@@ -210,10 +203,11 @@
   footer strong { color: var(--soft); font-weight: 500; }
 
   /* responsive */
-  @media (max-width: 620px) {
-    .stages { grid-template-columns: 1fr; gap: 14px; }
+  @media (max-width: 900px) {
+    .stages { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
   }
   @media (max-width: 560px) {
+    .stages { grid-template-columns: 1fr; gap: 14px; }
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
@@ -229,7 +223,7 @@
   <div class="topbar-inner">
     <a class="back" href="considerations.html"><span aria-hidden="true">&larr;</span> Considerations</a>
     <nav class="crumb" aria-label="Breadcrumb">
-      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Safety, Alignment &amp; Refusal</span>
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><span class="here">Context Engineering</span>
     </nav>
   </div>
 </nav>
@@ -239,107 +233,106 @@
   <span class="eyebrow">
     <span class="ico" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>
+        <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
       </svg>
-    </span>Consideration &middot; Safety, Alignment &amp; Refusal
+    </span>Consideration &middot; Context Engineering
   </span>
-  <div class="title-row"><h1 class="pattern-title">Safety, Alignment &amp; Refusal</h1><a class="how-pill" href="consideration-safety-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
-  <p class="explainer">Stopping harmful answers without strangling the helpful ones.</p>
-
-  <div class="flow" aria-label="Jump to a part of safety">
-    <button type="button" class="flow-chip" data-target="card-decide">Decide what is off-limits</button>
-    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
-    <button type="button" class="flow-chip" data-target="card-break">Try to break it first</button>
-    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
-    <button type="button" class="flow-chip" data-target="card-balance">Balance safe with useful</button>
-    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
-    <button type="button" class="flow-chip" data-target="card-injection">Defend against prompt injection</button>
+  <div class="title-row">
+    <h1 class="pattern-title">Context Engineering</h1>
+    <a class="how-pill" href="consideration-context-engineering-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a>
   </div>
-  <p class="flow-caption">Four jobs that turn a vague wish for "safe AI" into rules a system can follow.</p>
+  <p class="explainer">Decide what loads into the model's context window: what to keep, what to fetch, what to compress, what to isolate.</p>
+
+  <div class="flow" aria-label="Jump to a part of context engineering">
+    <button type="button" class="flow-chip" data-target="card-write">Write</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-select">Select</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-compress">Compress</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-isolate">Isolate</button>
+  </div>
+  <p class="flow-caption">Andrej Karpathy's four verbs for managing what goes into any AI call.</p>
 </header>
 
 <!-- STAGE CARDS -->
 <section>
   <div class="stages">
 
-    <!-- DECIDE WHAT IS OFF-LIMITS -->
-    <section class="stage-card" id="card-decide" aria-labelledby="g-decide">
-      <a class="card-door" href="consideration-safety-off-limits.html" aria-hidden="true" tabindex="-1"></a>
+    <!-- WRITE -->
+    <section class="stage-card clickable" id="card-write" aria-labelledby="g-write">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>
+            <path d="M12 19l7-7 2 2-7 7-3 1 1-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5 7.5 1.5z"/>
           </svg>
         </span>
-        <h2 id="g-decide"><span class="stage-name">Decide what is off-limits</span></h2>
+        <h2 id="g-write"><span class="stage-name">Write what's worth remembering</span></h2>
       </div>
-      <p class="stage-lead">Name the harms and rank how bad each is.</p>
+      <p class="stage-lead">Store information somewhere it can be retrieved next time.</p>
       <div class="chips">
-        <a class="chip" href="consideration-safety-line.html">Refusal calibration<span class="arr" aria-hidden="true">&#8599;</span></a>
-        <a class="chip" href="consideration-safety-harms-ranking.html">Harm taxonomies &amp; severity reasoning<span class="arr" aria-hidden="true">&#8599;</span></a>
-        <a class="chip" href="consideration-safety-principles.html">Principle-based behavioral evaluation<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <span class="chip">Long-term user memory</span>
+        <span class="chip">Conversation memory</span>
+        <span class="chip">Task ledger</span>
       </div>
-      <a class="see-how" href="consideration-safety-off-limits.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="consideration-context-engineering-write.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
-    <!-- TRY TO BREAK IT FIRST -->
-    <section class="stage-card" id="card-break" aria-labelledby="g-break">
-      <a class="card-door" href="consideration-safety-break.html" aria-hidden="true" tabindex="-1"></a>
+    <!-- SELECT -->
+    <section class="stage-card clickable" id="card-select" aria-labelledby="g-select">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/>
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/>
           </svg>
         </span>
-        <h2 id="g-break"><span class="stage-name">Try to break it first</span></h2>
+        <h2 id="g-select"><span class="stage-name">Select what to load now</span></h2>
       </div>
-      <p class="stage-lead">Attack your own system, then fix what breaks.</p>
+      <p class="stage-lead">Pick only the pieces that matter for this exact call.</p>
       <div class="chips">
-        <a class="chip" href="consideration-safety-red-teaming.html">Red-teaming methodology<span class="arr" aria-hidden="true">&#8599;</span></a>
-        <a class="chip" href="consideration-safety-jailbreaks.html">Jailbreak resistance<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <span class="chip">Retrieval</span>
+        <span class="chip">Reranking</span>
+        <span class="chip">Citations</span>
       </div>
-      <a class="see-how" href="consideration-safety-break.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="consideration-context-engineering-select.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
-    <!-- BALANCE SAFE WITH USEFUL -->
-    <section class="stage-card" id="card-balance" aria-labelledby="g-balance">
-      <a class="card-door" href="consideration-safety-balance.html" aria-hidden="true" tabindex="-1"></a>
+    <!-- COMPRESS -->
+    <section class="stage-card clickable" id="card-compress" aria-labelledby="g-compress">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 3v18"/><path d="M5 8h14"/><path d="M3 14c2 2 4 2 6 0M15 14c2 2 4 2 6 0"/>
+            <path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/>
           </svg>
         </span>
-        <h2 id="g-balance"><span class="stage-name">Balance safe with useful</span></h2>
+        <h2 id="g-compress"><span class="stage-name">Compress what's too long</span></h2>
       </div>
-      <p class="stage-lead">Tune refusals so honest users still get answers.</p>
+      <p class="stage-lead">Fit more meaning into fewer tokens before sending.</p>
       <div class="chips">
-        <a class="chip" href="consideration-safety-refusal-helpfulness.html">Refusal-vs-helpfulness tradeoff<span class="arr" aria-hidden="true">&#8599;</span></a>
-        <a class="chip" href="consideration-safety-dual-use.html">Dual-use review<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <span class="chip">Prompt compression</span>
+        <span class="chip">Lost-in-the-middle mitigation</span>
+        <span class="chip">Context packing</span>
       </div>
-      <a class="see-how" href="consideration-safety-balance.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="consideration-context-engineering-compress.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
-    <!-- DEFEND AGAINST PROMPT INJECTION -->
-    <section class="stage-card" id="card-injection" aria-labelledby="g-injection">
-      <a class="card-door" href="consideration-safety-injection.html" aria-hidden="true" tabindex="-1"></a>
+    <!-- ISOLATE -->
+    <section class="stage-card clickable" id="card-isolate" aria-labelledby="g-isolate">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/><path d="M12 15v2"/>
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
         </span>
-        <h2 id="g-injection"><span class="stage-name">Defend against prompt injection</span></h2>
+        <h2 id="g-isolate"><span class="stage-name">Isolate what shouldn't mix</span></h2>
       </div>
-      <p class="stage-lead">Stop untrusted content from hijacking what your agent does.</p>
+      <p class="stage-lead">Keep untrusted or unrelated content away from sensitive context.</p>
       <div class="chips">
-        <span class="chip">Lethal Trifecta</span>
-        <span class="chip">Agents Rule of Two</span>
-        <span class="chip">CaMeL / Dual-LLM pattern</span>
-        <span class="chip">Guardrail Layering</span>
-        <span class="chip">Sealed tools / Plan-Then-Execute</span>
+        <span class="chip">Sub-agent delegation</span>
+        <span class="chip">Sealed tools</span>
+        <span class="chip">Dual-LLM / CaMeL</span>
       </div>
-      <a class="see-how" href="consideration-safety-injection.html">See how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="consideration-context-engineering-isolate.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
   </div>
@@ -361,10 +354,9 @@
 </footer>
 
 <script>
-// flow legend: scroll + glow on card click, one-time load sweep
 (function(){
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  var stages = ['card-decide','card-break','card-balance','card-injection'];
+  var stages = ['card-write','card-select','card-compress','card-isolate'];
   var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
 
   function pillFor(cardId){
@@ -372,7 +364,6 @@
     return null;
   }
 
-  // nav buttons: smooth-scroll to the stage card + brief glow
   pills.forEach(function(btn){
     var target = btn.getAttribute('data-target');
     var card = document.getElementById(target);
@@ -384,7 +375,6 @@
     });
   });
 
-  // one-time load sweep: highlight each card in order, lighting the matching pill
   if(!reduce){
     var step = 0;
     function tour(){
@@ -404,6 +394,23 @@
     }
     window.setTimeout(tour, 350);
   }
+
+  var doors = {
+    'card-write':    'consideration-context-engineering-write.html',
+    'card-select':   'consideration-context-engineering-select.html',
+    'card-compress': 'consideration-context-engineering-compress.html',
+    'card-isolate':  'consideration-context-engineering-isolate.html'
+  };
+  Object.keys(doors).forEach(function(cardId){
+    var doorCard = document.getElementById(cardId);
+    if(!doorCard) return;
+    var doorHref = doors[cardId];
+    doorCard.addEventListener('click', function(e){
+      if(e.target.closest('.chip')) return;
+      if(e.target.closest('a')) return;
+      window.location.href = doorHref;
+    });
+  });
 
 })();
 </script>

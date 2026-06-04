@@ -130,14 +130,14 @@
   h2 em { font-style: italic; color: var(--accent); }
 
   /* ============ STAGE CARDS ============ */
-  .stages { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 6px; align-items: stretch; }
+  .stages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 6px; align-items: stretch; }
 
   .stage-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
     scroll-margin-top: 80px;
     transition: box-shadow .55s ease, border-color .55s ease;
-    display: flex; flex-direction: column; height: 100%;
+    display: flex; flex-direction: column; height: 100%; min-width: 0;
   }
   .stage-card.clickable { cursor: pointer; }
   .stage-card.clickable:hover { box-shadow: var(--shadow-lg); border-color: var(--border-strong); }
@@ -178,7 +178,6 @@
   .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: translateX(3px); }
   @media (prefers-reduced-motion:reduce) { .see-how, .see-how .arr { transition: none; } .stage-card:hover .see-how .arr, .see-how:hover .arr { transform: none; } }
 
-
   /* back link */
   .back-link {
     display: inline-flex; align-items: center; gap: 14px;
@@ -203,10 +202,11 @@
   footer strong { color: var(--soft); font-weight: 500; }
 
   /* responsive */
-  @media (max-width: 720px) {
-    .stages { grid-template-columns: 1fr; gap: 14px; }
+  @media (max-width: 820px) {
+    .stages { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
   }
   @media (max-width: 560px) {
+    .stages { grid-template-columns: 1fr; gap: 14px; }
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
     h2 { font-size: 21px; }
@@ -237,57 +237,79 @@
     </span>Layer &middot; 6
   </span>
   <div class="title-row"><h1 class="pattern-title">Stateful Memory</h1><a class="how-pill" href="stateful-memory-how-it-works.html">See it in action <span class="arr" aria-hidden="true">&rarr;</span></a></div>
-  <p class="explainer">How an AI remembers what was said and what you prefer, across this chat and across future ones.</p>
+  <p class="explainer">How an AI remembers what happened, what you prefer, and how it should behave, across this session and future ones.</p>
 
-  <div class="flow" aria-label="Jump to a part of stateful memory">
-    <button type="button" class="flow-chip" data-target="card-remember">What it remembers</button>
+  <div class="flow" aria-label="Jump to a memory type">
+    <button type="button" class="flow-chip" data-target="card-episodic">Episodic memory</button>
     <span class="flow-arrow" aria-hidden="true">&rarr;</span>
-    <button type="button" class="flow-chip" data-target="card-manage">Managing the memory</button>
+    <button type="button" class="flow-chip" data-target="card-semantic">Semantic memory</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-procedural">Procedural memory</button>
   </div>
-  <p class="flow-caption">Two halves: the things memory holds, and the work of keeping it useful.</p>
+  <p class="flow-caption">Three kinds of memory: events that happened, facts about you, and routines it has learned.</p>
 </header>
 
 <!-- STAGE CARDS -->
 <section>
   <div class="stages">
 
-    <!-- WHAT IT REMEMBERS -->
-    <section class="stage-card clickable" id="card-remember" aria-labelledby="g-remember">
+    <!-- EPISODIC MEMORY -->
+    <section class="stage-card clickable" id="card-episodic" aria-labelledby="g-episodic">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
         </span>
-        <h2 id="g-remember"><a class="stage-name" href="stateful-memory-what-remembers.html">What it remembers</a></h2>
+        <h2 id="g-episodic"><a class="stage-name" href="stateful-memory-episodic.html">Episodic memory</a></h2>
       </div>
-      <p class="stage-lead">What memory can hold for you.</p>
+      <p class="stage-lead">Specific things that happened: this chat, past sessions, everything the agent has done this run.</p>
       <div class="chips">
-        <a class="chip" href="stateful-memory-conversation-history.html">Conversation memory<span class="arr" aria-hidden="true">&#8599;</span></a>
-        <a class="chip" href="stateful-memory-user-profile.html">Long-term user memory<span class="arr" aria-hidden="true">&#8599;</span></a>
-        <a class="chip" href="stateful-memory-episodic.html">Episodic memory<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <span class="chip">Conversation memory (this session)</span>
+        <span class="chip">Memory of past conversations (per user)</span>
+        <span class="chip">Task log (what the agent has done this run)</span>
+        <span class="chip">Scheduled summarisation</span>
       </div>
-      <a class="see-how" href="stateful-memory-what-remembers.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="stateful-memory-episodic.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
-    <!-- MANAGING THE MEMORY -->
-    <section class="stage-card clickable" id="card-manage" aria-labelledby="g-manage">
+    <!-- SEMANTIC MEMORY -->
+    <section class="stage-card clickable" id="card-semantic" aria-labelledby="g-semantic">
       <div class="stage-head">
         <span class="sico" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
           </svg>
         </span>
-        <h2 id="g-manage"><a class="stage-name" href="stateful-memory-managing.html">Managing the memory</a></h2>
+        <h2 id="g-semantic"><a class="stage-name" href="stateful-memory-semantic.html">Semantic memory</a></h2>
       </div>
-      <p class="stage-lead">Keep it useful, current, and yours.</p>
+      <p class="stage-lead">Distilled facts about a user: preferences, identity, and what they knew at any point in time.</p>
       <div class="chips">
-        <a class="chip" href="stateful-memory-consolidation.html">Memory consolidation<span class="arr" aria-hidden="true">&#8599;</span></a>
-        <a class="chip" href="stateful-memory-retrieval-triggers.html">Retrieval triggers<span class="arr" aria-hidden="true">&#8599;</span></a>
-        <a class="chip" href="stateful-memory-eviction.html">Memory eviction &amp; forgetting<span class="arr" aria-hidden="true">&#8599;</span></a>
-        <a class="chip" href="stateful-memory-identity-continuity.html">Cross-session identity &amp; continuity<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <span class="chip">Long-term user profile (per user)</span>
+        <span class="chip">Time-aware knowledge graph (Graphiti / Zep style)</span>
+        <span class="chip">Tiered memory store (Letta / MemGPT style)</span>
+        <span class="chip">Cross-session identity and continuity (per user)</span>
       </div>
-      <a class="see-how" href="stateful-memory-managing.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="see-how" href="stateful-memory-semantic.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
+
+    <!-- PROCEDURAL MEMORY -->
+    <section class="stage-card clickable" id="card-procedural" aria-labelledby="g-procedural">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+          </svg>
+        </span>
+        <h2 id="g-procedural"><a class="stage-name" href="stateful-memory-procedural.html">Procedural memory</a></h2>
+      </div>
+      <p class="stage-lead">How-to knowledge the agent carries: files it can read and write, skills it knows to trigger, and workflows it reuses.</p>
+      <div class="chips">
+        <span class="chip">Virtual filesystem / scratchpad (Deep Agents)</span>
+        <span class="chip">Auto-invoked skill triggers</span>
+        <span class="chip">Workflow templates remembered across sessions</span>
+      </div>
+      <a class="see-how" href="stateful-memory-procedural.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
   </div>
@@ -312,7 +334,7 @@
 // flow legend: scroll + glow on card click, one-time load sweep
 (function(){
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  var stages = ['card-remember','card-manage'];
+  var stages = ['card-episodic','card-semantic','card-procedural'];
   var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
 
   function pillFor(cardId){
@@ -356,8 +378,9 @@
   // card-door: clicking anywhere on a card navigates to its guide page,
   // except clicks on inner anchors or chips (which navigate on their own)
   var doors = {
-    'card-remember': 'stateful-memory-what-remembers.html',
-    'card-manage':   'stateful-memory-managing.html'
+    'card-episodic':   'stateful-memory-episodic.html',
+    'card-semantic':   'stateful-memory-semantic.html',
+    'card-procedural': 'stateful-memory-procedural.html'
   };
   Object.keys(doors).forEach(function(cardId){
     var doorCard = document.getElementById(cardId);

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Structure the steps · Orchestration · The Pattern Book</title>
+<title>Semantic memory &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -80,121 +80,81 @@
     h1.title{font-size:30px}
     .explainer{font-size:15px}
     .guide-row{padding:15px 18px}
-    .cluster-head ~ .guide-row{padding-left:26px}
   }
 </style>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 
+<!-- TOP BAR -->
 <nav class="topbar">
   <div class="topbar-inner">
-    <a class="back" href="layer-orchestration-agents.html"><span aria-hidden="true">&larr;</span> Orchestration</a>
-    <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-orchestration-agents.html">Orchestration</a><span class="sep">/</span><span class="here">Structure the steps</span></nav>
+    <a class="back" href="layer-stateful-memory.html"><span aria-hidden="true">&larr;</span> Stateful Memory</a>
+    <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-stateful-memory.html">Stateful Memory</a><span class="sep">/</span><span class="here">Semantic memory</span></nav>
   </div>
 </nav>
 
+<!-- HEADER -->
 <header class="header" id="main">
-  <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></span>Orchestration &amp; Agents</span>
-  <h1 class="title">Structure the steps</h1>
-  <p class="explainer">How to decide what order and shape your system's calls take.</p>
+  <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span>Stateful Memory</span>
+  <h1 class="title">Semantic memory</h1>
+  <p class="explainer">Distilled facts about a user: preferences, identity, and what they knew or believed at any point in time.</p>
 </header>
 
+<!-- THE GUIDE -->
 <section>
   <div class="guide">
 
     <div class="cluster-head">
-      <h2 class="cluster-label">Simple flows</h2>
+      <h2 class="cluster-label">Per user (persistent facts)</h2>
     </div>
 
     <div class="guide-row">
-      <span class="want">Want to answer in a single round trip to the model?</span>
+      <span class="want">Want the AI to remember stable facts about a user, like their language, city, or preferences?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-single-call-patterns.html">Single-call patterns<span class="ext" aria-hidden="true">&#8599;</span></a>
+        <a class="tech" href="stateful-memory-user-profile.html">Long-term user profile<span class="ext" aria-hidden="true">&#8599;</span></a>
       </span>
     </div>
 
     <div class="guide-row">
-      <span class="want">Want steps to run one after another in a fixed order?</span>
+      <span class="want">Want to track how a user's beliefs or situation changed over time, not just their current state?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-sequential-pipelines.html">Sequential pipelines<span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="tech">Temporal knowledge graph (Graphiti / Zep style)</span>
       </span>
     </div>
 
     <div class="guide-row">
-      <span class="want">Want multiple sub-tasks to run at the same time and merge their results?</span>
+      <span class="want">Want the AI to feel like it knows who you are across different conversations?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-parallel-fan-out.html">Parallel / fan-out<span class="ext" aria-hidden="true">&#8599;</span></a>
-      </span>
-    </div>
-
-    <div class="cluster-head cluster-break">
-      <h2 class="cluster-label">Loops and branches</h2>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want the model to think, act, see the result, and loop until it has enough?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-iterative-loops.html">Iterative loops (ReAct, reflection)<span class="ext" aria-hidden="true">&#8599;</span></a>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want an entry point that reads the request and sends it to the right specialist?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-router-dispatcher.html">Router / dispatcher<span class="ext" aria-hidden="true">&#8599;</span></a>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want a planner to break the goal into steps and hand each to an executor?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-hierarchical-planning.html">Hierarchical planning<span class="ext" aria-hidden="true">&#8599;</span></a>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want the path through your system to change based on what the model finds at runtime?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-conditional-branching.html">Conditional branching<span class="ext" aria-hidden="true">&#8599;</span></a>
+        <a class="tech" href="stateful-memory-identity-continuity.html">Cross-session identity and continuity<span class="ext" aria-hidden="true">&#8599;</span></a>
       </span>
     </div>
 
     <div class="cluster-head cluster-break">
-      <h2 class="cluster-label">Code and termination</h2>
+      <h2 class="cluster-label">Memory tiering (agent-wide)</h2>
     </div>
 
     <div class="guide-row">
-      <span class="want">Want every tool call to be written as code and run in a sandbox, so the model sees exact output before deciding what to do next?</span>
+      <span class="want">Want to keep a large memory store without filling the context window, using hot / warm / cold tiers?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">CodeAct (code-as-action loop)</span>
+        <span class="tech">OS-style memory tiering (Letta / MemGPT style)</span>
       </span>
     </div>
 
-    <div class="guide-row">
-      <span class="want">Want a loop that stops reliably when it runs too long, costs too much, or hits a step limit, regardless of what the model thinks?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Bounded execution</span>
-      </span>
-    </div>
   </div>
 </section>
 
+<!-- BACK NAV -->
 <section style="padding-top:20px;padding-bottom:40px">
-  <a href="layer-orchestration-agents.html" class="back-link">
+  <a href="layer-stateful-memory.html" class="back-link">
     <div class="back-arrow" aria-hidden="true">&larr;</div>
     <div class="back-text">
       <div class="back-hint">Back to</div>
-      <div class="back-name">Orchestration</div>
+      <div class="back-name">Stateful Memory</div>
     </div>
   </a>
 </section>

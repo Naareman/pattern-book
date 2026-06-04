@@ -134,7 +134,10 @@
   @media (max-width:560px){.how-pill{font-size:13px;padding:7px 13px}}
 
   /* ============ STAGE CARDS ============ */
-  .stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 6px; align-items: stretch; }
+  .stages { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 6px; align-items: stretch; }
+  @media (max-width: 720px) {
+    .stages { grid-template-columns: 1fr !important; gap: 14px; }
+  }
 
   .stage-card {
     background: var(--surface); border: 1px solid var(--border);
@@ -225,10 +228,7 @@
   }
   footer strong { color: var(--soft); font-weight: 500; }
 
-  /* responsive */
-  @media (max-width: 720px) {
-    .stages { grid-template-columns: 1fr; gap: 14px; }
-  }
+  /* responsive (stage cards handled above) */
   @media (max-width: 560px) {
     h1.pattern-title { font-size: 30px; }
     .explainer { font-size: 15px; }
@@ -269,8 +269,10 @@
     <button type="button" class="flow-chip" data-target="card-action">Act in the world</button>
     <span class="flow-arrow" aria-hidden="true">&rarr;</span>
     <button type="button" class="flow-chip" data-target="card-coordinate">Coordinate agents</button>
+    <span class="flow-arrow" aria-hidden="true">&rarr;</span>
+    <button type="button" class="flow-chip" data-target="card-background">Run in the background</button>
   </div>
-  <p class="flow-caption">Three dimensions of how systems organize their work.</p>
+  <p class="flow-caption">Four dimensions of how systems organize their work.</p>
 </header>
 
 <!-- STAGE CARDS -->
@@ -295,6 +297,8 @@
         <a class="chip" href="orchestration-router-dispatcher.html">Router / dispatcher<span class="arr" aria-hidden="true">&#8599;</span></a>
         <a class="chip" href="orchestration-hierarchical-planning.html">Hierarchical planning<span class="arr" aria-hidden="true">&#8599;</span></a>
         <a class="chip" href="orchestration-conditional-branching.html">Conditional branching<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <span class="chip">CodeAct (code-as-action loop)</span>
+        <span class="chip">Bounded execution</span>
       </div>
       <a class="see-how" href="orchestration-structure.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
@@ -336,8 +340,34 @@
         <a class="chip" href="orchestration-shared-workspace.html">Shared workspace<span class="arr" aria-hidden="true">&#8599;</span></a>
         <a class="chip" href="orchestration-agent-identity.html">Agent identity and auth<span class="arr" aria-hidden="true">&#8599;</span></a>
         <a class="chip" href="orchestration-capability-negotiation.html">Capability negotiation and tool discovery<span class="arr" aria-hidden="true">&#8599;</span></a>
+        <span class="chip">Sub-agent delegation</span>
+        <span class="chip">Federated tool servers (MCP)</span>
+        <span class="chip">Progressive tool discovery</span>
+        <span class="chip">Capability advertisement (Agent Cards)</span>
       </div>
       <a class="see-how" href="orchestration-coordination.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
+    </section>
+
+    <section class="stage-card clickable" id="card-background" aria-labelledby="g-background">
+      <div class="stage-head">
+        <span class="sico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a10 10 0 1 0 10 10"/>
+            <path d="M12 6v6l4 2"/>
+            <path d="M18 2v4h4"/>
+          </svg>
+        </span>
+        <h2 id="g-background"><a class="stage-name" href="orchestration-background.html">Run in the background</a></h2>
+      </div>
+      <p class="stage-lead">Work that happens outside the user's request thread.</p>
+      <div class="chips">
+        <span class="chip">Sleep-time compute</span>
+        <span class="chip">Background mode</span>
+        <span class="chip">Scheduled tasks</span>
+        <span class="chip">Speculative tool execution</span>
+        <span class="chip">The Ralph Pattern</span>
+      </div>
+      <a class="see-how" href="orchestration-background.html">see how <span class="arr" aria-hidden="true">&rarr;</span></a>
     </section>
 
   </div>
@@ -362,7 +392,7 @@
 // flow legend: scroll + glow on card click
 (function(){
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  var stages = ['card-structure','card-action','card-coordinate'];
+  var stages = ['card-structure','card-action','card-coordinate','card-background'];
   var pills = Array.prototype.slice.call(document.querySelectorAll('.flow-chip'));
 
   function pillFor(cardId){
@@ -405,7 +435,8 @@
   var doors = {
     'card-structure': 'orchestration-structure.html',
     'card-action': 'orchestration-action.html',
-    'card-coordinate': 'orchestration-coordination.html'
+    'card-coordinate': 'orchestration-coordination.html',
+    'card-background': 'orchestration-background.html'
   };
   Object.keys(doors).forEach(function(cardId){
     var doorCard = document.getElementById(cardId);

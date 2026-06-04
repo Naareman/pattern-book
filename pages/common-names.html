@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Common names &middot; Appendix &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* Topbar */
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* Header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* Body */
+  section { max-width: 920px; margin: 0 auto; padding: 24px 24px 10px; scroll-margin-top: 80px; }
+
+  /* Mapping table */
+  .map-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  /* Group header */
+  .map-group {
+    padding: 13px 22px 8px;
+    border-top: 1px solid var(--border);
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--faint);
+  }
+  .map-group:first-child { border-top: none; }
+
+  /* Row */
+  .map-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--border);
+    padding: 0;
+  }
+  .map-row:first-of-type { border-top: none; }
+
+  .map-cell {
+    padding: 13px 22px;
+    font-size: 14px;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+  }
+  .map-cell.name {
+    color: var(--text);
+    font-weight: 500;
+    border-right: 1px solid var(--border);
+    background: var(--bg-subtle);
+  }
+  .map-cell.slot {
+    color: var(--soft);
+    display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+  }
+
+  /* Slot links */
+  .slot-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--accent-hover);
+    font-weight: 500;
+    font-size: 13.5px;
+    border-bottom: 1px solid transparent;
+    transition: border-color .15s, color .15s;
+  }
+  .slot-link:hover { border-color: var(--accent-hover); color: var(--accent); }
+  .slot-link .ext { font-size: 10px; color: var(--accent); }
+
+  /* Slot plain (no page yet) */
+  .slot-plain {
+    color: var(--soft);
+    font-size: 13.5px;
+  }
+
+  /* Slot separator */
+  .slot-sep { color: var(--border-strong); font-size: 13px; }
+
+  /* Sub-rows for multi-link entries */
+  .sub-rows { display: flex; flex-direction: column; gap: 4px; }
+  .sub-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .sub-label { font-size: 12px; color: var(--faint); flex-shrink: 0; }
+
+  /* Back link */
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); color: var(--text); transition: transform .18s, box-shadow .18s, border-color .18s; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 640px) {
+    h1.page-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    .map-row { grid-template-columns: 1fr; }
+    .map-cell.name { border-right: none; border-bottom: 1px solid var(--border); background: var(--bg-subtle); }
+    .map-cell { padding: 10px 18px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html"><span aria-hidden="true">&larr;</span> Pattern Book</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a>
+      <span class="sep">/</span>
+      <span class="here">Common names</span>
+    </nav>
+  </div>
+</nav>
+
+<header class="header" id="main">
+  <span class="eyebrow">Appendix &middot; Common names</span>
+  <h1 class="page-title">Common names for things on this site</h1>
+  <p class="explainer">If you came looking for a name you have seen elsewhere, here is where we filed it.</p>
+</header>
+
+<section>
+  <div class="map-card" role="table" aria-label="Common names to taxonomy slots">
+
+    <!-- Column headers -->
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="columnheader" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);background:var(--bg-subtle)">Common name</div>
+      <div class="map-cell slot" role="columnheader" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--faint)">Where we filed it</div>
+    </div>
+
+    <!-- GROUP: Andrew Ng's framing -->
+    <div class="map-group" role="rowgroup">Andrew Ng's framing</div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Ng's Four Patterns <span style="font-weight:400;color:var(--faint);font-size:13px">(Reflection, Tool Use, Planning, Multi-Agent)</span></div>
+      <div class="map-cell slot" role="cell">
+        <div class="sub-rows">
+          <div class="sub-row">
+            <span class="sub-label">Reflection</span>
+            <a class="slot-link" href="single-call-make-it-check-itself.html">Self-verification inside one call <span class="ext" aria-hidden="true">&#8599;</span></a>
+          </div>
+          <div class="sub-row">
+            <span class="sub-label">Tool Use</span>
+            <a class="slot-link" href="orchestration-action.html">Orchestration: Action <span class="ext" aria-hidden="true">&#8599;</span></a>
+          </div>
+          <div class="sub-row">
+            <span class="sub-label">Planning</span>
+            <a class="slot-link" href="orchestration-hierarchical-planning.html">Hierarchical planning <span class="ext" aria-hidden="true">&#8599;</span></a>
+          </div>
+          <div class="sub-row">
+            <span class="sub-label">Multi-Agent</span>
+            <a class="slot-link" href="orchestration-coordination.html">Coordinate agents <span class="ext" aria-hidden="true">&#8599;</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GROUP: Orchestration shapes -->
+    <div class="map-group" role="rowgroup">Orchestration shapes</div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Plan-and-Execute, ReWOO</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="orchestration-hierarchical-planning.html">Hierarchical planning variants <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">LangGraph Supervisor / Swarm / Network / Mesh</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="orchestration-coordination.html">Coordination variants <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">OpenAI Handoffs</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="orchestration-agent-to-agent-protocols.html">Agent-to-agent protocols <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Manager pattern (agents-as-tools)</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="orchestration-hierarchical-planning.html">Hierarchical planning <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Magentic-One orchestrator</div>
+      <div class="map-cell slot" role="cell">
+        <div class="sub-rows">
+          <div class="sub-row">
+            <a class="slot-link" href="orchestration-hierarchical-planning.html">Hierarchical planning <span class="ext" aria-hidden="true">&#8599;</span></a>
+            <span class="slot-sep">+</span>
+            <a class="slot-link" href="stateful-memory-managing.html">Task Ledger (stateful memory) <span class="ext" aria-hidden="true">&#8599;</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Sub-agents <span style="font-weight:400;color:var(--faint);font-size:13px">(Claude Code, etc.)</span></div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="orchestration-coordination.html">Sub-Agent Delegation <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">CodeAct</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="orchestration-structure.html">Code-as-action loop (orchestration shape) <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">The Ralph Pattern, Sleep-time compute, Background mode, Scheduled tasks, PASTE</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="orchestration-background.html">Asynchronous / Background shape <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Reflexion</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="single-call-make-it-check-itself.html">Self-verification <span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="slot-sep">+</span>
+        <a class="slot-link" href="stateful-memory-managing.html">Memory loop <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <!-- GROUP: Retrieval -->
+    <div class="map-group" role="rowgroup">Retrieval</div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Self-RAG, Corrective RAG (CRAG)</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="layer-stateless-retrieval.html">Stateless Retrieval <span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="slot-sep">+</span>
+        <a class="slot-link" href="single-call-make-it-check-itself.html">Self-verification <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">GraphRAG</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="stateless-retrieval-search.html">Retrieval: graph-based indexing mechanism <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">RAG-MCP, <code style="font-size:12px;background:var(--bg-subtle);padding:1px 5px;border-radius:4px;border:1px solid var(--border)">tools/list</code> + tool search</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="orchestration-coordination.html">Progressive Tool Disclosure <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">MCP / A2A</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="orchestration-agent-to-agent-protocols.html">Agent-to-agent protocols <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <!-- GROUP: Memory -->
+    <div class="map-group" role="rowgroup">Memory</div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Graphiti / Zep</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="stateful-memory-managing.html">Temporal knowledge graph (stateful memory) <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Letta (MemGPT)</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="stateful-memory-managing.html">OS-style memory tiering <span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="slot-sep">+</span>
+        <a class="slot-link" href="orchestration-background.html">Sleep-time compute <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Deep Agents</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="stateful-memory-managing.html">Virtual filesystem (stateful memory) <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <!-- GROUP: Composition -->
+    <div class="map-group" role="rowgroup">Composition and selection</div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Mixture of Experts <span style="font-weight:400;color:var(--faint);font-size:13px">(system-level routing across whole models)</span></div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="composition-specialist-routing.html">Specialist-of-experts routing <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Mixture of Experts <span style="font-weight:400;color:var(--faint);font-size:13px">(architectural, sparse layers inside one model)</span></div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="layer-training-adaptation.html">Training: pretraining architecture <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Best-of-N</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="composition-ensembling.html">Ensembling / Combine <span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="slot-sep">or</span>
+        <a class="slot-link" href="single-call-guide-its-thinking.html">In-decoding search (same model) <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">LLM-as-Judge</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="composition-verification.html">Verification by another model <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Llama Guard / Shield Gemma / NeMo Guardrails</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="composition-output-filtering.html">Output filtering by classifier <span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="slot-sep">or</span>
+        <a class="slot-link" href="layer-serving-infrastructure.html">Serving infrastructure gateway <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <!-- GROUP: Training -->
+    <div class="map-group" role="rowgroup">Training and adaptation</div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Constitutional AI, RLAIF</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="training-adaptation-preference-optimization.html">Preference optimization <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">DPO, KTO, IPO</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="training-adaptation-preference-optimization.html">Preference optimization variants <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">RLVR, GRPO / DAPO / GSPO, RFT, PRM</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="training-adaptation-reasoning-training.html">Reasoning-capability training <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Task Vectors, TIES, DARE</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="training-adaptation-model-merging.html">Model merging methods <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <!-- GROUP: Single-call control -->
+    <div class="map-group" role="rowgroup">Single-call control</div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Extended thinking / reasoning tokens / adaptive thinking</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="single-call-guide-its-thinking.html">Model-native reasoning (cognitive strategy) <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Prompt Engineering</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="single-call-ask-it-well.html">Shaping the input (single-call control) <span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="slot-sep">+</span>
+        <a class="slot-link" href="single-call-guide-its-thinking.html">Guiding its thinking <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <!-- GROUP: Infrastructure -->
+    <div class="map-group" role="rowgroup">Infrastructure</div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Portkey / LiteLLM / Kong AI Gateway / OpenRouter / Helicone</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="layer-serving-infrastructure.html">AI Gateway (serving infrastructure) <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">E2B / Modal / Daytona / Firecracker</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="orchestration-action.html">Code execution sandbox as a service <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <!-- GROUP: Artifacts and optimization -->
+    <div class="map-group" role="rowgroup">Artifacts and optimization</div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">GEPA, MIPROv2, TextGrad, BetterTogether</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="data-artifacts-deployable.html">Programmatic prompt optimization (deployable artifacts) <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Claude Skills, SKILL.md</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="data-artifacts-deployable.html">Skills as deployable artifacts <span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="slot-sep">+</span>
+        <a class="slot-link" href="orchestration-coordination.html">Progressive Tool Disclosure (loading) <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <!-- GROUP: Safety and security -->
+    <div class="map-group" role="rowgroup">Safety and security</div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Lethal Trifecta, Agents Rule of Two, CaMeL / Dual-LLM</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="consideration-safety-injection.html">Prompt Injection Defense <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">KYA (Know Your Agent), Verifiable Credentials, Agent wallets</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="consideration-privacy-agent-identity.html">Agent Identity and Provenance <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <!-- GROUP: Evaluation and observability -->
+    <div class="map-group" role="rowgroup">Evaluation and observability</div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Three-level eval (span / trace / persona)</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="consideration-evaluation.html">Evaluation methodology <span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="slot-sep">+</span>
+        <a class="slot-link" href="consideration-observability.html">Observability <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Error-analysis-first methodology</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="consideration-evaluation.html">Evaluation: reading your traces <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <!-- GROUP: Engineering practices -->
+    <div class="map-group" role="rowgroup">Engineering practices</div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Context Engineering <span style="font-weight:400;color:var(--faint);font-size:13px">(Karpathy)</span></div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="consideration-context-engineering.html">Context Engineering (C8 discipline) <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Spec-driven development</div>
+      <div class="map-cell slot" role="cell">
+        <span class="slot-plain">Spec-Driven Engineering Workflow recipe (page coming soon)</span>
+        <span class="slot-sep">+</span>
+        <a class="slot-link" href="user-experience-staying-control.html">User experience: approval gates <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Vibe coding</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="anti-patterns.html">Anti-pattern: vibe-coding without specs or evals <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="map-row" role="row">
+      <div class="map-cell name" role="cell">Async / Background patterns</div>
+      <div class="map-cell slot" role="cell">
+        <a class="slot-link" href="orchestration-background.html">Asynchronous / Background shape <span class="ext" aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section style="padding-top:20px;padding-bottom:40px">
+  <a href="../index.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Pattern Book</div>
+    </div>
+  </a>
+</section>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+</body>
+</html>

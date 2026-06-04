@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Structure the steps · Orchestration · The Pattern Book</title>
+<title>Know your agent &middot; The Pattern Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -24,11 +24,13 @@
   a{color:inherit;text-decoration:none}
   .serif{font-family:'Fraunces',serif}
 
+  /* a11y: visible keyboard focus, skip link, reduced motion */
   a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
   .skip-link{position:absolute;left:8px;top:-48px;z-index:300;background:var(--surface);color:var(--accent-hover);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;text-decoration:none;transition:top .15s ease}
   .skip-link:focus{top:8px}
   @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}}
 
+  /* top bar */
   .topbar{position:sticky;top:0;z-index:200;background:rgba(252,252,253,.86);backdrop-filter:saturate(180%) blur(10px);-webkit-backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--border)}
   .topbar-inner{max-width:920px;margin:0 auto;padding:11px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
   .back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text);text-decoration:none;padding:5px 11px;border:1px solid var(--border-strong);border-radius:20px;background:#fff;transition:border-color .2s ease,color .2s ease,background .2s ease;white-space:nowrap}
@@ -39,6 +41,7 @@
   .crumb .sep{margin:0 7px;color:var(--border-strong)}
   .crumb .here{color:var(--soft)}
 
+  /* header */
   .header{max-width:920px;margin:0 auto;padding:40px 24px 8px;scroll-margin-top:80px}
   .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-hover);background:var(--accent-soft);border:1px solid var(--border);border-radius:20px;padding:5px 12px}
   .eyebrow .ico{width:15px;height:15px;display:block;color:var(--accent)}
@@ -46,8 +49,11 @@
   h1.title{scroll-margin-top:80px;font-family:'Fraunces',serif;font-weight:500;font-size:38px;line-height:1.08;letter-spacing:-.015em;margin:16px 0 0}
   .explainer{color:var(--soft);font-size:16px;line-height:1.6;max-width:660px;margin-top:14px}
 
+  /* section + the guide */
   section{max-width:920px;margin:0 auto;padding:18px 24px 34px;scroll-margin-top:80px}
+  .guide-lede{font-size:14px;color:var(--soft);line-height:1.6;max-width:640px;margin-bottom:18px}
 
+  /* the goal-first guide */
   .guide{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
   .guide-row{display:flex;align-items:baseline;justify-content:flex-start;flex-wrap:wrap;gap:4px 10px;padding:17px 22px;border-top:1px solid var(--border)}
   .guide-row:first-child{border-top:none}
@@ -60,12 +66,14 @@
   a.tech .ext{font-size:11px;color:var(--accent);margin-left:2px;vertical-align:baseline}
   @media (prefers-reduced-motion:reduce){a.tech{transition:none}}
 
+  /* cluster labels */
   .cluster-head{padding:16px 22px 8px}
   .cluster-head.cluster-break{padding-top:26px;border-top:1px solid var(--border)}
   .cluster-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text);line-height:1.3}
   .cluster-head + .guide-row{border-top:none}
   .cluster-head ~ .guide-row{padding-left:40px}
 
+  /* back link card */
   .back-link{display:inline-flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);text-decoration:none;color:var(--text);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;cursor:pointer}
   .back-link:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
   .back-arrow{font-family:'Fraunces',serif;font-size:22px;color:var(--accent);line-height:1;transition:transform .2s ease}
@@ -80,121 +88,99 @@
     h1.title{font-size:30px}
     .explainer{font-size:15px}
     .guide-row{padding:15px 18px}
-    .cluster-head ~ .guide-row{padding-left:26px}
   }
 </style>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 
+<!-- TOP BAR -->
 <nav class="topbar">
   <div class="topbar-inner">
-    <a class="back" href="layer-orchestration-agents.html"><span aria-hidden="true">&larr;</span> Orchestration</a>
-    <nav class="crumb" aria-label="Breadcrumb"><a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="layers.html">Layers</a><span class="sep">/</span><a href="layer-orchestration-agents.html">Orchestration</a><span class="sep">/</span><span class="here">Structure the steps</span></nav>
+    <a class="back" href="consideration-privacy.html"><span aria-hidden="true">&larr;</span> Privacy, Security &amp; Governance</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><a href="consideration-privacy.html">Privacy, Security &amp; Governance</a><span class="sep">/</span><span class="here">Know your agent</span>
+    </nav>
   </div>
 </nav>
 
+<!-- HEADER -->
 <header class="header" id="main">
-  <span class="eyebrow"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></span>Orchestration &amp; Agents</span>
-  <h1 class="title">Structure the steps</h1>
-  <p class="explainer">How to decide what order and shape your system's calls take.</p>
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        <path d="M17 12l2 2 4-4"/>
+      </svg>
+    </span>Privacy, Security &amp; Governance &middot; Know your agent
+  </span>
+  <h1 class="title">Know your agent</h1>
+  <p class="explainer">Before you trust an agent to act on someone's behalf, verify who it is, who operates it, and what it is allowed to do.</p>
 </header>
 
+<!-- THE GUIDE -->
 <section>
   <div class="guide">
 
-    <div class="cluster-head">
-      <h2 class="cluster-label">Simple flows</h2>
-    </div>
-
     <div class="guide-row">
-      <span class="want">Want to answer in a single round trip to the model?</span>
+      <span class="want">Want to verify the agent acting on someone's behalf is who it claims to be?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-single-call-patterns.html">Single-call patterns<span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="tech">Know Your Agent (KYA)</span>
       </span>
     </div>
 
     <div class="guide-row">
-      <span class="want">Want steps to run one after another in a fixed order?</span>
+      <span class="want">Want a signed identity an agent can prove cryptographically?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-sequential-pipelines.html">Sequential pipelines<span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="tech">Verifiable credentials (W3C VC v2)</span>
       </span>
     </div>
 
     <div class="guide-row">
-      <span class="want">Want multiple sub-tasks to run at the same time and merge their results?</span>
+      <span class="want">Want agents to advertise their capabilities to each other?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-parallel-fan-out.html">Parallel / fan-out<span class="ext" aria-hidden="true">&#8599;</span></a>
-      </span>
-    </div>
-
-    <div class="cluster-head cluster-break">
-      <h2 class="cluster-label">Loops and branches</h2>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want the model to think, act, see the result, and loop until it has enough?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-iterative-loops.html">Iterative loops (ReAct, reflection)<span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="tech">Agent Cards (A2A protocol)</span>
       </span>
     </div>
 
     <div class="guide-row">
-      <span class="want">Want an entry point that reads the request and sends it to the right specialist?</span>
+      <span class="want">Want an agent to hold and spend its own scoped credentials?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-router-dispatcher.html">Router / dispatcher<span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="tech">Agent wallets</span>
       </span>
     </div>
 
     <div class="guide-row">
-      <span class="want">Want a planner to break the goal into steps and hand each to an executor?</span>
+      <span class="want">Want a tamper-proof record of the agent's manifest at deploy time?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-hierarchical-planning.html">Hierarchical planning<span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="tech">Signed agent manifests</span>
       </span>
     </div>
 
     <div class="guide-row">
-      <span class="want">Want the path through your system to change based on what the model finds at runtime?</span>
+      <span class="want">Want to make the agent the legal actor, not just the user?</span>
       <span class="resolve">
         <span class="connect" aria-hidden="true">&rarr;</span>
-        <a class="tech" href="orchestration-conditional-branching.html">Conditional branching<span class="ext" aria-hidden="true">&#8599;</span></a>
+        <span class="tech">Agent-as-principal model</span>
       </span>
     </div>
 
-    <div class="cluster-head cluster-break">
-      <h2 class="cluster-label">Code and termination</h2>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want every tool call to be written as code and run in a sandbox, so the model sees exact output before deciding what to do next?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">CodeAct (code-as-action loop)</span>
-      </span>
-    </div>
-
-    <div class="guide-row">
-      <span class="want">Want a loop that stops reliably when it runs too long, costs too much, or hits a step limit, regardless of what the model thinks?</span>
-      <span class="resolve">
-        <span class="connect" aria-hidden="true">&rarr;</span>
-        <span class="tech">Bounded execution</span>
-      </span>
-    </div>
   </div>
 </section>
 
+<!-- BACK NAV -->
 <section style="padding-top:20px;padding-bottom:40px">
-  <a href="layer-orchestration-agents.html" class="back-link">
+  <a href="consideration-privacy.html" class="back-link">
     <div class="back-arrow" aria-hidden="true">&larr;</div>
     <div class="back-text">
       <div class="back-hint">Back to</div>
-      <div class="back-name">Orchestration</div>
+      <div class="back-name">Privacy, Security &amp; Governance</div>
     </div>
   </a>
 </section>

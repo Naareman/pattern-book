@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Context Engineering &middot; How it works &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); text-decoration: none; padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; white-space: nowrap; transition: border-color .2s ease, color .2s ease, background .2s ease; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.5; color: var(--text); }
+
+  /* DEMO */
+  .demo-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 20px; }
+
+  /* window canvas */
+  .ctx-canvas {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 18px 16px; min-height: 260px;
+  }
+  .ctx-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); margin-bottom: 12px; }
+  .ctx-window {
+    border: 2px dashed var(--border-strong); border-radius: 10px;
+    padding: 14px; min-height: 160px; position: relative;
+    display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start;
+  }
+  .ctx-window-label {
+    position: absolute; top: -10px; left: 12px; background: var(--bg-subtle);
+    font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--soft); padding: 0 6px;
+  }
+
+  /* verb chips inside the window */
+  .ctx-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    border: 1.5px solid var(--border); background: var(--surface); color: var(--soft);
+    opacity: 0; transform: scale(0.85);
+    transition: opacity .35s ease, transform .35s ease, border-color .25s ease, background .25s ease, color .25s ease;
+  }
+  .ctx-chip.show { opacity: 1; transform: scale(1); }
+  .ctx-chip.verb-write  { border-color: #7C5CF6; background: #F0ECFE; color: #6D4DE6; }
+  .ctx-chip.verb-select { border-color: #0E9F6E; background: #E7F7F0; color: #0E9F6E; }
+  .ctx-chip.verb-compress { border-color: #E59D00; background: #FFF8E6; color: #B37A00; }
+  .ctx-chip.verb-isolate { border-color: #E53E3E; background: #FFF0F0; color: #C53030; }
+  @media (prefers-reduced-motion:reduce) { .ctx-chip { transition: none; } }
+
+  /* verb tabs */
+  .verb-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .verb-btn {
+    padding: 9px 16px; border-radius: var(--radius-sm); border: 1.5px solid var(--border);
+    background: var(--surface); font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+    color: var(--soft); cursor: pointer;
+    transition: background .18s ease, border-color .18s ease, color .18s ease, transform .15s ease;
+  }
+  .verb-btn:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+  .verb-btn.active-write   { background: #F0ECFE; border-color: #7C5CF6; color: #6D4DE6; }
+  .verb-btn.active-select  { background: #E7F7F0; border-color: #0E9F6E; color: #0E9F6E; }
+  .verb-btn.active-compress{ background: #FFF8E6; border-color: #E59D00; color: #B37A00; }
+  .verb-btn.active-isolate { background: #FFF0F0; border-color: #E53E3E; color: #C53030; }
+  @media (prefers-reduced-motion:reduce) { .verb-btn { transition: none; } .verb-btn:hover { transform: none; } }
+
+  .verb-explain {
+    margin-top: 14px; padding: 14px 16px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); font-size: 14px; color: var(--soft); line-height: 1.55;
+    min-height: 52px;
+  }
+  .verb-explain strong { color: var(--text); }
+
+  /* real example table */
+  .example-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .ex-row { display: flex; align-items: baseline; gap: 10px; padding: 16px 22px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+  .ex-row:first-child { border-top: none; }
+  .ex-verb {
+    flex: none; min-width: 80px; font-size: 12px; font-weight: 700; letter-spacing: .05em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 20px;
+  }
+  .ex-verb.write   { background: #F0ECFE; color: #6D4DE6; }
+  .ex-verb.select  { background: #E7F7F0; color: #0E9F6E; }
+  .ex-verb.compress{ background: #FFF8E6; color: #B37A00; }
+  .ex-verb.isolate { background: #FFF0F0; color: #C53030; }
+  .ex-text { font-size: 14px; color: var(--soft); line-height: 1.5; }
+  .ex-text strong { color: var(--text); }
+
+  /* tradeoffs */
+  .tradeoffs-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 170px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* back link */
+  .back-link { display: inline-flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources + footer */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .verb-tabs { gap: 6px; }
+    .verb-btn { font-size: 13px; padding: 8px 13px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+    .ex-row { flex-direction: column; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="consideration-context-engineering.html"><span aria-hidden="true">&larr;</span> Context Engineering</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="considerations.html">Considerations</a><span class="sep">/</span><a href="consideration-context-engineering.html">Context Engineering</a><span class="sep">/</span><span class="here">How it works</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+      </svg>
+    </span>Consideration &middot; Context Engineering
+  </span>
+  <h1 class="pattern-title">Context Engineering</h1>
+  <p class="explainer">Decide what loads into the model's context window: what to keep, what to fetch, what to compress, what to isolate.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>The context window is the model's working memory: like RAM in a computer, it holds only what fits right now, so every call is a choice about what to load, what to discard, and what to keep somewhere else for later.</p>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Tap a verb to <em>see</em> it.</h2>
+
+  <div class="demo-stage">
+    <p class="demo-lede">Each verb is a job you do on context. Tap one to see what it adds to the window and why.</p>
+
+    <div class="verb-tabs" role="group" aria-label="Context verbs">
+      <button class="verb-btn" data-verb="write"    type="button">WRITE</button>
+      <button class="verb-btn" data-verb="select"   type="button">SELECT</button>
+      <button class="verb-btn" data-verb="compress" type="button">COMPRESS</button>
+      <button class="verb-btn" data-verb="isolate"  type="button">ISOLATE</button>
+    </div>
+
+    <div class="ctx-canvas" aria-live="polite" aria-label="Context window diagram">
+      <div class="ctx-label">Context window</div>
+      <div class="ctx-window" id="ctxWindow">
+        <span class="ctx-window-label">What the model sees this call</span>
+      </div>
+    </div>
+
+    <div class="verb-explain" id="verbExplain" role="status" aria-live="polite" aria-atomic="true">
+      Tap a verb above to demonstrate it.
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>A support chat with <em>200 messages.</em></h2>
+
+  <div class="example-card" aria-label="Context engineering verbs applied to a long support chat">
+
+    <div class="ex-row">
+      <span class="ex-verb write">WRITE</span>
+      <span class="ex-text"><strong>After each turn</strong>, key facts (user's plan tier, past errors, their name) are saved to a user memory store so they don't have to repeat themselves next session.</span>
+    </div>
+
+    <div class="ex-row">
+      <span class="ex-verb select">SELECT</span>
+      <span class="ex-text"><strong>At call time</strong>, only the last 10 messages plus the 3 most relevant past tickets are retrieved. The other 190 messages stay in storage, not in context.</span>
+    </div>
+
+    <div class="ex-row">
+      <span class="ex-verb compress">COMPRESS</span>
+      <span class="ex-text"><strong>The older retrieved messages</strong> are summarized into a single paragraph. The full text is dropped. The model gets the meaning without the tokens.</span>
+    </div>
+
+    <div class="ex-row">
+      <span class="ex-verb isolate">ISOLATE</span>
+      <span class="ex-text"><strong>When the user pastes a long error log</strong>, a sub-agent processes it in its own fresh context. Only the diagnosis comes back. The raw log never touches the main conversation context.</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">More selection: retrieval cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">More compression: info loss risk</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">More isolation: orchestration overhead</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">No strategy: token cost spiral</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      The four verbs work together. Write saves retrieval cost by keeping facts close. Compress keeps selection cost low. Isolate keeps the main context clean so selection stays accurate.
+    </div>
+  </div>
+</section>
+
+<!-- BACK LINK -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="consideration-context-engineering.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Context Engineering</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Karpathy, A. (2025). <em>Context Engineering.</em> <span class="note">Post on X introducing the four-verb framework: write, select, compress, isolate.</span></li>
+    <li>LangChain. <em>Context Engineering Guide.</em> <span class="note">Practical breakdown of how each verb maps to retrieval, memory, and compression techniques.</span></li>
+    <li>Anthropic. <em>Building Effective Agents.</em> <span class="note">Covers sub-agent delegation and context isolation patterns in production agent systems.</span></li>
+    <li>PromptingGuide.ai. <em>Context Engineering Guide.</em> <span class="note">Survey of prompt compression, context packing, and retrieval-augmented generation as context strategies.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function(){
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var VERB_DATA = {
+    write: {
+      chips: [
+        { label: 'User name: Nareman', cls: 'verb-write' },
+        { label: 'Plan: Pro tier', cls: 'verb-write' },
+        { label: 'Last error: timeout on step 3', cls: 'verb-write' },
+        { label: 'Preference: Arabic first', cls: 'verb-write' }
+      ],
+      explain: '<strong>WRITE</strong> puts information somewhere durable so the model can find it later. These facts are stored in memory, not thrown away at the end of the call.'
+    },
+    select: {
+      chips: [
+        { label: 'Last 5 messages', cls: 'verb-select' },
+        { label: 'Top 2 past tickets', cls: 'verb-select' },
+        { label: 'Product doc: billing FAQ', cls: 'verb-select' }
+      ],
+      explain: '<strong>SELECT</strong> pulls only the relevant pieces for this call. The other 190 messages stay in storage. The window stays small and focused.'
+    },
+    compress: {
+      chips: [
+        { label: 'Summary: user reported 3 errors in April, all resolved', cls: 'verb-compress' },
+        { label: 'Compressed system prompt (40% shorter)', cls: 'verb-compress' }
+      ],
+      explain: '<strong>COMPRESS</strong> fits more meaning into fewer tokens. Long conversations become short summaries. Verbose prompts are rewritten tighter. Same information, less space.'
+    },
+    isolate: {
+      chips: [
+        { label: 'Sub-agent: error log analysis (own context)', cls: 'verb-isolate' },
+        { label: 'Result only: "Database connection timeout"', cls: 'verb-isolate' }
+      ],
+      explain: '<strong>ISOLATE</strong> keeps untrusted or unrelated content out of the main context. The raw log goes to a sub-agent. Only the clean diagnosis comes back. Nothing messy bleeds in.'
+    }
+  };
+
+  var ctxWindow = document.getElementById('ctxWindow');
+  var verbExplain = document.getElementById('verbExplain');
+  var buttons = document.querySelectorAll('.verb-btn');
+  var activeVerb = null;
+
+  function clearChips() {
+    var chips = ctxWindow.querySelectorAll('.ctx-chip');
+    chips.forEach(function(c){ ctxWindow.removeChild(c); });
+  }
+
+  function addChip(label, cls, delay) {
+    var chip = document.createElement('span');
+    chip.className = 'ctx-chip ' + cls;
+    chip.textContent = label;
+    ctxWindow.appendChild(chip);
+    if (reduceMotion) {
+      chip.classList.add('show');
+    } else {
+      window.setTimeout(function(){ chip.classList.add('show'); }, delay);
+    }
+  }
+
+  function activate(verb) {
+    if (activeVerb === verb) return;
+    activeVerb = verb;
+
+    buttons.forEach(function(b){
+      b.className = 'verb-btn';
+      if(b.getAttribute('data-verb') === verb) b.className = 'verb-btn active-' + verb;
+    });
+
+    clearChips();
+    var data = VERB_DATA[verb];
+    data.chips.forEach(function(ch, i){
+      addChip(ch.label, ch.cls, reduceMotion ? 0 : i * 180);
+    });
+    verbExplain.innerHTML = data.explain;
+  }
+
+  buttons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      activate(btn.getAttribute('data-verb'));
+    });
+  });
+
+  // auto-demonstrate write on load
+  window.setTimeout(function(){ activate('write'); }, reduceMotion ? 0 : 400);
+})();
+</script>
+</body>
+</html>
