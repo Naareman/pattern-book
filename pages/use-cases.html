@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I want to&hellip; &middot; The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.05);
+    --radius:16px; --radius-sm:11px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  body { min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* Topbar */
+  .topbar { position: sticky; top: 0; z-index: 200; background: rgba(252,252,253,.86); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text); padding: 5px 11px; border: 1px solid var(--border-strong); border-radius: 20px; background: #fff; transition: border-color .2s, color .2s, background .2s; white-space: nowrap; text-decoration: none; }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .back svg { width: 13px; height: 13px; display: block; flex: none; }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* Page header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 20px; padding: 4px 12px; }
+  h1.page-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px; line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0; }
+  .explainer { color: var(--soft); font-size: 15.5px; line-height: 1.6; max-width: 620px; margin-top: 12px; }
+
+  /* Main content */
+  .content { max-width: 920px; margin: 0 auto; padding: 32px 24px 80px; display: flex; flex-direction: column; gap: 40px; }
+
+  /* Section */
+  .section { }
+  .section-heading { font-family: 'Fraunces', serif; font-weight: 500; font-size: 20px; letter-spacing: -0.01em; color: var(--text); margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1.5px solid var(--border); }
+
+  /* Table */
+  .rows { display: flex; flex-direction: column; }
+  .row { display: flex; align-items: center; gap: 0; border-bottom: 1px solid var(--border); }
+  .row:last-child { border-bottom: none; }
+
+  .row-goal { flex: 1; min-width: 0; font-family: 'Inter', system-ui, sans-serif; font-size: 14px; color: var(--soft); padding: 11px 0 11px 2px; line-height: 1.4; }
+  .row-goal .prefix { color: var(--faint); font-size: 13px; margin-right: 4px; }
+
+  .row-link { flex: none; }
+  .row-link a { display: inline-flex; align-items: center; gap: 5px; font-family: 'Inter', system-ui, sans-serif; font-size: 13px; font-weight: 500; color: var(--accent-hover); background: var(--accent-soft); border: 1px solid transparent; border-radius: 20px; padding: 5px 11px; text-decoration: none; transition: background .15s, border-color .15s, color .15s; white-space: nowrap; }
+  .row-link a:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .row-link a svg { width: 11px; height: 11px; display: block; flex: none; opacity: .7; }
+  .row-link a:hover svg { opacity: 1; }
+
+  /* Plain text destination (page not yet built) */
+  .row-plain { flex: none; font-family: 'Inter', system-ui, sans-serif; font-size: 13px; font-weight: 500; color: var(--faint); background: none; border: 1px solid var(--border); border-radius: 20px; padding: 5px 11px; white-space: nowrap; }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    h1.page-title { font-size: 28px; }
+    .row { flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px 0; }
+    .row-goal { padding: 0; }
+    .row-link, .row-plain { align-self: flex-start; }
+    .content { padding: 24px 20px 60px; }
+    .header { padding: 28px 20px 8px; }
+    .topbar-inner { padding: 10px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- Topbar -->
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="../index.html">
+      <svg viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M8.5 2L4 6.5 8.5 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back
+    </a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <span class="here">I want to&hellip;</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- Page header -->
+<header class="header">
+  <div class="eyebrow" aria-label="Page type">Cheat sheet</div>
+  <h1 class="page-title">I want to&hellip;</h1>
+  <p class="explainer">Search by what you want to build or improve. Each row points to the right pattern or recipe on the site.</p>
+</header>
+
+<!-- Main -->
+<main id="main" class="content">
+
+  <!-- 1. Build a system -->
+  <section class="section" aria-labelledby="sec-build">
+    <h2 class="section-heading" id="sec-build">Build a system</h2>
+    <div class="rows" role="table" aria-label="Build a system use cases">
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build a chatbot</div>
+        <div class="row-link" role="cell"><a href="build-conversational-assistant.html">Conversational assistant <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build an agent that uses tools</div>
+        <div class="row-plain" role="cell">Tool-using agent</div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build document Q&amp;A</div>
+        <div class="row-link" role="cell"><a href="build-document-qa.html">Document Q&amp;A <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build a research agent that produces reports</div>
+        <div class="row-plain" role="cell">Deep research agent</div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build a council of models for hard questions</div>
+        <div class="row-plain" role="cell">LLM council</div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build a coding agent</div>
+        <div class="row-link" role="cell"><a href="build-coding-agent.html">Coding agent <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build a voice assistant</div>
+        <div class="row-link" role="cell"><a href="build-voice-assistant.html">Voice assistant <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build a customer support bot</div>
+        <div class="row-link" role="cell"><a href="build-customer-support-agent.html">Customer support agent <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build a multi-agent team</div>
+        <div class="row-link" role="cell"><a href="build-multi-agent-research-team.html">Multi-agent research team <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build a supervisor-with-workers shape</div>
+        <div class="row-plain" role="cell">Supervisor-worker</div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build an adversarial debate</div>
+        <div class="row-plain" role="cell">Multi-agent debate</div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build a hierarchical org of agents</div>
+        <div class="row-plain" role="cell">Hierarchical multi-agent</div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build peer-to-peer agents</div>
+        <div class="row-plain" role="cell">Swarm</div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build an agent harness (Claude Code style)</div>
+        <div class="row-plain" role="cell">Agent harness</div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build spec-driven engineering</div>
+        <div class="row-plain" role="cell">Spec-driven workflow</div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build a browsing agent</div>
+        <div class="row-link" role="cell"><a href="build-browsing-agent.html">Browsing agent <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build a summarization service</div>
+        <div class="row-link" role="cell"><a href="build-summarization-service.html">Summarization service <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>build code execution alongside reasoning</div>
+        <div class="row-link" role="cell"><a href="build-reasoning-code-execution.html">Reasoning + code execution <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Improve a prompt -->
+  <section class="section" aria-labelledby="sec-prompt">
+    <h2 class="section-heading" id="sec-prompt">Improve a prompt</h2>
+    <div class="rows" role="table" aria-label="Improve a prompt use cases">
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>make the model think step by step</div>
+        <div class="row-link" role="cell"><a href="pattern-chain-of-thought.html">Chain of thought <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>show examples first</div>
+        <div class="row-link" role="cell"><a href="pattern-few-shot.html">Few-shot prompting <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>force JSON output</div>
+        <div class="row-link" role="cell"><a href="pattern-structured-output.html">Structured output <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>set a role or persona</div>
+        <div class="row-link" role="cell"><a href="single-call-role-persona.html">Role &amp; persona <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>compress a long prompt</div>
+        <div class="row-link" role="cell"><a href="single-call-prompt-compression.html">Prompt compression <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>handle "lost in the middle"</div>
+        <div class="row-link" role="cell"><a href="single-call-lost-in-the-middle.html">Lost in the middle <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>mask harmful tokens</div>
+        <div class="row-link" role="cell"><a href="single-call-logit-biasing.html">Logit biasing <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>make the model verify its own answer</div>
+        <div class="row-link" role="cell"><a href="single-call-chain-of-verification.html">Chain of verification <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>get diverse answers and a vote</div>
+        <div class="row-link" role="cell"><a href="pattern-self-consistency.html">Self-consistency <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>make the model reflect</div>
+        <div class="row-link" role="cell"><a href="pattern-reflection.html">Reflection <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Add memory -->
+  <section class="section" aria-labelledby="sec-memory">
+    <h2 class="section-heading" id="sec-memory">Add memory</h2>
+    <div class="rows" role="table" aria-label="Add memory use cases">
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>make a conversation persist</div>
+        <div class="row-link" role="cell"><a href="stateful-memory-conversation-history.html">Conversation history <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>store long-term memory across sessions</div>
+        <div class="row-link" role="cell"><a href="stateful-memory-user-profile.html">User profile memory <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>keep an activity log the agent can scroll back through</div>
+        <div class="row-link" role="cell"><a href="stateful-memory-procedural.html">Procedural memory <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Retrieve information -->
+  <section class="section" aria-labelledby="sec-retrieve">
+    <h2 class="section-heading" id="sec-retrieve">Retrieve information</h2>
+    <div class="rows" role="table" aria-label="Retrieve information use cases">
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>add RAG</div>
+        <div class="row-link" role="cell"><a href="layer-stateless-retrieval.html">Stateless retrieval <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>add agentic or multi-round RAG</div>
+        <div class="row-plain" role="cell">Agentic RAG</div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>rerank search hits</div>
+        <div class="row-link" role="cell"><a href="stateless-retrieval-reranking.html">Reranking <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>pull from a live source</div>
+        <div class="row-link" role="cell"><a href="stateless-retrieval-live-source.html">Live source retrieval <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Compose multiple model calls -->
+  <section class="section" aria-labelledby="sec-compose">
+    <h2 class="section-heading" id="sec-compose">Compose multiple model calls</h2>
+    <div class="rows" role="table" aria-label="Compose multiple model calls use cases">
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>get N answers and a vote</div>
+        <div class="row-link" role="cell"><a href="composition-ensembling.html">Ensembling <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>use a generator-critic pair</div>
+        <div class="row-link" role="cell"><a href="composition-generator-critic.html">Generator-critic <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>run council deliberation</div>
+        <div class="row-plain" role="cell">LLM council</div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>use LLM-as-judge</div>
+        <div class="row-link" role="cell"><a href="composition-verification.html">Verification / LLM-as-judge <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Cut cost / speed up -->
+  <section class="section" aria-labelledby="sec-cost">
+    <h2 class="section-heading" id="sec-cost">Cut cost / speed up</h2>
+    <div class="rows" role="table" aria-label="Cut cost or speed up use cases">
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>add streaming</div>
+        <div class="row-link" role="cell"><a href="consideration-realtime-streaming.html">Real-time streaming <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>get a faster first word</div>
+        <div class="row-link" role="cell"><a href="consideration-realtime-ttfw.html">Time-to-first-word <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>use a cheaper default</div>
+        <div class="row-link" role="cell"><a href="consideration-cost-budget.html">Cost budget <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>use a smaller model when possible</div>
+        <div class="row-link" role="cell"><a href="serving-infrastructure-model-selection.html">Model selection <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>cache repeated answers</div>
+        <div class="row-link" role="cell"><a href="serving-infrastructure-response-caching.html">Response caching <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>batch many requests</div>
+        <div class="row-link" role="cell"><a href="serving-infrastructure-batching.html">Batching <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Keep it safe and private -->
+  <section class="section" aria-labelledby="sec-safety">
+    <h2 class="section-heading" id="sec-safety">Keep it safe and private</h2>
+    <div class="rows" role="table" aria-label="Safety and privacy use cases">
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>block prompt injection</div>
+        <div class="row-link" role="cell"><a href="consideration-safety-injection.html">Prompt injection defence <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>verify an agent's identity</div>
+        <div class="row-link" role="cell"><a href="consideration-privacy-agent-identity.html">Agent identity <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>scrub PII</div>
+        <div class="row-link" role="cell"><a href="consideration-privacy-pii.html">PII scrubbing <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>layer guardrails at every stage</div>
+        <div class="row-link" role="cell"><a href="consideration-safety-injection.html">Safety guardrails <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Measure and observe -->
+  <section class="section" aria-labelledby="sec-observe">
+    <h2 class="section-heading" id="sec-observe">Measure and observe</h2>
+    <div class="rows" role="table" aria-label="Measure and observe use cases">
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>evaluate my model</div>
+        <div class="row-link" role="cell"><a href="consideration-evaluation.html">Evaluation <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>trace what my agent did</div>
+        <div class="row-link" role="cell"><a href="consideration-observability-tracing.html">Tracing <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>detect drift</div>
+        <div class="row-link" role="cell"><a href="consideration-observability-drift.html">Drift detection <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>debug a single failed run</div>
+        <div class="row-link" role="cell"><a href="consideration-observability-replay.html">Replay / debug <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. Tune the model -->
+  <section class="section" aria-labelledby="sec-tune">
+    <h2 class="section-heading" id="sec-tune">Tune the model</h2>
+    <div class="rows" role="table" aria-label="Tune the model use cases">
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>fine-tune for my domain</div>
+        <div class="row-link" role="cell"><a href="training-adaptation-supervised-finetuning.html">Supervised fine-tuning <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>teach it from human ratings</div>
+        <div class="row-link" role="cell"><a href="training-adaptation-preference-optimization.html">Preference optimization <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>make the model smaller</div>
+        <div class="row-link" role="cell"><a href="training-adaptation-distillation.html">Distillation <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. Mistakes to avoid -->
+  <section class="section" aria-labelledby="sec-antipatterns">
+    <h2 class="section-heading" id="sec-antipatterns">Mistakes to avoid</h2>
+    <div class="rows" role="table" aria-label="Mistakes to avoid use cases">
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>know what to fix before I ship without evals</div>
+        <div class="row-link" role="cell"><a href="anti-patterns.html">Anti-patterns <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+      <div class="row" role="row">
+        <div class="row-goal" role="cell"><span class="prefix" aria-hidden="true">I want to&hellip;</span>avoid stuffing every tool into the prompt</div>
+        <div class="row-link" role="cell"><a href="anti-patterns.html">Anti-patterns <svg viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M2 9L9 2M9 2H4M9 2V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>

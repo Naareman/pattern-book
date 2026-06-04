@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spec-Driven Engineering Workflow · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --error:#C2554F; --error-soft:#FBECEB;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* topbar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* Default-in-2026 callout */
+  .default-callout {
+    margin-top: 20px;
+    max-width: 720px;
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .default-callout .badge {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--accent-hover);
+    background: #fff; border: 1px solid var(--accent);
+    border-radius: 12px; padding: 3px 9px; flex-shrink: 0; margin-top: 1px;
+    white-space: nowrap;
+  }
+  .default-callout .body {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 400;
+    font-size: 15px; line-height: 1.55; color: var(--text);
+  }
+  .default-callout .body strong { font-style: normal; font-weight: 600; color: var(--accent-hover); }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
+
+  /* ========== SPEC FLOW DEMO (4-stage tap-through) ========== */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+
+  .spec-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+
+  /* stage rail */
+  .stage-rail {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-subtle);
+  }
+  .stage-step {
+    border: none; border-right: 1px solid var(--border);
+    background: transparent; cursor: pointer; padding: 16px 12px;
+    font-family: 'Inter', sans-serif; text-align: left;
+    display: flex; flex-direction: column; gap: 4px;
+    transition: background .18s ease;
+  }
+  .stage-step:last-child { border-right: none; }
+  .stage-step:hover { background: var(--bg); }
+  .stage-step[aria-selected="true"] {
+    background: var(--accent-soft); border-bottom: 2px solid var(--accent);
+  }
+  .stage-step .stage-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 600; color: var(--faint);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .stage-step[aria-selected="true"] .stage-num { color: var(--accent-hover); }
+  .stage-step .stage-actor {
+    font-size: 11px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--faint);
+  }
+  .stage-step .stage-name {
+    font-size: 13.5px; font-weight: 600; color: var(--text); line-height: 1.3;
+  }
+  .stage-step[aria-selected="true"] .stage-name { color: var(--accent-hover); }
+  .stage-step.human .stage-actor { color: var(--success); }
+  .stage-step.agent .stage-actor { color: var(--accent-hover); }
+  .stage-step[aria-selected="true"].human .stage-actor { color: var(--success); }
+
+  /* stage panel */
+  .stage-panel { padding: 24px 26px; }
+  .stage-panel-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 700; letter-spacing: .05em;
+    text-transform: uppercase; padding: 4px 10px;
+    border-radius: 12px; margin-bottom: 12px;
+  }
+  .stage-panel-tag.human { background: var(--success-soft); color: var(--success); border: 1px solid var(--success); }
+  .stage-panel-tag.agent { background: var(--accent-soft); color: var(--accent-hover); border: 1px solid var(--accent); }
+  .stage-panel-tag .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .stage-panel-headline {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 19px;
+    color: var(--text); margin-bottom: 4px; letter-spacing: -0.01em;
+  }
+  .stage-panel-sub {
+    font-size: 13.5px; color: var(--soft); line-height: 1.55; margin-bottom: 14px;
+  }
+  .stage-panel-sub strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* artifact box */
+  .artifact {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); overflow: hidden;
+  }
+  .artifact-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px; background: #fff; border-bottom: 1px solid var(--border);
+  }
+  .artifact-name {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    font-weight: 500; color: var(--text);
+  }
+  .artifact-kind {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--faint);
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 10px; padding: 2px 8px;
+  }
+  .artifact-body {
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px; line-height: 1.65;
+    color: var(--text); white-space: pre-wrap; word-break: break-word;
+  }
+  .artifact-body .k { color: var(--accent-hover); font-weight: 500; }
+  .artifact-body .s { color: var(--success); }
+  .artifact-body .c { color: var(--faint); }
+  .artifact-body .add { color: var(--success); }
+  .artifact-body .rem { color: var(--error); }
+  .artifact-body .ctx { color: var(--faint); }
+
+  .stage-help {
+    margin-top: 14px; padding: 10px 14px;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px; line-height: 1.5; color: var(--accent-hover);
+  }
+  .stage-help strong { font-weight: 600; }
+
+  /* ========== PRODUCTION RECEIPTS ========== */
+  .receipts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .receipt-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 6px;
+    text-decoration: none; color: var(--text);
+    transition: border-color .2s ease, transform .18s ease, box-shadow .18s ease;
+  }
+  .receipt-card:hover {
+    border-color: var(--accent); transform: translateY(-1px); box-shadow: var(--shadow-sm);
+  }
+  .receipt-card .vendor { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent-hover); }
+  .receipt-card .product { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; line-height: 1.25; color: var(--text); letter-spacing: -0.005em; }
+  .receipt-card .what { font-size: 13px; line-height: 1.5; color: var(--soft); }
+  .receipt-card .link {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--faint); margin-top: 2px; word-break: break-all;
+  }
+
+  /* ========== TRADEOFFS ========== */
+  .tradeoffs-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 170px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* ========== PATTERNS IT USES ========== */
+  .piu-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .piu-chip {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    padding: 8px 14px;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+    line-height: 1.4;
+  }
+  .piu-chip:hover { border-color: var(--accent); background: #e4dcfe; }
+  .piu-chip .chip-name { font-size: 13px; font-weight: 600; color: var(--accent-hover); white-space: nowrap; }
+  .piu-chip .chip-clause { font-size: 12px; font-weight: 400; color: var(--soft); }
+  .piu-chip:hover .chip-name { color: var(--accent); }
+
+  /* ========== WHEN TO USE ========== */
+  .vs-stack { display: flex; flex-direction: column; gap: 12px; }
+  .vs-row {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 16px 18px;
+    display: grid; grid-template-columns: 1fr; gap: 8px;
+  }
+  .vs-row .vs-head {
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  }
+  .vs-row .vs-vs {
+    font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 10px; padding: 2px 8px;
+  }
+  .vs-row .vs-vs.warn { color: var(--error); background: var(--error-soft); border-color: var(--error); }
+  .vs-row .vs-name {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 16.5px;
+    color: var(--text); letter-spacing: -0.005em;
+  }
+  .vs-row .vs-name a { color: var(--text); text-decoration: none; border-bottom: 1px dashed var(--border-strong); }
+  .vs-row .vs-name a:hover { color: var(--accent-hover); border-bottom-color: var(--accent); }
+  .vs-row .vs-when { font-size: 14px; line-height: 1.6; color: var(--soft); }
+  .vs-row .vs-when strong { color: var(--text); font-weight: 600; }
+  .vs-row .vs-when a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px dashed var(--accent); }
+  .vs-row .vs-when a:hover { color: var(--accent); }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  .sources li a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px dashed var(--border-strong); }
+  .sources li a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 640px) {
+    .stage-rail { grid-template-columns: repeat(2, 1fr); }
+    .stage-step:nth-child(2) { border-right: none; }
+    .stage-step:nth-child(1), .stage-step:nth-child(2) { border-bottom: 1px solid var(--border); }
+  }
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .default-callout { flex-direction: column; }
+  }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="builds.html"><span aria-hidden="true">&larr;</span> Builds</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="builds.html">Builds</a><span class="sep">/</span><span class="here">Spec-Driven Engineering Workflow</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
+      </svg>
+    </span>
+    Recipe &middot; Spec-Driven Engineering Workflow
+  </span>
+  <h1 class="pattern-title">Spec-Driven Engineering Workflow</h1>
+  <p class="explainer">The post-vibe-coding workflow. A human writes the spec, an agent implements and tests it, the human reviews the diff before anything ships.</p>
+
+  <div class="default-callout" role="note" aria-label="Default in 2026">
+    <span class="badge">Default in 2026</span>
+    <span class="body">
+      <strong>Human writes spec; agent implements + writes tests; human reviews diff before merge.</strong> Store spec, impl, and test as triplets in git. Never "vibe-code": every commit traceable to the spec it answered.
+    </span>
+  </div>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>A <span style="color:var(--accent-hover);font-weight:500">Spec-Driven Engineering Workflow</span> is the discipline of writing the intended behavior down first, in plain English, before any code is generated. The agent implements against that spec; the human reviews the diff against that spec; the test suite proves the code keeps matching the spec.</p>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <h2>Four stages, four <em>artifacts</em>.</h2>
+  <p class="demo-lede">Tap each stage to see what the human or agent produces. The artifact at each step is the only thing that moves to the next.</p>
+
+  <div class="spec-stage" role="region" aria-label="Spec-driven workflow stages">
+    <div class="stage-rail" role="tablist" aria-label="Workflow stages" id="stageRail">
+      <button class="stage-step human" role="tab" aria-selected="true" aria-controls="stagePanel" data-stage="1" tabindex="0">
+        <span class="stage-num">Stage 1</span>
+        <span class="stage-actor">Human</span>
+        <span class="stage-name">Write the spec</span>
+      </button>
+      <button class="stage-step agent" role="tab" aria-selected="false" aria-controls="stagePanel" data-stage="2" tabindex="-1">
+        <span class="stage-num">Stage 2</span>
+        <span class="stage-actor">Agent</span>
+        <span class="stage-name">Generate the code</span>
+      </button>
+      <button class="stage-step agent" role="tab" aria-selected="false" aria-controls="stagePanel" data-stage="3" tabindex="-1">
+        <span class="stage-num">Stage 3</span>
+        <span class="stage-actor">Agent</span>
+        <span class="stage-name">Write tests against spec</span>
+      </button>
+      <button class="stage-step human" role="tab" aria-selected="false" aria-controls="stagePanel" data-stage="4" tabindex="-1">
+        <span class="stage-num">Stage 4</span>
+        <span class="stage-actor">Human</span>
+        <span class="stage-name">Review and approve</span>
+      </button>
+    </div>
+
+    <div class="stage-panel" id="stagePanel" role="tabpanel" aria-live="polite">
+      <span class="stage-panel-tag human" id="spTag"><span class="dot" aria-hidden="true"></span><span id="spTagText">Human owns this step</span></span>
+      <div class="stage-panel-headline" id="spHead">A markdown file. Plain English. The thing you would tell a careful colleague.</div>
+      <div class="stage-panel-sub" id="spSub">Before any code is written, you describe the behavior: what the function does, the inputs it accepts, the outputs it returns, and at least one tricky edge case. <strong>This file is the contract.</strong></div>
+      <div class="artifact" id="spArtifactWrap">
+        <div class="artifact-head">
+          <span class="artifact-name" id="spArtifactName">specs/rate_limiter.md</span>
+          <span class="artifact-kind" id="spArtifactKind">Spec</span>
+        </div>
+        <div class="artifact-body" id="spArtifactBody"></div>
+      </div>
+      <div class="stage-help" id="spHelp"><strong>Tip:</strong> If you cannot write the spec, you do not yet understand the problem. Do not start coding.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE (production receipts) -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>Built and <em>shipped</em>.</h2>
+  <p class="demo-lede">Four 2026 environments that bake the spec-first loop into the tool itself. Different IDEs, same shape: spec is the source of truth.</p>
+
+  <div class="receipts-grid" role="list" aria-label="Production spec-driven tools">
+    <a class="receipt-card" href="https://kiro.dev" target="_blank" rel="noopener" role="listitem">
+      <span class="vendor">AWS</span>
+      <span class="product">Kiro IDE</span>
+      <span class="what">Spec-first IDE. You write a <code>.spec.md</code> file; Kiro generates code, tests, and a task plan against it. The spec stays beside the code in git.</span>
+      <span class="link">kiro.dev</span>
+    </a>
+    <a class="receipt-card" href="https://docs.cursor.com/agent" target="_blank" rel="noopener" role="listitem">
+      <span class="vendor">Cursor</span>
+      <span class="product">Cursor Agent Mode</span>
+      <span class="what">You write a spec file in the repo, point the agent at it, and watch it edit across files. Review the diff in the same pane before applying.</span>
+      <span class="link">docs.cursor.com/agent</span>
+    </a>
+    <a class="receipt-card" href="https://githubnext.com/projects/copilot-workspace" target="_blank" rel="noopener" role="listitem">
+      <span class="vendor">GitHub</span>
+      <span class="product">Copilot Workspace</span>
+      <span class="what">Issue becomes spec, spec becomes plan, plan becomes PR. Every stage is editable by the human before it advances.</span>
+      <span class="link">githubnext.com/projects/copilot-workspace</span>
+    </a>
+    <a class="receipt-card" href="https://x.com/karpathy/status/1886192184808149383" target="_blank" rel="noopener" role="listitem">
+      <span class="vendor">Andrej Karpathy</span>
+      <span class="product">Post-vibe-coding manifesto</span>
+      <span class="what">Karpathy on X: "vibe coding" is for throwaway demos; production work in 2026 means specs, tests, and review. The naming stuck.</span>
+      <span class="link">x.com/karpathy</span>
+    </a>
+  </div>
+</section>
+
+<!-- 04 THE PRICE YOU PAY -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost per task</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Time to first commit</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Up-front discipline</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Quality at merge</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Traceability later</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Slower at the start, faster forever after. The spec is the bill you pay so the next engineer (or the next agent) does not have to reverse-engineer your intent from the code.
+    </div>
+  </div>
+</section>
+
+<!-- 05 PATTERNS IT USES (decomposes-into) -->
+<section>
+  <div class="section-label"><span class="num">05</span>Patterns It Uses</div>
+  <h2>What it <em>decomposes</em> into.</h2>
+  <div class="piu-grid" role="list" aria-label="Patterns that compose this workflow">
+    <a class="piu-chip" href="orchestration-approval-gates.html" role="listitem">
+      <span class="chip-name">Approval Gates</span>
+      <span class="chip-clause">human signs off before merge</span>
+    </a>
+    <a class="piu-chip" href="orchestration-coordination.html" role="listitem">
+      <span class="chip-name">Coordination</span>
+      <span class="chip-clause">human and agent hand off cleanly</span>
+    </a>
+    <a class="piu-chip" href="data-artifacts-prompt-versioning.html" role="listitem">
+      <span class="chip-name">Specs as Artifacts</span>
+      <span class="chip-clause">spec lives in git next to the code</span>
+    </a>
+    <a class="piu-chip" href="consideration-eval-driven-development.html" role="listitem">
+      <span class="chip-name">Evals as Living Tests</span>
+      <span class="chip-clause">tests track the spec, not the impl</span>
+    </a>
+  </div>
+</section>
+
+<!-- 06 WHEN TO USE -->
+<section>
+  <div class="section-label"><span class="num">06</span>When to Use It</div>
+  <h2>Pick the right <em>shape</em>.</h2>
+  <div class="vs-stack">
+    <div class="vs-row">
+      <div class="vs-head">
+        <span class="vs-vs warn">Pick this over</span>
+        <span class="vs-name"><a href="anti-patterns.html">Vibe coding</a></span>
+      </div>
+      <div class="vs-when">Always, for anything that ships. "Vibe coding" (prompting until the demo works, no spec, no tests) is fine for throwaway prototypes and explicitly listed as an anti-pattern for production. Spec-driven is the cure.</div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-head">
+        <span class="vs-vs">Pick this over</span>
+        <span class="vs-name">Pair-programming with the agent</span>
+      </div>
+      <div class="vs-when">When you can articulate the behavior up front. Pair-programming is the right shape for <strong>exploring an unknown</strong>; spec-driven is the right shape once you <strong>know what you want</strong>. The transition point is the moment you can write the spec.</div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-head">
+        <span class="vs-vs">Pick this over</span>
+        <span class="vs-name">PR review of a human-written change</span>
+      </div>
+      <div class="vs-when">When the work is well-scoped and mechanical (refactors, CRUD endpoints, schema migrations, API client updates). A human-authored PR pays for an agent's time you did not have to. Save human authorship for the parts that need genuine judgment.</div>
+    </div>
+  </div>
+</section>
+
+<!-- BACK LINK -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>AWS. <em>Kiro IDE: spec-driven development.</em> <a href="https://kiro.dev" target="_blank" rel="noopener">kiro.dev</a> <span class="note">Production IDE built around the spec-impl-test triplet stored in git.</span></li>
+    <li>Cursor. <em>Cursor Agent Mode.</em> <a href="https://docs.cursor.com/agent" target="_blank" rel="noopener">docs.cursor.com/agent</a> <span class="note">Spec files in the repo drive agent edits; the diff is the review surface.</span></li>
+    <li>GitHub. <em>Copilot Workspace.</em> <a href="https://githubnext.com/projects/copilot-workspace" target="_blank" rel="noopener">githubnext.com/projects/copilot-workspace</a> <span class="note">End-to-end pipeline from issue to spec to plan to PR, with human checkpoints at every stage.</span></li>
+    <li>Karpathy, A. (2025). <em>On post-vibe-coding.</em> <a href="https://x.com/karpathy/status/1886192184808149383" target="_blank" rel="noopener">x.com/karpathy</a> <span class="note">The original framing of why "vibe coding" works for demos and breaks for production.</span></li>
+    <li>Beck, K. <em>Test-Driven Development by Example.</em> <span class="note">The pre-LLM ancestor: the test is the spec, written first. Spec-driven is TDD with the spec hoisted up one level so an agent can read it.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ SPEC WORKFLOW TAP-THROUGH ============
+const STAGES = {
+  '1': {
+    actor: 'human',
+    tagText: 'Human owns this step',
+    head: 'A markdown file. Plain English. The thing you would tell a careful colleague.',
+    sub: 'Before any code is written, you describe the behavior: what the function does, the inputs it accepts, the outputs it returns, and at least one tricky edge case. <strong>This file is the contract.</strong>',
+    artifactName: 'specs/rate_limiter.md',
+    artifactKind: 'Spec',
+    artifactBody:
+`<span class="c"># Rate limiter spec</span>
+
+<span class="k">## What it does</span>
+Limit a caller to <span class="s">N</span> requests per <span class="s">window_seconds</span>.
+
+<span class="k">## Inputs</span>
+- <span class="s">caller_id</span>: stable string identifier
+- <span class="s">N</span>: integer, requests allowed per window
+- <span class="s">window_seconds</span>: integer
+
+<span class="k">## Returns</span>
+- <span class="s">True</span>  if the call is allowed
+- <span class="s">False</span> if the call is over the limit
+
+<span class="k">## Edge cases</span>
+- Brand-new caller: always allowed
+- Window has rolled over: counter resets
+- Clock skew: trust the server clock, not the caller</span>`,
+    help: '<strong>Tip:</strong> If you cannot write the spec, you do not yet understand the problem. Do not start coding.',
+  },
+  '2': {
+    actor: 'agent',
+    tagText: 'Agent owns this step',
+    head: 'The agent reads the spec and writes the implementation.',
+    sub: 'Same model and harness you would use for any task. The difference: the agent works <strong>against the spec</strong>, not against a one-shot prompt. The spec sits open in context the whole time.',
+    artifactName: 'rate_limiter.py',
+    artifactKind: 'Implementation',
+    artifactBody:
+`<span class="c"># Generated by agent from specs/rate_limiter.md</span>
+<span class="k">from</span> time <span class="k">import</span> time
+<span class="k">from</span> collections <span class="k">import</span> defaultdict, deque
+
+<span class="k">class</span> RateLimiter:
+    <span class="k">def</span> __init__(self, n, window_seconds):
+        self.n = n
+        self.window = window_seconds
+        self.calls = defaultdict(deque)
+
+    <span class="k">def</span> allow(self, caller_id):
+        now = time()
+        q = self.calls[caller_id]
+        <span class="k">while</span> q <span class="k">and</span> q[0] &lt;= now - self.window:
+            q.popleft()
+        <span class="k">if</span> len(q) &lt; self.n:
+            q.append(now)
+            <span class="k">return</span> <span class="s">True</span>
+        <span class="k">return</span> <span class="s">False</span></span>`,
+    help: '<strong>Tip:</strong> The agent does not invent behavior outside the spec. If it thinks something should change, it edits the spec first and asks you to re-approve.',
+  },
+  '3': {
+    actor: 'agent',
+    tagText: 'Agent owns this step',
+    head: 'Tests written against the spec, not against the code.',
+    sub: 'Each test maps to one bullet in the spec. If the spec changes, the tests change. If the implementation changes, tests should still pass. <strong>The tests are how you check the impl still matches the spec.</strong>',
+    artifactName: 'test_rate_limiter.py',
+    artifactKind: 'Tests',
+    artifactBody:
+`<span class="c"># Each test cites the spec line it covers</span>
+<span class="k">def</span> test_new_caller_allowed():
+    <span class="c"># Spec: Brand-new caller: always allowed</span>
+    rl = RateLimiter(n=3, window_seconds=60)
+    <span class="k">assert</span> rl.allow(<span class="s">"alice"</span>) <span class="k">is</span> <span class="s">True</span>
+
+<span class="k">def</span> test_over_limit_blocks():
+    <span class="c"># Spec: False if the call is over the limit</span>
+    rl = RateLimiter(n=2, window_seconds=60)
+    rl.allow(<span class="s">"alice"</span>); rl.allow(<span class="s">"alice"</span>)
+    <span class="k">assert</span> rl.allow(<span class="s">"alice"</span>) <span class="k">is</span> <span class="s">False</span>
+
+<span class="k">def</span> test_window_rolls_over():
+    <span class="c"># Spec: Window has rolled over: counter resets</span>
+    <span class="c"># ...time-mock test omitted for brevity...</span>
+    <span class="k">pass</span></span>`,
+    help: '<strong>Tip:</strong> Comments cite the spec bullet. When a test fails, you can see which part of the contract it is enforcing.',
+  },
+  '4': {
+    actor: 'human',
+    tagText: 'Human owns this step',
+    head: 'You read the diff. You approve, edit, or reject.',
+    sub: 'Three artifacts arrive together for review: the spec, the implementation, the tests. <strong>You scan for "does this match what I asked for?"</strong> If yes, merge. If not, you edit the spec and the loop runs again.',
+    artifactName: 'PR #142: rate limiter',
+    artifactKind: 'Review',
+    artifactBody:
+`<span class="ctx">  Files changed (3)</span>
+<span class="add">+ specs/rate_limiter.md           (new, 18 lines)</span>
+<span class="add">+ rate_limiter.py                 (new, 22 lines)</span>
+<span class="add">+ test_rate_limiter.py            (new, 31 lines)</span>
+
+<span class="ctx">  Checks</span>
+<span class="add">  ✓ pytest                         3 passed</span>
+<span class="add">  ✓ spec linked from impl docstring</span>
+<span class="add">  ✓ each test cites a spec line</span>
+
+<span class="ctx">  Decision</span>
+<span class="add">  [ Approve ]  [ Request changes ]  [ Edit spec & retry ]</span></span>`,
+    help: '<strong>Tip:</strong> The merge button is the only place humans stay in the loop end-to-end. Everything else can shift to the agent.',
+  },
+};
+
+const stageEls = document.querySelectorAll('#stageRail .stage-step');
+const spTag      = document.getElementById('spTag');
+const spTagText  = document.getElementById('spTagText');
+const spHead     = document.getElementById('spHead');
+const spSub      = document.getElementById('spSub');
+const spName     = document.getElementById('spArtifactName');
+const spKind     = document.getElementById('spArtifactKind');
+const spBody     = document.getElementById('spArtifactBody');
+const spHelp     = document.getElementById('spHelp');
+
+function showStage(n, focusEl) {
+  const s = STAGES[n];
+  if (!s) return;
+  stageEls.forEach(el => {
+    const active = el.dataset.stage === String(n);
+    el.setAttribute('aria-selected', active ? 'true' : 'false');
+    el.tabIndex = active ? 0 : -1;
+    if (active && focusEl) el.focus();
+  });
+  spTag.classList.remove('human','agent');
+  spTag.classList.add(s.actor);
+  spTagText.textContent = s.tagText;
+  spHead.textContent = s.head;
+  spSub.innerHTML    = s.sub;
+  spName.textContent = s.artifactName;
+  spKind.textContent = s.artifactKind;
+  spBody.innerHTML   = s.artifactBody;
+  spHelp.innerHTML   = s.help;
+}
+
+const keys = ['1','2','3','4'];
+stageEls.forEach((el, idx) => {
+  el.addEventListener('click', () => showStage(el.dataset.stage, false));
+  el.addEventListener('keydown', (e) => {
+    let next = idx;
+    if (e.key === 'ArrowRight') next = Math.min(idx + 1, keys.length - 1);
+    else if (e.key === 'ArrowLeft') next = Math.max(idx - 1, 0);
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = keys.length - 1;
+    else return;
+    e.preventDefault();
+    showStage(keys[next], true);
+  });
+});
+
+showStage('1', false);
+</script>
+</body>
+</html>

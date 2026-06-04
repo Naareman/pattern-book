@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swarm · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --warn:#B5651D; --warn-soft:#FBF1E2;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* default-in-2026 callout */
+  .default-callout {
+    margin-top: 22px;
+    background: linear-gradient(180deg, #FBFAFF 0%, #F4F0FE 100%);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .default-callout-icon { flex-shrink: 0; width: 18px; height: 18px; color: var(--accent); margin-top: 2px; }
+  .default-callout-icon svg { width: 100%; height: 100%; display: block; }
+  .default-callout-body { flex: 1; min-width: 0; }
+  .default-callout-label {
+    font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--accent-hover);
+    margin-bottom: 4px;
+  }
+  .default-callout-text {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 400;
+    font-size: 15.5px; line-height: 1.55; color: var(--text);
+  }
+  .default-callout-text code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace; font-style: normal;
+    font-size: 12.5px; padding: 1px 5px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 4px; color: var(--accent-hover);
+  }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.6; color: var(--text); }
+
+  /* layer badges */
+  .layer-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .layer-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .layer-badge:hover { border-color: var(--accent); background: #e4dcfe; }
+  .layer-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ============ DEMO: peer-to-peer handoffs ============ */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* query bar */
+  .query-bar {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 18px;
+  }
+  .query-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .query-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--text); line-height: 1.3; }
+
+  /* peer ring */
+  .peer-ring {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 0.78;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .peer-svg {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  .peer-svg .peer-edge {
+    fill: none; stroke: var(--border-strong); stroke-width: 1.4;
+    stroke-dasharray: 4 3;
+    transition: stroke .3s ease, stroke-width .3s ease, opacity .3s ease;
+    opacity: 0.7;
+  }
+  .peer-svg .peer-edge.active { stroke: var(--accent); stroke-width: 2.2; opacity: 1; stroke-dasharray: none; }
+  .peer-svg .peer-edge.past   { stroke: var(--success); stroke-width: 1.6; opacity: 0.9; stroke-dasharray: 2 3; }
+
+  /* token marker travelling along an active edge */
+  .peer-svg .peer-token { fill: var(--accent); }
+
+  .peer-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    background: var(--surface); border: 2px solid var(--border-strong);
+    border-radius: 50%;
+    width: 116px; height: 116px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    padding: 8px;
+    text-align: center;
+    transition: border-color .25s ease, background .25s ease, box-shadow .25s ease, transform .25s ease;
+  }
+  .peer-node.holding {
+    border-color: var(--accent); background: var(--accent-soft);
+    box-shadow: 0 8px 22px rgba(124, 92, 246, 0.22);
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  .peer-node.touched { border-color: var(--success); }
+  .peer-node-icon { width: 22px; height: 22px; color: var(--accent-hover); }
+  .peer-node-icon svg { width: 100%; height: 100%; display: block; }
+  .peer-node-name { font-size: 12.5px; font-weight: 700; color: var(--text); line-height: 1.2; }
+  .peer-node-role {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px; color: var(--faint);
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+  .peer-node.holding .peer-node-role { color: var(--accent-hover); }
+
+  /* the conversation card travelling between peers */
+  .peer-convo {
+    margin-top: 22px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px 14px;
+    font-size: 13px; line-height: 1.55; color: var(--text);
+    display: flex; gap: 10px; align-items: flex-start;
+    min-height: 64px;
+  }
+  .peer-convo-tag {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10.5px; font-weight: 600; letter-spacing: .06em;
+    background: var(--accent); color: #fff; padding: 3px 7px;
+    border-radius: 4px; flex-shrink: 0; text-transform: uppercase;
+    min-width: 78px; text-align: center;
+  }
+  .peer-convo-tag.start { background: var(--soft); }
+  .peer-convo-tag.done  { background: var(--success); }
+  .peer-convo-body { flex: 1; min-width: 0; }
+  .peer-convo-route {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11.5px; color: var(--faint); margin-bottom: 4px;
+  }
+  .peer-convo-trigger {
+    display: inline-block;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10.5px; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 4px; padding: 1px 6px; margin-left: 6px;
+  }
+  .peer-convo-text { font-size: 13.5px; color: var(--text); line-height: 1.5; }
+
+  /* honesty banner about research vs production */
+  .honest-banner {
+    margin-top: 16px;
+    background: var(--warn-soft); border: 1px solid #e8d5b1;
+    border-left: 3px solid var(--warn);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 12.5px; line-height: 1.55; color: #6b4313;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .honest-banner-icon { flex-shrink: 0; color: var(--warn); width: 16px; height: 16px; margin-top: 2px; }
+  .honest-banner-icon svg { width: 100%; height: 100%; }
+  .honest-banner strong { color: var(--warn); font-weight: 700; }
+
+  /* controls */
+  .demo-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .step-counter {
+    margin-left: auto; align-self: center;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px; color: var(--faint);
+  }
+
+  /* ============ REAL EXAMPLE: production receipts ============ */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .example-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
+  .example-intro strong { color: var(--warn); font-weight: 600; }
+
+  .receipt-list {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .receipt {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--bg-subtle);
+    padding: 14px 16px;
+    display: flex; gap: 14px; align-items: flex-start;
+    text-decoration: none; color: var(--text);
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    position: relative;
+  }
+  .receipt:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+  .receipt-stamp {
+    flex-shrink: 0;
+    width: 42px; height: 42px; border-radius: 8px;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent-hover);
+  }
+  .receipt-stamp svg { width: 20px; height: 20px; display: block; }
+  .receipt-body { flex: 1; min-width: 0; }
+  .receipt-co {
+    font-size: 13.5px; font-weight: 700; color: var(--text);
+    margin-bottom: 3px;
+  }
+  .receipt-co .receipt-product { color: var(--soft); font-weight: 500; }
+  .receipt-status {
+    display: inline-block;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: .04em;
+    padding: 2px 7px; border-radius: 4px;
+    margin-left: 6px; vertical-align: middle;
+    text-transform: uppercase;
+  }
+  .receipt-status.deprecated { background: var(--warn-soft); color: var(--warn); border: 1px solid #e8d5b1; }
+  .receipt-status.successor  { background: var(--success-soft); color: var(--success); border: 1px solid #b2e4d5; }
+  .receipt-status.research   { background: #eff4ff; color: #2b4a99; border: 1px solid #c8d6f5; }
+  .receipt-quote { font-size: 13px; color: var(--soft); line-height: 1.55; margin-bottom: 6px; }
+  .receipt-link {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px; color: var(--accent-hover);
+    word-break: break-all;
+  }
+  .receipt:hover .receipt-link { color: var(--accent); }
+
+  /* ============ PATTERNS IT USES: compact chips ============ */
+  .layer-chips {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .layer-chip {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    padding: 9px 14px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 20px;
+    text-decoration: none; font-size: 13px; font-weight: 500;
+    color: var(--text); transition: border-color .18s ease, background .18s ease;
+    line-height: 1.4;
+  }
+  .layer-chip:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .layer-chip-name { color: var(--accent-hover); font-weight: 700; white-space: nowrap; }
+  .layer-chip-sep { color: var(--border-strong); font-weight: 400; }
+  .layer-chip-clause { color: var(--soft); }
+
+  .decomposes-note {
+    margin-top: 14px;
+    font-size: 13px; color: var(--soft); line-height: 1.55;
+    padding: 12px 14px; background: var(--bg-subtle);
+    border: 1px dashed var(--border-strong); border-radius: var(--radius-sm);
+  }
+  .decomposes-note strong { color: var(--accent-hover); font-weight: 600; font-family: 'Inter', sans-serif; }
+
+  /* ============ TRADEOFFS ============ */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 170px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
+    .tradeoff-label { min-width: 0; }
+  }
+
+  /* ============ DECISION LOGIC ============ */
+  .decision-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .decision-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
+  .decision-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    margin-bottom: 16px;
+  }
+  .decision-row:last-child { margin-bottom: 0; }
+  @media (max-width: 560px) { .decision-row { grid-template-columns: 1fr; } }
+  .decision-cell {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 14px; background: var(--bg-subtle);
+  }
+  .decision-cell.pick {
+    background: var(--accent-soft); border-color: var(--accent);
+  }
+  .decision-vs {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10.5px; font-weight: 600; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--faint); margin-bottom: 4px;
+  }
+  .decision-cell.pick .decision-vs { color: var(--accent-hover); }
+  .decision-name {
+    font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px;
+  }
+  .decision-name a { color: var(--text); text-decoration: none; border-bottom: 1px dashed var(--border-strong); }
+  .decision-name a:hover { color: var(--accent-hover); border-bottom-color: var(--accent); }
+  .decision-when { font-size: 12.5px; color: var(--soft); line-height: 1.5; }
+  .decision-rule {
+    margin-top: 14px; padding: 12px 14px;
+    background: var(--bg-subtle); border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    font-size: 13.5px; line-height: 1.6; color: var(--text);
+  }
+  .decision-rule strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  .sources li a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px dashed var(--border-strong); }
+  .sources li a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .peer-node { width: 92px; height: 92px; }
+    .peer-node-name { font-size: 11.5px; }
+    .peer-node-role { font-size: 9.5px; }
+  }
+  @media (max-width: 480px) {
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+    .step-counter { text-align: center; margin: 4px 0 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="builds.html"><span aria-hidden="true">&larr;</span> Builds</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep">/</span>
+      <a href="builds.html">Builds</a>
+      <span class="sep">/</span>
+      <span class="here">Swarm</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="6"  cy="7"  r="2.5"/>
+        <circle cx="18" cy="7"  r="2.5"/>
+        <circle cx="6"  cy="17" r="2.5"/>
+        <circle cx="18" cy="17" r="2.5"/>
+        <path d="M8 7h8M8 17h8M6 9.5v5M18 9.5v5"/>
+      </svg>
+    </span>Recipe &middot; Swarm / Peer-to-peer Agents
+  </span>
+  <h1 class="pattern-title">Swarm</h1>
+  <p class="explainer">A small group of peer agents that pass the conversation between themselves based on what the task needs next. No supervisor, no hierarchy, no fixed roles.</p>
+
+  <div class="default-callout" role="note" aria-label="Default in 2026">
+    <span class="default-callout-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 7v5l3 2"/>
+      </svg>
+    </span>
+    <div class="default-callout-body">
+      <div class="default-callout-label">Default in 2026 &middot; Updated June</div>
+      <div class="default-callout-text">
+        OpenAI <code>Swarm</code> is deprecated; the OpenAI <code>Agents SDK</code> Handoffs API is its spiritual successor. Reach for peer-to-peer only when no single agent has authority and roles shift dynamically. Mostly research, rarely production this year.
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>A <span style="color:var(--accent-hover);font-weight:500">Swarm</span> is a group of agents who talk to each other as peers, not as boss and reports. Whoever holds the conversation looks at what the task needs next and hands it off to whichever peer can do that next thing. The handoff is the structure. No agent has lasting authority. Roles shift turn by turn.</p>
+  </div>
+  <div class="layer-badges" aria-label="Layers used by this build">
+    <a class="layer-badge" href="layer-orchestration-agents.html">
+      <span class="dot" aria-hidden="true"></span>Orchestration &amp; agents
+    </a>
+    <a class="layer-badge" href="layer-composition.html">
+      <span class="dot" aria-hidden="true"></span>Composition
+    </a>
+    <a class="layer-badge" href="layer-stateful-memory.html">
+      <span class="dot" aria-hidden="true"></span>Stateful Memory
+    </a>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Watch the conversation <em>change hands</em>.</h2>
+
+  <p class="demo-lede">Four peer agents. Whoever holds the conversation decides who handles the next move based on a trigger. No supervisor ever appears.</p>
+
+  <div class="demo-stage">
+    <!-- the question -->
+    <div class="query-bar">
+      <div class="query-label">Customer message (handed to whichever peer is online)</div>
+      <div class="query-text">I bought the wrong plan last month and want a refund, plus help moving my data to the new one.</div>
+    </div>
+
+    <!-- peer ring -->
+    <div class="peer-ring" id="peerRing">
+      <svg class="peer-svg" id="peerSvg" preserveAspectRatio="none" aria-hidden="true"></svg>
+
+      <!-- four peer nodes, positioned in JS to stay on a centered ellipse -->
+      <div class="peer-node" id="p-triage" data-id="triage">
+        <span class="peer-node-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg>
+        </span>
+        <span class="peer-node-name">Triage</span>
+        <span class="peer-node-role">reads intent</span>
+      </div>
+      <div class="peer-node" id="p-billing" data-id="billing">
+        <span class="peer-node-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>
+        </span>
+        <span class="peer-node-name">Billing</span>
+        <span class="peer-node-role">refunds &amp; plans</span>
+      </div>
+      <div class="peer-node" id="p-data" data-id="data">
+        <span class="peer-node-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>
+        </span>
+        <span class="peer-node-name">Data Move</span>
+        <span class="peer-node-role">migration</span>
+      </div>
+      <div class="peer-node" id="p-followup" data-id="followup">
+        <span class="peer-node-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 6L12 13 2 6"/><rect x="2" y="6" width="20" height="13" rx="2"/></svg>
+        </span>
+        <span class="peer-node-name">Follow-up</span>
+        <span class="peer-node-role">closes loop</span>
+      </div>
+    </div>
+
+    <!-- conversation card -->
+    <div class="peer-convo" id="peerConvo" aria-live="polite" aria-atomic="true">
+      <span class="peer-convo-tag start" id="peerConvoTag">Idle</span>
+      <div class="peer-convo-body">
+        <div class="peer-convo-route" id="peerConvoRoute">tap Step or Play to begin</div>
+        <div class="peer-convo-text" id="peerConvoText">The conversation has not started. The first agent to receive the message will decide what to do next.</div>
+      </div>
+    </div>
+
+    <div class="honest-banner" role="note">
+      <span class="honest-banner-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.1"/></svg>
+      </span>
+      <span><strong>Honest note.</strong> This demo is a tidy version. In real swarms, agents can loop, argue, or drop the ball with no boss to catch them.</span>
+    </div>
+
+    <div class="demo-controls">
+      <button class="diagram-btn" id="stepBtn" type="button">&rarr; Step</button>
+      <button class="diagram-btn primary" id="playBtn" type="button">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn" type="button">&#8635; Reset</button>
+      <span class="step-counter" id="stepCounter" aria-live="polite">step 0 of 5</span>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>Who <em>actually</em> ships this.</h2>
+  <div class="example-stage">
+    <p class="example-intro">Honest receipts: the foundational reference is deprecated, the successor is well-supported but young, and production usage is concentrated in <strong>research labs and orchestration demos</strong> rather than user-facing apps.</p>
+
+    <div class="receipt-list">
+      <a class="receipt" href="https://github.com/openai/swarm" target="_blank" rel="noopener noreferrer">
+        <span class="receipt-stamp" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M3 12h18M12 3a13 13 0 010 18M12 3a13 13 0 000 18"/>
+          </svg>
+        </span>
+        <div class="receipt-body">
+          <div class="receipt-co">OpenAI <span class="receipt-product">&middot; Swarm</span><span class="receipt-status deprecated">deprecated</span></div>
+          <div class="receipt-quote">The reference implementation that defined the recipe in 2024: agents declare handoff functions, the framework routes turn-by-turn with no central manager. Maintained as an educational library but no longer recommended for new builds.</div>
+          <div class="receipt-link">github.com/openai/swarm</div>
+        </div>
+      </a>
+
+      <a class="receipt" href="https://openai.github.io/openai-agents-python/" target="_blank" rel="noopener noreferrer">
+        <span class="receipt-stamp" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12h6l2 -3 2 6 2 -3h6"/>
+          </svg>
+        </span>
+        <div class="receipt-body">
+          <div class="receipt-co">OpenAI <span class="receipt-product">&middot; Agents SDK Handoffs</span><span class="receipt-status successor">successor</span></div>
+          <div class="receipt-quote">The production-supported spiritual successor. <code style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--accent-hover)">handoff()</code> primitives let agents transfer the conversation to a peer with full context. Comes with tracing, guardrails, and a Python-first API.</div>
+          <div class="receipt-link">openai.github.io/openai-agents-python</div>
+        </div>
+      </a>
+
+      <a class="receipt" href="https://docs.crewai.com/concepts/flows" target="_blank" rel="noopener noreferrer">
+        <span class="receipt-stamp" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6l4 4 -4 4M16 6l4 4 -4 4M4 18h16"/>
+          </svg>
+        </span>
+        <div class="receipt-body">
+          <div class="receipt-co">CrewAI <span class="receipt-product">&middot; Flows for peer mode</span></div>
+          <div class="receipt-quote">Event-driven flows let agents react to each other's outputs without a manager. The closest production-grade swarm pattern in the CrewAI stack: declarative routing instead of a hierarchical process.</div>
+          <div class="receipt-link">docs.crewai.com/concepts/flows</div>
+        </div>
+      </a>
+
+      <a class="receipt" href="https://modelcontextprotocol.io/" target="_blank" rel="noopener noreferrer">
+        <span class="receipt-stamp" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6"  cy="6"  r="2.5"/>
+            <circle cx="18" cy="6"  r="2.5"/>
+            <circle cx="12" cy="18" r="2.5"/>
+            <path d="M7.5 8L11 16M16.5 8L13 16M8 6h8"/>
+          </svg>
+        </span>
+        <div class="receipt-body">
+          <div class="receipt-co">Anthropic <span class="receipt-product">&middot; MCP federation</span><span class="receipt-status research">research-ish</span></div>
+          <div class="receipt-quote">Model Context Protocol is the substrate that lets independent agents discover and call each other's capabilities. Not a swarm framework by itself, but the open protocol that makes peer-to-peer agent topologies plausible across vendors.</div>
+          <div class="receipt-link">modelcontextprotocol.io</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Flexibility</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Predictability</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Debuggability</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Token cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Production readiness</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+
+    <div class="tradeoff-quote">
+      No supervisor means no single place to fix a runaway loop, drop a bad handoff, or override a dumb decision. You gain adaptability and lose the safety net that hierarchy provides.
+    </div>
+  </div>
+</section>
+
+<!-- 05 PATTERNS IT USES -->
+<section>
+  <div class="section-label"><span class="num">05</span>Patterns It Uses</div>
+  <h2>Which <em>layers</em> do the work.</h2>
+  <div class="layer-chips">
+    <a class="layer-chip" href="orchestration-agent-to-agent-protocols.html">
+      <span class="layer-chip-name">Agent-to-agent protocols</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">peers speak directly, not through a manager</span>
+    </a>
+    <a class="layer-chip" href="orchestration-capability-negotiation.html">
+      <span class="layer-chip-name">Capability negotiation</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">whoever holds the conversation picks the next peer based on declared skills</span>
+    </a>
+    <a class="layer-chip" href="orchestration-shared-workspace.html">
+      <span class="layer-chip-name">Shared workspace</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">the conversation history is the only common state across peers</span>
+    </a>
+    <a class="layer-chip" href="orchestration-router-dispatcher.html">
+      <span class="layer-chip-name">Router / dispatcher</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">routing logic lives inside each peer, not in a central node</span>
+    </a>
+    <a class="layer-chip" href="orchestration-agent-identity.html">
+      <span class="layer-chip-name">Agent identity</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">each peer has a stable role declaration that others can discover and hand off to</span>
+    </a>
+  </div>
+
+  <div class="decomposes-note">
+    <strong>Decomposes into:</strong> at Layer 5, this recipe is coordination with no supervisor, plus dynamic role transitions on every turn. Roles are still declared statically, but who holds the conversation is decided turn-by-turn by the holder, not by a fixed plan.
+  </div>
+</section>
+
+<!-- 06 WHEN TO USE VS ALTERNATIVES -->
+<section>
+  <div class="section-label"><span class="num">06</span>When To Use</div>
+  <h2>Swarm, or a <em>shape with a boss</em>?</h2>
+  <div class="decision-stage">
+    <p class="decision-intro">Swarm is the right answer in fewer cases than it looks. Most teams default to it because it sounds futuristic, then end up rebuilding hierarchy by hand.</p>
+
+    <div class="decision-row">
+      <div class="decision-cell">
+        <div class="decision-vs">vs.</div>
+        <div class="decision-name"><a href="build-customer-support-agent.html">Supervisor / Worker</a></div>
+        <div class="decision-when">A boss agent owns the plan and tells workers what to do. Pick this when authority is fixed and you want a clear audit trail.</div>
+      </div>
+      <div class="decision-cell pick">
+        <div class="decision-vs">pick swarm when</div>
+        <div class="decision-name">There is <em>no boss</em></div>
+        <div class="decision-when">No one peer can sensibly own the whole task and authority shifts based on what each turn needs. Let the holder hand off.</div>
+      </div>
+    </div>
+
+    <div class="decision-row">
+      <div class="decision-cell">
+        <div class="decision-vs">vs.</div>
+        <div class="decision-name">Multi-Agent Debate</div>
+        <div class="decision-when">Peers argue opposing positions to surface tradeoffs. Pick this when adversarial pressure improves the answer.</div>
+      </div>
+      <div class="decision-cell pick">
+        <div class="decision-vs">pick swarm when</div>
+        <div class="decision-name">Peers are <em>collaborating</em></div>
+        <div class="decision-when">Everyone is on the same side, just with different skills. Handoffs are help, not challenge.</div>
+      </div>
+    </div>
+
+    <div class="decision-row">
+      <div class="decision-cell">
+        <div class="decision-vs">vs.</div>
+        <div class="decision-name"><a href="build-hierarchical-multi-agent.html">Hierarchical Multi-Agent</a></div>
+        <div class="decision-when">Formal levels: orchestrator, team supervisors, specialist workers. Pick this when the task is genuinely tree-shaped.</div>
+      </div>
+      <div class="decision-cell pick">
+        <div class="decision-vs">pick swarm when</div>
+        <div class="decision-name">Roles <em>shift dynamically</em></div>
+        <div class="decision-when">The next move depends on what the last move uncovered, not on a pre-drawn org chart.</div>
+      </div>
+    </div>
+
+    <div class="decision-rule">
+      <strong>The honest rule.</strong> If you can name a supervisor, use one. Swarm earns its place only when no agent can credibly own the result, and you are willing to accept harder debugging in exchange for adaptability. In 2026 this is still mostly research, rarely production.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>OpenAI (2024). <em>Swarm: an educational framework for multi-agent orchestration.</em> <a href="https://github.com/openai/swarm" target="_blank" rel="noopener noreferrer">github.com/openai/swarm</a>. <span class="note">Deprecated reference implementation. Kept as historical context.</span></li>
+    <li>OpenAI (2025). <em>OpenAI Agents SDK: Handoffs.</em> <a href="https://openai.github.io/openai-agents-python/" target="_blank" rel="noopener noreferrer">openai.github.io/openai-agents-python</a>. <span class="note">Production-supported successor with tracing and guardrails.</span></li>
+    <li>CrewAI (2024 onwards). <em>Flows: event-driven orchestration.</em> <a href="https://docs.crewai.com/concepts/flows" target="_blank" rel="noopener noreferrer">docs.crewai.com/concepts/flows</a>. <span class="note">The peer-friendly counterpart to CrewAI's hierarchical process.</span></li>
+    <li>Anthropic (2024 onwards). <em>Model Context Protocol.</em> <a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener noreferrer">modelcontextprotocol.io</a>. <span class="note">Open protocol enabling cross-vendor peer discovery and capability sharing.</span></li>
+    <li>Park et al. (2023). <em>Generative Agents: Interactive Simulacra of Human Behavior.</em> <span class="note">Foundational peer-to-peer agent paper. Demonstrates emergent coordination without supervisor.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ DEMO: peer-to-peer handoffs, tap-through 5 steps ============
+// Each step shows which peer is holding the conversation and which trigger caused
+// the next handoff. Token animates along the active edge.
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+const peerRing = document.getElementById('peerRing');
+const peerSvg  = document.getElementById('peerSvg');
+
+const PEERS = ['triage','billing','data','followup'];
+const P = {
+  triage:   document.getElementById('p-triage'),
+  billing:  document.getElementById('p-billing'),
+  data:     document.getElementById('p-data'),
+  followup: document.getElementById('p-followup'),
+};
+
+const convoTag   = document.getElementById('peerConvoTag');
+const convoRoute = document.getElementById('peerConvoRoute');
+const convoText  = document.getElementById('peerConvoText');
+
+const stepBtn  = document.getElementById('stepBtn');
+const playBtn  = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+const stepCounter = document.getElementById('stepCounter');
+
+// position peers on an ellipse and draw all pairwise edges (peer mesh)
+function layoutAndDraw() {
+  const r = peerRing.getBoundingClientRect();
+  const cx = r.width / 2;
+  const cy = r.height / 2;
+  const rx = r.width  * 0.36;
+  const ry = r.height * 0.36;
+
+  // four corners of a square inscribed in the ellipse
+  const positions = {
+    triage:   { x: cx - rx, y: cy - ry },
+    billing:  { x: cx + rx, y: cy - ry },
+    data:     { x: cx + rx, y: cy + ry },
+    followup: { x: cx - rx, y: cy + ry },
+  };
+
+  PEERS.forEach(id => {
+    const el = P[id];
+    el.style.left = positions[id].x + 'px';
+    el.style.top  = positions[id].y + 'px';
+  });
+
+  // draw edges between every pair (mesh)
+  peerSvg.setAttribute('viewBox', `0 0 ${r.width} ${r.height}`);
+  peerSvg.setAttribute('width',  r.width);
+  peerSvg.setAttribute('height', r.height);
+  peerSvg.innerHTML = '';
+
+  for (let i = 0; i < PEERS.length; i++) {
+    for (let j = i + 1; j < PEERS.length; j++) {
+      const a = positions[PEERS[i]];
+      const b = positions[PEERS[j]];
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1', a.x);
+      line.setAttribute('y1', a.y);
+      line.setAttribute('x2', b.x);
+      line.setAttribute('y2', b.y);
+      line.setAttribute('class','peer-edge');
+      line.setAttribute('data-a', PEERS[i]);
+      line.setAttribute('data-b', PEERS[j]);
+      peerSvg.appendChild(line);
+    }
+  }
+}
+
+function findEdge(a, b) {
+  return peerSvg.querySelector(`line[data-a="${a}"][data-b="${b}"]`)
+      || peerSvg.querySelector(`line[data-a="${b}"][data-b="${a}"]`);
+}
+
+function clearAllStates() {
+  PEERS.forEach(id => P[id].classList.remove('holding','touched'));
+  Array.from(peerSvg.querySelectorAll('line')).forEach(l => l.classList.remove('active','past'));
+}
+
+// the conversation as a sequence of (holder, trigger, message)
+// each handoff goes (prevHolder -> nextHolder)
+const STEPS = [
+  // 0: idle
+  { holder: null, prev: null, tag: 'Idle', trigger: null,
+    text: 'The conversation has not started. The first agent to receive the message will decide what to do next.' },
+  // 1: Triage receives the message
+  { holder: 'triage', prev: null, tag: 'Holding', trigger: 'intent=mixed',
+    text: 'Reads the message. Detects two intents: a billing question and a data question. Decides this needs Billing first, then Data Move.' },
+  // 2: Triage hands off to Billing
+  { holder: 'billing', prev: 'triage', tag: 'Handoff', trigger: 'refund_request',
+    text: 'Pulls last month\'s charge, confirms the plan downgrade is eligible, queues the refund. Notices the customer also asked about migration and hands off.' },
+  // 3: Billing hands off to Data Move
+  { holder: 'data', prev: 'billing', tag: 'Handoff', trigger: 'plan_change_confirmed',
+    text: 'Now that the plan change is live, migrates the customer\'s workspace to the new plan\'s schema. Reports rows moved and any items skipped.' },
+  // 4: Data Move hands off to Follow-up
+  { holder: 'followup', prev: 'data', tag: 'Handoff', trigger: 'migration_complete',
+    text: 'Writes a short summary, confirms both actions to the customer, schedules a check-in in 48 hours. Closes the loop.' },
+  // 5: done
+  { holder: null, prev: 'followup', tag: 'Done', trigger: null,
+    text: 'Conversation complete. No supervisor was ever consulted. Triage, Billing, Data Move, Follow-up each took one turn, each in their own area.' },
+];
+const TOTAL = STEPS.length - 1;
+
+let step = 0;
+let holdingHistory = []; // peers that have held the conversation so far
+
+function applyStep(s) {
+  step = s;
+  clearAllStates();
+  stepCounter.textContent = `step ${s} of ${TOTAL}`;
+  const def = STEPS[s];
+
+  // rebuild holdingHistory
+  holdingHistory = [];
+  for (let i = 0; i <= s; i++) {
+    if (STEPS[i].holder) holdingHistory.push(STEPS[i].holder);
+  }
+  // mark every peer that has ever held the conversation as touched
+  holdingHistory.forEach(id => P[id].classList.add('touched'));
+  // mark the current holder
+  if (def.holder) P[def.holder].classList.add('holding');
+
+  // mark past edges (between every consecutive pair in holdingHistory)
+  for (let i = 1; i < holdingHistory.length; i++) {
+    const e = findEdge(holdingHistory[i-1], holdingHistory[i]);
+    if (e) e.classList.add('past');
+  }
+  // mark the current active edge
+  if (def.prev && def.holder) {
+    const e = findEdge(def.prev, def.holder);
+    if (e) { e.classList.remove('past'); e.classList.add('active'); }
+  }
+
+  // update conversation card
+  convoTag.textContent = def.tag;
+  convoTag.classList.remove('start','done');
+  if (s === 0) convoTag.classList.add('start');
+  if (s === TOTAL) convoTag.classList.add('done');
+
+  if (s === 0) {
+    convoRoute.textContent = 'tap Step or Play to begin';
+  } else {
+    const route = def.prev
+      ? `${labelOf(def.prev)} &rarr; ${labelOf(def.holder)}`
+      : `incoming message &rarr; ${labelOf(def.holder)}`;
+    const trig = def.trigger
+      ? `<span class="peer-convo-trigger">${def.trigger}</span>`
+      : '';
+    convoRoute.innerHTML = route + trig;
+  }
+  convoText.textContent = def.text;
+}
+
+function labelOf(id) {
+  switch (id) {
+    case 'triage':   return 'Triage';
+    case 'billing':  return 'Billing';
+    case 'data':     return 'Data Move';
+    case 'followup': return 'Follow-up';
+    default:         return id;
+  }
+}
+
+stepBtn.addEventListener('click', () => {
+  if (step >= TOTAL) { applyStep(0); return; }
+  applyStep(step + 1);
+});
+playBtn.addEventListener('click', async () => {
+  playBtn.disabled = true; stepBtn.disabled = true;
+  applyStep(0);
+  const delay = reduceMotion ? 0 : 1300;
+  for (let i = 1; i <= TOTAL; i++) {
+    await sleep(delay);
+    applyStep(i);
+  }
+  playBtn.disabled = false; stepBtn.disabled = false;
+});
+resetBtn.addEventListener('click', () => applyStep(0));
+
+window.addEventListener('load', () => { layoutAndDraw(); applyStep(0); });
+window.addEventListener('resize', () => { layoutAndDraw(); applyStep(step); });
+
+// kick once in case load already fired
+layoutAndDraw();
+applyStep(0);
+</script>
+</body>
+</html>

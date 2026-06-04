@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Research Agent · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --warn:#B45309; --warn-soft:#FEF3C7; --warn-border:#FCD34D;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.6; color: var(--text); }
+
+  /* default-in-2026 callout */
+  .default-callout {
+    margin-top: 14px;
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 15px; line-height: 1.6; color: var(--text);
+  }
+  .default-callout .default-label {
+    display: block; font-family: 'Inter', sans-serif; font-style: normal;
+    font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--accent-hover); margin-bottom: 4px;
+  }
+
+  /* layer badges */
+  .layer-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .layer-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .layer-badge:hover { border-color: var(--accent); background: #e4dcfe; }
+  .layer-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ============ DEMO: planner + sub-agents + chairman ============ */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* query bar */
+  .query-bar {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 12px;
+  }
+  .query-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .query-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--text); line-height: 1.3; }
+
+  /* live cost meter */
+  .meters-bar {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    padding: 10px 14px; margin-bottom: 18px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--bg-subtle);
+  }
+  .meter { display: flex; flex-direction: column; gap: 3px; min-width: 110px; flex: 1; }
+  .meter-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+  .meter-value { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; color: var(--text); line-height: 1.1; }
+  .meter-value .unit { font-family: 'Inter', sans-serif; font-size: 12px; color: var(--soft); margin-left: 3px; font-weight: 400; }
+  .meter.warn .meter-value { color: var(--warn); }
+  .meter-bar-track {
+    height: 4px; border-radius: 2px; background: var(--border); margin-top: 4px; overflow: hidden;
+  }
+  .meter-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 2px;
+    transition: width .4s ease;
+  }
+  .meter.warn .meter-bar-fill { background: var(--warn); }
+
+  /* phases */
+  .phases { display: flex; flex-direction: column; gap: 14px; }
+  .phase {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    overflow: hidden; opacity: 0; transform: translateY(6px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .phase.visible { opacity: 1; transform: translateY(0); }
+  .phase-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; background: var(--bg-subtle); border-bottom: 1px solid var(--border);
+  }
+  .phase-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .phase.active .phase-head { background: var(--accent-soft); border-bottom-color: var(--accent); }
+  .phase-title { font-weight: 600; font-size: 14px; color: var(--text); }
+  .phase-status {
+    margin-left: auto; font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    color: var(--faint); text-transform: uppercase;
+  }
+  .phase.active .phase-status { color: var(--accent); }
+  .phase.done .phase-status { color: var(--success); }
+  .phase.done .phase-head { background: var(--success-soft); border-bottom-color: #b2e4d5; }
+  .phase.done .phase-num { background: var(--success); }
+  .phase-body { padding: 12px 14px; min-height: 48px; }
+
+  /* Phase 1: planner decomposition */
+  .plan-list { font-size: 13px; color: var(--soft); line-height: 1.7; display: none; }
+  .plan-list ol { margin: 6px 0 0 18px; display: flex; flex-direction: column; gap: 3px; }
+  .plan-list ol li::marker { color: var(--accent); font-weight: 600; }
+
+  /* Phase 2: sub-agent grid */
+  .subs-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+  }
+  @media (max-width: 700px) { .subs-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 380px) { .subs-grid { grid-template-columns: 1fr; } }
+
+  .sub-card {
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); padding: 10px 11px;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .3s ease, transform .3s ease, border-color .3s ease, background .3s ease;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .sub-card.in { opacity: 1; transform: translateY(0); }
+  .sub-card.working { border-color: var(--accent); background: var(--accent-soft); }
+  .sub-card.done-card { border-color: var(--success); background: var(--success-soft); }
+
+  .sub-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--faint);
+  }
+  .sub-card.working .sub-label { color: var(--accent-hover); }
+  .sub-card.done-card .sub-label { color: var(--success); }
+
+  .sub-topic { font-size: 12.5px; font-weight: 500; color: var(--text); line-height: 1.35; }
+  .sub-finding {
+    font-size: 11.5px; color: var(--soft); line-height: 1.45;
+    border-top: 1px solid var(--border); padding-top: 5px; margin-top: 2px;
+    opacity: 0; transition: opacity .4s ease;
+  }
+  .sub-card.done-card .sub-finding { opacity: 1; color: var(--text); }
+  .sub-status { font-size: 11px; font-weight: 600; color: var(--faint); }
+  .sub-card.working .sub-status { color: var(--accent); }
+  .sub-card.done-card .sub-status { color: var(--success); }
+
+  /* Phase 3: chairman synthesis */
+  .chair-note {
+    font-size: 13px; color: var(--soft); margin-bottom: 10px; display: none;
+    line-height: 1.6;
+  }
+  .report-block {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+    font-size: 14px; line-height: 1.7; color: var(--text);
+    opacity: 0; transition: opacity .5s ease;
+    min-height: 60px;
+  }
+  .report-block.visible { opacity: 1; }
+  .report-block p + p { margin-top: 8px; }
+  .report-block sup { color: var(--accent-hover); font-weight: 600; font-size: 11px; }
+  .report-block .cite { font-size: 11.5px; color: var(--faint); border-top: 1px solid var(--border); margin-top: 12px; padding-top: 8px; line-height: 1.6; }
+  .report-block .cite-num { color: var(--accent-hover); font-weight: 700; }
+
+  /* controls */
+  .demo-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ PRODUCTION RECEIPTS ============ */
+  .receipts-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .receipts-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
+  .receipts-list { display: flex; flex-direction: column; gap: 10px; }
+  .receipt {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 16px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); background: var(--bg-subtle);
+    text-decoration: none; color: var(--text);
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
+  }
+  .receipt:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+  .receipt-mark {
+    flex-shrink: 0; width: 36px; height: 36px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
+    color: var(--accent-hover);
+  }
+  .receipt-body { flex: 1; min-width: 0; }
+  .receipt-name {
+    font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 3px;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .receipt-host {
+    font-size: 11px; font-weight: 600; color: var(--faint);
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 1px 7px; border-radius: 20px; letter-spacing: .02em;
+  }
+  .receipt:hover .receipt-host { color: var(--accent-hover); border-color: var(--accent); }
+  .receipt-desc { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .receipt-arrow { flex-shrink: 0; color: var(--faint); transition: transform .2s ease, color .2s ease; font-size: 14px; }
+  .receipt:hover .receipt-arrow { color: var(--accent); transform: translateX(2px); }
+
+  /* ============ TRADEOFFS ============ */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 170px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* ============ DECOMPOSES-INTO CHIPS ============ */
+  .decomp-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .decomp-intro { font-size: 13px; color: var(--soft); margin-bottom: 14px; line-height: 1.6; }
+  .decomp-grid { display: flex; flex-direction: column; gap: 8px; }
+  .decomp-chip {
+    display: flex; align-items: baseline; gap: 8px;
+    padding: 11px 14px; background: var(--bg-subtle);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    text-decoration: none; color: var(--text);
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    line-height: 1.4;
+  }
+  .decomp-chip:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateX(2px); }
+  .decomp-tier {
+    flex-shrink: 0; font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 14px; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    padding: 2px 9px; border-radius: 6px; min-width: 34px; text-align: center;
+  }
+  .decomp-chip:hover .decomp-tier { background: var(--surface); border-color: var(--accent); }
+  .decomp-name { font-weight: 600; font-size: 13.5px; color: var(--text); }
+  .decomp-clause { font-size: 13px; color: var(--soft); }
+
+  /* ============ DECISION LOGIC: vs alternatives ============ */
+  .decision-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .decision-row {
+    display: flex; align-items: stretch; padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+  }
+  .decision-row:last-child { border-bottom: none; }
+  .decision-row:hover { background: var(--bg-subtle); }
+  .decision-vs {
+    flex-shrink: 0; width: 200px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .decision-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--faint);
+  }
+  .decision-alt {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px;
+    color: var(--text); line-height: 1.25;
+  }
+  .decision-rule { flex: 1; min-width: 0; font-size: 14px; line-height: 1.6; color: var(--soft); }
+  .decision-rule strong { color: var(--accent-hover); font-weight: 600; }
+  @media (max-width: 560px) {
+    .decision-row { flex-direction: column; gap: 6px; }
+    .decision-vs { width: 100%; }
+  }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+  }
+  @media (max-width: 480px) {
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="builds.html"><span aria-hidden="true">&larr;</span> Builds</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a href="builds.html">Builds</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <span class="here" aria-current="page">Deep Research Agent</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main" tabindex="-1">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M16 16l5 5"/>
+        <path d="M11 8v6M8 11h6"/>
+      </svg>
+    </span>Recipe &middot; Deep Research Agent
+  </span>
+  <h1 class="pattern-title">Deep Research Agent</h1>
+  <p class="explainer">A long-running team of sub-agents that turn one question into a fully cited report, with time to think.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section aria-labelledby="idea-heading">
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2 id="idea-heading">What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>A <span style="color:var(--accent-hover);font-weight:500">Deep Research Agent</span> turns one question into a long, cited report by breaking it down, sending sub-agents off to research, and synthesising what they bring back.</p>
+  </div>
+
+  <div class="default-callout" role="note">
+    <span class="default-label">Default in 2026</span>
+    OpenAI Deep Research or Anthropic Computer Use. Decompose query into 5-15 sub-questions; assign each to a sub-agent; aggregate; cite every claim. Plan to wait 5-20 minutes.
+  </div>
+
+  <div class="layer-badges" aria-label="Layers used by this build">
+    <a class="layer-badge" href="layer-orchestration-agents.html">
+      <span class="dot" aria-hidden="true"></span>Orchestration &amp; agents
+    </a>
+    <a class="layer-badge" href="layer-stateless-retrieval.html">
+      <span class="dot" aria-hidden="true"></span>Stateless Retrieval
+    </a>
+    <a class="layer-badge" href="layer-composition.html">
+      <span class="dot" aria-hidden="true"></span>Composition
+    </a>
+    <a class="layer-badge" href="layer-user-experience.html">
+      <span class="dot" aria-hidden="true"></span>User experience
+    </a>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section aria-labelledby="demo-heading">
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2 id="demo-heading">Watch it <em>think for a while</em>.</h2>
+
+  <p class="demo-lede">Planner breaks the question into five sub-questions. Five sub-agents work in parallel. The chairman synthesises one cited report. Note the cost meter climbing as the work spreads.</p>
+
+  <div class="demo-stage">
+    <!-- the question -->
+    <div class="query-bar">
+      <div class="query-label">Question</div>
+      <div class="query-text">Should a mid-sized European bank build or buy an agentic AI compliance reviewer in 2026?</div>
+    </div>
+
+    <!-- live meters -->
+    <div class="meters-bar" aria-label="Live cost and iteration meters">
+      <div class="meter" id="meterRounds">
+        <span class="meter-label">Iteration budget</span>
+        <span class="meter-value"><span id="metRoundsVal">0</span><span class="unit"> / 5 sub-agents used</span></span>
+        <div class="meter-bar-track"><div class="meter-bar-fill" id="metRoundsBar" style="width:0%"></div></div>
+      </div>
+      <div class="meter" id="meterCost">
+        <span class="meter-label">Cumulative cost</span>
+        <span class="meter-value">$<span id="metCostVal">0.00</span><span class="unit"> of $5.00 cap</span></span>
+        <div class="meter-bar-track"><div class="meter-bar-fill" id="metCostBar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="phases" aria-live="polite" aria-atomic="false">
+
+      <!-- Phase 1: planner decomposes -->
+      <div class="phase" id="phase-plan">
+        <div class="phase-head">
+          <span class="phase-num" aria-hidden="true">1</span>
+          <span class="phase-title">Planner: decompose into sub-questions</span>
+          <span class="phase-status" id="status-plan">waiting</span>
+        </div>
+        <div class="phase-body">
+          <div class="plan-list" id="plan-body">
+            The planner reads the brief and writes five sub-questions, one per sub-agent:
+            <ol>
+              <li>Regulatory baseline: what does the EU AI Act + DORA require for compliance review automation?</li>
+              <li>Vendor scan: which off-the-shelf agentic compliance products exist and what do they cost?</li>
+              <li>Build cost model: what would a 6-12 month in-house build cost end-to-end?</li>
+              <li>Risk profile: failure modes and liability shifts between build and buy.</li>
+              <li>Peer signal: what have comparable mid-sized banks chosen and why?</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 2: sub-agents fan out -->
+      <div class="phase" id="phase-subs">
+        <div class="phase-head">
+          <span class="phase-num" aria-hidden="true">2</span>
+          <span class="phase-title">Sub-agents: research in parallel</span>
+          <span class="phase-status" id="status-subs">waiting</span>
+        </div>
+        <div class="phase-body">
+          <div class="subs-grid" id="subs-grid">
+
+            <div class="sub-card" id="sc0">
+              <div class="sub-label">A &middot; Regulatory</div>
+              <div class="sub-topic">EU AI Act + DORA scope</div>
+              <div class="sub-status" id="ss0">queued</div>
+              <div class="sub-finding">AI Act Annex III classifies compliance-decision systems as high-risk: conformity assessment + human-in-the-loop mandatory.</div>
+            </div>
+
+            <div class="sub-card" id="sc1">
+              <div class="sub-label">B &middot; Vendors</div>
+              <div class="sub-topic">Off-the-shelf compliance agents</div>
+              <div class="sub-status" id="ss1">queued</div>
+              <div class="sub-finding">Hummingbird, ComplyAdvantage Mesh, Greenlite all shipped agentic review in 2025; £200-450k/yr at mid-bank scale.</div>
+            </div>
+
+            <div class="sub-card" id="sc2">
+              <div class="sub-label">C &middot; Build cost</div>
+              <div class="sub-topic">In-house total cost of build</div>
+              <div class="sub-status" id="ss2">queued</div>
+              <div class="sub-finding">5-7 FTE for 9 months + LLM inference + audit tooling: £1.4-2.1M year one; £600k/yr steady state.</div>
+            </div>
+
+            <div class="sub-card" id="sc3">
+              <div class="sub-label">D &middot; Risk</div>
+              <div class="sub-topic">Liability and failure modes</div>
+              <div class="sub-status" id="ss3">queued</div>
+              <div class="sub-finding">Buy shifts model-risk evidence to vendor SOC2/AI Act file; build keeps full liability but full control of audit trail.</div>
+            </div>
+
+            <div class="sub-card" id="sc4">
+              <div class="sub-label">E &middot; Peer signal</div>
+              <div class="sub-topic">What comparable banks chose</div>
+              <div class="sub-status" id="ss4">queued</div>
+              <div class="sub-finding">8 of 11 named peers (Nordea, KBC, BBVA, etc.) bought + customised. Two built. One hybrid.</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 3: chairman synthesises -->
+      <div class="phase" id="phase-report">
+        <div class="phase-head">
+          <span class="phase-num" aria-hidden="true">3</span>
+          <span class="phase-title">Chairman: synthesise the cited report</span>
+          <span class="phase-status" id="status-report">waiting</span>
+        </div>
+        <div class="phase-body">
+          <div class="chair-note" id="chair-note">
+            The chairman reads all five findings together and writes one coherent recommendation with numbered citations back to each sub-agent's sources.
+          </div>
+          <div class="report-block" id="report-block">
+            <p><strong>Recommendation: buy and customise.</strong> Eight of eleven comparable European banks have already chosen this path<sup>[5]</sup>, and the economics support it: leading vendors charge £200-450k/yr<sup>[2]</sup> versus £1.4-2.1M year-one to build in-house<sup>[3]</sup>.</p>
+            <p>The regulatory floor is the same either way: compliance-review AI is classified as high-risk under the EU AI Act Annex III, requiring conformity assessment and a human-in-the-loop checkpoint<sup>[1]</sup>. Buying shifts the model-risk evidence burden to a vendor with an existing AI Act file; building keeps full audit-trail control but full liability<sup>[4]</sup>.</p>
+            <p>Suggested path: 90-day vendor bake-off (Hummingbird, ComplyAdvantage Mesh, Greenlite) with a parallel internal prototype to validate that customisation hooks meet your control catalogue.</p>
+            <div class="cite">
+              <span class="cite-num">[1]</span> Sub-agent A: EU AI Act Annex III + DORA Article 17 <br>
+              <span class="cite-num">[2]</span> Sub-agent B: vendor pricing pages + analyst notes (Q1 2026) <br>
+              <span class="cite-num">[3]</span> Sub-agent C: peer-bank build budgets + LLM cost model <br>
+              <span class="cite-num">[4]</span> Sub-agent D: AI Act + DORA liability mapping <br>
+              <span class="cite-num">[5]</span> Sub-agent E: peer interviews + public filings
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="demo-controls">
+      <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE -->
+<section aria-labelledby="receipts-heading">
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2 id="receipts-heading">Where it <em>actually runs</em>.</h2>
+  <div class="receipts-stage">
+    <p class="receipts-intro">Four production systems built on this shape, all launched between October 2024 and 2025.</p>
+    <div class="receipts-list">
+
+      <a class="receipt" href="https://openai.com/index/introducing-deep-research/" target="_blank" rel="noopener">
+        <span class="receipt-mark" aria-hidden="true">O</span>
+        <div class="receipt-body">
+          <div class="receipt-name">OpenAI Deep Research <span class="receipt-host">openai.com</span></div>
+          <div class="receipt-desc">Launched Feb 2025 on o3. Multi-step planning, parallel browsing, cited synthesis. The reference implementation other vendors now copy.</div>
+        </div>
+        <span class="receipt-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+
+      <a class="receipt" href="https://www.anthropic.com/news/3-5-models-and-computer-use" target="_blank" rel="noopener">
+        <span class="receipt-mark" aria-hidden="true">A</span>
+        <div class="receipt-body">
+          <div class="receipt-name">Anthropic Computer Use <span class="receipt-host">anthropic.com</span></div>
+          <div class="receipt-desc">Launched Oct 2024. Claude drives a real desktop to gather sources, fill spreadsheets, and produce a report end to end.</div>
+        </div>
+        <span class="receipt-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+
+      <a class="receipt" href="https://www.perplexity.ai/hub/blog/introducing-perplexity-deep-research" target="_blank" rel="noopener">
+        <span class="receipt-mark" aria-hidden="true">P</span>
+        <div class="receipt-body">
+          <div class="receipt-name">Perplexity Pro Deep Research <span class="receipt-host">perplexity.ai</span></div>
+          <div class="receipt-desc">Multi-source iterative research with a visible step-by-step trace and a downloadable cited report, included with Pro.</div>
+        </div>
+        <span class="receipt-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+
+      <a class="receipt" href="https://blog.google/products/gemini/google-gemini-deep-research/" target="_blank" rel="noopener">
+        <span class="receipt-mark" aria-hidden="true">G</span>
+        <div class="receipt-body">
+          <div class="receipt-name">Google Gemini Deep Research <span class="receipt-host">blog.google</span></div>
+          <div class="receipt-desc">Gemini Advanced feature: shows a research plan, lets you edit it, then runs the plan and returns a structured report with sources.</div>
+        </div>
+        <span class="receipt-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section aria-labelledby="tradeoffs-heading">
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2 id="tradeoffs-heading">The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Depth of report</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Wait time</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost per query</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Coordination complexity</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Drift / hallucination risk</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Deepest possible output at the highest possible wait time. Every sub-agent is another LLM context, another set of citations to verify, another chance for drift. The shape only earns its cost when the answer needs to be a report, not a paragraph.
+    </div>
+  </div>
+</section>
+
+<!-- 05 PATTERNS IT USES -->
+<section aria-labelledby="decomp-heading">
+  <div class="section-label"><span class="num">05</span>Patterns It Uses</div>
+  <h2 id="decomp-heading">The <em>pieces</em> inside.</h2>
+  <div class="decomp-stage">
+    <p class="decomp-intro">Deep Research stacks five mechanisms together. Tap any piece to read its layer page.</p>
+    <div class="decomp-grid">
+
+      <a class="decomp-chip" href="orchestration-hierarchical-planning.html">
+        <span class="decomp-tier" aria-hidden="true">L5</span>
+        <div>
+          <span class="decomp-name">Hierarchical planning</span>
+          <span class="decomp-clause"> &middot; planner decomposes one question into a tree of sub-questions before any retrieval runs</span>
+        </div>
+      </a>
+
+      <a class="decomp-chip" href="layer-orchestration-agents.html">
+        <span class="decomp-tier" aria-hidden="true">L5</span>
+        <div>
+          <span class="decomp-name">Sub-agent delegation</span>
+          <span class="decomp-clause"> &middot; each sub-question goes to its own agent with its own context window</span>
+        </div>
+      </a>
+
+      <a class="decomp-chip" href="layer-stateless-retrieval.html">
+        <span class="decomp-tier" aria-hidden="true">L3a</span>
+        <div>
+          <span class="decomp-name">Retrieval</span>
+          <span class="decomp-clause"> &middot; each sub-agent searches, reads, and keeps only what is relevant to its slice</span>
+        </div>
+      </a>
+
+      <a class="decomp-chip" href="single-call-plan-and-solve.html">
+        <span class="decomp-tier" aria-hidden="true">L4</span>
+        <div>
+          <span class="decomp-name">Cognitive Strategy</span>
+          <span class="decomp-clause"> &middot; plan-and-solve, self-critique, and verification all run inside the chairman before it writes</span>
+        </div>
+      </a>
+
+      <a class="decomp-chip" href="layer-user-experience.html">
+        <span class="decomp-tier" aria-hidden="true">L7</span>
+        <div>
+          <span class="decomp-name">User experience</span>
+          <span class="decomp-clause"> &middot; visible plan, progress trace, and cited report give the user something to watch while the agent thinks</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- 06 WHEN TO USE VS ALTERNATIVES -->
+<section aria-labelledby="decision-heading">
+  <div class="section-label"><span class="num">06</span>When to use vs alternatives</div>
+  <h2 id="decision-heading">When this <em>vs that</em>.</h2>
+  <div class="decision-stage">
+
+    <div class="decision-row">
+      <div class="decision-vs">
+        <span class="decision-label">vs</span>
+        <span class="decision-alt">Agentic RAG</span>
+      </div>
+      <div class="decision-rule">
+        Pick <strong>Agentic RAG</strong> when the output is a single grounded answer in seconds. Pick <strong>Deep Research</strong> when the output is a multi-section cited report and the user accepts a long wait.
+      </div>
+    </div>
+
+    <div class="decision-row">
+      <div class="decision-vs">
+        <span class="decision-label">vs</span>
+        <span class="decision-alt">Tool-using Agent</span>
+      </div>
+      <div class="decision-rule">
+        Pick a <strong>Tool-using Agent</strong> when the goal is to act (run code, book a flight, file a ticket). Pick <strong>Deep Research</strong> when the goal is to know: pure reading and writing, no side effects on the world.
+      </div>
+    </div>
+
+    <div class="decision-row">
+      <div class="decision-vs">
+        <span class="decision-label">vs</span>
+        <span class="decision-alt">Single-call answer</span>
+      </div>
+      <div class="decision-rule">
+        Use a <strong>single call</strong> when one prompt can plausibly carry the whole answer. Reach for <strong>Deep Research</strong> only when the question needs multi-hour depth, fan-out across many sources, and every claim has to be citable.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;" aria-label="Navigation">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>OpenAI (Feb 2025). <em>Introducing Deep Research.</em> <span class="note">Architecture description for the o3-backed reference implementation.</span></li>
+    <li>Anthropic (Oct 2024). <em>Claude 3.5 models and computer use.</em> <span class="note">Launch post for the first production agent that drives a real computer to do research end to end.</span></li>
+    <li>Wu et al. (2023). <em>AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation.</em> <span class="note">Foundational planner/worker architecture that Deep Research products inherit.</span></li>
+    <li>Khattab et al. (2023). <em>DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines.</em> <span class="note">Reference for orchestrated multi-step LLM programs.</span></li>
+    <li>Nakano et al. (2022). <em>WebGPT: Browser-assisted question-answering with human feedback.</em> <span class="note">The earliest production deep-research-shaped system.</span></li>
+    <li>Yao et al. (2023). <em>ReAct: Synergizing Reasoning and Acting in Language Models.</em> <span class="note">The reason-act loop each sub-agent uses internally.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ DEMO ANIMATION ============
+// Phase 1: planner writes plan. Phase 2: 5 sub-agents fan out in parallel.
+// Phase 3: chairman synthesises. Cost meter and iteration meter climb live.
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+const phasePlan   = document.getElementById('phase-plan');
+const phaseSubs   = document.getElementById('phase-subs');
+const phaseReport = document.getElementById('phase-report');
+
+const statusPlan   = document.getElementById('status-plan');
+const statusSubs   = document.getElementById('status-subs');
+const statusReport = document.getElementById('status-report');
+
+const planBody   = document.getElementById('plan-body');
+const chairNote  = document.getElementById('chair-note');
+const reportBlock = document.getElementById('report-block');
+
+const subCards = [0,1,2,3,4].map(i => document.getElementById('sc' + i));
+const subStatuses = [0,1,2,3,4].map(i => document.getElementById('ss' + i));
+
+const metRoundsVal = document.getElementById('metRoundsVal');
+const metRoundsBar = document.getElementById('metRoundsBar');
+const metCostVal   = document.getElementById('metCostVal');
+const metCostBar   = document.getElementById('metCostBar');
+const meterCost    = document.getElementById('meterCost');
+
+const stepBtn  = document.getElementById('stepBtn');
+const playBtn  = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+let demoStep = -1;
+let running  = false;
+
+const COST_CAP = 5.00;
+const COST_BUDGET_WARN = 0.80;  // turn meter warn at 80%
+
+function setMeters(subsCount, cost) {
+  metRoundsVal.textContent = subsCount;
+  metRoundsBar.style.width = (subsCount / 5 * 100) + '%';
+
+  metCostVal.textContent = cost.toFixed(2);
+  const pct = Math.min(cost / COST_CAP, 1) * 100;
+  metCostBar.style.width = pct + '%';
+  if (cost / COST_CAP >= COST_BUDGET_WARN) meterCost.classList.add('warn');
+  else meterCost.classList.remove('warn');
+}
+
+function resetDemo() {
+  demoStep = -1; running = false;
+  [phasePlan, phaseSubs, phaseReport].forEach(p => p.classList.remove('visible', 'active', 'done'));
+  statusPlan.textContent   = 'waiting';
+  statusSubs.textContent   = 'waiting';
+  statusReport.textContent = 'waiting';
+  planBody.style.display   = 'none';
+  chairNote.style.display  = 'none';
+  reportBlock.classList.remove('visible');
+  subCards.forEach((c, i) => {
+    c.classList.remove('in', 'working', 'done-card');
+    subStatuses[i].textContent = 'queued';
+  });
+  setMeters(0, 0);
+}
+
+// Phase 1: planner
+async function doPhase1(animate) {
+  phasePlan.classList.add('visible', 'active');
+  statusPlan.textContent = 'planning...';
+  if (animate) await sleep(reduceMotion ? 0 : 500);
+  planBody.style.display = 'block';
+  // small planner cost tick
+  setMeters(0, 0.12);
+  if (animate) await sleep(reduceMotion ? 0 : 500);
+  phasePlan.classList.remove('active');
+  phasePlan.classList.add('done');
+  statusPlan.textContent = 'done';
+}
+
+// Phase 2: sub-agents
+async function doPhase2(animate) {
+  phaseSubs.classList.add('visible', 'active');
+  statusSubs.textContent = 'researching...';
+
+  // show all five cards (queued)
+  for (let i = 0; i < subCards.length; i++) {
+    subCards[i].classList.add('in');
+    if (animate) await sleep(reduceMotion ? 0 : 90);
+  }
+  if (animate) await sleep(reduceMotion ? 0 : 200);
+
+  // all five start working (parallel)
+  for (let i = 0; i < subCards.length; i++) {
+    subCards[i].classList.add('working');
+    subStatuses[i].textContent = 'researching...';
+  }
+
+  // tick cost up smoothly while "working"
+  if (animate) {
+    const ticks = reduceMotion ? 1 : 12;
+    for (let t = 1; t <= ticks; t++) {
+      const cost = 0.12 + (t / ticks) * 2.85;
+      setMeters(0, cost);
+      await sleep(reduceMotion ? 0 : 75);
+    }
+  } else {
+    setMeters(0, 0.12 + 2.85);
+  }
+
+  // workers finish one by one
+  for (let i = 0; i < subCards.length; i++) {
+    subCards[i].classList.remove('working');
+    subCards[i].classList.add('done-card');
+    subStatuses[i].textContent = 'done';
+    setMeters(i + 1, 0.12 + 2.85 + (i + 1) * 0.10);
+    if (animate) await sleep(reduceMotion ? 0 : 160);
+  }
+
+  if (animate) await sleep(reduceMotion ? 0 : 300);
+  phaseSubs.classList.remove('active');
+  phaseSubs.classList.add('done');
+  statusSubs.textContent = 'done';
+}
+
+// Phase 3: chairman
+async function doPhase3(animate) {
+  phaseReport.classList.add('visible', 'active');
+  statusReport.textContent = 'synthesising...';
+  chairNote.style.display = 'block';
+  if (animate) await sleep(reduceMotion ? 0 : 600);
+
+  // chairman cost tick
+  if (animate) {
+    const ticks = reduceMotion ? 1 : 6;
+    const startCost = 0.12 + 2.85 + 5 * 0.10; // 3.47
+    for (let t = 1; t <= ticks; t++) {
+      const cost = startCost + (t / ticks) * 0.85;
+      setMeters(5, cost);
+      await sleep(reduceMotion ? 0 : 100);
+    }
+  } else {
+    setMeters(5, 4.32);
+  }
+
+  reportBlock.classList.add('visible');
+  if (animate) await sleep(reduceMotion ? 0 : 300);
+  phaseReport.classList.remove('active');
+  phaseReport.classList.add('done');
+  statusReport.textContent = 'done';
+}
+
+stepBtn.addEventListener('click', async () => {
+  if (running) return;
+  if (demoStep >= 2) { resetDemo(); return; }
+  running = true;
+  stepBtn.disabled = true; playBtn.disabled = true;
+  demoStep++;
+  if (demoStep === 0) await doPhase1(true);
+  else if (demoStep === 1) await doPhase2(true);
+  else if (demoStep === 2) await doPhase3(true);
+  running = false;
+  stepBtn.disabled = false; playBtn.disabled = false;
+});
+
+playBtn.addEventListener('click', async () => {
+  if (running) return;
+  resetDemo();
+  running = true;
+  playBtn.disabled = true; stepBtn.disabled = true;
+  await sleep(reduceMotion ? 0 : 200);
+  await doPhase1(!reduceMotion);
+  await sleep(reduceMotion ? 0 : 400);
+  await doPhase2(!reduceMotion);
+  await sleep(reduceMotion ? 0 : 300);
+  await doPhase3(!reduceMotion);
+  demoStep = 2;
+  running = false;
+  playBtn.disabled = false; stepBtn.disabled = false;
+});
+
+resetBtn.addEventListener('click', () => {
+  if (running) return;
+  resetDemo();
+});
+
+if (reduceMotion) {
+  (async () => {
+    await doPhase1(false);
+    await doPhase2(false);
+    await doPhase3(false);
+    demoStep = 2;
+  })();
+}
+</script>
+</body>
+</html>

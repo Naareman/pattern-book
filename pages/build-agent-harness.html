@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Harness · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --error:#C2554F; --error-soft:#FBECEB;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* topbar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto;
+    padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* Default-in-2026 callout */
+  .default-callout {
+    margin-top: 20px;
+    max-width: 720px;
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .default-callout .badge {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--accent-hover);
+    background: #fff; border: 1px solid var(--accent);
+    border-radius: 12px; padding: 3px 9px; flex-shrink: 0; margin-top: 1px;
+    white-space: nowrap;
+  }
+  .default-callout .body {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 400;
+    font-size: 15px; line-height: 1.55; color: var(--text);
+  }
+  .default-callout .body strong { font-style: normal; font-weight: 600; color: var(--accent-hover); }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px; }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.55; color: var(--text); }
+
+  /* ========== HARNESS DEMO (tap-through brain / hands / session) ========== */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+
+  .harness-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .harness-pills {
+    display: flex; gap: 0; border-bottom: 1px solid var(--border);
+    overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  .harness-pills::-webkit-scrollbar { display: none; }
+  .harness-pill {
+    flex: 1; min-width: 0; padding: 16px 12px;
+    border: none; border-right: 1px solid var(--border);
+    background: var(--bg-subtle); cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    transition: background .18s ease, color .18s ease;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .harness-pill:last-child { border-right: none; }
+  .harness-pill .pill-icon { width: 22px; height: 22px; color: var(--faint); transition: color .18s ease; }
+  .harness-pill .pill-icon svg { width: 22px; height: 22px; display: block; }
+  .harness-pill .pill-name { font-size: 13px; font-weight: 600; color: var(--faint); letter-spacing: .01em; }
+  .harness-pill .pill-role { font-size: 11.5px; color: var(--faint); font-weight: 500; }
+  .harness-pill[aria-selected="true"] { background: var(--accent-soft); border-bottom: 2px solid var(--accent); }
+  .harness-pill[aria-selected="true"] .pill-icon { color: var(--accent); }
+  .harness-pill[aria-selected="true"] .pill-name { color: var(--accent-hover); }
+  .harness-pill[aria-selected="true"] .pill-role { color: var(--accent-hover); }
+  .harness-pill:hover:not([aria-selected="true"]) { background: var(--bg); }
+
+  .harness-panel { padding: 24px 26px; }
+  .harness-panel-name {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 19px;
+    color: var(--text); margin-bottom: 4px; letter-spacing: -0.01em;
+  }
+  .harness-panel-tag {
+    font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--accent-hover); margin-bottom: 14px;
+  }
+  .harness-panel-text { font-size: 14.5px; line-height: 1.65; color: var(--soft); margin-bottom: 14px; }
+  .harness-panel-text strong { color: var(--accent-hover); font-weight: 600; }
+
+  .harness-rows { display: flex; flex-direction: column; gap: 8px; }
+  .harness-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .harness-row .row-tag {
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 500;
+    color: var(--accent-hover); background: #fff;
+    border: 1px solid var(--border-strong); border-radius: 6px;
+    padding: 3px 8px; flex-shrink: 0; min-width: 90px; text-align: center;
+  }
+  .harness-row .row-text { font-size: 13.5px; line-height: 1.5; color: var(--text); }
+  .harness-row .row-text code { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--accent-hover); background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
+
+  .harness-help {
+    margin-top: 14px; padding: 10px 14px;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px; line-height: 1.5; color: var(--accent-hover);
+  }
+  .harness-help strong { font-weight: 600; }
+
+  /* ========== PRODUCTION RECEIPTS ========== */
+  .receipts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .receipt-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 6px;
+    text-decoration: none; color: var(--text);
+    transition: border-color .2s ease, transform .18s ease, box-shadow .18s ease;
+  }
+  .receipt-card:hover {
+    border-color: var(--accent); transform: translateY(-1px); box-shadow: var(--shadow-sm);
+  }
+  .receipt-card .vendor { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent-hover); }
+  .receipt-card .product { font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px; line-height: 1.25; color: var(--text); letter-spacing: -0.005em; }
+  .receipt-card .what { font-size: 13px; line-height: 1.5; color: var(--soft); }
+  .receipt-card .link {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--faint); margin-top: 2px; word-break: break-all;
+  }
+
+  /* ========== TRADEOFFS (price you pay meter) ========== */
+  .tradeoffs-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 170px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* ========== PATTERNS IT USES (decomposes-into) ========== */
+  .piu-grid {
+    display: flex; flex-wrap: wrap; gap: 10px;
+  }
+  .piu-chip {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    padding: 8px 14px;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+    line-height: 1.4;
+  }
+  .piu-chip:hover { border-color: var(--accent); background: #e4dcfe; }
+  .piu-chip .chip-name { font-size: 13px; font-weight: 600; color: var(--accent-hover); white-space: nowrap; }
+  .piu-chip .chip-clause { font-size: 12px; font-weight: 400; color: var(--soft); }
+  .piu-chip:hover .chip-name { color: var(--accent); }
+
+  /* ========== WHEN TO USE (vs alternatives) ========== */
+  .vs-stack { display: flex; flex-direction: column; gap: 12px; }
+  .vs-row {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 16px 18px;
+    display: grid; grid-template-columns: 1fr; gap: 8px;
+  }
+  .vs-row .vs-head {
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  }
+  .vs-row .vs-vs {
+    font-size: 11px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 10px; padding: 2px 8px;
+  }
+  .vs-row .vs-name {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 16.5px;
+    color: var(--text); letter-spacing: -0.005em;
+  }
+  .vs-row .vs-name a { color: var(--text); text-decoration: none; border-bottom: 1px dashed var(--border-strong); }
+  .vs-row .vs-name a:hover { color: var(--accent-hover); border-bottom-color: var(--accent); }
+  .vs-row .vs-when {
+    font-size: 14px; line-height: 1.6; color: var(--soft);
+  }
+  .vs-row .vs-when strong { color: var(--text); font-weight: 600; }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform 0.2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  .sources li a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px dashed var(--border-strong); }
+  .sources li a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .harness-pill { padding: 12px 8px; }
+    .harness-pill .pill-role { display: none; }
+    .default-callout { flex-direction: column; }
+  }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+    .harness-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .harness-row .row-tag { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="builds.html"><span aria-hidden="true">&larr;</span> Builds</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a><span class="sep">/</span><a href="builds.html">Builds</a><span class="sep">/</span><span class="here">Agent Harness</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17.5h7M17.5 14v7"/>
+      </svg>
+    </span>
+    Recipe &middot; Agent Harness
+  </span>
+  <h1 class="pattern-title">Agent Harness</h1>
+  <p class="explainer">A brain, a pair of hands, and a session. The shape every long-running agent ends up converging on.</p>
+
+  <div class="default-callout" role="note" aria-label="Default in 2026">
+    <span class="badge">Default in 2026</span>
+    <span class="body">
+      <strong>Anthropic Claude Code as reference.</strong> Brain = Claude. Hands = sandboxed bash + file tools + MCP servers. Session = persistent context + virtual filesystem. Add Skills (SKILL.md) for domain workflows.
+    </span>
+  </div>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>An <span style="color:var(--accent-hover);font-weight:500">Agent Harness</span> splits the agent into three jobs: one model that thinks, a fixed set of tools that act, and a session that remembers. The harness is the box that keeps them coordinated across many steps.</p>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See it Work</div>
+  <h2>Tap each <em>piece</em>.</h2>
+  <p class="demo-lede">Every harness is the same three jobs. Tap to see what lives where, using Claude Code as the reference shape.</p>
+
+  <div class="harness-stage" role="region" aria-label="Agent harness anatomy">
+    <div class="harness-pills" role="tablist" aria-label="Harness pieces" id="harnessPills">
+      <button class="harness-pill" role="tab" aria-selected="true" aria-controls="harnessPanel" data-piece="brain" tabindex="0">
+        <span class="pill-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-2 2.83V13a3 3 0 0 0 3 3 3 3 0 0 0 3 3h0a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zM15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 2 2.83V13a3 3 0 0 1-3 3 3 3 0 0 1-3 3h0a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z"/></svg>
+        </span>
+        <span class="pill-name">Brain</span>
+        <span class="pill-role">the model + plan</span>
+      </button>
+      <button class="harness-pill" role="tab" aria-selected="false" aria-controls="harnessPanel" data-piece="hands" tabindex="-1">
+        <span class="pill-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 11V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v10"/><path d="M10 9V3a2 2 0 0 0-2-2 2 2 0 0 0-2 2v11"/><path d="M6 11a2 2 0 0 0-2 2v0a2 2 0 0 0 2 2"/><path d="M18 13V5a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"/><path d="M18 15v-2a2 2 0 0 1 4 0v4a7 7 0 0 1-7 7h-1a8 8 0 0 1-8-8v-1"/></svg>
+        </span>
+        <span class="pill-name">Hands</span>
+        <span class="pill-role">sandboxed tools</span>
+      </button>
+      <button class="harness-pill" role="tab" aria-selected="false" aria-controls="harnessPanel" data-piece="session" tabindex="-1">
+        <span class="pill-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 11v6c0 1.66 4 3 9 3s9-1.34 9-3v-6"/></svg>
+        </span>
+        <span class="pill-name">Session</span>
+        <span class="pill-role">memory + skills</span>
+      </button>
+    </div>
+
+    <div class="harness-panel" id="harnessPanel" role="tabpanel" aria-live="polite">
+      <div class="harness-panel-name" id="hpName">Brain</div>
+      <div class="harness-panel-tag" id="hpTag">The model and its plan</div>
+      <div class="harness-panel-text" id="hpText">A single strong LLM does <strong>all the thinking</strong>. It reads the task, decides which tool to call next, and updates its plan after each result. No sub-team of models. One brain stays in charge for the whole session.</div>
+      <div class="harness-rows" id="hpRows">
+        <div class="harness-row"><span class="row-tag">Model</span><span class="row-text">Claude (Sonnet by default, Opus for hard turns)</span></div>
+        <div class="harness-row"><span class="row-tag">Decides</span><span class="row-text">Which tool to call, with what arguments, when to stop</span></div>
+        <div class="harness-row"><span class="row-tag">Plans</span><span class="row-text">Writes a todo list, ticks items off as it works</span></div>
+      </div>
+      <div class="harness-help" id="hpHelp"><strong>Why one model?</strong> Switching models mid-session breaks the plan. Keep one brain end-to-end; pick the model up front.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE (production receipts) -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>Built and <em>shipped</em>.</h2>
+  <p class="demo-lede">Five production harnesses in 2026. Every one is some flavor of the brain/hands/session split, with sub-agents and skills layered on top.</p>
+
+  <div class="receipts-grid" role="list" aria-label="Production harnesses">
+    <a class="receipt-card" href="https://docs.claude.com/en/docs/claude-code/overview" target="_blank" rel="noopener" role="listitem">
+      <span class="vendor">Anthropic</span>
+      <span class="product">Claude Code</span>
+      <span class="what">The reference harness. Bash + file tools + MCP, Skills via SKILL.md, sub-agents via the Task tool. Runs in your terminal.</span>
+      <span class="link">claude.com/docs</span>
+    </a>
+    <a class="receipt-card" href="https://www.anthropic.com/engineering/managed-agents" target="_blank" rel="noopener" role="listitem">
+      <span class="vendor">Anthropic</span>
+      <span class="product">Managed Agents</span>
+      <span class="what">The same harness shape, hosted. Spawns sandboxed VMs, exposes tools and sub-agents via API, persists session state for you.</span>
+      <span class="link">anthropic.com/engineering/managed-agents</span>
+    </a>
+    <a class="receipt-card" href="https://www.langchain.com/deep-agents" target="_blank" rel="noopener" role="listitem">
+      <span class="vendor">LangChain</span>
+      <span class="product">deepagents</span>
+      <span class="what">Open-source library that ships the harness pattern (planner, file system, sub-agents) so you can swap any model in.</span>
+      <span class="link">langchain.com/deep-agents</span>
+    </a>
+    <a class="receipt-card" href="https://github.com/openai/codex" target="_blank" rel="noopener" role="listitem">
+      <span class="vendor">OpenAI</span>
+      <span class="product">Codex CLI</span>
+      <span class="what">Same shape, OpenAI brand. Local sandboxed shell, file ops, MCP support; the agent runs in your repo until the task is done.</span>
+      <span class="link">github.com/openai/codex</span>
+    </a>
+    <a class="receipt-card" href="https://manus.im" target="_blank" rel="noopener" role="listitem">
+      <span class="vendor">Manus AI</span>
+      <span class="product">Manus.im</span>
+      <span class="what">Consumer-facing general agent. Browser + shell + files in a cloud VM, long-running sessions, sub-agents for parallel work.</span>
+      <span class="link">manus.im</span>
+    </a>
+  </div>
+</section>
+
+<!-- 04 THE PRICE YOU PAY -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost per task</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency to finish</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Autonomy granted</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Setup complexity</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Blast radius if it errs</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      A harness is the most powerful shape and the most expensive one. Sandbox the hands, log every tool call, and put a hard turn limit on the loop. Without those three, it will spend money and break things in your name.
+    </div>
+  </div>
+</section>
+
+<!-- 05 PATTERNS IT USES (decomposes-into) -->
+<section>
+  <div class="section-label"><span class="num">05</span>Patterns It Uses</div>
+  <h2>What it <em>decomposes</em> into.</h2>
+  <div class="piu-grid" role="list" aria-label="Patterns that compose this harness">
+    <a class="piu-chip" href="orchestration-iterative-loops.html" role="listitem">
+      <span class="chip-name">Iterative Loop</span>
+      <span class="chip-clause">think, act, observe, repeat</span>
+    </a>
+    <a class="piu-chip" href="orchestration-coordination.html" role="listitem">
+      <span class="chip-name">Sub-agent Delegation</span>
+      <span class="chip-clause">spawn workers for sub-tasks</span>
+    </a>
+    <a class="piu-chip" href="orchestration-side-effect-sandboxing.html" role="listitem">
+      <span class="chip-name">Sandboxed I/O</span>
+      <span class="chip-clause">tools run in a contained box</span>
+    </a>
+    <a class="piu-chip" href="data-artifacts-prompt-versioning.html" role="listitem">
+      <span class="chip-name">Skills as Artifacts</span>
+      <span class="chip-clause">SKILL.md files versioned in git</span>
+    </a>
+    <a class="piu-chip" href="consideration-observability-tracing.html" role="listitem">
+      <span class="chip-name">Observability</span>
+      <span class="chip-clause">every tool call is traced</span>
+    </a>
+  </div>
+</section>
+
+<!-- 06 WHEN TO USE vs alternatives -->
+<section>
+  <div class="section-label"><span class="num">06</span>When to Use It</div>
+  <h2>Or pick something <em>simpler</em>.</h2>
+  <div class="vs-stack">
+    <div class="vs-row">
+      <div class="vs-head">
+        <span class="vs-vs">Pick harness over</span>
+        <span class="vs-name">Tool-using Agent Loop</span>
+      </div>
+      <div class="vs-when">When the task <strong>needs a persistent session</strong> across many steps, <strong>sub-agents for parallel work</strong>, and <strong>reusable skills</strong>. The plain agent loop fits a single bounded task; the harness fits an open-ended job.</div>
+    </div>
+    <div class="vs-row">
+      <div class="vs-head">
+        <span class="vs-vs">Pick harness over</span>
+        <span class="vs-name">Deep Research Agent</span>
+      </div>
+      <div class="vs-when">When the work is <strong>engineering, not research</strong>. Deep research produces a written report from sources. A harness produces edits, builds, and side effects in a real system. Different output, different shape.</div>
+    </div>
+  </div>
+</section>
+
+<!-- BACK LINK -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Anthropic. <em>Claude Code: overview and architecture.</em> <a href="https://docs.claude.com/en/docs/claude-code/overview" target="_blank" rel="noopener">claude.com/docs</a> <span class="note">The reference brain/hands/session implementation, including Skills (SKILL.md) and sub-agents via the Task tool.</span></li>
+    <li>Anthropic. <em>Building Managed Agents.</em> <a href="https://www.anthropic.com/engineering/managed-agents" target="_blank" rel="noopener">anthropic.com/engineering/managed-agents</a> <span class="note">Engineering writeup on the harness shape as a hosted service: sandboxed VMs, tool catalog, persistent session, sub-agent spawn.</span></li>
+    <li>LangChain. <em>deepagents library.</em> <a href="https://www.langchain.com/deep-agents" target="_blank" rel="noopener">langchain.com/deep-agents</a> <span class="note">Open-source distillation of the harness pattern (planner + file system + sub-agents) usable with any model.</span></li>
+    <li>OpenAI. <em>Codex CLI.</em> <a href="https://github.com/openai/codex" target="_blank" rel="noopener">github.com/openai/codex</a> <span class="note">Shows the convergence: the same harness shape, different vendor.</span></li>
+    <li>Manus AI. <em>Manus.im.</em> <a href="https://manus.im" target="_blank" rel="noopener">manus.im</a> <span class="note">Consumer-facing general-purpose agent harness with browser + shell + files in a cloud sandbox.</span></li>
+    <li>Yao et al. (2023). <em>ReAct: Synergizing Reasoning and Acting in Language Models.</em> <span class="note">The underlying think-act-observe loop the harness runs inside.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ HARNESS TAP-THROUGH ============
+const PIECES = {
+  brain: {
+    name: 'Brain',
+    tag: 'The model and its plan',
+    text: 'A single strong LLM does <strong>all the thinking</strong>. It reads the task, decides which tool to call next, and updates its plan after each result. No sub-team of models. One brain stays in charge for the whole session.',
+    rows: [
+      { tag: 'Model',   text: 'Claude (Sonnet by default, Opus for hard turns)' },
+      { tag: 'Decides', text: 'Which tool to call, with what arguments, when to stop' },
+      { tag: 'Plans',   text: 'Writes a todo list, ticks items off as it works' },
+    ],
+    help: '<strong>Why one model?</strong> Switching models mid-session breaks the plan. Keep one brain end-to-end; pick the model up front.',
+  },
+  hands: {
+    name: 'Hands',
+    tag: 'Sandboxed tools and sub-agents',
+    text: 'A <strong>fixed set of tools</strong> the brain can call. In Claude Code: a bash shell, file read/write/edit, a web fetch, and any MCP servers you have wired up. For heavy work, the brain can also <strong>spawn sub-agents</strong> via the Task tool: each gets its own context and runs in parallel.',
+    rows: [
+      { tag: 'Shell',     text: 'Sandboxed <code>bash</code> with allowlisted commands' },
+      { tag: 'Files',     text: '<code>Read</code>, <code>Write</code>, <code>Edit</code> on a scoped workspace' },
+      { tag: 'MCP',       text: 'Pluggable external servers (Notion, Slack, GitHub, your DB)' },
+      { tag: 'Sub-agents',text: '<code>Task</code> spawns a fresh agent on a sub-problem' },
+    ],
+    help: '<strong>Why sandbox?</strong> Tools touch the real world. A wrong <code>rm</code> deletes real files. The sandbox is what makes "autonomy" safe to grant.',
+  },
+  session: {
+    name: 'Session',
+    tag: 'Persistent context and loaded Skills',
+    text: 'The <strong>working memory</strong> of the agent. Not just the prompt: a virtual filesystem the brain can write notes into, a todo list it owns, and any <strong>Skills</strong> (SKILL.md files) it loaded at startup. The session is what makes the agent feel like a coworker, not a one-shot.',
+    rows: [
+      { tag: 'Context',   text: 'Conversation + tool results, compacted as it grows' },
+      { tag: 'Filesystem',text: 'Virtual workspace the brain edits across turns' },
+      { tag: 'Todo list', text: 'Persistent plan the brain checks against' },
+      { tag: 'Skills',    text: '<code>SKILL.md</code> packs of domain workflows, loaded on demand' },
+    ],
+    help: '<strong>Why Skills?</strong> They are reusable, versioned playbooks ("how we do code review", "how we deploy") that the brain can pick up like a colleague reading the team handbook.',
+  },
+};
+
+const pillEls  = document.querySelectorAll('#harnessPills .harness-pill');
+const hpName   = document.getElementById('hpName');
+const hpTag    = document.getElementById('hpTag');
+const hpText   = document.getElementById('hpText');
+const hpRows   = document.getElementById('hpRows');
+const hpHelp   = document.getElementById('hpHelp');
+
+function showPiece(key, focusPill) {
+  const p = PIECES[key];
+  if (!p) return;
+  pillEls.forEach((el) => {
+    const active = el.dataset.piece === key;
+    el.setAttribute('aria-selected', active ? 'true' : 'false');
+    el.tabIndex = active ? 0 : -1;
+    if (active && focusPill) el.focus();
+  });
+  hpName.textContent = p.name;
+  hpTag.textContent  = p.tag;
+  hpText.innerHTML   = p.text;
+  hpRows.innerHTML   = p.rows.map(r => `<div class="harness-row"><span class="row-tag">${r.tag}</span><span class="row-text">${r.text}</span></div>`).join('');
+  hpHelp.innerHTML   = p.help;
+}
+
+const keys = ['brain','hands','session'];
+pillEls.forEach((pill, idx) => {
+  pill.addEventListener('click', () => showPiece(pill.dataset.piece, false));
+  pill.addEventListener('keydown', (e) => {
+    let next = idx;
+    if (e.key === 'ArrowRight') next = Math.min(idx + 1, keys.length - 1);
+    else if (e.key === 'ArrowLeft') next = Math.max(idx - 1, 0);
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = keys.length - 1;
+    else return;
+    e.preventDefault();
+    showPiece(keys[next], true);
+  });
+});
+
+showPiece('brain', false);
+</script>
+</body>
+</html>

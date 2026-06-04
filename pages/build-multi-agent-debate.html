@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Agent Debate · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+
+    /* debate tints (still inside locked palette family) */
+    --side-a-soft:#EEF2FF; --side-a-edge:#C7D2FE; --side-a-ink:#3730A3;
+    --side-b-soft:#FEF3F2; --side-b-edge:#FECDCA; --side-b-ink:#B42318;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* default-in-2026 callout */
+  .default-callout {
+    margin-top: 18px; padding: 14px 18px;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 15px; line-height: 1.55; color: var(--text);
+    max-width: 720px;
+  }
+  .default-callout strong { font-family: 'Inter', sans-serif; font-style: normal; font-weight: 600; color: var(--accent-hover); text-transform: uppercase; font-size: 11px; letter-spacing: .07em; display: inline-block; margin-right: 8px; padding: 2px 8px; background: #fff; border: 1px solid var(--border); border-radius: 12px; vertical-align: 2px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.6; color: var(--text); }
+
+  /* layer badges */
+  .layer-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .layer-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .layer-badge:hover { border-color: var(--accent); background: #e4dcfe; }
+  .layer-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ============ DEMO: debate ============ */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* query bar */
+  .query-bar {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 18px;
+  }
+  .query-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .query-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--text); line-height: 1.3; }
+
+  /* round header */
+  .round-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; background: var(--bg-subtle);
+    border: 1px solid var(--border); border-bottom: none;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    font-size: 12px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--faint);
+  }
+  .round-head .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: 11px;
+  }
+
+  /* rounds */
+  .rounds { display: flex; flex-direction: column; gap: 14px; }
+  .round {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    overflow: hidden;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .round.visible { opacity: 1; transform: translateY(0); }
+  .round-body { padding: 14px; background: var(--surface); }
+
+  /* model row: side-by-side */
+  .model-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  @media (max-width: 560px) { .model-row { grid-template-columns: 1fr; } }
+
+  .model-card {
+    border: 1px solid var(--border-strong); border-radius: 10px;
+    padding: 12px 14px; background: var(--surface);
+    display: flex; flex-direction: column; gap: 8px;
+    opacity: 0; transform: translateY(4px);
+    transition: opacity .3s ease, transform .3s ease, border-color .25s ease, background .25s ease;
+  }
+  .model-card.in { opacity: 1; transform: translateY(0); }
+
+  .model-card.side-a { background: var(--side-a-soft); border-color: var(--side-a-edge); }
+  .model-card.side-b { background: var(--side-b-soft); border-color: var(--side-b-edge); }
+
+  .model-head { display: flex; align-items: center; gap: 8px; }
+  .model-dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff;
+  }
+  .side-a .model-dot { background: var(--side-a-ink); }
+  .side-b .model-dot { background: var(--side-b-ink); }
+  .model-name { font-size: 13px; font-weight: 700; }
+  .side-a .model-name { color: var(--side-a-ink); }
+  .side-b .model-name { color: var(--side-b-ink); }
+  .model-pos {
+    font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    margin-left: auto; padding: 2px 8px; border-radius: 12px;
+    background: #fff; border: 1px solid var(--border);
+    color: var(--faint);
+  }
+  .side-a .model-pos { color: var(--side-a-ink); border-color: var(--side-a-edge); }
+  .side-b .model-pos { color: var(--side-b-ink); border-color: var(--side-b-edge); }
+
+  .model-says {
+    font-size: 13px; line-height: 1.6; color: var(--text);
+  }
+  .model-says em { font-style: italic; color: var(--soft); }
+  .model-says .crit {
+    margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border);
+    font-size: 12.5px; color: var(--text);
+  }
+  .model-says .crit-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--faint); margin-bottom: 3px;
+    display: block;
+  }
+  .side-a .model-says .crit-label { color: var(--side-a-ink); }
+  .side-b .model-says .crit-label { color: var(--side-b-ink); }
+
+  /* judge card */
+  .judge-wrap {
+    margin-top: 4px; border: 1px solid var(--accent);
+    border-radius: var(--radius-sm); overflow: hidden;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .4s ease, transform .4s ease;
+  }
+  .judge-wrap.visible { opacity: 1; transform: translateY(0); }
+  .judge-head {
+    padding: 10px 14px; background: var(--accent); color: #fff;
+    font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .judge-head .gavel { font-size: 14px; }
+  .judge-body { padding: 14px 16px; background: var(--accent-soft); }
+  .judge-text { font-size: 14px; line-height: 1.65; color: var(--text); }
+  .judge-text strong { color: var(--accent-hover); font-weight: 600; }
+  .judge-note {
+    margin-top: 10px; padding-top: 8px; border-top: 1px solid #d8cffd;
+    font-size: 12px; color: var(--soft); font-style: italic;
+  }
+
+  /* controls */
+  .demo-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ REAL EXAMPLE: production receipts ============ */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .example-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
+
+  .receipts { display: flex; flex-direction: column; gap: 10px; }
+  .receipt {
+    display: grid; grid-template-columns: 36px 1fr auto; gap: 14px; align-items: center;
+    padding: 14px 16px; background: var(--bg-subtle);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    text-decoration: none; color: var(--text);
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
+  }
+  .receipt:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+  .receipt-ico {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .receipt-ico svg { width: 18px; height: 18px; color: var(--accent-hover); }
+  .receipt-body { min-width: 0; }
+  .receipt-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .receipt-blurb { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .receipt-host { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--faint); white-space: nowrap; }
+  @media (max-width: 540px) {
+    .receipt { grid-template-columns: 36px 1fr; }
+    .receipt-host { display: none; }
+  }
+
+  /* ============ PATTERNS IT USES ============ */
+  .layer-chips { display: flex; flex-direction: column; gap: 8px; }
+  .layer-chip {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    padding: 9px 14px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 20px;
+    text-decoration: none; font-size: 13px; font-weight: 500;
+    color: var(--text); transition: border-color .18s ease, background .18s ease;
+    line-height: 1.4;
+  }
+  .layer-chip:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .layer-chip-name { color: var(--accent-hover); font-weight: 700; white-space: nowrap; }
+  .layer-chip-sep { color: var(--border-strong); font-weight: 400; }
+  .layer-chip-clause { color: var(--soft); }
+
+  /* ============ TRADEOFFS METER ============ */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 170px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
+    .tradeoff-label { min-width: 0; }
+  }
+
+  /* ============ WHEN TO USE ============ */
+  .decide-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .decide-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .decide-row:last-child { border-bottom: none; }
+  .decide-row:first-child { padding-top: 0; }
+  .decide-vs { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--accent-hover); margin-bottom: 6px; }
+  .decide-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .decide-rule { font-size: 13.5px; color: var(--soft); line-height: 1.55; }
+  .decide-rule strong { color: var(--text); font-weight: 600; }
+  @media (max-width: 560px) { .decide-row { grid-template-columns: 1fr; gap: 6px; } }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px dotted var(--border-strong); }
+  .sources li a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .sources li .note { color: var(--faint); }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+  }
+  @media (max-width: 480px) {
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="builds.html"><span aria-hidden="true">&larr;</span> Builds</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep">/</span>
+      <a href="builds.html">Builds</a>
+      <span class="sep">/</span>
+      <span class="here">Multi-Agent Debate</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 10h-3a2 2 0 0 0-2 2v6h6v-6a2 2 0 0 0-1 0z"/>
+        <path d="M16 14h3a2 2 0 0 1 2 2v6h-6v-6a2 2 0 0 1 1-2z"/>
+        <path d="M9 6l3-3 3 3M12 3v8"/>
+      </svg>
+    </span>Recipe &middot; Multi-Agent Debate
+  </span>
+  <h1 class="pattern-title">Multi-Agent Debate</h1>
+  <p class="explainer">Two or more AI models argue opposing positions across explicit rounds of critique; a separate judge reads the whole debate and synthesizes one final answer.</p>
+  <div class="default-callout">
+    <strong>Default in 2026</strong>Three vendors (Claude + GPT + Gemini), adversarial rounds with explicit critique, and a separate judge that synthesizes. Use when correctness benefits from adversarial pressure: legal review, code review, fact-checking. NOT a Council: a Council is collaborative peer review, Debate is attack and defend.
+  </div>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>A <span style="color:var(--accent-hover);font-weight:500">Multi-Agent Debate</span> pits two or more models against each other on the same question. Each round, they read each other's positions and write back the strongest critique they can. A separate judge model reads the whole exchange and writes the final answer, citing whichever side held up.</p>
+  </div>
+  <div class="layer-badges" aria-label="Layers used by this build">
+    <a class="layer-badge" href="layer-orchestration-agents.html">
+      <span class="dot" aria-hidden="true"></span>Orchestration &amp; agents
+    </a>
+    <a class="layer-badge" href="orchestration-coordination.html">
+      <span class="dot" aria-hidden="true"></span>Coordination
+    </a>
+    <a class="layer-badge" href="layer-composition.html">
+      <span class="dot" aria-hidden="true"></span>Composition
+    </a>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Watch two models <em>attack</em> each other.</h2>
+
+  <p class="demo-lede">A real legal-review style question. Two models start on opposite sides. Round 2, they read each other and try to break the other's argument. Then a separate judge model picks the winning points.</p>
+
+  <div class="demo-stage">
+    <div class="query-bar">
+      <div class="query-label">Question (sent to both models)</div>
+      <div class="query-text">Is this non-compete clause enforceable in California? "Employee shall not work for any competitor for 24 months post-termination."</div>
+    </div>
+
+    <div class="rounds" aria-live="polite" aria-atomic="false">
+
+      <!-- ROUND 1: opening positions -->
+      <div class="round" id="round-1">
+        <div class="round-head"><span class="badge">1</span>Round 1 &middot; opening positions</div>
+        <div class="round-body">
+          <div class="model-row">
+
+            <div class="model-card side-a" id="m1a">
+              <div class="model-head">
+                <span class="model-dot">A</span>
+                <span class="model-name">Claude</span>
+                <span class="model-pos">Defending: unenforceable</span>
+              </div>
+              <div class="model-says">
+                California Business and Professions Code &sect;16600 voids contracts that restrain anyone from engaging in a lawful profession. A blanket 24-month non-compete falls squarely in that prohibition.
+              </div>
+            </div>
+
+            <div class="model-card side-b" id="m1b">
+              <div class="model-head">
+                <span class="model-dot">B</span>
+                <span class="model-name">GPT</span>
+                <span class="model-pos">Defending: enforceable</span>
+              </div>
+              <div class="model-says">
+                The narrow trade-secret exception under <em>Edwards v. Arthur Andersen</em> still permits restraints reasonably tailored to protect trade secrets. If this employee had access, a 24-month restraint may survive scrutiny.
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ROUND 2: critiques -->
+      <div class="round" id="round-2">
+        <div class="round-head"><span class="badge">2</span>Round 2 &middot; critiques (each model reads the other)</div>
+        <div class="round-body">
+          <div class="model-row">
+
+            <div class="model-card side-a" id="m2a">
+              <div class="model-head">
+                <span class="model-dot">A</span>
+                <span class="model-name">Claude</span>
+                <span class="model-pos">Attacks B</span>
+              </div>
+              <div class="model-says">
+                <span class="crit-label">Critique of GPT</span>
+                <em>Edwards</em> explicitly rejected the "narrow restraint" reading the dissent argued for. AB 1076 (2024) codified that all post-employment non-competes are void, regardless of trade-secret framing. The exception you cite does not exist for non-competes, only for sale-of-business.
+              </div>
+            </div>
+
+            <div class="model-card side-b" id="m2b">
+              <div class="model-head">
+                <span class="model-dot">B</span>
+                <span class="model-name">GPT</span>
+                <span class="model-pos">Attacks A</span>
+              </div>
+              <div class="model-says">
+                <span class="crit-label">Critique of Claude</span>
+                Conceding: AB 1076 closes my carve-out. However, a properly-pleaded trade-secret <em>misappropriation</em> claim under CUTSA is still actionable. The clause is void, but the conduct it tries to prevent may still be restrainable through a different cause of action.
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- JUDGE -->
+      <div class="judge-wrap" id="judge">
+        <div class="judge-head"><span class="gavel">&#9878;</span>Judge (separate model, reads both rounds)</div>
+        <div class="judge-body">
+          <div class="judge-text">
+            The clause as written is <strong>unenforceable</strong> in California. Claude's citation to &sect;16600 and AB 1076 (2024) is correct and was conceded by GPT in round 2. GPT's surviving point is also right and worth carrying forward: trade-secret protection in California is via <strong>CUTSA misappropriation claims</strong>, not through non-compete clauses.
+          </div>
+          <div class="judge-note">Judge's job: weigh the rounds, keep the points that survived attack, discard the rest.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="demo-controls">
+      <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>Where this <em>comes from</em>.</h2>
+  <div class="example-stage">
+    <p class="example-intro">Multi-Agent Debate has a deep research lineage. These are the three papers and research programs production teams cite when they ship it.</p>
+
+    <div class="receipts">
+
+      <a class="receipt" href="https://arxiv.org/abs/2305.14325" target="_blank" rel="noopener noreferrer">
+        <div class="receipt-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h9l5 5v11H6z"/><path d="M14 4v6h6"/><path d="M9 14h6M9 17h4"/></svg>
+        </div>
+        <div class="receipt-body">
+          <div class="receipt-name">Du et al. (2023) &middot; Multiagent Debate</div>
+          <div class="receipt-blurb">"Improving Factuality and Reasoning in Language Models through Multiagent Debate." The seminal paper showing debate raises factuality on reasoning benchmarks.</div>
+        </div>
+        <div class="receipt-host">arxiv.org/abs/2305.14325</div>
+      </a>
+
+      <a class="receipt" href="https://deepmind.google/research/" target="_blank" rel="noopener noreferrer">
+        <div class="receipt-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a14 14 0 0 1 0 18M3 12h18"/></svg>
+        </div>
+        <div class="receipt-body">
+          <div class="receipt-name">Google DeepMind &middot; Debate research</div>
+          <div class="receipt-blurb">Ongoing research program treating debate as a scalable oversight mechanism for evaluating model claims.</div>
+        </div>
+        <div class="receipt-host">deepmind.google</div>
+      </a>
+
+      <a class="receipt" href="https://openai.com/index/ai-safety-via-debate/" target="_blank" rel="noopener noreferrer">
+        <div class="receipt-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 4v6c0 5-4 8-9 8s-9-3-9-8V7z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <div class="receipt-body">
+          <div class="receipt-name">AI Safety via Debate &middot; Irving, Christiano, Amodei</div>
+          <div class="receipt-blurb">The original 2018 proposal: two AIs argue, a human judge picks the winner. The intellectual root of every production debate system today.</div>
+        </div>
+        <div class="receipt-host">openai.com</div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- 04 THE PRICE YOU PAY -->
+<section>
+  <div class="section-label"><span class="num">04</span>The Price You Pay</div>
+  <h2>What it <em>costs</em>.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Token cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Correctness on hard Qs</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Vendor risk</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      You pay 3 to 5 model calls per question (two debaters x N rounds, plus a judge). In exchange you get a meaningful lift on adversarial-pressure-rewarding tasks and a built-in hedge against single-vendor blind spots.
+    </div>
+  </div>
+</section>
+
+<!-- 05 PATTERNS IT USES -->
+<section>
+  <div class="section-label"><span class="num">05</span>Patterns It Uses</div>
+  <h2>What's <em>underneath</em>.</h2>
+  <div class="layer-chips">
+    <a class="layer-chip" href="orchestration-coordination.html">
+      <span class="layer-chip-name">Coordination</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">explicit round structure tells each model when to argue and when to attack</span>
+    </a>
+    <a class="layer-chip" href="composition-ensembling.html">
+      <span class="layer-chip-name">Ensembling</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">multiple model calls (often different vendors) instead of just one</span>
+    </a>
+    <a class="layer-chip" href="composition-verification.html">
+      <span class="layer-chip-name">Verification</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">each round is a critique pass that filters out weak claims</span>
+    </a>
+    <a class="layer-chip" href="composition-cascading.html">
+      <span class="layer-chip-name">Cascading</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">a separate judge model reads the whole debate and synthesizes</span>
+    </a>
+  </div>
+</section>
+
+<!-- 06 WHEN TO USE VS ALTERNATIVES -->
+<section>
+  <div class="section-label"><span class="num">06</span>When To Use</div>
+  <h2>Pick this over the <em>look-alikes</em>.</h2>
+  <div class="decide-stage">
+
+    <div class="decide-row">
+      <div>
+        <div class="decide-vs">Pick Debate over</div>
+        <div class="decide-name">LLM Council</div>
+      </div>
+      <div class="decide-rule">
+        Debate is <strong>adversarial</strong>: models try to break each other's argument. Council is <strong>collaborative peer review</strong>: models read each other and refine. Use Debate when you need attack pressure, Council when you need calibration.
+      </div>
+    </div>
+
+    <div class="decide-row">
+      <div>
+        <div class="decide-vs">Pick Debate over</div>
+        <div class="decide-name">Self-Consistency</div>
+      </div>
+      <div class="decide-rule">
+        Self-Consistency runs <strong>one model multiple times</strong> and votes. Debate runs <strong>different models attacking each other</strong>. Self-Consistency catches reasoning variance. Debate catches model blind spots.
+      </div>
+    </div>
+
+    <div class="decide-row">
+      <div>
+        <div class="decide-vs">Pick Debate over</div>
+        <div class="decide-name">Generator-Critic pair</div>
+      </div>
+      <div class="decide-rule">
+        A Generator-Critic is <strong>one round</strong>: critic gives feedback, generator revises, done. Debate is <strong>multi-round symmetric</strong>: both sides write, both sides attack, judge picks the winner. Use Debate when the cheaper one-shot critique already failed.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Du, Y., Li, S., Torralba, A., Tenenbaum, J. B., &amp; Mordatch, I. (2023). <em>Improving Factuality and Reasoning in Language Models through Multiagent Debate.</em> <a href="https://arxiv.org/abs/2305.14325" target="_blank" rel="noopener noreferrer">arxiv.org/abs/2305.14325</a> <span class="note">The empirical case for debate as a quality lift on factual and reasoning tasks.</span></li>
+    <li>Irving, G., Christiano, P., &amp; Amodei, D. (2018). <em>AI Safety via Debate.</em> <a href="https://openai.com/index/ai-safety-via-debate/" target="_blank" rel="noopener noreferrer">openai.com</a> <span class="note">The original framing: two AIs debate, a judge decides. Intellectual root for the pattern.</span></li>
+    <li>Google DeepMind (ongoing). <em>Debate research program.</em> <a href="https://deepmind.google/research/" target="_blank" rel="noopener noreferrer">deepmind.google</a> <span class="note">Debate as scalable oversight, with more recent empirical follow-ups.</span></li>
+    <li>Anthropic (2024). <em>Building Effective Agents.</em> <a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener noreferrer">anthropic.com</a> <span class="note">Production guidance for ensembling and judging across model calls.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ DEMO ANIMATION ============
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+const round1 = document.getElementById('round-1');
+const round2 = document.getElementById('round-2');
+const judge  = document.getElementById('judge');
+
+const m1a = document.getElementById('m1a');
+const m1b = document.getElementById('m1b');
+const m2a = document.getElementById('m2a');
+const m2b = document.getElementById('m2b');
+
+const stepBtn  = document.getElementById('stepBtn');
+const playBtn  = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+let demoStep = -1;
+let running  = false;
+
+function resetDemo() {
+  demoStep = -1;
+  running  = false;
+  [round1, round2].forEach(r => r.classList.remove('visible'));
+  judge.classList.remove('visible');
+  [m1a, m1b, m2a, m2b].forEach(c => c.classList.remove('in'));
+}
+
+async function doRound1(animate) {
+  round1.classList.add('visible');
+  if (animate) await sleep(reduceMotion ? 0 : 200);
+  m1a.classList.add('in');
+  if (animate) await sleep(reduceMotion ? 0 : 350);
+  m1b.classList.add('in');
+  if (animate) await sleep(reduceMotion ? 0 : 200);
+}
+
+async function doRound2(animate) {
+  round2.classList.add('visible');
+  if (animate) await sleep(reduceMotion ? 0 : 200);
+  m2a.classList.add('in');
+  if (animate) await sleep(reduceMotion ? 0 : 350);
+  m2b.classList.add('in');
+  if (animate) await sleep(reduceMotion ? 0 : 200);
+}
+
+async function doJudge(animate) {
+  judge.classList.add('visible');
+  if (animate) await sleep(reduceMotion ? 0 : 400);
+}
+
+stepBtn.addEventListener('click', async () => {
+  if (running) return;
+  if (demoStep >= 2) { resetDemo(); return; }
+  running = true;
+  stepBtn.disabled = true; playBtn.disabled = true;
+  demoStep++;
+  if (demoStep === 0) await doRound1(true);
+  else if (demoStep === 1) await doRound2(true);
+  else if (demoStep === 2) await doJudge(true);
+  running = false;
+  stepBtn.disabled = false; playBtn.disabled = false;
+});
+
+playBtn.addEventListener('click', async () => {
+  if (running) return;
+  resetDemo();
+  running = true;
+  playBtn.disabled = true; stepBtn.disabled = true;
+  await sleep(reduceMotion ? 0 : 200);
+  await doRound1(!reduceMotion);
+  await sleep(reduceMotion ? 0 : 500);
+  await doRound2(!reduceMotion);
+  await sleep(reduceMotion ? 0 : 500);
+  await doJudge(!reduceMotion);
+  demoStep = 2;
+  running = false;
+  playBtn.disabled = false; stepBtn.disabled = false;
+});
+
+resetBtn.addEventListener('click', () => {
+  if (running) return;
+  resetDemo();
+});
+
+if (reduceMotion) {
+  (async () => {
+    await doRound1(false);
+    await doRound2(false);
+    await doJudge(false);
+    demoStep = 2;
+  })();
+}
+</script>
+</body>
+</html>

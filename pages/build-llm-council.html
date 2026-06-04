@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM Council · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --warn:#B45309; --warn-soft:#FEF3C7;
+    --danger:#C2554F;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header {
+    max-width: 920px; margin: 0 auto; padding: 40px 24px 8px;
+    scroll-margin-top: 80px;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* Default in 2026 callout */
+  .default-callout {
+    max-width: 920px; margin: 22px auto 0; padding: 0 24px;
+  }
+  .default-callout-inner {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: linear-gradient(180deg, #FCFBFF 0%, var(--accent-soft) 100%);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius); padding: 16px 20px;
+    box-shadow: var(--shadow-sm);
+  }
+  .default-callout .ico {
+    flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+    background: #fff; border: 1px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent-hover);
+  }
+  .default-callout .ico svg { width: 14px; height: 14px; display: block; }
+  .default-callout .body { flex: 1; min-width: 0; }
+  .default-callout .label {
+    font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--accent-hover); margin-bottom: 3px;
+  }
+  .default-callout .body p {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 400; font-size: 15.5px;
+    line-height: 1.5; color: var(--text);
+  }
+
+  /* sections */
+  section {
+    max-width: 920px; margin: 0 auto; padding: 18px 24px 34px;
+    position: relative; scroll-margin-top: 80px;
+  }
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 9px;
+  }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
+    line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px;
+    line-height: 1.55; color: var(--text);
+  }
+  .idea-card p strong { color: var(--accent-hover); font-weight: 500; }
+
+  /* ============ COUNCIL DEMO ============ */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .council-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .council-question {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 18px;
+  }
+  .council-question .qlabel {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 6px;
+  }
+  .council-question .qtext {
+    font-family: 'Fraunces', serif; font-size: 15.5px; line-height: 1.5; color: var(--text);
+  }
+
+  /* round indicator */
+  .round-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .round-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 13px; background: var(--bg-subtle);
+    border: 1px solid var(--border); border-radius: 20px;
+    font-size: 12.5px; font-weight: 600; color: var(--faint);
+    transition: background .25s ease, border-color .25s ease, color .25s ease;
+  }
+  .round-pill .rnum {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--border); color: var(--faint);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    transition: background .25s ease, color .25s ease;
+  }
+  .round-pill.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .round-pill.active .rnum { background: var(--accent); color: #fff; }
+  .round-pill.done { background: var(--success-soft); border-color: var(--success); color: var(--success); }
+  .round-pill.done .rnum { background: var(--success); color: #fff; }
+
+  /* model panels */
+  .model-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 640px) { .model-grid { grid-template-columns: 1fr; } }
+
+  .model-card {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 13px 14px;
+    display: flex; flex-direction: column; gap: 8px;
+    position: relative;
+    transition: border-color .25s ease, background .25s ease, box-shadow .25s ease;
+    min-height: 120px;
+  }
+  .model-card.active { border-color: var(--accent); background: #FCFBFF; box-shadow: 0 0 0 3px rgba(124,92,246,.08); }
+  .model-card.scored { border-color: var(--success); background: #FAFFFD; }
+  .model-card.chairman { border-color: var(--accent); background: linear-gradient(180deg,#FCFBFF 0%, var(--accent-soft) 100%); box-shadow: var(--shadow-sm); }
+
+  .model-head {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .model-id {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+    color: var(--accent-hover); background: #fff;
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 2px 7px; letter-spacing: .03em;
+  }
+  .model-status {
+    font-size: 10.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--faint); margin-left: auto;
+  }
+  .model-card.active .model-status { color: var(--accent-hover); }
+  .model-card.scored .model-status { color: var(--success); }
+
+  .model-real {
+    font-size: 11.5px; color: var(--faint);
+    display: flex; align-items: center; gap: 4px;
+    transition: opacity .3s ease;
+  }
+  .model-real.hidden { opacity: 0; }
+  .model-real.shown { opacity: 1; }
+  .model-real .reveal-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+
+  .model-answer {
+    font-size: 13px; line-height: 1.5; color: var(--text);
+    margin-top: 2px;
+    max-height: 0; opacity: 0; overflow: hidden;
+    transition: max-height .4s ease, opacity .3s ease;
+  }
+  .model-card.active .model-answer,
+  .model-card.scored .model-answer { max-height: 200px; opacity: 1; }
+
+  .model-scores {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin-top: 4px;
+    max-height: 0; opacity: 0; overflow: hidden;
+    transition: max-height .4s ease, opacity .3s ease;
+  }
+  .model-card.scored .model-scores { max-height: 40px; opacity: 1; }
+  .score-chip {
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600;
+    padding: 2px 7px; border-radius: 6px;
+    background: #fff; border: 1px solid var(--border); color: var(--soft);
+  }
+  .score-chip strong { color: var(--success); }
+
+  /* chairman row */
+  .chairman-row {
+    margin-top: 16px;
+    background: linear-gradient(180deg, #FCFBFF 0%, var(--accent-soft) 100%);
+    border: 1.5px solid var(--accent); border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    max-height: 0; opacity: 0; overflow: hidden;
+    transition: max-height .5s ease, opacity .4s ease, padding .3s ease;
+  }
+  .chairman-row.visible { max-height: 400px; opacity: 1; }
+  .chairman-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+  }
+  .chairman-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--accent-hover);
+  }
+  .chairman-tag .crown { width: 14px; height: 14px; color: var(--accent); }
+  .chairman-name {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+    color: var(--accent-hover); background: #fff;
+    border: 1px solid var(--accent); border-radius: 6px;
+    padding: 2px 8px;
+  }
+  .chairman-final {
+    font-family: 'Fraunces', serif; font-size: 15.5px; line-height: 1.55; color: var(--text);
+  }
+  .chairman-final strong { color: var(--accent-hover); font-weight: 500; }
+  .chairman-meta {
+    font-size: 12px; color: var(--faint); margin-top: 8px;
+    display: flex; gap: 12px; flex-wrap: wrap;
+  }
+  .chairman-meta span { display: inline-flex; gap: 4px; align-items: center; }
+  .chairman-meta strong { color: var(--soft); font-weight: 600; }
+
+  /* controls */
+  .demo-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ RECEIPTS ============ */
+  .receipts-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 0;
+    overflow: hidden;
+  }
+  .receipt {
+    padding: 18px 20px; border-bottom: 1px solid var(--border);
+  }
+  .receipt:last-child { border-bottom: none; }
+  .receipt-head {
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .receipt-org {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px;
+    color: var(--text); letter-spacing: -.005em;
+  }
+  .receipt-date {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--faint); font-weight: 500;
+  }
+  .receipt-tag {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 2px 9px;
+  }
+  .receipt-body { font-size: 14px; color: var(--soft); line-height: 1.6; }
+  .receipt-config {
+    margin-top: 10px; padding: 10px 12px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text); line-height: 1.55;
+    white-space: pre-wrap;
+  }
+  .receipt-config .k { color: var(--accent-hover); font-weight: 600; }
+  .receipt-config .v { color: var(--soft); }
+  .receipt-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    margin-top: 10px; font-size: 12.5px; font-weight: 600;
+    color: var(--accent-hover); text-decoration: none;
+    border-bottom: 1px solid var(--accent-soft);
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .receipt-link:hover { color: var(--accent); border-color: var(--accent); }
+  .receipt-link .ext { font-size: 11px; }
+
+  /* ============ TRADEOFFS ============ */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 14px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg {
+    flex: 1; height: 22px; background: var(--bg-subtle);
+    border: 1px solid var(--border); border-radius: 5px;
+  }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-bars .seg.on-y { background: #F59E0B; border-color: #F59E0B; }
+  .tradeoff-bars .seg.on-g { background: var(--success); border-color: var(--success); }
+  .tradeoff-bars .seg.on-r { background: var(--danger); border-color: var(--danger); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 170px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote {
+    margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border);
+    font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+
+  /* ============ LAYER CHIPS ============ */
+  .layer-chips {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .layer-chip {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px;
+    padding: 11px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    text-decoration: none; font-size: 13.5px; font-weight: 500;
+    color: var(--text); transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    line-height: 1.45;
+  }
+  .layer-chip:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+  .layer-chip-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 2px 7px; letter-spacing: .03em;
+    margin-right: 3px;
+  }
+  .layer-chip-name { color: var(--accent-hover); font-weight: 700; white-space: nowrap; }
+  .layer-chip-sep { color: var(--border-strong); font-weight: 400; margin: 0 2px; }
+  .layer-chip-clause { color: var(--soft); }
+
+  /* ============ DECISION LOGIC ============ */
+  .decide-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 0; overflow: hidden;
+  }
+  .decide-headline {
+    padding: 16px 20px; background: var(--bg-subtle);
+    border-bottom: 1px solid var(--border);
+    font-family: 'Fraunces', serif; font-size: 16px; line-height: 1.5; color: var(--text);
+  }
+  .decide-headline strong { color: var(--accent-hover); font-weight: 500; }
+  .decide-row {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+  }
+  .decide-row:last-child { border-bottom: none; }
+  .decide-when {
+    flex: 1; min-width: 0; font-size: 14px; line-height: 1.55; color: var(--text);
+  }
+  .decide-when strong { color: var(--text); font-weight: 600; }
+  .decide-arrow {
+    flex-shrink: 0; font-family: 'Fraunces', serif; font-size: 16px;
+    color: var(--accent); font-weight: 500; padding-top: 1px;
+  }
+  .decide-pick {
+    flex-shrink: 0; font-family: 'Fraunces', serif; font-size: 15px;
+    font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 12px;
+    white-space: nowrap;
+  }
+
+  /* back card */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow {
+    font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent);
+    line-height: 1; transition: transform 0.2s ease;
+  }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources + footer */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  .sources li a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+  .sources li a:hover { color: var(--accent); border-color: var(--accent); }
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+    .decide-row { flex-direction: column; gap: 8px; }
+    .decide-arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="builds.html"><span aria-hidden="true">&larr;</span> Builds</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a><span class="sep">/</span><a href="builds.html">Builds</a><span class="sep">/</span><a href="builds.html#llm-council" class="here" style="color:var(--soft)">LLM Council</a>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M5 7v12h14V7M9 11h6"/></svg></span>
+    Recipe &middot; LLM Council
+  </span>
+  <h1 class="pattern-title">LLM Council</h1>
+  <p class="explainer">Three top models from different vendors answer the same question, anonymously score each other, and one chairman synthesizes the final reply.</p>
+</header>
+
+<!-- DEFAULT IN 2026 -->
+<div class="default-callout">
+  <div class="default-callout-inner">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+    </span>
+    <div class="body">
+      <div class="label">Default in 2026</div>
+      <p>Claude Opus 4.7 + GPT-5 + Gemini 2.5 Pro panel. Anonymize before peer review. Chairman = strongest model. Use only when correctness is worth roughly 3x the cost and 10s of added latency.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 01: THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>Ask three different models the same hard question, let them <strong>peer-review each other anonymously</strong>, then have one chairman model write the final answer using what the council agreed on.</p>
+  </div>
+</section>
+
+<!-- 02: SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>The council, <em>live</em>.</h2>
+  <p class="demo-lede">Tap Next to walk through one council deliberation: question goes out to three anonymous models in parallel, each scores the others' answers without knowing who wrote them, then a chairman synthesizes one final reply.</p>
+
+  <div class="council-stage">
+    <div class="council-question">
+      <div class="qlabel">Question</div>
+      <div class="qtext">Should a Series A SaaS company file for a US patent on its core algorithm, given competitors and 18 months of runway?</div>
+    </div>
+
+    <!-- round indicator -->
+    <div class="round-bar" aria-label="Council rounds">
+      <div class="round-pill" id="rp1"><span class="rnum">1</span>Parallel answers</div>
+      <div class="round-pill" id="rp2"><span class="rnum">2</span>Anonymous peer review</div>
+      <div class="round-pill" id="rp3"><span class="rnum">3</span>Chairman synthesis</div>
+    </div>
+
+    <!-- model panels -->
+    <div class="model-grid" role="list" aria-label="Council members">
+      <div class="model-card" id="mc-a" role="listitem">
+        <div class="model-head">
+          <span class="model-id">MODEL-A</span>
+          <span class="model-status" id="ms-a">waiting</span>
+        </div>
+        <div class="model-real hidden" id="mr-a"><span class="reveal-dot" aria-hidden="true"></span>Claude Opus 4.7</div>
+        <div class="model-answer" id="ma-a">Yes, but narrowly. File a provisional now ($300, locks priority), invest in a full filing only after Series B. The defensive value matters more than the offensive use at this stage.</div>
+        <div class="model-scores" id="msc-a">
+          <span class="score-chip">B: <strong>8/10</strong></span>
+          <span class="score-chip">C: <strong>7/10</strong></span>
+        </div>
+      </div>
+
+      <div class="model-card" id="mc-b" role="listitem">
+        <div class="model-head">
+          <span class="model-id">MODEL-B</span>
+          <span class="model-status" id="ms-b">waiting</span>
+        </div>
+        <div class="model-real hidden" id="mr-b"><span class="reveal-dot" aria-hidden="true"></span>GPT-5</div>
+        <div class="model-answer" id="ma-b">No. At Series A, cash and speed matter more than IP. Patents take 2+ years to grant, your algorithm will have evolved, and trade-secret protection plus shipping fast gives you more durable advantage.</div>
+        <div class="model-scores" id="msc-b">
+          <span class="score-chip">A: <strong>7/10</strong></span>
+          <span class="score-chip">C: <strong>6/10</strong></span>
+        </div>
+      </div>
+
+      <div class="model-card" id="mc-c" role="listitem">
+        <div class="model-head">
+          <span class="model-id">MODEL-C</span>
+          <span class="model-status" id="ms-c">waiting</span>
+        </div>
+        <div class="model-real hidden" id="mr-c"><span class="reveal-dot" aria-hidden="true"></span>Gemini 2.5 Pro</div>
+        <div class="model-answer" id="ma-c">It depends on whether your algorithm is genuinely novel. If yes, file a provisional ($300, 12-month window). If it's an obvious application of known methods, skip it: a denied patent reveals your method publicly.</div>
+        <div class="model-scores" id="msc-c">
+          <span class="score-chip">A: <strong>9/10</strong></span>
+          <span class="score-chip">B: <strong>6/10</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- chairman synthesis -->
+    <div class="chairman-row" id="chairman">
+      <div class="chairman-head">
+        <span class="chairman-tag">
+          <svg class="crown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l4 5 5-8 5 8 4-5v10H3z"/></svg>
+          Chairman
+        </span>
+        <span class="chairman-name">Claude Opus 4.7</span>
+      </div>
+      <div class="chairman-final">
+        <strong>File a provisional patent ($300) within 30 days.</strong> Two of three council members agreed this captures defensive value cheaply without overcommitting cash. The dissent (Model B) is right that a full filing is premature, so do not pursue one until Series B. The condition Model C raised about genuine novelty applies: if the algorithm is an obvious extension of public work, skip the filing.
+      </div>
+      <div class="chairman-meta">
+        <span><strong>Agreement</strong>: 2 of 3</span>
+        <span><strong>Cost</strong>: $0.42 + $0.31 + $0.28 + $0.39 = $1.40 per query</span>
+        <span><strong>Latency</strong>: 11.3 s</span>
+      </div>
+    </div>
+
+    <div class="demo-controls">
+      <button class="diagram-btn primary" id="nextBtn">Next step &rarr;</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03: PRODUCTION RECEIPTS -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example with Production Receipts</div>
+  <h2>Named companies <em>shipping</em> this.</h2>
+  <p class="demo-lede">Council architectures are no longer a research toy. Here are three real deployments with their actual configs.</p>
+
+  <div class="receipts-stage">
+
+    <!-- Perplexity -->
+    <div class="receipt">
+      <div class="receipt-head">
+        <span class="receipt-org">Perplexity Model Council</span>
+        <span class="receipt-date">Feb 2026</span>
+        <span class="receipt-tag">$200/mo tier</span>
+      </div>
+      <div class="receipt-body">
+        Perplexity's Max tier ships a "Model Council" toggle: Pro queries are fanned out to Claude, GPT, Gemini, and Grok in parallel, each answer is sourced and cited, and a final synthesis is presented with vendor attribution removed during voting.
+      </div>
+      <div class="receipt-config"><span class="k">members</span>:    <span class="v">claude-opus-4.7, gpt-5, gemini-2.5-pro, grok-4</span>
+<span class="k">anonymize</span>:  <span class="v">true (model IDs stripped pre-vote)</span>
+<span class="k">chairman</span>:   <span class="v">claude-opus-4.7</span>
+<span class="k">tier</span>:       <span class="v">Max ($200/mo)</span></div>
+      <a class="receipt-link" href="https://www.perplexity.ai/hub/blog/introducing-model-council" target="_blank" rel="noopener">perplexity.ai/hub/blog/introducing-model-council<span class="ext" aria-hidden="true">&#8599;</span></a>
+    </div>
+
+    <!-- Karpathy LLM Council -->
+    <div class="receipt">
+      <div class="receipt-head">
+        <span class="receipt-org">Karpathy's LLM Council</span>
+        <span class="receipt-date">Dec 2025</span>
+        <span class="receipt-tag">Open source</span>
+      </div>
+      <div class="receipt-body">
+        Andrej Karpathy's open-source "LLM Council" project popularized the three-round shape: parallel generation, anonymous peer-review with numerical scoring, and a chairman that writes the final answer. The reference implementation runs four frontier models against any prompt.
+      </div>
+      <div class="receipt-config"><span class="k">members</span>:    <span class="v">gpt-5, claude-opus-4.6, gemini-2.5-pro, grok-4</span>
+<span class="k">rounds</span>:     <span class="v">3 (answer, peer-review, synthesis)</span>
+<span class="k">scoring</span>:    <span class="v">1-10 per peer, anonymized</span>
+<span class="k">chairman</span>:   <span class="v">gpt-5</span></div>
+      <a class="receipt-link" href="https://www.analyticsvidhya.com/blog/2025/12/llm-council-by-andrej-karpathy/" target="_blank" rel="noopener">analyticsvidhya.com/blog/2025/12/llm-council-by-andrej-karpathy<span class="ext" aria-hidden="true">&#8599;</span></a>
+    </div>
+
+    <!-- Medical paper -->
+    <div class="receipt">
+      <div class="receipt-head">
+        <span class="receipt-org">Ophthalmology multi-LLM deliberation</span>
+        <span class="receipt-date">2024 peer-reviewed</span>
+        <span class="receipt-tag">Medical</span>
+      </div>
+      <div class="receipt-body">
+        Peer-reviewed work in clinical ophthalmology showed a council of three LLMs deliberating on retinal disease cases reached higher diagnostic agreement with specialist panels than any single model alone. Anonymous deliberation reduced the most-confident-model bias.
+      </div>
+      <div class="receipt-config"><span class="k">domain</span>:     <span class="v">retinal disease diagnosis (n=187 cases)</span>
+<span class="k">members</span>:    <span class="v">3 frontier LLMs (vendor-blinded)</span>
+<span class="k">finding</span>:    <span class="v">council agreement &gt; best single model</span>
+<span class="k">use</span>:        <span class="v">decision support, not autonomous</span></div>
+      <a class="receipt-link" href="https://pubmed.ncbi.nlm.nih.gov/?term=multi-LLM+deliberation+ophthalmology" target="_blank" rel="noopener">pubmed.ncbi.nlm.nih.gov &middot; multi-LLM deliberation ophthalmology<span class="ext" aria-hidden="true">&#8599;</span></a>
+    </div>
+
+  </div>
+</section>
+
+<!-- 04: THE PRICE YOU PAY -->
+<section>
+  <div class="section-label"><span class="num">04</span>The Price You Pay</div>
+  <h2>What it <em>costs</em>.</h2>
+
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Dollar cost per query</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Operational complexity</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Vendor lock-in (lower is better)</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-g"></div><div class="seg on-g"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Answer quality on hard questions</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-g"></div><div class="seg on-g"></div><div class="seg on-g"></div><div class="seg on-g"></div><div class="seg on-g"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Roughly 3x the dollar cost (you pay every model) and 10x the latency of a single call (parallel answers plus a peer-review round plus chairman synthesis). What you gain is genuinely diverse views and a vote against any one model's failure modes. Worth it for high-stakes correctness, never worth it for cheap reads.
+    </div>
+  </div>
+</section>
+
+<!-- 05: PATTERNS IT USES -->
+<section>
+  <div class="section-label"><span class="num">05</span>Patterns It Uses</div>
+  <h2>It <em>decomposes</em> into.</h2>
+  <p class="demo-lede">All three sub-patterns live in the Composition layer: every step combines or verifies outputs from multiple models.</p>
+
+  <div class="layer-chips">
+    <a class="layer-chip" href="composition-ensembling.html">
+      <span class="layer-chip-num">L2</span>
+      <span class="layer-chip-name">Combine</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">Ensembling N diverse models for parallel answers (round 1)</span>
+    </a>
+    <a class="layer-chip" href="composition-verify.html">
+      <span class="layer-chip-num">L2</span>
+      <span class="layer-chip-name">Verify</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">Anonymous peer review across council members (round 2)</span>
+    </a>
+    <a class="layer-chip" href="composition-combine.html">
+      <span class="layer-chip-num">L2</span>
+      <span class="layer-chip-name">Combine</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">Chairman synthesis of scored peer answers into one reply (round 3)</span>
+    </a>
+  </div>
+</section>
+
+<!-- 06: WHEN TO USE VS ALTERNATIVES -->
+<section>
+  <div class="section-label"><span class="num">06</span>When to Use vs Alternatives</div>
+  <h2>The <em>decision</em>.</h2>
+
+  <div class="decide-stage">
+    <div class="decide-headline">Use an <strong>LLM Council</strong> when correctness genuinely matters and you need cross-vendor robustness. For most other cases, cheaper patterns win.</div>
+
+    <div class="decide-row">
+      <div class="decide-when"><strong>If</strong> you only need one model with a critic loop (drafting plus revision), and 1.5-2x cost is acceptable</div>
+      <div class="decide-arrow" aria-hidden="true">&rarr;</div>
+      <div class="decide-pick">Generator-Critic pair</div>
+    </div>
+
+    <div class="decide-row">
+      <div class="decide-when"><strong>If</strong> the answer is checkable (math, code) and you just want to reduce variance on one model</div>
+      <div class="decide-arrow" aria-hidden="true">&rarr;</div>
+      <div class="decide-pick">Self-Consistency</div>
+    </div>
+
+    <div class="decide-row">
+      <div class="decide-when"><strong>If</strong> adversarial pressure helps (red-team, contested claims) more than diverse views do</div>
+      <div class="decide-arrow" aria-hidden="true">&rarr;</div>
+      <div class="decide-pick">Multi-agent Debate</div>
+    </div>
+
+    <div class="decide-row">
+      <div class="decide-when"><strong>If</strong> you need cross-vendor diverse views, anonymous peer review, and 3x cost is justified</div>
+      <div class="decide-arrow" aria-hidden="true">&rarr;</div>
+      <div class="decide-pick">LLM Council</div>
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Perplexity (Feb 2026). <em>Introducing Model Council.</em> <a href="https://www.perplexity.ai/hub/blog/introducing-model-council" target="_blank" rel="noopener">perplexity.ai/hub/blog/introducing-model-council</a> <span class="note">Production cross-vendor council shipped to the $200/mo Max tier.</span></li>
+    <li>Karpathy (Dec 2025). <em>LLM Council: parallel answer, anonymous peer review, chairman synthesis.</em> <a href="https://www.analyticsvidhya.com/blog/2025/12/llm-council-by-andrej-karpathy/" target="_blank" rel="noopener">analyticsvidhya.com/blog/2025/12/llm-council-by-andrej-karpathy</a> <span class="note">Open-source reference implementation that popularized the three-round shape.</span></li>
+    <li>Du et al. (2023). <em>Improving Factuality and Reasoning in Language Models through Multiagent Debate.</em> <span class="note">MIT/Google paper showing multi-model deliberation outperforms single-model on factual reasoning benchmarks.</span></li>
+    <li>Wang et al. (2023). <em>Self-Consistency Improves Chain of Thought Reasoning in Language Models.</em> Google Research. <span class="note">The cheaper single-model variance-reduction alternative.</span></li>
+    <li>Clinical ophthalmology peer-reviewed work (2024). <em>Multi-LLM deliberation for retinal disease diagnosis.</em> <span class="note">Council architectures outperforming best single model in a medical setting; vendor-blinded design.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function(){
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const nextBtn  = document.getElementById('nextBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  const rp = [
+    document.getElementById('rp1'),
+    document.getElementById('rp2'),
+    document.getElementById('rp3'),
+  ];
+
+  const cards = [
+    { el: document.getElementById('mc-a'), status: document.getElementById('ms-a'), real: document.getElementById('mr-a') },
+    { el: document.getElementById('mc-b'), status: document.getElementById('ms-b'), real: document.getElementById('mr-b') },
+    { el: document.getElementById('mc-c'), status: document.getElementById('ms-c'), real: document.getElementById('mr-c') },
+  ];
+
+  const chairman = document.getElementById('chairman');
+
+  // step: 0 = initial, 1 = parallel answers, 2 = peer review, 3 = chairman, 4 = identities revealed
+  let step = 0;
+
+  function setStatus(card, text){ card.status.textContent = text; }
+
+  function resetAll(){
+    step = 0;
+    rp.forEach(p => p.classList.remove('active','done'));
+    cards.forEach(c => {
+      c.el.classList.remove('active','scored','chairman');
+      setStatus(c, 'waiting');
+      c.real.classList.remove('shown');
+      c.real.classList.add('hidden');
+    });
+    chairman.classList.remove('visible');
+    nextBtn.disabled = false;
+    nextBtn.textContent = 'Next step →';
+  }
+
+  function advance(){
+    step++;
+    if (step === 1){
+      // Parallel answers: all three become active
+      rp[0].classList.add('active');
+      cards.forEach((c, i) => {
+        setTimeout(() => {
+          c.el.classList.add('active');
+          setStatus(c, 'answered');
+        }, reduceMotion ? 0 : i * 180);
+      });
+      nextBtn.textContent = 'Run peer review →';
+    } else if (step === 2){
+      // Anonymous peer review: each card moves to "scored" state
+      rp[0].classList.remove('active');
+      rp[0].classList.add('done');
+      rp[1].classList.add('active');
+      cards.forEach((c, i) => {
+        setTimeout(() => {
+          c.el.classList.remove('active');
+          c.el.classList.add('scored');
+          setStatus(c, 'peer-scored');
+        }, reduceMotion ? 0 : i * 160);
+      });
+      nextBtn.textContent = 'Chairman synthesizes →';
+    } else if (step === 3){
+      // Chairman synthesis
+      rp[1].classList.remove('active');
+      rp[1].classList.add('done');
+      rp[2].classList.add('active');
+      cards[0].el.classList.add('chairman');
+      setStatus(cards[0], 'chairman');
+      setTimeout(() => {
+        chairman.classList.add('visible');
+        rp[2].classList.remove('active');
+        rp[2].classList.add('done');
+      }, reduceMotion ? 0 : 250);
+      nextBtn.textContent = 'Reveal identities →';
+    } else if (step === 4){
+      // Reveal real model names
+      cards.forEach((c, i) => {
+        setTimeout(() => {
+          c.real.classList.remove('hidden');
+          c.real.classList.add('shown');
+        }, reduceMotion ? 0 : i * 140);
+      });
+      nextBtn.textContent = 'Done';
+      nextBtn.disabled = true;
+    }
+  }
+
+  nextBtn.addEventListener('click', advance);
+  resetBtn.addEventListener('click', resetAll);
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tool-using Agent Loop · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+    --radius:16px; --radius-sm:11px;
+    --bg-subtle:#F6F7F9;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --warn:#B45309; --warn-soft:#FEF3C7;
+    --danger:#C2554F; --danger-soft:#FDECEA;
+    --think:#0E7490; --think-soft:#E0F7FA;
+    --act:#7C5CF6;
+    --obs:#0E9F6E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 920px; margin: 0 auto; padding: 11px 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px; background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease; white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header {
+    max-width: 920px; margin: 0 auto; padding: 40px 24px 8px;
+    scroll-margin-top: 80px;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* Default in 2026 callout */
+  .default-callout { max-width: 920px; margin: 22px auto 0; padding: 0 24px; }
+  .default-callout-inner {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: linear-gradient(180deg, #FCFBFF 0%, var(--accent-soft) 100%);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius); padding: 16px 20px;
+    box-shadow: var(--shadow-sm);
+  }
+  .default-callout .ico {
+    flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+    background: #fff; border: 1px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent-hover);
+  }
+  .default-callout .ico svg { width: 14px; height: 14px; display: block; }
+  .default-callout .body { flex: 1; min-width: 0; }
+  .default-callout .label {
+    font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--accent-hover); margin-bottom: 3px;
+  }
+  .default-callout .body p {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 400; font-size: 15.5px;
+    line-height: 1.5; color: var(--text);
+  }
+
+  /* sections */
+  section {
+    max-width: 920px; margin: 0 auto; padding: 18px 24px 34px;
+    position: relative; scroll-margin-top: 80px;
+  }
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 9px;
+  }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px;
+    line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p {
+    font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px;
+    line-height: 1.55; color: var(--text);
+  }
+  .idea-card p strong { color: var(--accent-hover); font-weight: 500; }
+
+  /* ============ REACT LOOP DEMO ============ */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .loop-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .loop-task {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 16px;
+  }
+  .loop-task .qlabel {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 6px;
+  }
+  .loop-task .qtext {
+    font-family: 'Fraunces', serif; font-size: 15.5px; line-height: 1.5; color: var(--text);
+  }
+  .loop-task .qtext code {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    background: #fff; border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 5px; color: var(--accent-hover);
+  }
+
+  /* iteration counter */
+  .iter-counter {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+    padding-bottom: 12px; border-bottom: 1px solid var(--border);
+  }
+  .iter-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--faint);
+  }
+  .iter-dots { display: flex; gap: 4px; flex: 1; }
+  .iter-dot {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700;
+    color: var(--faint);
+    display: flex; align-items: center; justify-content: center;
+    transition: background .3s ease, border-color .3s ease, color .3s ease;
+  }
+  .iter-dot.done { background: var(--success-soft); border-color: var(--success); color: var(--success); }
+  .iter-dot.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); transform: scale(1.1); }
+  .iter-dot.cap { background: var(--danger-soft); border-color: var(--danger); color: var(--danger); }
+  .iter-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+    color: var(--soft); min-width: 78px; text-align: right;
+  }
+
+  /* iteration cards */
+  .iter-stream {
+    display: flex; flex-direction: column; gap: 10px;
+    min-height: 220px;
+  }
+  .iter-card {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px 14px;
+    opacity: 0; max-height: 0; overflow: hidden;
+    transition: opacity .3s ease, max-height .4s ease, padding .3s ease, margin-top .3s ease;
+  }
+  .iter-card.shown { opacity: 1; max-height: 220px; }
+  .iter-card-head {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+  }
+  .iter-card-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700;
+    color: var(--faint); letter-spacing: .04em;
+  }
+  .iter-card-tag {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 6px;
+  }
+  .iter-card-tag.think { background: var(--think-soft); color: var(--think); border: 1px solid #B2EBF2; }
+  .iter-card-tag.act   { background: var(--accent-soft); color: var(--accent-hover); border: 1px solid #DDD1FC; }
+  .iter-card-tag.obs   { background: var(--success-soft); color: var(--success); border: 1px solid #BFE3D3; }
+  .iter-card-tag.final { background: #FFF0F5; color: #C026D3; border: 1px solid #F4D4F4; }
+  .iter-card-text { font-size: 13.5px; line-height: 1.55; color: var(--text); }
+  .iter-card-text strong { color: var(--accent-hover); font-weight: 600; }
+  .iter-card-text code {
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+    background: #fff; border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 5px; color: var(--text);
+  }
+
+  /* controls */
+  .demo-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .diagram-btn.danger { color: var(--danger); border-color: #F4D2D0; background: var(--danger-soft); }
+  .diagram-btn.danger:hover { background: #FBE0DC; border-color: var(--danger); }
+
+  /* bounded vs unbounded callout */
+  .bounded-callout {
+    margin-top: 14px; padding: 12px 14px;
+    border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: var(--bg-subtle);
+    font-size: 13px; line-height: 1.55; color: var(--soft);
+    display: flex; gap: 10px; align-items: flex-start;
+    transition: background .3s ease, border-color .3s ease, color .3s ease;
+  }
+  .bounded-callout .ico {
+    flex-shrink: 0; width: 20px; height: 20px; color: var(--faint);
+    transition: color .3s ease;
+  }
+  .bounded-callout strong { color: var(--text); font-weight: 600; }
+  .bounded-callout.cap { background: var(--danger-soft); border-color: var(--danger); color: #7F1D1D; }
+  .bounded-callout.cap .ico { color: var(--danger); }
+  .bounded-callout.cap strong { color: var(--danger); }
+  .bounded-callout.runaway { background: var(--warn-soft); border-color: #F59E0B; color: #78350F; }
+  .bounded-callout.runaway .ico { color: var(--warn); }
+  .bounded-callout.runaway strong { color: var(--warn); }
+
+  /* ============ RECEIPTS ============ */
+  .receipts-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 0; overflow: hidden;
+  }
+  .receipt { padding: 18px 20px; border-bottom: 1px solid var(--border); }
+  .receipt:last-child { border-bottom: none; }
+  .receipt-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .receipt-org { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--text); letter-spacing: -.005em; }
+  .receipt-date { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--faint); font-weight: 500; }
+  .receipt-tag {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 2px 9px;
+  }
+  .receipt-body { font-size: 14px; color: var(--soft); line-height: 1.6; }
+  .receipt-config {
+    margin-top: 10px; padding: 10px 12px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text); line-height: 1.55;
+    white-space: pre-wrap;
+  }
+  .receipt-config .k { color: var(--accent-hover); font-weight: 600; }
+  .receipt-config .v { color: var(--soft); }
+  .receipt-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    margin-top: 10px; font-size: 12.5px; font-weight: 600;
+    color: var(--accent-hover); text-decoration: none;
+    border-bottom: 1px solid var(--accent-soft);
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .receipt-link:hover { color: var(--accent); border-color: var(--accent); }
+  .receipt-link .ext { font-size: 11px; }
+
+  /* ============ TRADEOFFS ============ */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 14px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 180px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg {
+    flex: 1; height: 22px; background: var(--bg-subtle);
+    border: 1px solid var(--border); border-radius: 5px;
+  }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-bars .seg.on-y { background: #F59E0B; border-color: #F59E0B; }
+  .tradeoff-bars .seg.on-g { background: var(--success); border-color: var(--success); }
+  .tradeoff-bars .seg.on-r { background: var(--danger); border-color: var(--danger); }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 180px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-quote {
+    margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border);
+    font-size: 15px; line-height: 1.6; color: var(--soft);
+  }
+
+  /* ============ LAYER CHIPS ============ */
+  .layer-chips { display: flex; flex-direction: column; gap: 8px; }
+  .layer-chip {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px;
+    padding: 11px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    text-decoration: none; font-size: 13.5px; font-weight: 500;
+    color: var(--text); transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    line-height: 1.45;
+  }
+  .layer-chip:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+  .layer-chip-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 2px 7px; letter-spacing: .03em;
+    margin-right: 3px;
+  }
+  .layer-chip-name { color: var(--accent-hover); font-weight: 700; white-space: nowrap; }
+  .layer-chip-sep { color: var(--border-strong); font-weight: 400; margin: 0 2px; }
+  .layer-chip-clause { color: var(--soft); }
+
+  /* ============ DECISION LOGIC ============ */
+  .decide-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 0; overflow: hidden;
+  }
+  .decide-headline {
+    padding: 16px 20px; background: var(--bg-subtle);
+    border-bottom: 1px solid var(--border);
+    font-family: 'Fraunces', serif; font-size: 16px; line-height: 1.5; color: var(--text);
+  }
+  .decide-headline strong { color: var(--accent-hover); font-weight: 500; }
+  .decide-row {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+  }
+  .decide-row:last-child { border-bottom: none; }
+  .decide-when {
+    flex: 1; min-width: 0; font-size: 14px; line-height: 1.55; color: var(--text);
+  }
+  .decide-when strong { color: var(--text); font-weight: 600; }
+  .decide-arrow {
+    flex-shrink: 0; font-family: 'Fraunces', serif; font-size: 16px;
+    color: var(--accent); font-weight: 500; padding-top: 1px;
+  }
+  .decide-pick {
+    flex-shrink: 0; font-family: 'Fraunces', serif; font-size: 15px;
+    font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 12px;
+    white-space: nowrap;
+  }
+
+  /* back card */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow {
+    font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent);
+    line-height: 1; transition: transform 0.2s ease;
+  }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources + footer */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  .sources li a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+  .sources li a:hover { color: var(--accent); border-color: var(--accent); }
+  footer {
+    max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0;
+    text-align: center; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--faint); line-height: 1.8;
+  }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+    .decide-row { flex-direction: column; gap: 8px; }
+    .decide-arrow { display: none; }
+    .iter-dot { width: 16px; height: 16px; font-size: 9px; }
+    .iter-num { min-width: 70px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="builds.html"><span aria-hidden="true">&larr;</span> Builds</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">Pattern Book</a><span class="sep">/</span><a href="builds.html">Builds</a><span class="sep">/</span><a href="builds.html#tool-using-agent" class="here" style="color:var(--soft)">Tool-using Agent Loop</a>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h4M17 12h4M12 3v4M12 17v4"/><circle cx="12" cy="12" r="2.5"/></svg></span>
+    Recipe &middot; Tool-using Agent Loop
+  </span>
+  <h1 class="pattern-title">Tool-using Agent Loop</h1>
+  <p class="explainer">The canonical agent: a model that thinks, calls a tool, reads the result, and decides what to do next, on repeat, until done or out of tries.</p>
+</header>
+
+<!-- DEFAULT IN 2026 -->
+<div class="default-callout">
+  <div class="default-callout-inner">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+    </span>
+    <div class="body">
+      <div class="label">Default in 2026</div>
+      <p>ReAct loop, max 10 iterations, exponential backoff on tool errors. Pair with sealed tools (capability-scoped). Reference: Anthropic, <i>Building Effective Agents</i>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 01: THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>A model that <strong>thinks, acts, observes, repeats</strong>: at each turn it writes a thought, calls a tool, reads what came back, and decides whether to keep going or answer.</p>
+  </div>
+</section>
+
+<!-- 02: SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>The ReAct loop, <em>live</em>.</h2>
+  <p class="demo-lede">Step through one bounded loop: three real iterations of Thought / Action / Observation, then the agent answers. Toggle the cap off to see what happens with no bound.</p>
+
+  <div class="loop-stage">
+    <div class="loop-task">
+      <div class="qlabel">User task</div>
+      <div class="qtext">"Find out whether <code>requests==2.31.0</code> has any known CVEs in 2025 and recommend an upgrade."</div>
+    </div>
+
+    <!-- iteration counter -->
+    <div class="iter-counter" aria-label="Loop iteration">
+      <span class="iter-label">Iter</span>
+      <div class="iter-dots" id="iterDots" role="list">
+        <!-- 10 dots -->
+      </div>
+      <span class="iter-num" id="iterNum">0 / 10</span>
+    </div>
+
+    <!-- iteration stream -->
+    <div class="iter-stream" id="iterStream" aria-live="polite">
+
+      <!-- Iteration 1 -->
+      <div class="iter-card" id="ic1-t">
+        <div class="iter-card-head">
+          <span class="iter-card-num">Iter 1</span>
+          <span class="iter-card-tag think">Thought</span>
+        </div>
+        <div class="iter-card-text">I need CVE data for <code>requests==2.31.0</code>. The NVD database has machine-readable CVE records. I'll search there first.</div>
+      </div>
+      <div class="iter-card" id="ic1-a">
+        <div class="iter-card-head">
+          <span class="iter-card-num">Iter 1</span>
+          <span class="iter-card-tag act">Action</span>
+        </div>
+        <div class="iter-card-text"><code>search_cve(package="requests", version="2.31.0", year=2025)</code></div>
+      </div>
+      <div class="iter-card" id="ic1-o">
+        <div class="iter-card-head">
+          <span class="iter-card-num">Iter 1</span>
+          <span class="iter-card-tag obs">Observation</span>
+        </div>
+        <div class="iter-card-text">Returned <strong>1 match</strong>: CVE-2025-1417 (medium, certificate-bypass). Fixed in 2.32.0.</div>
+      </div>
+
+      <!-- Iteration 2 -->
+      <div class="iter-card" id="ic2-t">
+        <div class="iter-card-head">
+          <span class="iter-card-num">Iter 2</span>
+          <span class="iter-card-tag think">Thought</span>
+        </div>
+        <div class="iter-card-text">One CVE, fix exists in 2.32.0. I should confirm that version is stable and check its release notes for breaking changes before recommending it.</div>
+      </div>
+      <div class="iter-card" id="ic2-a">
+        <div class="iter-card-head">
+          <span class="iter-card-num">Iter 2</span>
+          <span class="iter-card-tag act">Action</span>
+        </div>
+        <div class="iter-card-text"><code>fetch_release_notes(package="requests", version="2.32.0")</code></div>
+      </div>
+      <div class="iter-card" id="ic2-o">
+        <div class="iter-card-head">
+          <span class="iter-card-num">Iter 2</span>
+          <span class="iter-card-tag obs">Observation</span>
+        </div>
+        <div class="iter-card-text">Returned release notes. No breaking API changes. Drops support for Python 3.7. Patches CVE-2025-1417.</div>
+      </div>
+
+      <!-- Iteration 3 -->
+      <div class="iter-card" id="ic3-t">
+        <div class="iter-card-head">
+          <span class="iter-card-num">Iter 3</span>
+          <span class="iter-card-tag think">Thought</span>
+        </div>
+        <div class="iter-card-text">I have a clear answer: 1 CVE exists, 2.32.0 fixes it, no breaking changes. I can stop and respond.</div>
+      </div>
+      <div class="iter-card" id="ic3-f">
+        <div class="iter-card-head">
+          <span class="iter-card-num">Iter 3</span>
+          <span class="iter-card-tag final">Final answer</span>
+        </div>
+        <div class="iter-card-text"><strong>Yes, upgrade.</strong> <code>requests==2.31.0</code> has one known 2025 CVE (CVE-2025-1417, certificate-bypass, medium severity), patched in 2.32.0. The upgrade has no breaking API changes; only drops Python 3.7 support.</div>
+      </div>
+
+    </div>
+
+    <div class="bounded-callout" id="bounded">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v5M12 16h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+      <span id="boundedText"><strong>Bounded execution active.</strong> Max iterations: 10. Tool errors retry with exponential backoff. Loop halts on final answer or when the cap is reached.</span>
+    </div>
+
+    <div class="demo-controls">
+      <button class="diagram-btn primary" id="stepBtn">Next step &rarr;</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+      <button class="diagram-btn danger" id="uncapBtn">Try without cap</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03: PRODUCTION RECEIPTS -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example with Production Receipts</div>
+  <h2>Named companies <em>shipping</em> this.</h2>
+  <p class="demo-lede">The tool-using ReAct loop is the most-shipped agent shape in 2026. Here are three reference implementations with real configs.</p>
+
+  <div class="receipts-stage">
+
+    <!-- Anthropic Claude Code -->
+    <div class="receipt">
+      <div class="receipt-head">
+        <span class="receipt-org">Anthropic Claude Code</span>
+        <span class="receipt-date">2026 effective-harness post</span>
+        <span class="receipt-tag">Coding agent</span>
+      </div>
+      <div class="receipt-body">
+        Claude Code's harness runs a ReAct-style loop with file-system, shell, and code-edit tools. Anthropic's <em>Effective Harnesses for Long-Running Agents</em> post recommends bounded iteration limits, structured tool error handling, and capability scoping so the agent cannot exceed its sandbox.
+      </div>
+      <div class="receipt-config"><span class="k">loop</span>:        <span class="v">ReAct (Thought / Action / Observation)</span>
+<span class="k">max_iter</span>:    <span class="v">configurable, default bounded</span>
+<span class="k">tools</span>:       <span class="v">Read, Edit, Bash, Grep, WebFetch (sealed)</span>
+<span class="k">on_error</span>:    <span class="v">exponential backoff, structured retry</span>
+<span class="k">termination</span>: <span class="v">final answer OR cap OR user interrupt</span></div>
+      <a class="receipt-link" href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents" target="_blank" rel="noopener">anthropic.com/engineering/effective-harnesses-for-long-running-agents<span class="ext" aria-hidden="true">&#8599;</span></a>
+    </div>
+
+    <!-- Cursor -->
+    <div class="receipt">
+      <div class="receipt-head">
+        <span class="receipt-org">Cursor Agent mode</span>
+        <span class="receipt-date">2026 docs</span>
+        <span class="receipt-tag">Coding agent</span>
+      </div>
+      <div class="receipt-body">
+        Cursor's Agent mode runs a tool-using loop over the user's repo: it reads files, runs commands, edits code, and re-reads its output until the task closes or the iteration budget is exhausted. Docs explicitly warn that tools must be capability-scoped and bounded.
+      </div>
+      <div class="receipt-config"><span class="k">loop</span>:        <span class="v">tool-use ReAct over repo + terminal</span>
+<span class="k">tools</span>:       <span class="v">read_file, edit_file, run_terminal, search</span>
+<span class="k">model</span>:       <span class="v">claude-opus-4.7 / gpt-5 (user choice)</span>
+<span class="k">bounds</span>:      <span class="v">per-turn budget, repo-scoped</span></div>
+      <a class="receipt-link" href="https://docs.cursor.com/" target="_blank" rel="noopener">docs.cursor.com<span class="ext" aria-hidden="true">&#8599;</span></a>
+    </div>
+
+    <!-- OpenAI Agents SDK -->
+    <div class="receipt">
+      <div class="receipt-head">
+        <span class="receipt-org">OpenAI Agents SDK &middot; Handoffs</span>
+        <span class="receipt-date">2026 reference</span>
+        <span class="receipt-tag">Framework</span>
+      </div>
+      <div class="receipt-body">
+        OpenAI's Agents SDK ships a ReAct loop primitive plus a Handoffs feature: when the current agent decides it needs a specialist, it can hand off the task to another agent with its own tools and bounded loop. Both loops are independently capped.
+      </div>
+      <div class="receipt-config"><span class="k">loop</span>:        <span class="v">tool-call cycle (function-calling JSON)</span>
+<span class="k">max_turns</span>:   <span class="v">10 (override per agent)</span>
+<span class="k">handoffs</span>:    <span class="v">delegate to specialist agent with own loop</span>
+<span class="k">tracing</span>:     <span class="v">built-in (every iteration logged)</span></div>
+      <a class="receipt-link" href="https://openai.github.io/openai-agents-python/" target="_blank" rel="noopener">openai.github.io/openai-agents-python<span class="ext" aria-hidden="true">&#8599;</span></a>
+    </div>
+
+  </div>
+</section>
+
+<!-- 04: THE PRICE YOU PAY -->
+<section>
+  <div class="section-label"><span class="num">04</span>The Price You Pay</div>
+  <h2>What it <em>costs</em>.</h2>
+
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Token cost per task</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency (tool round-trips)</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Failure surface (tool errors)</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-y"></div><div class="seg on-y"></div><div class="seg on-y"></div><div class="seg on-y"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Runaway risk (without cap)</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-r"></div><div class="seg on-r"></div><div class="seg on-r"></div><div class="seg on-r"></div><div class="seg on-r"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Reasoning ceiling</div>
+      <div class="tradeoff-bars">
+        <div class="seg on-g"></div><div class="seg on-g"></div><div class="seg on-g"></div><div class="seg on-g"></div><div class="seg on-g"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      The loop pays compounding token cost per iteration and inherits every tool's failure modes. The bound is non-negotiable: without it, a confused agent will loop on bad observations until your bill or rate limit stops it. With a cap and exponential backoff, this is the most powerful single-agent shape available in 2026.
+    </div>
+  </div>
+</section>
+
+<!-- 05: PATTERNS IT USES -->
+<section>
+  <div class="section-label"><span class="num">05</span>Patterns It Uses</div>
+  <h2>It <em>decomposes</em> into.</h2>
+  <p class="demo-lede">Two layers in play: the cognitive strategy (how the model reasons through tool use) and the orchestration shape (how the loop is structured and bounded).</p>
+
+  <div class="layer-chips">
+    <a class="layer-chip" href="layer-single-call-control.html">
+      <span class="layer-chip-num">L4</span>
+      <span class="layer-chip-name">Cognitive Strategy</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">ReAct prompting interleaves Thought / Action / Observation in one stream</span>
+    </a>
+    <a class="layer-chip" href="orchestration-iterative-loops.html">
+      <span class="layer-chip-num">L5</span>
+      <span class="layer-chip-name">Shape</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">Iterative loops repeat the call until a stopping rule fires</span>
+    </a>
+    <a class="layer-chip" href="orchestration-external-action.html">
+      <span class="layer-chip-num">L5</span>
+      <span class="layer-chip-name">Action</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">External Action reaches outside the model (search, code, APIs)</span>
+    </a>
+    <a class="layer-chip" href="orchestration-structure.html">
+      <span class="layer-chip-num">L5</span>
+      <span class="layer-chip-name">Shape</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">Bounded Execution caps iterations so the loop cannot run forever</span>
+    </a>
+  </div>
+</section>
+
+<!-- 06: WHEN TO USE VS ALTERNATIVES -->
+<section>
+  <div class="section-label"><span class="num">06</span>When to Use vs Alternatives</div>
+  <h2>The <em>decision</em>.</h2>
+
+  <div class="decide-stage">
+    <div class="decide-headline">Use a <strong>Tool-using Agent Loop</strong> when the task needs more than one tool call, but the work is still single-track and single-session.</div>
+
+    <div class="decide-row">
+      <div class="decide-when"><strong>If</strong> the task needs no tools or only a fixed pipeline (no choice at runtime)</div>
+      <div class="decide-arrow" aria-hidden="true">&rarr;</div>
+      <div class="decide-pick">Single call (no loop)</div>
+    </div>
+
+    <div class="decide-row">
+      <div class="decide-when"><strong>If</strong> the task needs persistent session, sub-agents, and a long-running brain / hands split</div>
+      <div class="decide-arrow" aria-hidden="true">&rarr;</div>
+      <div class="decide-pick">Agent Harness</div>
+    </div>
+
+    <div class="decide-row">
+      <div class="decide-when"><strong>If</strong> the task has natural levels (plan, then specialists, then synthesis)</div>
+      <div class="decide-arrow" aria-hidden="true">&rarr;</div>
+      <div class="decide-pick">Hierarchical Multi-Agent</div>
+    </div>
+
+    <div class="decide-row">
+      <div class="decide-when"><strong>If</strong> the task needs tools and a bounded number of think-act-observe rounds</div>
+      <div class="decide-arrow" aria-hidden="true">&rarr;</div>
+      <div class="decide-pick">Tool-using Agent Loop</div>
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Anthropic (2026). <em>Effective Harnesses for Long-Running Agents.</em> <a href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents" target="_blank" rel="noopener">anthropic.com/engineering/effective-harnesses-for-long-running-agents</a> <span class="note">Why bounded iteration limits and structured tool errors are non-negotiable for production agents.</span></li>
+    <li>Anthropic (2024). <em>Building Effective Agents.</em> <span class="note">Source of the 2026 default: ReAct loop, sealed tools, capability scoping.</span></li>
+    <li>Cursor docs (2026). <em>Agent mode.</em> <a href="https://docs.cursor.com/" target="_blank" rel="noopener">docs.cursor.com</a> <span class="note">Production tool-using loop over user repos plus terminal.</span></li>
+    <li>OpenAI Agents SDK (2026). <em>Handoffs and bounded loops.</em> <a href="https://openai.github.io/openai-agents-python/" target="_blank" rel="noopener">openai.github.io/openai-agents-python</a> <span class="note">Default max_turns = 10 and built-in tracing of every iteration.</span></li>
+    <li>Yao et al. (2023). <em>ReAct: Synergizing Reasoning and Acting in Language Models.</em> <span class="note">The original paper introducing interleaved reasoning and tool-use traces.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+(function(){
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const stepBtn  = document.getElementById('stepBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const uncapBtn = document.getElementById('uncapBtn');
+  const iterNum  = document.getElementById('iterNum');
+  const iterDots = document.getElementById('iterDots');
+  const bounded  = document.getElementById('bounded');
+  const boundedText = document.getElementById('boundedText');
+
+  // build 10 iteration dots
+  const MAX = 10;
+  const dots = [];
+  for (let i = 1; i <= MAX; i++) {
+    const d = document.createElement('div');
+    d.className = 'iter-dot';
+    d.setAttribute('role', 'listitem');
+    d.textContent = i;
+    iterDots.appendChild(d);
+    dots.push(d);
+  }
+
+  // step sequence for the demo:
+  // each entry: { iter: 1, kind: 'think'|'act'|'obs'|'final', cardId: '...' }
+  const seq = [
+    { iter: 1, cardId: 'ic1-t' },
+    { iter: 1, cardId: 'ic1-a' },
+    { iter: 1, cardId: 'ic1-o' },
+    { iter: 2, cardId: 'ic2-t' },
+    { iter: 2, cardId: 'ic2-a' },
+    { iter: 2, cardId: 'ic2-o' },
+    { iter: 3, cardId: 'ic3-t' },
+    { iter: 3, cardId: 'ic3-f', isFinal: true },
+  ];
+
+  let cursor = 0;
+  let uncap  = false;
+  let runaway = null;
+
+  function setIter(n, state){
+    if (n < 1 || n > MAX) return;
+    const d = dots[n - 1];
+    d.classList.remove('done','active','cap');
+    if (state) d.classList.add(state);
+  }
+
+  function setIterNum(used, capped){
+    iterNum.textContent = `${used} / ${capped ? '∞' : MAX}`;
+  }
+
+  function resetAll(){
+    if (runaway) { clearInterval(runaway); runaway = null; }
+    cursor = 0;
+    uncap  = false;
+    seq.forEach(s => document.getElementById(s.cardId).classList.remove('shown'));
+    dots.forEach(d => d.classList.remove('done','active','cap'));
+    setIterNum(0, false);
+    bounded.classList.remove('cap','runaway');
+    boundedText.innerHTML = '<strong>Bounded execution active.</strong> Max iterations: 10. Tool errors retry with exponential backoff. Loop halts on final answer or when the cap is reached.';
+    stepBtn.disabled = false;
+    stepBtn.textContent = 'Next step →';
+    uncapBtn.disabled = false;
+    uncapBtn.textContent = 'Try without cap';
+  }
+
+  function advance(){
+    if (cursor >= seq.length) return;
+    const item = seq[cursor];
+    const card = document.getElementById(item.cardId);
+    card.classList.add('shown');
+
+    // activate current iteration's dot
+    // mark earlier iterations done
+    for (let i = 1; i < item.iter; i++) setIter(i, 'done');
+    setIter(item.iter, 'active');
+
+    setIterNum(item.iter, false);
+
+    // scroll into view (gentle)
+    if (!reduceMotion) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    if (item.isFinal){
+      setIter(item.iter, 'done');
+      bounded.classList.remove('cap','runaway');
+      boundedText.innerHTML = '<strong>Loop terminated cleanly.</strong> Final answer reached in 3 iterations, well under the 10-cap. Total tool calls: 2. Total tokens: ~1,800.';
+      stepBtn.disabled = true;
+      stepBtn.textContent = 'Done';
+    }
+
+    cursor++;
+  }
+
+  function tryUncap(){
+    // visually demo: same 3 iters, but show what would happen on a confused loop
+    // we play the 8 sequence steps quickly, then keep "looping" past MAX
+    resetAll();
+    uncap = true;
+    bounded.classList.add('runaway');
+    boundedText.innerHTML = '<strong>Unbounded mode.</strong> No iteration cap. Watch what happens if the model gets confused by a bad observation and keeps trying.';
+
+    // first run the 8 happy steps fast
+    let i = 0;
+    const playOne = () => {
+      if (i < seq.length) {
+        const item = seq[i];
+        document.getElementById(item.cardId).classList.add('shown');
+        for (let j = 1; j < item.iter; j++) setIter(j, 'done');
+        setIter(item.iter, 'active');
+        setIterNum(item.iter, true);
+        i++;
+        runaway = setTimeout(playOne, reduceMotion ? 0 : 380);
+      } else {
+        // mark iter 3 as done
+        setIter(3, 'done');
+        // then start a runaway: blink iters 4..N as if it kept looping past the cap
+        let virt = 4;
+        runaway = setInterval(() => {
+          // when we hit the visible cap dot (10), turn it red to show what bounded would have stopped
+          if (virt <= MAX) {
+            setIter(virt - 1, 'done');
+            setIter(virt, virt === MAX ? 'cap' : 'active');
+            setIterNum(virt, true);
+            if (virt === MAX) {
+              bounded.classList.remove('runaway');
+              bounded.classList.add('cap');
+              boundedText.innerHTML = '<strong>This is where the cap would have fired.</strong> Without it, the loop keeps spending tokens on each confused round-trip until your rate limit or wallet stops it. Cap = your circuit breaker.';
+            }
+          } else {
+            // past the cap: keep counting iterations to drive the point home
+            setIterNum(virt, true);
+          }
+          virt++;
+          if (virt > MAX + 6) { clearInterval(runaway); runaway = null; }
+        }, reduceMotion ? 0 : 520);
+      }
+    };
+    playOne();
+
+    stepBtn.disabled = true;
+    uncapBtn.disabled = true;
+    uncapBtn.textContent = 'Running…';
+  }
+
+  stepBtn.addEventListener('click', advance);
+  resetBtn.addEventListener('click', resetAll);
+  uncapBtn.addEventListener('click', tryUncap);
+
+  setIterNum(0, false);
+})();
+</script>
+
+</body>
+</html>

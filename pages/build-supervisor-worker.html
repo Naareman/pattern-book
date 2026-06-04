@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supervisor / Worker · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* default-in-2026 callout */
+  .default-callout {
+    margin-top: 18px; padding: 14px 18px;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 15px; line-height: 1.55; color: var(--text);
+    max-width: 720px;
+  }
+  .default-callout strong { font-family: 'Inter', sans-serif; font-style: normal; font-weight: 600; color: var(--accent-hover); text-transform: uppercase; font-size: 11px; letter-spacing: .07em; display: inline-block; margin-right: 8px; padding: 2px 8px; background: #fff; border: 1px solid var(--border); border-radius: 12px; vertical-align: 2px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.6; color: var(--text); }
+
+  /* layer badges */
+  .layer-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .layer-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .layer-badge:hover { border-color: var(--accent); background: #e4dcfe; }
+  .layer-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ============ DEMO: supervisor + persistent workers ============ */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* query bar */
+  .query-bar {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 18px;
+  }
+  .query-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .query-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--text); line-height: 1.3; }
+
+  /* supervisor strip (persistent across all rounds) */
+  .super-strip {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border: 1px solid var(--accent);
+    border-radius: var(--radius-sm); background: var(--accent-soft);
+    margin-bottom: 14px;
+  }
+  .super-ico {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .super-ico svg { width: 18px; height: 18px; }
+  .super-body { flex: 1; min-width: 0; }
+  .super-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-hover); }
+  .super-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .super-state {
+    font-size: 12px; color: var(--soft); line-height: 1.45; margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .super-state .k { color: var(--accent-hover); font-weight: 500; }
+  .super-state .v { color: var(--text); }
+
+  /* phases */
+  .phases { display: flex; flex-direction: column; gap: 12px; }
+  .phase {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    overflow: hidden; opacity: 0; transform: translateY(6px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .phase.visible { opacity: 1; transform: translateY(0); }
+  .phase-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; background: var(--bg-subtle); border-bottom: 1px solid var(--border);
+  }
+  .phase-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .phase.active .phase-head { background: var(--accent-soft); border-bottom-color: var(--accent); }
+  .phase-title { font-weight: 600; font-size: 14px; color: var(--text); }
+  .phase-status {
+    margin-left: auto; font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    color: var(--faint); text-transform: uppercase;
+  }
+  .phase.active .phase-status { color: var(--accent); }
+  .phase.done .phase-status { color: var(--success); }
+  .phase.done .phase-head { background: var(--success-soft); border-bottom-color: #b2e4d5; }
+  .phase.done .phase-num { background: var(--success); }
+  .phase-body { padding: 14px 16px; min-height: 60px; }
+
+  /* worker handoff layout */
+  .handoff {
+    display: grid; grid-template-columns: 1fr; gap: 12px;
+  }
+  .handoff .dispatch {
+    padding: 10px 12px; background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 8px; font-size: 13px; color: var(--soft); line-height: 1.55;
+  }
+  .handoff .dispatch strong { color: var(--accent-hover); font-weight: 600; }
+  .worker-card {
+    display: grid; grid-template-columns: 40px 1fr; gap: 12px;
+    padding: 12px 14px; border: 1px solid var(--border-strong);
+    border-radius: 8px; background: var(--surface);
+  }
+  .worker-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .worker-icon svg { width: 17px; height: 17px; color: var(--accent-hover); }
+  .worker-id { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-hover); margin-bottom: 2px; }
+  .worker-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .worker-output {
+    font-size: 13px; color: var(--text); line-height: 1.55;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 6px; padding: 8px 10px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .worker-output .label { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); display: block; margin-bottom: 4px; }
+
+  /* scope note */
+  .scope-note {
+    margin-top: 10px; padding: 10px 12px;
+    background: #fff8e1; border: 1px solid #fce7a5; border-radius: 8px;
+    font-size: 12.5px; color: #6b5a1f; line-height: 1.55;
+  }
+  .scope-note strong { color: #8a6d10; font-weight: 600; }
+
+  /* controls */
+  .demo-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ REAL EXAMPLE: production receipts ============ */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .example-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
+
+  .receipts {
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .receipt {
+    display: grid; grid-template-columns: 36px 1fr auto; gap: 14px; align-items: center;
+    padding: 14px 16px; background: var(--bg-subtle);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    text-decoration: none; color: var(--text);
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
+  }
+  .receipt:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+  .receipt-ico {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .receipt-ico svg { width: 18px; height: 18px; color: var(--accent-hover); }
+  .receipt-body { min-width: 0; }
+  .receipt-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .receipt-blurb { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .receipt-host { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--faint); white-space: nowrap; }
+  @media (max-width: 540px) {
+    .receipt { grid-template-columns: 36px 1fr; }
+    .receipt-host { display: none; }
+  }
+
+  /* ============ PATTERNS IT USES: compact chips ============ */
+  .layer-chips {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .layer-chip {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    padding: 9px 14px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 20px;
+    text-decoration: none; font-size: 13px; font-weight: 500;
+    color: var(--text); transition: border-color .18s ease, background .18s ease;
+    line-height: 1.4;
+  }
+  .layer-chip:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .layer-chip-name { color: var(--accent-hover); font-weight: 700; white-space: nowrap; }
+  .layer-chip-sep { color: var(--border-strong); font-weight: 400; }
+  .layer-chip-clause { color: var(--soft); }
+
+  /* ============ TRADEOFFS METER ============ */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 170px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
+    .tradeoff-label { min-width: 0; }
+  }
+
+  /* ============ WHEN TO USE: decision table ============ */
+  .decide-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .decide-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .decide-row:last-child { border-bottom: none; }
+  .decide-row:first-child { padding-top: 0; }
+  .decide-vs { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--accent-hover); margin-bottom: 6px; }
+  .decide-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .decide-rule { font-size: 13.5px; color: var(--soft); line-height: 1.55; }
+  .decide-rule strong { color: var(--text); font-weight: 600; }
+  @media (max-width: 560px) { .decide-row { grid-template-columns: 1fr; gap: 6px; } }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px dotted var(--border-strong); }
+  .sources li a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .sources li .note { color: var(--faint); }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+  }
+  @media (max-width: 480px) {
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="builds.html"><span aria-hidden="true">&larr;</span> Builds</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep">/</span>
+      <a href="builds.html">Builds</a>
+      <span class="sep">/</span>
+      <span class="here">Supervisor / Worker</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="6" r="3"/>
+        <path d="M12 9v4M6 21v-3a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v3"/>
+        <circle cx="6" cy="14" r="2"/>
+        <circle cx="18" cy="14" r="2"/>
+      </svg>
+    </span>Recipe &middot; Supervisor / Worker
+  </span>
+  <h1 class="pattern-title">Supervisor / Worker</h1>
+  <p class="explainer">One persistent supervisor agent routes a task to a small team of specialist workers, each with a fixed role, and stitches their outputs into a result.</p>
+  <div class="default-callout">
+    <strong>Default in 2026</strong>One persistent supervisor and N specialists with stable identity. Build it with LangGraph supervisor or CrewAI hierarchical. Use when the workers have permanent specialization. NOT Planner-Executor: the workers persist across the task instead of being spun up per step.
+  </div>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>A <span style="color:var(--accent-hover);font-weight:500">Supervisor / Worker</span> system is one boss agent with a memory of the whole task and a small bench of specialist workers (Planner, Coder, Reviewer). The supervisor decides who works next, hands them a scoped sub-task, reads what comes back, and updates its plan.</p>
+  </div>
+  <div class="layer-badges" aria-label="Layers used by this build">
+    <a class="layer-badge" href="layer-orchestration-agents.html">
+      <span class="dot" aria-hidden="true"></span>Orchestration &amp; agents
+    </a>
+    <a class="layer-badge" href="orchestration-hierarchical-planning.html">
+      <span class="dot" aria-hidden="true"></span>Hierarchical planning
+    </a>
+    <a class="layer-badge" href="orchestration-agent-identity.html">
+      <span class="dot" aria-hidden="true"></span>Agent identity
+    </a>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Watch one supervisor <em>route</em> a coding task.</h2>
+
+  <p class="demo-lede">The supervisor holds the whole task in its head. Each worker only sees the sub-task it was handed. Tap Step to walk through one round trip.</p>
+
+  <div class="demo-stage">
+    <!-- the task -->
+    <div class="query-bar">
+      <div class="query-label">Task (one prompt, sent to the supervisor)</div>
+      <div class="query-text">Add a /healthz endpoint to the FastAPI service and write a test for it.</div>
+    </div>
+
+    <!-- supervisor strip (persists across all rounds) -->
+    <div class="super-strip">
+      <div class="super-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="3"/>
+          <path d="M5 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/>
+        </svg>
+      </div>
+      <div class="super-body">
+        <div class="super-label">Supervisor (persistent across all rounds)</div>
+        <div class="super-name">Engineering Lead</div>
+        <div class="super-state" id="super-state">
+          <span class="k">plan</span>: <span class="v" id="ss-plan">(thinking...)</span> &nbsp; <span class="k">next</span>: <span class="v" id="ss-next">-</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- phases -->
+    <div class="phases" aria-live="polite" aria-atomic="false">
+
+      <!-- Phase 1: Plan -->
+      <div class="phase" id="phase-plan">
+        <div class="phase-head">
+          <span class="phase-num" aria-hidden="true">1</span>
+          <span class="phase-title">Supervisor routes to Planner</span>
+          <span class="phase-status" id="status-plan">waiting</span>
+        </div>
+        <div class="phase-body">
+          <div class="handoff">
+            <div class="dispatch"><strong>Hand-off:</strong> "Planner, sketch the file changes needed. Don't write code yet."</div>
+            <div class="worker-card">
+              <div class="worker-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11h6M9 15h4M6 3h8l4 4v14H6z"/></svg>
+              </div>
+              <div>
+                <div class="worker-id">Worker A</div>
+                <div class="worker-name">Planner</div>
+                <div class="worker-output"><span class="label">Returns to supervisor</span>Edit app/main.py: add GET /healthz returning {"ok": true}. Add tests/test_health.py: one assert on 200 + body shape.</div>
+              </div>
+            </div>
+            <div class="scope-note"><strong>Scope:</strong> Planner sees only this hand-off. It does not know there will be a Coder or a Reviewer next.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 2: Code -->
+      <div class="phase" id="phase-code">
+        <div class="phase-head">
+          <span class="phase-num" aria-hidden="true">2</span>
+          <span class="phase-title">Supervisor routes to Coder</span>
+          <span class="phase-status" id="status-code">waiting</span>
+        </div>
+        <div class="phase-body">
+          <div class="handoff">
+            <div class="dispatch"><strong>Hand-off:</strong> "Coder, here is Planner's spec. Write both files."</div>
+            <div class="worker-card">
+              <div class="worker-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-5 6 5 6M16 6l5 6-5 6"/></svg>
+              </div>
+              <div>
+                <div class="worker-id">Worker B</div>
+                <div class="worker-name">Coder</div>
+                <div class="worker-output"><span class="label">Returns to supervisor</span>app/main.py + tests/test_health.py drafted. Diff: +14 lines.</div>
+              </div>
+            </div>
+            <div class="scope-note"><strong>Scope:</strong> Coder only receives Planner's spec, not the original user request. Supervisor mediates everything.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 3: Review -->
+      <div class="phase" id="phase-review">
+        <div class="phase-head">
+          <span class="phase-num" aria-hidden="true">3</span>
+          <span class="phase-title">Supervisor routes to Reviewer</span>
+          <span class="phase-status" id="status-review">waiting</span>
+        </div>
+        <div class="phase-body">
+          <div class="handoff">
+            <div class="dispatch"><strong>Hand-off:</strong> "Reviewer, check Coder's diff against Planner's spec and the original task."</div>
+            <div class="worker-card">
+              <div class="worker-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/><circle cx="12" cy="12" r="9"/></svg>
+              </div>
+              <div>
+                <div class="worker-id">Worker C</div>
+                <div class="worker-name">Reviewer</div>
+                <div class="worker-output"><span class="label">Returns to supervisor</span>Looks correct. One nit: test should also assert content-type is application/json. Approved with note.</div>
+              </div>
+            </div>
+            <div class="scope-note"><strong>Scope:</strong> Reviewer sees the diff plus context the supervisor chose to share. The supervisor still owns the merge decision.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 4: Supervisor reports -->
+      <div class="phase" id="phase-merge">
+        <div class="phase-head">
+          <span class="phase-num" aria-hidden="true">4</span>
+          <span class="phase-title">Supervisor delivers result</span>
+          <span class="phase-status" id="status-merge">waiting</span>
+        </div>
+        <div class="phase-body">
+          <div class="handoff">
+            <div class="dispatch">The supervisor stitches Planner's spec, Coder's diff, and Reviewer's note into one deliverable. The same supervisor that took the task hands the result back, with its full memory of who did what.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /phases -->
+
+    <div class="demo-controls">
+      <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>Where this <em>actually ships</em>.</h2>
+  <div class="example-stage">
+    <p class="example-intro">These four are the production-grade recipes most teams adopt in 2026. They are all the same shape: one supervisor, named workers with persistent roles. Tap any one to read the source.</p>
+
+    <div class="receipts">
+
+      <a class="receipt" href="https://langchain-ai.github.io/langgraph/tutorials/multi_agent/agent_supervisor/" target="_blank" rel="noopener noreferrer">
+        <div class="receipt-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12h8M12 8v8"/></svg>
+        </div>
+        <div class="receipt-body">
+          <div class="receipt-name">LangGraph &middot; Agent Supervisor</div>
+          <div class="receipt-blurb">The reference implementation. A supervisor node decides which worker node runs next, until done.</div>
+        </div>
+        <div class="receipt-host">langchain-ai.github.io</div>
+      </a>
+
+      <a class="receipt" href="https://docs.crewai.com/" target="_blank" rel="noopener noreferrer">
+        <div class="receipt-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3"/><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M9 9l-2 6M15 9l2 6"/></svg>
+        </div>
+        <div class="receipt-body">
+          <div class="receipt-name">CrewAI &middot; Hierarchical process</div>
+          <div class="receipt-blurb">Manager agent assigns work to crew members defined with role, goal, and backstory. Identity-first by design.</div>
+        </div>
+        <div class="receipt-host">docs.crewai.com</div>
+      </a>
+
+      <a class="receipt" href="https://microsoft.github.io/autogen/" target="_blank" rel="noopener noreferrer">
+        <div class="receipt-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 10h8M8 14h5"/></svg>
+        </div>
+        <div class="receipt-body">
+          <div class="receipt-name">AutoGen &middot; GroupChat with manager</div>
+          <div class="receipt-blurb">A GroupChatManager picks the next speaker from a fixed set of named agents until termination.</div>
+        </div>
+        <div class="receipt-host">microsoft.github.io</div>
+      </a>
+
+      <a class="receipt" href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener noreferrer">
+        <div class="receipt-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 4v6c0 5-4 8-9 8s-9-3-9-8V7z"/></svg>
+        </div>
+        <div class="receipt-body">
+          <div class="receipt-name">Anthropic &middot; Orchestrator-Workers</div>
+          <div class="receipt-blurb">"Building Effective Agents" names this pattern outright: a central LLM orchestrates parallel workers and synthesizes results.</div>
+        </div>
+        <div class="receipt-host">anthropic.com</div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- 04 THE PRICE YOU PAY -->
+<section>
+  <div class="section-label"><span class="num">04</span>The Price You Pay</div>
+  <h2>What it <em>costs</em>.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Token cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Coordination overhead</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Debuggability</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Named workers with stable roles make traces easy to read. The supervisor's extra round-trips are the cost: every worker hand-off is a model call, and you pay for them sequentially.
+    </div>
+  </div>
+</section>
+
+<!-- 05 PATTERNS IT USES -->
+<section>
+  <div class="section-label"><span class="num">05</span>Patterns It Uses</div>
+  <h2>What's <em>underneath</em>.</h2>
+  <div class="layer-chips">
+    <a class="layer-chip" href="orchestration-hierarchical-planning.html">
+      <span class="layer-chip-name">Hierarchical planning</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">supervisor decides which worker runs next, in what order</span>
+    </a>
+    <a class="layer-chip" href="orchestration-agent-identity.html">
+      <span class="layer-chip-name">Agent identity</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">workers have persistent named roles (Planner, Coder, Reviewer)</span>
+    </a>
+    <a class="layer-chip" href="orchestration-router-dispatcher.html">
+      <span class="layer-chip-name">Router / dispatcher</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">each round, the supervisor routes the next sub-task to the right worker</span>
+    </a>
+    <a class="layer-chip" href="orchestration-shared-workspace.html">
+      <span class="layer-chip-name">Shared workspace</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">the supervisor's state is the workspace every worker reads and writes through</span>
+    </a>
+  </div>
+</section>
+
+<!-- 06 WHEN TO USE VS ALTERNATIVES -->
+<section>
+  <div class="section-label"><span class="num">06</span>When To Use</div>
+  <h2>Pick this over the <em>look-alikes</em>.</h2>
+  <div class="decide-stage">
+
+    <div class="decide-row">
+      <div>
+        <div class="decide-vs">Pick Supervisor / Worker over</div>
+        <div class="decide-name">Planner-Executor</div>
+      </div>
+      <div class="decide-rule">
+        Supervisor / Worker has <strong>persistent specialized workers</strong> across the task. Planner-Executor spins up stateless steps each round. Use Supervisor when "Coder" is a real role with continuity, not a one-off function call.
+      </div>
+    </div>
+
+    <div class="decide-row">
+      <div>
+        <div class="decide-vs">Pick Supervisor / Worker over</div>
+        <div class="decide-name">Multi-Agent Research Team</div>
+      </div>
+      <div class="decide-rule">
+        Both have a lead. The Research Team's workers are <strong>interchangeable researchers</strong>, all doing the same kind of job in parallel. Supervisor's workers are <strong>different specialists</strong>: a Planner and a Coder are not swappable.
+      </div>
+    </div>
+
+    <div class="decide-row">
+      <div>
+        <div class="decide-vs">Pick Supervisor / Worker over</div>
+        <div class="decide-name">Flat Swarm</div>
+      </div>
+      <div class="decide-rule">
+        A Swarm has peers passing work to each other with no boss. Supervisor has <strong>clear authority</strong>: one agent decides who runs and merges the result. Use Supervisor for production. Use Swarm for research.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>LangGraph (2024). <em>Agent Supervisor tutorial.</em> <a href="https://langchain-ai.github.io/langgraph/tutorials/multi_agent/agent_supervisor/" target="_blank" rel="noopener noreferrer">langchain-ai.github.io</a> <span class="note">Canonical implementation of the supervisor pattern as a state graph.</span></li>
+    <li>CrewAI (2024). <em>Hierarchical process documentation.</em> <a href="https://docs.crewai.com/" target="_blank" rel="noopener noreferrer">docs.crewai.com</a> <span class="note">Role-driven framework where agents are defined with persistent identity.</span></li>
+    <li>Microsoft (2024). <em>AutoGen: GroupChat with manager.</em> <a href="https://microsoft.github.io/autogen/" target="_blank" rel="noopener noreferrer">microsoft.github.io</a> <span class="note">A GroupChatManager selects the next speaker from a fixed named cast.</span></li>
+    <li>Anthropic (2024). <em>Building Effective Agents.</em> <a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener noreferrer">anthropic.com</a> <span class="note">Names "Orchestrator-Workers" as one of five core agent patterns.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ DEMO ANIMATION ============
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+const phasePlan   = document.getElementById('phase-plan');
+const phaseCode   = document.getElementById('phase-code');
+const phaseReview = document.getElementById('phase-review');
+const phaseMerge  = document.getElementById('phase-merge');
+
+const statusPlan   = document.getElementById('status-plan');
+const statusCode   = document.getElementById('status-code');
+const statusReview = document.getElementById('status-review');
+const statusMerge  = document.getElementById('status-merge');
+
+const ssPlan = document.getElementById('ss-plan');
+const ssNext = document.getElementById('ss-next');
+
+const stepBtn  = document.getElementById('stepBtn');
+const playBtn  = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+let demoStep = -1;
+let running  = false;
+
+function resetDemo() {
+  demoStep = -1;
+  running  = false;
+  [phasePlan, phaseCode, phaseReview, phaseMerge].forEach(p => {
+    p.classList.remove('visible', 'active', 'done');
+  });
+  statusPlan.textContent   = 'waiting';
+  statusCode.textContent   = 'waiting';
+  statusReview.textContent = 'waiting';
+  statusMerge.textContent  = 'waiting';
+  ssPlan.textContent = '(thinking...)';
+  ssNext.textContent = '-';
+}
+
+async function doPlan(animate) {
+  phasePlan.classList.add('visible', 'active');
+  statusPlan.textContent = 'routing...';
+  ssPlan.textContent = 'spec the file changes';
+  ssNext.textContent = 'Planner';
+  if (animate) await sleep(reduceMotion ? 0 : 900);
+  phasePlan.classList.remove('active');
+  phasePlan.classList.add('done');
+  statusPlan.textContent = 'done';
+}
+
+async function doCode(animate) {
+  phaseCode.classList.add('visible', 'active');
+  statusCode.textContent = 'routing...';
+  ssPlan.textContent = 'Planner returned spec, write code';
+  ssNext.textContent = 'Coder';
+  if (animate) await sleep(reduceMotion ? 0 : 900);
+  phaseCode.classList.remove('active');
+  phaseCode.classList.add('done');
+  statusCode.textContent = 'done';
+}
+
+async function doReview(animate) {
+  phaseReview.classList.add('visible', 'active');
+  statusReview.textContent = 'routing...';
+  ssPlan.textContent = 'Coder returned diff, check it';
+  ssNext.textContent = 'Reviewer';
+  if (animate) await sleep(reduceMotion ? 0 : 900);
+  phaseReview.classList.remove('active');
+  phaseReview.classList.add('done');
+  statusReview.textContent = 'done';
+}
+
+async function doMerge(animate) {
+  phaseMerge.classList.add('visible', 'active');
+  statusMerge.textContent = 'merging...';
+  ssPlan.textContent = 'all three done, deliver';
+  ssNext.textContent = 'user';
+  if (animate) await sleep(reduceMotion ? 0 : 700);
+  phaseMerge.classList.remove('active');
+  phaseMerge.classList.add('done');
+  statusMerge.textContent = 'done';
+}
+
+stepBtn.addEventListener('click', async () => {
+  if (running) return;
+  if (demoStep >= 3) { resetDemo(); return; }
+  running = true;
+  stepBtn.disabled = true; playBtn.disabled = true;
+  demoStep++;
+  if (demoStep === 0) await doPlan(true);
+  else if (demoStep === 1) await doCode(true);
+  else if (demoStep === 2) await doReview(true);
+  else if (demoStep === 3) await doMerge(true);
+  running = false;
+  stepBtn.disabled = false; playBtn.disabled = false;
+});
+
+playBtn.addEventListener('click', async () => {
+  if (running) return;
+  resetDemo();
+  running = true;
+  playBtn.disabled = true; stepBtn.disabled = true;
+  await sleep(reduceMotion ? 0 : 200);
+  await doPlan(!reduceMotion);
+  await sleep(reduceMotion ? 0 : 300);
+  await doCode(!reduceMotion);
+  await sleep(reduceMotion ? 0 : 300);
+  await doReview(!reduceMotion);
+  await sleep(reduceMotion ? 0 : 300);
+  await doMerge(!reduceMotion);
+  demoStep = 3;
+  running = false;
+  playBtn.disabled = false; stepBtn.disabled = false;
+});
+
+resetBtn.addEventListener('click', () => {
+  if (running) return;
+  resetDemo();
+});
+
+if (reduceMotion) {
+  (async () => {
+    await doPlan(false);
+    await doCode(false);
+    await doReview(false);
+    await doMerge(false);
+    demoStep = 3;
+  })();
+}
+</script>
+</body>
+</html>

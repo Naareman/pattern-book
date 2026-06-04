@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hierarchical Multi-Agent · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* default-in-2026 callout */
+  .default-callout {
+    margin-top: 22px;
+    background: linear-gradient(180deg, #FBFAFF 0%, #F4F0FE 100%);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .default-callout-icon { flex-shrink: 0; width: 18px; height: 18px; color: var(--accent); margin-top: 2px; }
+  .default-callout-icon svg { width: 100%; height: 100%; display: block; }
+  .default-callout-body { flex: 1; min-width: 0; }
+  .default-callout-label {
+    font-family: 'Inter', sans-serif; font-size: 10.5px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--accent-hover);
+    margin-bottom: 4px;
+  }
+  .default-callout-text {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 400;
+    font-size: 15.5px; line-height: 1.55; color: var(--text);
+  }
+  .default-callout-text code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace; font-style: normal;
+    font-size: 12.5px; padding: 1px 5px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 4px; color: var(--accent-hover);
+  }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.6; color: var(--text); }
+
+  /* layer badges */
+  .layer-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .layer-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .layer-badge:hover { border-color: var(--accent); background: #e4dcfe; }
+  .layer-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ============ DEMO: hierarchical org chart ============ */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* query bar */
+  .query-bar {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 18px;
+  }
+  .query-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .query-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--text); line-height: 1.3; }
+
+  /* org-chart canvas */
+  .org-chart {
+    position: relative;
+    padding: 8px 6px 14px;
+  }
+  .org-row {
+    display: flex; justify-content: center; gap: 14px;
+    position: relative;
+    flex-wrap: wrap;
+  }
+  .org-row + .org-row { margin-top: 38px; }
+
+  /* connector lines via pseudo-elements (drawn from row to row) */
+  .org-row + .org-row::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: -26px; height: 14px;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  /* node */
+  .org-node {
+    position: relative;
+    background: var(--surface); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px; min-width: 124px; max-width: 168px;
+    display: flex; flex-direction: column; gap: 4px;
+    transition: border-color .25s ease, background .25s ease, box-shadow .25s ease, transform .25s ease;
+    opacity: 1;
+  }
+  .org-node.dim { opacity: 0.45; }
+  .org-node.active {
+    border-color: var(--accent); background: var(--accent-soft);
+    box-shadow: 0 6px 18px rgba(124, 92, 246, 0.18);
+  }
+  .org-node.done {
+    border-color: var(--success); background: var(--success-soft);
+  }
+  .org-node-tier {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px; font-weight: 600; letter-spacing: .06em;
+    color: var(--faint); text-transform: uppercase;
+  }
+  .org-node.active .org-node-tier { color: var(--accent-hover); }
+  .org-node.done .org-node-tier { color: var(--success); }
+  .org-node-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
+  .org-node-role { font-size: 11.5px; color: var(--soft); line-height: 1.35; }
+
+  /* connector layer (SVG) */
+  .org-svg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  .org-svg path {
+    fill: none; stroke: var(--border-strong); stroke-width: 1.5;
+    transition: stroke .3s ease, stroke-width .3s ease;
+  }
+  .org-svg path.active { stroke: var(--accent); stroke-width: 2; }
+  .org-svg path.done { stroke: var(--success); stroke-width: 2; }
+  .org-svg path.bubble { stroke-dasharray: 4 3; }
+
+  /* message rail */
+  .org-message {
+    margin-top: 22px;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px 14px;
+    font-size: 13px; line-height: 1.55; color: var(--text);
+    min-height: 56px;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .org-message-tag {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10.5px; font-weight: 600; letter-spacing: .06em;
+    background: var(--accent); color: #fff; padding: 3px 7px;
+    border-radius: 4px; flex-shrink: 0; text-transform: uppercase;
+    min-width: 78px; text-align: center;
+  }
+  .org-message-tag.bubble { background: var(--success); }
+  .org-message-body { flex: 1; min-width: 0; }
+  .org-message-route {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11.5px; color: var(--faint); margin-bottom: 4px;
+  }
+  .org-message-text { font-size: 13.5px; color: var(--text); line-height: 1.5; }
+
+  /* controls */
+  .demo-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .step-counter {
+    margin-left: auto; align-self: center;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px; color: var(--faint);
+  }
+
+  /* ============ REAL EXAMPLE: production receipts ============ */
+  .example-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .example-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
+
+  .receipt-list {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .receipt {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--bg-subtle);
+    padding: 14px 16px;
+    display: flex; gap: 14px; align-items: flex-start;
+    text-decoration: none; color: var(--text);
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
+  }
+  .receipt:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+  .receipt-stamp {
+    flex-shrink: 0;
+    width: 42px; height: 42px; border-radius: 8px;
+    background: var(--accent-soft); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent-hover);
+  }
+  .receipt-stamp svg { width: 20px; height: 20px; display: block; }
+  .receipt-body { flex: 1; min-width: 0; }
+  .receipt-co {
+    font-size: 13.5px; font-weight: 700; color: var(--text);
+    margin-bottom: 3px;
+  }
+  .receipt-co .receipt-product { color: var(--soft); font-weight: 500; }
+  .receipt-quote { font-size: 13px; color: var(--soft); line-height: 1.55; margin-bottom: 6px; }
+  .receipt-link {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px; color: var(--accent-hover);
+    word-break: break-all;
+  }
+  .receipt:hover .receipt-link { color: var(--accent); }
+
+  /* ============ PATTERNS IT USES: compact chips ============ */
+  .layer-chips {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .layer-chip {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    padding: 9px 14px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 20px;
+    text-decoration: none; font-size: 13px; font-weight: 500;
+    color: var(--text); transition: border-color .18s ease, background .18s ease;
+    line-height: 1.4;
+  }
+  .layer-chip:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .layer-chip-name { color: var(--accent-hover); font-weight: 700; white-space: nowrap; }
+  .layer-chip-sep { color: var(--border-strong); font-weight: 400; }
+  .layer-chip-clause { color: var(--soft); }
+
+  .decomposes-note {
+    margin-top: 14px;
+    font-size: 13px; color: var(--soft); line-height: 1.55;
+    padding: 12px 14px; background: var(--bg-subtle);
+    border: 1px dashed var(--border-strong); border-radius: var(--radius-sm);
+  }
+  .decomposes-note strong { color: var(--accent-hover); font-weight: 600; font-family: 'Inter', sans-serif; }
+
+  /* ============ TRADEOFFS ============ */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 170px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+  @media (max-width: 480px) {
+    .tradeoff-row { flex-direction: column; align-items: stretch; }
+    .tradeoff-label { min-width: 0; }
+  }
+
+  /* ============ DECISION LOGIC ============ */
+  .decision-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .decision-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
+  .decision-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    margin-bottom: 16px;
+  }
+  .decision-row:last-child { margin-bottom: 0; }
+  @media (max-width: 560px) { .decision-row { grid-template-columns: 1fr; } }
+  .decision-cell {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px 14px; background: var(--bg-subtle);
+  }
+  .decision-cell.pick {
+    background: var(--accent-soft); border-color: var(--accent);
+  }
+  .decision-vs {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10.5px; font-weight: 600; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--faint); margin-bottom: 4px;
+  }
+  .decision-cell.pick .decision-vs { color: var(--accent-hover); }
+  .decision-name {
+    font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px;
+  }
+  .decision-name a { color: var(--text); text-decoration: none; border-bottom: 1px dashed var(--border-strong); }
+  .decision-name a:hover { color: var(--accent-hover); border-bottom-color: var(--accent); }
+  .decision-when { font-size: 12.5px; color: var(--soft); line-height: 1.5; }
+  .decision-rule {
+    margin-top: 14px; padding: 12px 14px;
+    background: var(--bg-subtle); border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    font-size: 13.5px; line-height: 1.6; color: var(--text);
+  }
+  .decision-rule strong { color: var(--accent-hover); font-weight: 600; }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+  .sources li a { color: var(--accent-hover); text-decoration: none; border-bottom: 1px dashed var(--border-strong); }
+  .sources li a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .org-node { min-width: 104px; max-width: 144px; padding: 8px 10px; }
+    .org-node-name { font-size: 12px; }
+    .org-node-role { font-size: 11px; }
+  }
+  @media (max-width: 480px) {
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+    .step-counter { text-align: center; margin: 4px 0 0; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="builds.html"><span aria-hidden="true">&larr;</span> Builds</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep">/</span>
+      <a href="builds.html">Builds</a>
+      <span class="sep">/</span>
+      <span class="here">Hierarchical Multi-Agent</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+    </span>Recipe &middot; Hierarchical Multi-Agent
+  </span>
+  <h1 class="pattern-title">Hierarchical Multi-Agent</h1>
+  <p class="explainer">A top orchestrator delegates to team supervisors, each of whom delegates to a small crew of specialist workers. Results bubble back up the tree.</p>
+
+  <div class="default-callout" role="note" aria-label="Default in 2026">
+    <span class="default-callout-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 7v5l3 2"/>
+      </svg>
+    </span>
+    <div class="default-callout-body">
+      <div class="default-callout-label">Default in 2026 &middot; Updated June</div>
+      <div class="default-callout-text">
+        Three levels: orchestrator, then team supervisors, then specialist workers. Reach for <code>LangGraph</code> supervisor-of-supervisors or <code>CrewAI</code> hierarchical mode. Use only when the task has a natural hierarchy: coordination overhead kills simple work.
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- 01 THE IDEA -->
+<section>
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2>What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p>A <span style="color:var(--accent-hover);font-weight:500">Hierarchical Multi-Agent</span> system is a company org chart, but every box is an AI. One orchestrator at the top sees the full task. It delegates broad chunks to team supervisors. Each supervisor splits its chunk further and gives the pieces to specialist workers. Findings bubble back up: workers report to supervisors, supervisors report to the orchestrator, the orchestrator answers you.</p>
+  </div>
+  <div class="layer-badges" aria-label="Layers used by this build">
+    <a class="layer-badge" href="layer-orchestration-agents.html">
+      <span class="dot" aria-hidden="true"></span>Orchestration &amp; agents
+    </a>
+    <a class="layer-badge" href="layer-composition.html">
+      <span class="dot" aria-hidden="true"></span>Composition
+    </a>
+    <a class="layer-badge" href="layer-stateless-retrieval.html">
+      <span class="dot" aria-hidden="true"></span>Stateless Retrieval
+    </a>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section>
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2>Tap through the <em>org chart</em>.</h2>
+
+  <p class="demo-lede">Three levels. Orchestrator delegates to two team supervisors, each delegates to two or three specialists. Watch the messages route down, then results bubble back.</p>
+
+  <div class="demo-stage">
+    <!-- the question -->
+    <div class="query-bar">
+      <div class="query-label">Task (handed to the orchestrator)</div>
+      <div class="query-text">Draft the Q3 product launch plan for our new analytics dashboard.</div>
+    </div>
+
+    <!-- org chart -->
+    <div class="org-chart" id="orgChart">
+      <svg class="org-svg" id="orgSvg" preserveAspectRatio="none" aria-hidden="true"></svg>
+
+      <!-- Tier 1: Orchestrator -->
+      <div class="org-row" data-tier="1">
+        <div class="org-node" id="n-orch" data-id="orch">
+          <span class="org-node-tier">L1 &middot; Orchestrator</span>
+          <span class="org-node-name">Launch Lead</span>
+          <span class="org-node-role">owns the whole plan</span>
+        </div>
+      </div>
+
+      <!-- Tier 2: Team Supervisors -->
+      <div class="org-row" data-tier="2">
+        <div class="org-node" id="n-sup-mkt" data-id="sup-mkt">
+          <span class="org-node-tier">L2 &middot; Supervisor</span>
+          <span class="org-node-name">Marketing Lead</span>
+          <span class="org-node-role">owns awareness and demand</span>
+        </div>
+        <div class="org-node" id="n-sup-eng" data-id="sup-eng">
+          <span class="org-node-tier">L2 &middot; Supervisor</span>
+          <span class="org-node-name">Engineering Lead</span>
+          <span class="org-node-role">owns release readiness</span>
+        </div>
+      </div>
+
+      <!-- Tier 3: Specialists -->
+      <div class="org-row" data-tier="3">
+        <div class="org-node" id="n-w-copy" data-id="w-copy">
+          <span class="org-node-tier">L3 &middot; Worker</span>
+          <span class="org-node-name">Copywriter</span>
+          <span class="org-node-role">landing page + email</span>
+        </div>
+        <div class="org-node" id="n-w-paid" data-id="w-paid">
+          <span class="org-node-tier">L3 &middot; Worker</span>
+          <span class="org-node-name">Paid Media</span>
+          <span class="org-node-role">channel mix + budget</span>
+        </div>
+        <div class="org-node" id="n-w-qa" data-id="w-qa">
+          <span class="org-node-tier">L3 &middot; Worker</span>
+          <span class="org-node-name">QA Engineer</span>
+          <span class="org-node-role">release-blocker checks</span>
+        </div>
+        <div class="org-node" id="n-w-docs" data-id="w-docs">
+          <span class="org-node-tier">L3 &middot; Worker</span>
+          <span class="org-node-name">Docs Writer</span>
+          <span class="org-node-role">API + changelog</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- message rail -->
+    <div class="org-message" id="orgMsg" aria-live="polite" aria-atomic="true">
+      <span class="org-message-tag" id="orgMsgTag">Idle</span>
+      <div class="org-message-body">
+        <div class="org-message-route" id="orgMsgRoute">tap Step or Play to begin</div>
+        <div class="org-message-text" id="orgMsgText">No messages yet. The orchestrator is waiting for its first decision.</div>
+      </div>
+    </div>
+
+    <div class="demo-controls">
+      <button class="diagram-btn" id="stepBtn" type="button">&rarr; Step</button>
+      <button class="diagram-btn primary" id="playBtn" type="button">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn" type="button">&#8635; Reset</button>
+      <span class="step-counter" id="stepCounter" aria-live="polite">step 0 of 7</span>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE -->
+<section>
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2>Who <em>actually</em> runs this in production.</h2>
+  <div class="example-stage">
+    <p class="example-intro">Four teams shipping hierarchical multi-agent in 2026, with the framework receipts. Tap any row to open the source.</p>
+
+    <div class="receipt-list">
+      <a class="receipt" href="https://langchain-ai.github.io/langgraph/tutorials/multi_agent/hierarchical_agent_teams/" target="_blank" rel="noopener noreferrer">
+        <span class="receipt-stamp" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v6M12 15v6M3 12h6M15 12h6"/>
+            <circle cx="12" cy="12" r="2"/>
+          </svg>
+        </span>
+        <div class="receipt-body">
+          <div class="receipt-co">LangChain <span class="receipt-product">&middot; LangGraph Hierarchical Agent Teams</span></div>
+          <div class="receipt-quote">The canonical reference implementation. A top-level supervisor routes between two team supervisors (research team, document-writing team), and each team supervisor routes between its own workers. State graphs all the way down.</div>
+          <div class="receipt-link">langchain-ai.github.io/langgraph/tutorials/multi_agent/hierarchical_agent_teams</div>
+        </div>
+      </a>
+
+      <a class="receipt" href="https://docs.crewai.com/concepts/processes" target="_blank" rel="noopener noreferrer">
+        <span class="receipt-stamp" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="8" r="3"/>
+            <circle cx="17" cy="8" r="2.5"/>
+            <path d="M3 19c0-3 3-5 6-5s6 2 6 5"/>
+            <path d="M14 19c0-2 2-3.5 4-3.5s4 1.5 4 3.5"/>
+          </svg>
+        </span>
+        <div class="receipt-body">
+          <div class="receipt-co">CrewAI <span class="receipt-product">&middot; Hierarchical Process</span></div>
+          <div class="receipt-quote">Set <code style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--accent-hover)">process=Process.hierarchical</code> and the framework spawns an auto-generated manager agent that delegates to crew members, validates outputs, and assigns follow-up work. Used in production at agentic-finance and procurement startups.</div>
+          <div class="receipt-link">docs.crewai.com/concepts/processes</div>
+        </div>
+      </a>
+
+      <a class="receipt" href="https://microsoft.github.io/autogen/" target="_blank" rel="noopener noreferrer">
+        <span class="receipt-stamp" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="8.5" y="14" width="7" height="7" rx="1.5"/>
+            <path d="M6.5 10v2.5M17.5 10v2.5M12 12.5v1.5"/>
+          </svg>
+        </span>
+        <div class="receipt-body">
+          <div class="receipt-co">Microsoft <span class="receipt-product">&middot; AutoGen Nested Chats</span></div>
+          <div class="receipt-quote">Each outer-conversation agent can host an inner group chat with its own roster. The outer message is the brief; the inner chat is the team meeting. Composable to arbitrary depth.</div>
+          <div class="receipt-link">microsoft.github.io/autogen</div>
+        </div>
+      </a>
+
+      <a class="receipt" href="https://www.microsoft.com/en-us/research/articles/magentic-one-a-generalist-multi-agent-system-for-solving-complex-tasks/" target="_blank" rel="noopener noreferrer">
+        <span class="receipt-stamp" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2l9 4v6c0 5-3.5 9-9 10C6.5 21 3 17 3 12V6z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </span>
+        <div class="receipt-body">
+          <div class="receipt-co">Microsoft Research <span class="receipt-product">&middot; Magentic-One</span></div>
+          <div class="receipt-quote">An Orchestrator agent maintains a task-progress ledger and dispatches to four specialist workers (WebSurfer, FileSurfer, Coder, ComputerTerminal). Two-level hierarchy with re-planning loops on failure. State-of-the-art on GAIA benchmark.</div>
+          <div class="receipt-link">microsoft.com/research &middot; Magentic-One generalist multi-agent</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section>
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2>The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale"><span class="spacer"></span><div class="scale-track"><span>low</span><span>high</span></div></div>
+
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Coordination overhead</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Token cost</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Latency</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Debuggability</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Failure blast radius</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+
+    <div class="tradeoff-quote">
+      Every level adds a planning step and a merge step. Each supervisor is a fresh AI call that has to understand the brief, route to workers, and synthesise results. On simple work, you spend more on coordination than on doing the actual job.
+    </div>
+  </div>
+</section>
+
+<!-- 05 PATTERNS IT USES -->
+<section>
+  <div class="section-label"><span class="num">05</span>Patterns It Uses</div>
+  <h2>Which <em>layers</em> do the work.</h2>
+  <div class="layer-chips">
+    <a class="layer-chip" href="orchestration-hierarchical-planning.html">
+      <span class="layer-chip-name">Hierarchical planning</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">orchestrator decomposes once, supervisors decompose again, depth becomes structure</span>
+    </a>
+    <a class="layer-chip" href="orchestration-router-dispatcher.html">
+      <span class="layer-chip-name">Router / dispatcher</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">each supervisor is a router for the workers underneath it</span>
+    </a>
+    <a class="layer-chip" href="orchestration-parallel-fan-out.html">
+      <span class="layer-chip-name">Parallel fan-out</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">workers inside a team run in parallel; teams themselves run in parallel</span>
+    </a>
+    <a class="layer-chip" href="orchestration-shared-workspace.html">
+      <span class="layer-chip-name">Shared workspace</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">supervisors read team output before bubbling up to the orchestrator</span>
+    </a>
+    <a class="layer-chip" href="composition-decomposition-recomposition.html">
+      <span class="layer-chip-name">Decomposition / recomposition</span><span class="layer-chip-sep">:</span>
+      <span class="layer-chip-clause">split task into sub-tasks at each level, stitch sub-results back at each level</span>
+    </a>
+  </div>
+
+  <div class="decomposes-note">
+    <strong>Decomposes into:</strong> at Layer 5, this recipe is recursive composition. A Hierarchical Multi-Agent system is a Supervisor/Worker pattern stacked inside another Supervisor/Worker pattern, applied as many times as the task tree is deep.
+  </div>
+</section>
+
+<!-- 06 WHEN TO USE VS ALTERNATIVES -->
+<section>
+  <div class="section-label"><span class="num">06</span>When To Use</div>
+  <h2>Hierarchical, or something <em>simpler</em>?</h2>
+  <div class="decision-stage">
+    <p class="decision-intro">Pick the lightest structure that the task actually needs. Hierarchical is the heaviest, so it should win only when the task is genuinely tree-shaped.</p>
+
+    <div class="decision-row">
+      <div class="decision-cell">
+        <div class="decision-vs">vs.</div>
+        <div class="decision-name"><a href="build-customer-support-agent.html">Supervisor / Worker</a></div>
+        <div class="decision-when">One boss, a team of workers, a single merge step. Pick this when the work splits cleanly in one cut.</div>
+      </div>
+      <div class="decision-cell pick">
+        <div class="decision-vs">pick hierarchical when</div>
+        <div class="decision-name">You need <em>another layer</em></div>
+        <div class="decision-when">A single supervisor would be juggling six or more workers across two clearly different domains. Add team supervisors.</div>
+      </div>
+    </div>
+
+    <div class="decision-row">
+      <div class="decision-cell">
+        <div class="decision-vs">vs.</div>
+        <div class="decision-name"><a href="build-multi-agent-research-team.html">Multi-Agent Research Team</a></div>
+        <div class="decision-when">Lead plus parallel workers, all reading-only, all flat. Pick this for breadth-first research.</div>
+      </div>
+      <div class="decision-cell pick">
+        <div class="decision-vs">pick hierarchical when</div>
+        <div class="decision-name">You need <em>formal levels</em></div>
+        <div class="decision-when">Different teams own different deliverables, each team needs its own internal coordination. Add the management layer.</div>
+      </div>
+    </div>
+
+    <div class="decision-row">
+      <div class="decision-cell">
+        <div class="decision-vs">vs.</div>
+        <div class="decision-name"><a href="build-swarm.html">Flat Swarm</a></div>
+        <div class="decision-when">Peers hand the conversation around with no boss. Pick this when authority shifts dynamically.</div>
+      </div>
+      <div class="decision-cell pick">
+        <div class="decision-vs">pick hierarchical when</div>
+        <div class="decision-name">You need <em>top-down authority</em></div>
+        <div class="decision-when">Someone has to make the final call, override sub-team output, and own the result end-to-end. Use the tree.</div>
+      </div>
+    </div>
+
+    <div class="decision-rule">
+      <strong>The one-line rule.</strong> If you can sketch the task as a real company org chart in under 30 seconds and the boxes feel necessary, use Hierarchical. If you find yourself inventing levels to look thorough, use a simpler shape and ship faster.
+    </div>
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>LangChain (2024 onwards). <em>LangGraph: Hierarchical Agent Teams tutorial.</em> <a href="https://langchain-ai.github.io/langgraph/tutorials/multi_agent/hierarchical_agent_teams/" target="_blank" rel="noopener noreferrer">langchain-ai.github.io</a>. <span class="note">Canonical supervisor-of-supervisors implementation with state graphs.</span></li>
+    <li>CrewAI (2024 onwards). <em>Processes: Hierarchical Process.</em> <a href="https://docs.crewai.com/concepts/processes" target="_blank" rel="noopener noreferrer">docs.crewai.com</a>. <span class="note">Built-in hierarchical mode with auto-generated manager agent.</span></li>
+    <li>Microsoft (2024 onwards). <em>AutoGen documentation: Nested chats and group chat composition.</em> <a href="https://microsoft.github.io/autogen/" target="_blank" rel="noopener noreferrer">microsoft.github.io/autogen</a>. <span class="note">Conversation-based primitives for stacking teams inside teams.</span></li>
+    <li>Microsoft Research (2024). <em>Magentic-One: A Generalist Multi-Agent System for Solving Complex Tasks.</em> <a href="https://www.microsoft.com/en-us/research/articles/magentic-one-a-generalist-multi-agent-system-for-solving-complex-tasks/" target="_blank" rel="noopener noreferrer">microsoft.com/research</a>. <span class="note">Orchestrator + specialist workers with a task-progress ledger.</span></li>
+    <li>Wu et al. (2024). <em>AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation.</em> <span class="note">Foundational paper for conversation-based multi-agent composition.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ DEMO: hierarchical org chart, tap-through 7 steps ============
+// Step 0: idle
+// Step 1: orchestrator activates
+// Step 2: delegates DOWN to Marketing Lead + Engineering Lead
+// Step 3: Marketing Lead delegates to its workers (copy, paid)
+// Step 4: Engineering Lead delegates to its workers (qa, docs)
+// Step 5: workers finish, results bubble UP to supervisors
+// Step 6: supervisors merge, results bubble UP to orchestrator
+// Step 7: orchestrator publishes final plan
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+const orgChart = document.getElementById('orgChart');
+const orgSvg   = document.getElementById('orgSvg');
+
+const N = {
+  orch:    document.getElementById('n-orch'),
+  supMkt:  document.getElementById('n-sup-mkt'),
+  supEng:  document.getElementById('n-sup-eng'),
+  wCopy:   document.getElementById('n-w-copy'),
+  wPaid:   document.getElementById('n-w-paid'),
+  wQa:     document.getElementById('n-w-qa'),
+  wDocs:   document.getElementById('n-w-docs'),
+};
+const allNodes = Object.values(N);
+
+const msgTag   = document.getElementById('orgMsgTag');
+const msgRoute = document.getElementById('orgMsgRoute');
+const msgText  = document.getElementById('orgMsgText');
+
+const stepBtn  = document.getElementById('stepBtn');
+const playBtn  = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+const stepCounter = document.getElementById('stepCounter');
+
+// pairs of (parent, child) for the org tree
+const EDGES = [
+  ['orch',   'sup-mkt'],
+  ['orch',   'sup-eng'],
+  ['sup-mkt','w-copy'],
+  ['sup-mkt','w-paid'],
+  ['sup-eng','w-qa'],
+  ['sup-eng','w-docs'],
+];
+const idToEl = {
+  'orch':   N.orch,
+  'sup-mkt': N.supMkt,
+  'sup-eng': N.supEng,
+  'w-copy': N.wCopy,
+  'w-paid': N.wPaid,
+  'w-qa':   N.wQa,
+  'w-docs': N.wDocs,
+};
+
+// draw SVG connector lines between nodes
+function drawEdges() {
+  const rect = orgChart.getBoundingClientRect();
+  orgSvg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
+  orgSvg.setAttribute('width',  rect.width);
+  orgSvg.setAttribute('height', rect.height);
+  orgSvg.innerHTML = '';
+
+  EDGES.forEach(([from, to]) => {
+    const a = idToEl[from].getBoundingClientRect();
+    const b = idToEl[to].getBoundingClientRect();
+    const x1 = a.left + a.width/2  - rect.left;
+    const y1 = a.bottom            - rect.top;
+    const x2 = b.left + b.width/2  - rect.left;
+    const y2 = b.top               - rect.top;
+    const my = (y1 + y2) / 2;
+    const d  = `M ${x1} ${y1} C ${x1} ${my}, ${x2} ${my}, ${x2} ${y2}`;
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', d);
+    path.setAttribute('data-from', from);
+    path.setAttribute('data-to', to);
+    orgSvg.appendChild(path);
+  });
+}
+function findPath(from, to) {
+  return orgSvg.querySelector(`path[data-from="${from}"][data-to="${to}"]`);
+}
+
+function clearAllStates() {
+  allNodes.forEach(n => n.classList.remove('active','done','dim'));
+  Array.from(orgSvg.querySelectorAll('path')).forEach(p => p.classList.remove('active','done','bubble'));
+}
+
+// Step state machine
+let step = 0;
+const TOTAL = 7;
+
+function setMessage(tag, route, text, bubble) {
+  msgTag.textContent = tag;
+  msgTag.classList.toggle('bubble', !!bubble);
+  msgRoute.textContent = route;
+  msgText.innerHTML = text;
+}
+
+function dimOthers(active) {
+  const activeSet = new Set(active);
+  allNodes.forEach(n => {
+    const id = n.dataset.id;
+    if (!activeSet.has(id)) n.classList.add('dim');
+    else n.classList.remove('dim');
+  });
+}
+
+function applyStep(s) {
+  step = s;
+  clearAllStates();
+  stepCounter.textContent = `step ${s} of ${TOTAL}`;
+
+  if (s === 0) {
+    setMessage('Idle','tap Step or Play to begin','No messages yet. The orchestrator is waiting for its first decision.');
+    return;
+  }
+
+  if (s === 1) {
+    N.orch.classList.add('active');
+    setMessage('Plan','Launch Lead (L1)',
+      'Reads the task. Decides: this needs a marketing team for awareness and an engineering team for release readiness. Drafts a two-stream brief.');
+    return;
+  }
+
+  if (s === 2) {
+    N.orch.classList.add('done');
+    N.supMkt.classList.add('active');
+    N.supEng.classList.add('active');
+    findPath('orch','sup-mkt').classList.add('active');
+    findPath('orch','sup-eng').classList.add('active');
+    setMessage('Delegate &darr;','Launch Lead &rarr; Marketing Lead, Engineering Lead',
+      'Two briefs go down: <strong>Marketing</strong> gets "own awareness and demand for Q3", <strong>Engineering</strong> gets "own release readiness for Q3".');
+    return;
+  }
+
+  if (s === 3) {
+    N.orch.classList.add('done');
+    N.supMkt.classList.add('active');
+    N.supEng.classList.add('done');
+    findPath('orch','sup-mkt').classList.add('done');
+    findPath('orch','sup-eng').classList.add('done');
+    findPath('sup-mkt','w-copy').classList.add('active');
+    findPath('sup-mkt','w-paid').classList.add('active');
+    N.wCopy.classList.add('active');
+    N.wPaid.classList.add('active');
+    setMessage('Delegate &darr;','Marketing Lead &rarr; Copywriter, Paid Media',
+      'Marketing Lead splits its brief two ways: <strong>Copywriter</strong> gets landing page + announcement email, <strong>Paid Media</strong> gets channel mix and budget.');
+    return;
+  }
+
+  if (s === 4) {
+    N.orch.classList.add('done');
+    N.supMkt.classList.add('done');
+    N.supEng.classList.add('active');
+    findPath('orch','sup-mkt').classList.add('done');
+    findPath('orch','sup-eng').classList.add('done');
+    findPath('sup-mkt','w-copy').classList.add('done');
+    findPath('sup-mkt','w-paid').classList.add('done');
+    findPath('sup-eng','w-qa').classList.add('active');
+    findPath('sup-eng','w-docs').classList.add('active');
+    N.wCopy.classList.add('done');
+    N.wPaid.classList.add('done');
+    N.wQa.classList.add('active');
+    N.wDocs.classList.add('active');
+    setMessage('Delegate &darr;','Engineering Lead &rarr; QA, Docs',
+      'Engineering Lead splits its brief: <strong>QA</strong> gets release-blocker checklist, <strong>Docs</strong> gets API reference and changelog.');
+    return;
+  }
+
+  if (s === 5) {
+    [N.wCopy, N.wPaid, N.wQa, N.wDocs].forEach(n => n.classList.add('done'));
+    [N.orch, N.supMkt, N.supEng].forEach(n => n.classList.add('done'));
+    EDGES.forEach(([from,to]) => {
+      const p = findPath(from, to);
+      p.classList.add('done');
+      // mark the worker->supervisor direction as bubble
+      if (from.startsWith('sup-') && to.startsWith('w-')) p.classList.add('bubble');
+    });
+    setMessage('Bubble &uarr;','workers &rarr; supervisors',
+      'Each worker hands its output back up. Copywriter ships draft copy, Paid Media ships budget split, QA ships blocker list, Docs ships reference draft.', true);
+    return;
+  }
+
+  if (s === 6) {
+    [N.wCopy, N.wPaid, N.wQa, N.wDocs].forEach(n => n.classList.add('done'));
+    N.supMkt.classList.add('done');
+    N.supEng.classList.add('done');
+    N.orch.classList.add('active');
+    EDGES.forEach(([from,to]) => {
+      const p = findPath(from, to);
+      p.classList.add('done');
+      if (from === 'orch') p.classList.add('bubble');
+      if (from.startsWith('sup-') && to.startsWith('w-')) p.classList.add('done');
+    });
+    setMessage('Bubble &uarr;','supervisors &rarr; orchestrator',
+      'Each supervisor merges its team output into a section. <strong>Marketing</strong> hands up a go-to-market sub-plan, <strong>Engineering</strong> hands up a release-readiness sub-plan.', true);
+    return;
+  }
+
+  if (s === 7) {
+    allNodes.forEach(n => n.classList.add('done'));
+    Array.from(orgSvg.querySelectorAll('path')).forEach(p => p.classList.add('done'));
+    setMessage('Publish','Launch Lead (L1) &rarr; you',
+      'Orchestrator stitches the two sub-plans into one Q3 launch plan with owners, dates, and budget. Hands it back to you as a single document.', true);
+    return;
+  }
+}
+
+stepBtn.addEventListener('click', () => {
+  if (step >= TOTAL) { applyStep(0); return; }
+  applyStep(step + 1);
+});
+playBtn.addEventListener('click', async () => {
+  playBtn.disabled = true; stepBtn.disabled = true;
+  applyStep(0);
+  const delay = reduceMotion ? 0 : 1100;
+  for (let i = 1; i <= TOTAL; i++) {
+    await sleep(delay);
+    applyStep(i);
+  }
+  playBtn.disabled = false; stepBtn.disabled = false;
+});
+resetBtn.addEventListener('click', () => applyStep(0));
+
+// initial draw + redraw on resize
+function redraw() {
+  drawEdges();
+  applyStep(step);
+}
+window.addEventListener('load', () => { drawEdges(); applyStep(0); });
+window.addEventListener('resize', () => { drawEdges(); applyStep(step); });
+
+// kick once in case load already fired
+drawEdges();
+applyStep(0);
+</script>
+</body>
+</html>

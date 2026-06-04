@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic RAG · The Pattern Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#FCFCFD; --surface:#FFFFFF; --text:#15171C; --soft:#565C68; --faint:#6B7280;
+    --border:#E8EAEE; --border-strong:#D5D9E0;
+    --accent:#7C5CF6; --accent-hover:#6D4DE6; --accent-soft:#F0ECFE;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 26px rgba(16,24,40,.06);
+    --radius:16px;
+    --bg-subtle:#F6F7F9; --radius-sm:11px;
+    --success:#0E9F6E; --success-soft:#E7F7F0;
+    --warn:#B45309; --warn-soft:#FEF3C7; --warn-border:#FCD34D;
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.04),0 1px 3px rgba(16,24,40,0.05);
+    --shadow-lg:0 10px 40px rgba(16,24,40,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-padding-top: 80px; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { min-height: 100vh; }
+
+  /* a11y */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .skip-link { position: absolute; left: 8px; top: -48px; z-index: 300; background: var(--surface); color: var(--accent-hover); border: 1px solid var(--accent); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; text-decoration: none; transition: top .15s ease; }
+  .skip-link:focus { top: 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(252,252,253,.86);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner { max-width: 920px; margin: 0 auto; padding: 11px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--text);
+    text-decoration: none; padding: 5px 11px;
+    border: 1px solid var(--border-strong); border-radius: 20px;
+    background: #fff;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .back:hover { border-color: var(--accent); color: var(--accent-hover); background: var(--accent-soft); }
+  .crumb { font-size: 12.5px; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .crumb a { color: var(--faint); text-decoration: none; }
+  .crumb a:hover { color: var(--accent); }
+  .crumb .sep { margin: 0 7px; color: var(--border-strong); }
+  .crumb .here { color: var(--soft); }
+
+  /* header */
+  .header { max-width: 920px; margin: 0 auto; padding: 40px 24px 8px; scroll-margin-top: 80px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent-hover); background: var(--accent-soft);
+    border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px;
+  }
+  .eyebrow .ico { width: 15px; height: 15px; display: block; color: var(--accent); }
+  .eyebrow .ico svg { width: 15px; height: 15px; display: block; }
+  h1.pattern-title {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 38px;
+    line-height: 1.08; letter-spacing: -0.015em; margin: 16px 0 0;
+  }
+  .explainer { color: var(--soft); font-size: 16px; line-height: 1.6; max-width: 660px; margin-top: 14px; }
+
+  /* sections */
+  section { max-width: 920px; margin: 0 auto; padding: 18px 24px 34px; position: relative; scroll-margin-top: 80px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 9px; }
+  .section-label .num { color: var(--accent); font-weight: 600; margin-right: 7px; }
+  h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 23px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 14px; }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* idea card */
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 28px;
+  }
+  .idea-card p { font-family: 'Fraunces', serif; font-weight: 400; font-size: 18px; line-height: 1.6; color: var(--text); }
+
+  /* default-in-2026 callout */
+  .default-callout {
+    margin-top: 14px;
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 15px; line-height: 1.6; color: var(--text);
+  }
+  .default-callout .default-label {
+    display: block; font-family: 'Inter', sans-serif; font-style: normal;
+    font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--accent-hover); margin-bottom: 4px;
+  }
+
+  /* layer badges */
+  .layer-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .layer-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 12px; text-decoration: none;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .layer-badge:hover { border-color: var(--accent); background: #e4dcfe; }
+  .layer-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ============ DEMO: iterative retrieval rounds ============ */
+  .demo-lede { font-size: 15px; color: var(--soft); line-height: 1.6; max-width: 640px; margin-bottom: 18px; }
+  .demo-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+
+  /* query bar */
+  .query-bar {
+    background: var(--bg-subtle); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 18px;
+  }
+  .query-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .query-text { font-family: 'Fraunces', serif; font-weight: 500; font-size: 17px; color: var(--text); line-height: 1.3; }
+
+  /* rounds */
+  .rounds { display: flex; flex-direction: column; gap: 14px; }
+  .round {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    overflow: hidden; opacity: 0; transform: translateY(6px);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .round.visible { opacity: 1; transform: translateY(0); }
+
+  .round-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; background: var(--bg-subtle); border-bottom: 1px solid var(--border);
+  }
+  .round-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .round.active .round-head { background: var(--accent-soft); border-bottom-color: var(--accent); }
+  .round-title { font-weight: 600; font-size: 14px; color: var(--text); }
+  .round-status {
+    margin-left: auto; font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    color: var(--faint); text-transform: uppercase;
+  }
+  .round.active .round-status { color: var(--accent); }
+  .round.done .round-status { color: var(--success); }
+  .round.done .round-head { background: var(--success-soft); border-bottom-color: #b2e4d5; }
+  .round.done .round-num { background: var(--success); }
+  .round.final.done .round-head { background: var(--success-soft); }
+
+  .round-body { padding: 12px 14px; min-height: 48px; display: flex; flex-direction: column; gap: 10px; }
+
+  /* search query echo */
+  .query-echo {
+    font-size: 12px; font-family: monospace; color: var(--soft);
+    background: var(--bg); padding: 6px 10px; border-radius: 6px;
+    border: 1px solid var(--border);
+    display: none;
+  }
+  .query-echo .qe-label {
+    font-family: 'Inter', sans-serif; font-weight: 700; color: var(--accent-hover);
+    margin-right: 6px; font-size: 11px; letter-spacing: .04em; text-transform: uppercase;
+  }
+
+  /* retrieved doc cards */
+  .docs { display: flex; flex-direction: column; gap: 6px; }
+  .doc-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface);
+    font-size: 13px; color: var(--soft);
+    opacity: 0; transform: translateX(-8px);
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .doc-card.in { opacity: 1; transform: translateX(0); }
+  .doc-card.kept { border-color: var(--success); background: var(--success-soft); color: var(--text); }
+  .doc-card.dropped { opacity: 0.5; text-decoration: line-through; }
+  .doc-src { font-weight: 600; font-size: 11px; color: var(--faint); min-width: 78px; letter-spacing: .03em; text-transform: uppercase; }
+  .doc-card.kept .doc-src { color: var(--success); }
+  .doc-snippet { flex: 1; min-width: 0; }
+  .doc-check { flex-shrink: 0; font-size: 14px; color: var(--success); opacity: 0; transition: opacity .3s ease; }
+  .doc-card.kept .doc-check { opacity: 1; }
+
+  /* self-check verdict */
+  .verdict {
+    display: none;
+    align-items: flex-start; gap: 10px;
+    background: var(--bg); padding: 10px 12px; border-radius: 8px;
+    border-left: 3px solid var(--accent);
+  }
+  .verdict.visible { display: flex; }
+  .verdict.ok { border-left-color: var(--success); background: var(--success-soft); }
+  .verdict-ico {
+    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent-hover);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .verdict.ok .verdict-ico { background: #b2e4d5; color: var(--success); }
+  .verdict-body { font-size: 13px; line-height: 1.55; color: var(--text); }
+  .verdict-body strong { color: var(--accent-hover); font-weight: 700; }
+  .verdict.ok .verdict-body strong { color: var(--success); }
+
+  /* final answer block */
+  .answer-block {
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+    font-size: 14px; line-height: 1.7; color: var(--text);
+    opacity: 0; transition: opacity .5s ease;
+    min-height: 60px;
+  }
+  .answer-block.visible { opacity: 1; }
+  .answer-block .cite { font-size: 12px; color: var(--faint); border-top: 1px solid var(--border); margin-top: 10px; padding-top: 8px; }
+
+  /* controls */
+  .demo-controls {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border);
+  }
+  .diagram-btn {
+    padding: 10px 16px; border: 1px solid var(--border-strong);
+    background: var(--surface); border-radius: var(--radius-sm);
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .diagram-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--accent); }
+  .diagram-btn:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+  .diagram-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .diagram-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* ============ PRODUCTION RECEIPTS ============ */
+  .receipts-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .receipts-intro { font-size: 14px; color: var(--soft); margin-bottom: 16px; line-height: 1.6; }
+  .receipts-list { display: flex; flex-direction: column; gap: 10px; }
+  .receipt {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 16px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); background: var(--bg-subtle);
+    text-decoration: none; color: var(--text);
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
+  }
+  .receipt:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+  .receipt-mark {
+    flex-shrink: 0; width: 36px; height: 36px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 15px;
+    color: var(--accent-hover);
+  }
+  .receipt-body { flex: 1; min-width: 0; }
+  .receipt-name {
+    font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 3px;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .receipt-host {
+    font-size: 11px; font-weight: 600; color: var(--faint);
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 1px 7px; border-radius: 20px; letter-spacing: .02em;
+  }
+  .receipt:hover .receipt-host { color: var(--accent-hover); border-color: var(--accent); }
+  .receipt-desc { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .receipt-arrow { flex-shrink: 0; color: var(--faint); transition: transform .2s ease, color .2s ease; font-size: 14px; }
+  .receipt:hover .receipt-arrow { color: var(--accent); transform: translateX(2px); }
+
+  /* ============ TRADEOFFS ============ */
+  .tradeoffs-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .tradeoff-scale { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+  .tradeoff-scale .spacer { width: 170px; flex: none; }
+  .scale-track { flex: 1; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+  .tradeoff-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .tradeoff-row:last-of-type { margin-bottom: 0; }
+  .tradeoff-label { font-size: 14px; font-weight: 500; color: var(--soft); width: 170px; flex: none; }
+  .tradeoff-bars { flex: 1; display: flex; gap: 5px; }
+  .tradeoff-bars .seg { flex: 1; height: 22px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 5px; }
+  .tradeoff-bars .seg.on { background: var(--accent); border-color: var(--accent); }
+  .tradeoff-quote { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 15px; line-height: 1.6; color: var(--soft); }
+
+  /* ============ DECOMPOSES-INTO CHIPS ============ */
+  .decomp-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px;
+  }
+  .decomp-intro { font-size: 13px; color: var(--soft); margin-bottom: 14px; line-height: 1.6; }
+  .decomp-grid { display: flex; flex-direction: column; gap: 8px; }
+  .decomp-chip {
+    display: flex; align-items: baseline; gap: 8px;
+    padding: 11px 14px; background: var(--bg-subtle);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    text-decoration: none; color: var(--text);
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
+    line-height: 1.4;
+  }
+  .decomp-chip:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateX(2px); }
+  .decomp-tier {
+    flex-shrink: 0; font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 14px; color: var(--accent-hover);
+    background: var(--accent-soft); border: 1px solid var(--border);
+    padding: 2px 9px; border-radius: 6px; min-width: 34px; text-align: center;
+  }
+  .decomp-chip:hover .decomp-tier { background: var(--surface); border-color: var(--accent); }
+  .decomp-name { font-weight: 600; font-size: 13.5px; color: var(--text); }
+  .decomp-clause { font-size: 13px; color: var(--soft); }
+
+  /* ============ DECISION LOGIC: vs alternatives ============ */
+  .decision-stage {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .decision-row {
+    display: flex; align-items: stretch; padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+  }
+  .decision-row:last-child { border-bottom: none; }
+  .decision-row:hover { background: var(--bg-subtle); }
+  .decision-vs {
+    flex-shrink: 0; width: 200px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .decision-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--faint);
+  }
+  .decision-alt {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 16px;
+    color: var(--text); line-height: 1.25;
+  }
+  .decision-rule { flex: 1; min-width: 0; font-size: 14px; line-height: 1.6; color: var(--soft); }
+  .decision-rule strong { color: var(--accent-hover); font-weight: 600; }
+  @media (max-width: 560px) {
+    .decision-row { flex-direction: column; gap: 6px; }
+    .decision-vs { width: 100%; }
+  }
+
+  /* back link */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 14px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); text-decoration: none; color: var(--text);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; cursor: pointer;
+  }
+  .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .back-arrow { font-family: 'Fraunces', serif; font-size: 22px; color: var(--accent); line-height: 1; transition: transform .2s ease; }
+  .back-link:hover .back-arrow { transform: translateX(-3px); }
+  .back-hint { font-size: 13px; font-weight: 500; color: var(--faint); margin-bottom: 3px; }
+  .back-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; line-height: 1; letter-spacing: -0.01em; }
+
+  /* sources */
+  .sources { max-width: 920px; margin: 0 auto; padding: 28px 24px 0; }
+  .sources .sources-title { font-size: 13px; font-weight: 500; color: var(--faint); padding-top: 24px; border-top: 1px solid var(--border); margin-bottom: 12px; }
+  .sources ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .sources li { font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .sources li em { font-style: italic; color: var(--text); }
+  .sources li .note { color: var(--faint); }
+
+  /* footer */
+  footer { max-width: 920px; margin: 30px auto 48px; padding: 16px 24px 0; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--faint); line-height: 1.8; }
+  footer strong { color: var(--soft); font-weight: 500; }
+
+  /* responsive */
+  @media (max-width: 560px) {
+    h1.pattern-title { font-size: 30px; }
+    .explainer { font-size: 15px; }
+    h2 { font-size: 21px; }
+    .tradeoff-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    .tradeoff-label { min-width: 0; }
+  }
+  @media (max-width: 480px) {
+    .demo-controls { flex-direction: column; align-items: stretch; }
+    .diagram-btn { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- TOP BAR -->
+<nav class="topbar" aria-label="Site navigation">
+  <div class="topbar-inner">
+    <a class="back" href="builds.html"><span aria-hidden="true">&larr;</span> Builds</a>
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="../index.html">The Pattern Book</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a href="builds.html">Builds</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <span class="here" aria-current="page">Agentic RAG</span>
+    </nav>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" id="main" tabindex="-1">
+  <span class="eyebrow">
+    <span class="ico" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="1 4 1 10 7 10"/>
+        <path d="M3.51 15a9 9 0 1 0 .49-3.51"/>
+      </svg>
+    </span>Recipe &middot; Agentic RAG
+  </span>
+  <h1 class="pattern-title">Agentic RAG</h1>
+  <p class="explainer">RAG that keeps retrieving until it has enough, instead of answering off a single search.</p>
+</header>
+
+<!-- 01 THE IDEA -->
+<section aria-labelledby="idea-heading">
+  <div class="section-label"><span class="num">01</span>The Idea</div>
+  <h2 id="idea-heading">What <em>is</em> it?</h2>
+  <div class="idea-card">
+    <p><span style="color:var(--accent-hover);font-weight:500">Agentic RAG</span> retrieves, checks if it has enough, and retrieves again until it does, then answers.</p>
+  </div>
+
+  <div class="default-callout" role="note">
+    <span class="default-label">Default in 2026</span>
+    Claude with tool use + Pinecone hybrid retrieval + LangGraph iterative loop. Max 3 retrieval rounds. Skip Agentic RAG (use plain RAG) when queries answer in one pass.
+  </div>
+
+  <div class="layer-badges" aria-label="Layers used by this build">
+    <a class="layer-badge" href="layer-stateless-retrieval.html">
+      <span class="dot" aria-hidden="true"></span>Stateless Retrieval
+    </a>
+    <a class="layer-badge" href="layer-orchestration-agents.html">
+      <span class="dot" aria-hidden="true"></span>Orchestration &amp; agents
+    </a>
+    <a class="layer-badge" href="layer-single-call-control.html">
+      <span class="dot" aria-hidden="true"></span>Single-call control
+    </a>
+  </div>
+</section>
+
+<!-- 02 SEE IT WORK -->
+<section aria-labelledby="demo-heading">
+  <div class="section-label"><span class="num">02</span>See It Work</div>
+  <h2 id="demo-heading">Watch it <em>keep going</em>.</h2>
+
+  <p class="demo-lede">Three retrieval rounds. After each one the model asks itself "do I have enough yet?" Tap "Step" to walk through, or "Play" to watch it run.</p>
+
+  <div class="demo-stage">
+    <!-- the question -->
+    <div class="query-bar">
+      <div class="query-label">Question</div>
+      <div class="query-text">Did Pfizer's Q3 2024 vaccine revenue beat or miss analyst expectations, and what was the reason?</div>
+    </div>
+
+    <div class="rounds" aria-live="polite" aria-atomic="false">
+
+      <!-- Round 1: broad retrieval -->
+      <div class="round" id="round1">
+        <div class="round-head">
+          <span class="round-num" aria-hidden="true">1</span>
+          <span class="round-title">Round 1: broad retrieval</span>
+          <span class="round-status" id="status1">waiting</span>
+        </div>
+        <div class="round-body">
+          <div class="query-echo" id="qe1">
+            <span class="qe-label">query</span>"Pfizer Q3 2024 vaccine revenue"
+          </div>
+          <div class="docs" id="docs1">
+            <div class="doc-card" id="d1a">
+              <span class="doc-src">10-Q filing</span>
+              <span class="doc-snippet">Q3 2024 total revenue: $17.7B; up 31% YoY.</span>
+              <span class="doc-check" aria-label="kept">&#10003;</span>
+            </div>
+            <div class="doc-card" id="d1b">
+              <span class="doc-src">Reuters</span>
+              <span class="doc-snippet">Pfizer Q3 earnings call: CEO discusses cost cuts.</span>
+              <span class="doc-check" aria-label="kept">&#10003;</span>
+            </div>
+            <div class="doc-card" id="d1c">
+              <span class="doc-src">Press release</span>
+              <span class="doc-snippet">Pfizer announces new oncology pipeline updates.</span>
+              <span class="doc-check" aria-label="kept">&#10003;</span>
+            </div>
+          </div>
+          <div class="verdict" id="v1">
+            <span class="verdict-ico" aria-hidden="true">?</span>
+            <div class="verdict-body">
+              <strong>Self-check:</strong> I have total revenue but not the vaccine line item, and no analyst consensus number. <strong>Retrieve again.</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Round 2: more specific -->
+      <div class="round" id="round2">
+        <div class="round-head">
+          <span class="round-num" aria-hidden="true">2</span>
+          <span class="round-title">Round 2: targeted retrieval</span>
+          <span class="round-status" id="status2">waiting</span>
+        </div>
+        <div class="round-body">
+          <div class="query-echo" id="qe2">
+            <span class="qe-label">query</span>"Pfizer Comirnaty Paxlovid Q3 2024 revenue analyst consensus"
+          </div>
+          <div class="docs" id="docs2">
+            <div class="doc-card" id="d2a">
+              <span class="doc-src">10-Q filing</span>
+              <span class="doc-snippet">Comirnaty Q3 2024 revenue: $1.42B; Paxlovid: $2.7B.</span>
+              <span class="doc-check" aria-label="kept">&#10003;</span>
+            </div>
+            <div class="doc-card" id="d2b">
+              <span class="doc-src">Refinitiv</span>
+              <span class="doc-snippet">Analyst consensus pre-earnings: Comirnaty $1.08B; Paxlovid $2.27B.</span>
+              <span class="doc-check" aria-label="kept">&#10003;</span>
+            </div>
+            <div class="doc-card" id="d2c">
+              <span class="doc-src">Earnings call</span>
+              <span class="doc-snippet">CEO: "stronger US fall vaccination season than expected."</span>
+              <span class="doc-check" aria-label="kept">&#10003;</span>
+            </div>
+          </div>
+          <div class="verdict" id="v2">
+            <span class="verdict-ico" aria-hidden="true">?</span>
+            <div class="verdict-body">
+              <strong>Self-check:</strong> I have the numbers and a reason quote. One more pass to verify the consensus source. <strong>Retrieve once more.</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Round 3: verify -->
+      <div class="round" id="round3">
+        <div class="round-head">
+          <span class="round-num" aria-hidden="true">3</span>
+          <span class="round-title">Round 3: verify consensus number</span>
+          <span class="round-status" id="status3">waiting</span>
+        </div>
+        <div class="round-body">
+          <div class="query-echo" id="qe3">
+            <span class="qe-label">query</span>"Pfizer Q3 2024 Comirnaty consensus Visible Alpha"
+          </div>
+          <div class="docs" id="docs3">
+            <div class="doc-card" id="d3a">
+              <span class="doc-src">Visible Alpha</span>
+              <span class="doc-snippet">Confirms Comirnaty consensus $1.08B; Paxlovid $2.27B. Beat by 31% and 19% respectively.</span>
+              <span class="doc-check" aria-label="kept">&#10003;</span>
+            </div>
+            <div class="doc-card" id="d3b">
+              <span class="doc-src">Bloomberg</span>
+              <span class="doc-snippet">Headline: "Pfizer tops Q3 estimates on stronger vaccine, antiviral demand."</span>
+              <span class="doc-check" aria-label="kept">&#10003;</span>
+            </div>
+          </div>
+          <div class="verdict ok" id="v3">
+            <span class="verdict-ico" aria-hidden="true">&#10003;</span>
+            <div class="verdict-body">
+              <strong>Self-check:</strong> Two independent sources confirm the consensus and the beat. <strong>Ready to answer.</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Final answer -->
+      <div class="round final" id="round-answer">
+        <div class="round-head">
+          <span class="round-num" aria-hidden="true">&#10003;</span>
+          <span class="round-title">Answer</span>
+          <span class="round-status" id="status-answer">waiting</span>
+        </div>
+        <div class="round-body">
+          <div class="answer-block" id="answer-block">
+            Pfizer's Q3 2024 vaccine and antiviral revenue beat consensus. Comirnaty came in at $1.42B versus $1.08B expected (+31%); Paxlovid at $2.7B versus $2.27B expected (+19%). Management attributed the beat to a stronger US fall vaccination season than analysts had modelled.
+            <div class="cite">Sources: Pfizer Q3 2024 10-Q, Visible Alpha consensus, Pfizer earnings call transcript, Bloomberg coverage</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="demo-controls">
+      <button class="diagram-btn" id="stepBtn">&rarr; Step</button>
+      <button class="diagram-btn primary" id="playBtn">&#9654; Play</button>
+      <button class="diagram-btn" id="resetBtn">&#8635; Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- 03 A REAL EXAMPLE -->
+<section aria-labelledby="receipts-heading">
+  <div class="section-label"><span class="num">03</span>A Real Example</div>
+  <h2 id="receipts-heading">Where it <em>actually runs</em>.</h2>
+  <div class="receipts-stage">
+    <p class="receipts-intro">Four production systems that decide for themselves when one search is not enough and go again.</p>
+    <div class="receipts-list">
+
+      <a class="receipt" href="https://www.perplexity.ai" target="_blank" rel="noopener">
+        <span class="receipt-mark" aria-hidden="true">P</span>
+        <div class="receipt-body">
+          <div class="receipt-name">Perplexity Live Agentic Search <span class="receipt-host">perplexity.ai</span></div>
+          <div class="receipt-desc">Every paid query runs multiple retrieval rounds, each conditioned on what the model still does not know after the previous one.</div>
+        </div>
+        <span class="receipt-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+
+      <a class="receipt" href="https://you.com" target="_blank" rel="noopener">
+        <span class="receipt-mark" aria-hidden="true">Y</span>
+        <div class="receipt-body">
+          <div class="receipt-name">You.com Smart Mode <span class="receipt-host">you.com</span></div>
+          <div class="receipt-desc">Smart mode loops retrieval and lets the model judge sufficiency before answering, with a visible step trace per query.</div>
+        </div>
+        <span class="receipt-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+
+      <a class="receipt" href="https://docs.anthropic.com/en/docs/build-with-claude/tool-use/web-search-tool" target="_blank" rel="noopener">
+        <span class="receipt-mark" aria-hidden="true">A</span>
+        <div class="receipt-body">
+          <div class="receipt-name">Anthropic Claude web_search tool <span class="receipt-host">docs.anthropic.com</span></div>
+          <div class="receipt-desc">Claude can call web_search multiple times in one turn, refining queries based on results until it judges the context sufficient.</div>
+        </div>
+        <span class="receipt-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+
+      <a class="receipt" href="https://python.langchain.com/docs/tutorials/local_rag/" target="_blank" rel="noopener">
+        <span class="receipt-mark" aria-hidden="true">L</span>
+        <div class="receipt-body">
+          <div class="receipt-name">LangChain Self-RAG cookbook <span class="receipt-host">langchain.com</span></div>
+          <div class="receipt-desc">Reference implementation of Self-RAG: retrieve, grade documents, decide to retrieve again or answer, with LangGraph state machine.</div>
+        </div>
+        <span class="receipt-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- 04 TRADEOFFS -->
+<section aria-labelledby="tradeoffs-heading">
+  <div class="section-label"><span class="num">04</span>Tradeoffs</div>
+  <h2 id="tradeoffs-heading">The <em>price</em> you pay.</h2>
+  <div class="tradeoffs-stage">
+    <div class="tradeoff-scale">
+      <span class="spacer"></span>
+      <div class="scale-track"><span>low</span><span>high</span></div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Accuracy on hard queries</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Wait time</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Cost per query</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-row">
+      <div class="tradeoff-label">Complexity to operate</div>
+      <div class="tradeoff-bars">
+        <div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+    </div>
+    <div class="tradeoff-quote">
+      Every extra round is another retrieval call and another model call. Worth it on questions where plain RAG returns half an answer. Wasteful on questions one search already covers.
+    </div>
+  </div>
+</section>
+
+<!-- 05 PATTERNS IT USES -->
+<section aria-labelledby="decomp-heading">
+  <div class="section-label"><span class="num">05</span>Patterns It Uses</div>
+  <h2 id="decomp-heading">The <em>pieces</em> inside.</h2>
+  <div class="decomp-stage">
+    <p class="decomp-intro">Agentic RAG decomposes into four mechanisms working together.</p>
+    <div class="decomp-grid">
+
+      <a class="decomp-chip" href="layer-stateless-retrieval.html">
+        <span class="decomp-tier" aria-hidden="true">L3a</span>
+        <div>
+          <span class="decomp-name">Retrieval</span>
+          <span class="decomp-clause"> &middot; hybrid dense + sparse search runs each round, scoped by the model's new query</span>
+        </div>
+      </a>
+
+      <a class="decomp-chip" href="single-call-chain-of-verification.html">
+        <span class="decomp-tier" aria-hidden="true">L4</span>
+        <div>
+          <span class="decomp-name">Self-Verification</span>
+          <span class="decomp-clause"> &middot; the model judges whether retrieved context is enough before it answers</span>
+        </div>
+      </a>
+
+      <a class="decomp-chip" href="orchestration-iterative-loops.html">
+        <span class="decomp-tier" aria-hidden="true">L5</span>
+        <div>
+          <span class="decomp-name">Iterative loops</span>
+          <span class="decomp-clause"> &middot; bounded retrieve-judge-retrieve cycle with a hard round limit</span>
+        </div>
+      </a>
+
+      <a class="decomp-chip" href="orchestration-action.html">
+        <span class="decomp-tier" aria-hidden="true">L5</span>
+        <div>
+          <span class="decomp-name">Action</span>
+          <span class="decomp-clause"> &middot; each retrieval is a tool call the model chose to make, not a fixed pipeline step</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- 06 WHEN TO USE VS ALTERNATIVES -->
+<section aria-labelledby="decision-heading">
+  <div class="section-label"><span class="num">06</span>When to use vs alternatives</div>
+  <h2 id="decision-heading">When this <em>vs that</em>.</h2>
+  <div class="decision-stage">
+
+    <div class="decision-row">
+      <div class="decision-vs">
+        <span class="decision-label">vs</span>
+        <span class="decision-alt">Plain RAG</span>
+      </div>
+      <div class="decision-rule">
+        Use <strong>plain RAG</strong> when one retrieval pass is enough (single-fact lookup, narrow corpus, well-formed queries). Reach for <strong>Agentic RAG</strong> only when the first pass routinely returns half an answer.
+      </div>
+    </div>
+
+    <div class="decision-row">
+      <div class="decision-vs">
+        <span class="decision-label">vs</span>
+        <span class="decision-alt">Tool-using Agent</span>
+      </div>
+      <div class="decision-rule">
+        Use a <strong>Tool-using Agent</strong> when the loop is about acting on the world (running code, calling APIs, writing files). Pick <strong>Agentic RAG</strong> when the loop is specifically about reading: more searches, better queries, no side effects.
+      </div>
+    </div>
+
+    <div class="decision-row">
+      <div class="decision-vs">
+        <span class="decision-label">vs</span>
+        <span class="decision-alt">Deep Research</span>
+      </div>
+      <div class="decision-rule">
+        Use <strong>Deep Research</strong> when the output is a long cited report and you can wait minutes. Pick <strong>Agentic RAG</strong> when the output is a final answer in seconds, sharp and grounded.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- BACK NAV -->
+<section style="padding-top: 20px; padding-bottom: 40px;" aria-label="Navigation">
+  <a href="builds.html" class="back-link">
+    <div class="back-arrow" aria-hidden="true">&larr;</div>
+    <div class="back-text">
+      <div class="back-hint">Back to</div>
+      <div class="back-name">Builds</div>
+    </div>
+  </a>
+</section>
+
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-title">Sources</div>
+  <ul>
+    <li>Asai et al. (2023). <em>Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection.</em> <span class="note">The canonical paper for the retrieve-grade-decide loop.</span></li>
+    <li>Anthropic (2024). <em>Tool use with Claude: web_search tool documentation.</em> <span class="note">Production reference for multi-round retrieval inside one model turn.</span></li>
+    <li>Yao et al. (2023). <em>ReAct: Synergizing Reasoning and Acting in Language Models.</em> <span class="note">Foundational interleaving of reasoning and tool calls that agentic RAG inherits.</span></li>
+    <li>LangChain (2024). <em>Self-RAG and Corrective-RAG cookbook.</em> <span class="note">Production reference implementation with LangGraph state machine.</span></li>
+    <li>Perplexity AI (2025). <em>How Perplexity answers questions.</em> <span class="note">Live agentic-search system serving millions of queries per day.</span></li>
+  </ul>
+</div>
+
+<footer>
+  <strong>The Pattern Book</strong> &nbsp;&middot;&nbsp; An interactive reference for the patterns behind modern AI systems.
+</footer>
+
+<script>
+// ============ DEMO ANIMATION ============
+// Three retrieval rounds + final answer. Step: one phase per tap. Play: auto-run.
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+const rounds = [1, 2, 3, 'answer'].map(id => document.getElementById('round' + id));
+const statuses = [1, 2, 3, 'answer'].map(id => document.getElementById('status' + id));
+const qeElems = [1, 2, 3].map(id => document.getElementById('qe' + id));
+const verdicts = [1, 2, 3].map(id => document.getElementById('v' + id));
+const answerBlock = document.getElementById('answer-block');
+
+const docGroups = [
+  ['d1a', 'd1b', 'd1c'].map(id => document.getElementById(id)),
+  ['d2a', 'd2b', 'd2c'].map(id => document.getElementById(id)),
+  ['d3a', 'd3b'].map(id => document.getElementById(id)),
+];
+
+const stepBtn  = document.getElementById('stepBtn');
+const playBtn  = document.getElementById('playBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+let demoStep = -1;
+let running = false;
+
+function resetDemo() {
+  demoStep = -1; running = false;
+  rounds.forEach(el => el.classList.remove('visible', 'active', 'done'));
+  statuses.forEach(el => { el.textContent = 'waiting'; });
+  qeElems.forEach(el => { el.style.display = 'none'; });
+  verdicts.forEach(el => el.classList.remove('visible'));
+  docGroups.flat().forEach(c => c.classList.remove('in', 'kept'));
+  answerBlock.classList.remove('visible');
+}
+
+async function runRound(idx, animate) {
+  const r = rounds[idx];
+  const st = statuses[idx];
+  r.classList.add('visible', 'active');
+  st.textContent = 'retrieving...';
+  if (animate) await sleep(reduceMotion ? 0 : 350);
+
+  // show query echo
+  qeElems[idx].style.display = 'block';
+  if (animate) await sleep(reduceMotion ? 0 : 350);
+
+  // fan in docs
+  const docs = docGroups[idx];
+  for (let i = 0; i < docs.length; i++) {
+    docs[i].classList.add('in');
+    if (animate) await sleep(reduceMotion ? 0 : 200);
+  }
+  if (animate) await sleep(reduceMotion ? 0 : 250);
+
+  // mark all kept
+  for (let i = 0; i < docs.length; i++) {
+    docs[i].classList.add('kept');
+    if (animate) await sleep(reduceMotion ? 0 : 120);
+  }
+
+  if (animate) await sleep(reduceMotion ? 0 : 300);
+  st.textContent = 'checking...';
+
+  // verdict appears
+  verdicts[idx].classList.add('visible');
+  if (animate) await sleep(reduceMotion ? 0 : 600);
+
+  r.classList.remove('active');
+  r.classList.add('done');
+  st.textContent = 'done';
+}
+
+async function runAnswer(animate) {
+  const r = rounds[3];
+  const st = statuses[3];
+  r.classList.add('visible', 'active');
+  st.textContent = 'writing...';
+  if (animate) await sleep(reduceMotion ? 0 : 500);
+  answerBlock.classList.add('visible');
+  if (animate) await sleep(reduceMotion ? 0 : 300);
+  r.classList.remove('active');
+  r.classList.add('done');
+  st.textContent = 'done';
+}
+
+stepBtn.addEventListener('click', async () => {
+  if (running) return;
+  if (demoStep >= 3) { resetDemo(); return; }
+  running = true;
+  stepBtn.disabled = true; playBtn.disabled = true;
+  demoStep++;
+  if (demoStep < 3) await runRound(demoStep, true);
+  else await runAnswer(true);
+  running = false;
+  stepBtn.disabled = false; playBtn.disabled = false;
+});
+
+playBtn.addEventListener('click', async () => {
+  if (running) return;
+  resetDemo();
+  running = true;
+  playBtn.disabled = true; stepBtn.disabled = true;
+  await sleep(reduceMotion ? 0 : 200);
+  for (let i = 0; i < 3; i++) {
+    await runRound(i, !reduceMotion);
+    await sleep(reduceMotion ? 0 : 350);
+  }
+  await runAnswer(!reduceMotion);
+  demoStep = 3;
+  running = false;
+  playBtn.disabled = false; stepBtn.disabled = false;
+});
+
+resetBtn.addEventListener('click', () => {
+  if (running) return;
+  resetDemo();
+});
+
+// Reduced motion: reveal immediately
+if (reduceMotion) {
+  (async () => {
+    for (let i = 0; i < 3; i++) await runRound(i, false);
+    await runAnswer(false);
+    demoStep = 3;
+  })();
+}
+</script>
+</body>
+</html>
